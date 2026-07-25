@@ -1,0 +1,49 @@
+{
+  "schema_version": "standalone-fixture-v1",
+  "objects": [
+    {
+      "object_id": "resolve_target_reference",
+      "ab_level": 0,
+      "kind": "effect_primitive",
+      "category": "grounding",
+      "owner_package": "scene_grounding",
+      "expected_effects": ["target reference resolved"],
+      "observable_success": ["canonical target id returned"],
+      "decomposes_to": [],
+      "metadata": {"runtime_callable": false}
+    },
+    {
+      "object_id": "find_object",
+      "ab_level": 1,
+      "kind": "skill",
+      "category": "perception",
+      "owner_package": "object_finder",
+      "expected_effects": ["requested object localized"],
+      "observable_success": ["fresh detector-backed result returned"],
+      "decomposes_to": ["resolve_target_reference"],
+      "metadata": {"runtime_callable": true}
+    },
+    {
+      "object_id": "report_result",
+      "ab_level": 1,
+      "kind": "skill",
+      "category": "communication",
+      "owner_package": "dialogue_runtime",
+      "expected_effects": ["verified result relayed"],
+      "observable_success": ["one terminal result event emitted"],
+      "decomposes_to": [],
+      "metadata": {"runtime_callable": true}
+    },
+    {
+      "object_id": "walk_to",
+      "ab_level": 1,
+      "kind": "skill",
+      "category": "navigation",
+      "owner_package": "navigation_runtime",
+      "expected_effects": ["navigation target reached"],
+      "observable_success": ["navigation success event returned"],
+      "decomposes_to": [],
+      "metadata": {"runtime_callable": true}
+    }
+  ]
+}
