@@ -10,6 +10,9 @@ the Neural Workbench AB capability graph.
 - `universal_agentic_harness_masterplan.md` (+ HTML) - canonical implementation
   plan, H0-H5 release spine, AB4/AB5 boundary, subsystem map, external-harness
   adoption decisions, seam-hypothesis audit, ablations, and ordered work queue.
+- `universal_agentic_harness_development_log.md` (+ HTML) - practical running
+  state, source-assimilation record, verification dashboard, eval gates,
+  Watson/Bonsai matrix, issue ledger, and executable next probes.
 - `universal_agentic_harness_foundation.md` (+ HTML) - project thesis,
   primary-source harness survey, current-stack extraction map, AB-aware
   architecture, model-serving design, hypothesis registry, evaluation plan,
@@ -49,13 +52,14 @@ the Neural Workbench research repository. It should depend on `skill_common`
 instead of copying the AB registry. ROS nodes, Codex/Pi/OpenHands workers, and
 served-model backends should integrate through adapters.
 
-The parent repository now contains a pure-Python `src/ab_harness` H0 contract
-proof. It implements frame-relative role bands, a hashed read-only canonical
-registry snapshot, task projection with decomposition closure, deterministic
-output/reachability checks, append-only JSONL traces, and temporary NAO payload
-adapters. Seven focused tests pass. It is not yet wired into live nodes, and the
-full H0 lifecycle grammar remains incomplete. The masterplan separates that
-implemented proof from H1 runtime and H2 cooperative integration work.
+The repository now contains a pure-Python `src/ab_harness` H0 contract proof
+and one narrow H1 synthetic vertical slice. It implements frame-relative role
+bands, a hashed read-only registry snapshot, task projection with decomposition
+closure, deterministic output/reachability checks, append-only JSONL traces,
+semantic implementation bindings, a mounted in-process environment owner,
+owner-issued evidence, and a recorded NAO-shaped qualification path.
+Twenty-three focused tests pass. It is not wired into live nodes or a model
+provider, and the full lifecycle grammar remains incomplete.
 
 ## H0 Completion Slice
 

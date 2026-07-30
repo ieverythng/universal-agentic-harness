@@ -21,11 +21,15 @@ H0 proves:
 - deterministic output-type, object-reachability, AB-level, and effect-claim
   gates;
 - append-only JSONL trace round trips;
-- thin NAO chatbot/planner payload adapters.
+- thin NAO chatbot/planner payload adapters;
+- semantic implementation bindings with candidate quarantine;
+- an in-process environment-owner adapter that issues effect evidence;
+- one recorded, ROS-free chatbot-to-planner-to-fake-owner qualification path.
 
-It does **not** yet provide a complete runnable agent loop. Provider adapters,
-full task/environment schemas, lifecycle events, execution, evidence closure,
-replay, and cross-domain conformance are the H1-H5 roadmap.
+It does **not** yet provide a complete live agent loop. Provider adapters, full
+task/environment schemas, lifecycle events, stale-evidence handling, model
+evaluation, live-node parity, and cross-domain conformance remain on the H1-H5
+roadmap.
 
 ```mermaid
 flowchart LR
@@ -83,7 +87,8 @@ module = InteractionProjector(registry).compile(
   trace store, and NAO compatibility views.
 - `tests/` — fail-closed H0 tests and a standalone registry fixture.
 - `docs/agentic_harness/` — canonical foundation, adaptive Workbench design,
-  implementation masterplan, and generated HTML editions.
+  implementation masterplan, practical development log, and generated HTML
+  editions.
 - `docs/watson_inference_seams.md` — concrete seams for local-model and
   llama.cpp experimentation.
 - `scripts/` — dependency-free Markdown-to-HTML rendering.

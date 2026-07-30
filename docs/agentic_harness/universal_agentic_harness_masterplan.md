@@ -1,7 +1,7 @@
 # Universal Agentic Harness: Implementation Masterplan
 
-**Status:** Canonical implementation plan; H0 contract proof implemented, live integration pending
-**Date:** 2026-07-22
+**Status:** Canonical implementation plan; H0 contract proof and first H1 synthetic slice implemented, live integration pending
+**Date:** 2026-07-30
 **Scope:** Model-agnostic and task-agnostic harness kernel with domain-specific AB frames and adapters
 **Extends:** `universal_agentic_harness_foundation.md` and `neural_workbench_adaptive_ab_harness.md`
 **Decision owner:** Neural Workbench research track; NAO remains the first reference environment
@@ -101,6 +101,30 @@ graph. The resulting system must:
 | Runtime effect evidence | AB1 skill owner | Close effects using fresh execution-time evidence |
 | Canonical AB object graph | Neural Workbench `skill_common` registry | Read by snapshot/hash; changed only through registry governance |
 
+### Semantic objects and implementation bindings
+
+An AB object is a stable semantic object. A method, topic, service, endpoint,
+MCP tool, fake handler, or provider operation is an implementation binding to
+that object, not a new object by default.
+
+```text
+AB semantic object
+  -> candidate producer/contract/consumer bindings
+  -> source, schema, owner, replay, and holdout validation
+  -> approved runtime-mode binding
+  -> environment owner
+  -> effect evidence
+```
+
+Multiple bindings may represent one interface. Their implementation owners may
+differ from the registry's semantic owner, as with a chatbot publisher and
+planner consumer of `/planner/request`. Direct AB1 execution is stricter: the
+binding implementation owner must be the registry-declared effect owner.
+
+A future method-to-AB tool may discover or propose bindings, but may not
+automatically promote methods into the canonical AB registry. This decision is
+recorded in `docs/adr/0001-semantic-objects-and-shadow-first-bindings.md`.
+
 ### Acceptance definition
 
 The implementation is accepted only when the same task contract can be replayed
@@ -128,6 +152,23 @@ correct scope + correct ownership + valid output + evidence-complete effect
 - System `python3` lacks PyYAML; this is an interpreter-environment gap, not a
   registry inconsistency.
 
+### Implementation update checked on 2026-07-30
+
+- UAH checkout: `feat/base-implementation-H0`; existing user work preserved.
+- Latest chatbot integration branch inspected:
+  `nao_chatbot_llm/feat/planner_llm_hooks` at
+  `a1cddc2cf100ac9e1f7a33c1b67d55cd7bf48e37`.
+- Latest integrated NAO planner branch inspected:
+  `nao-ros4hri-bridge/feat/TFM-LLM_planner` at
+  `00aa66e54f55c82719ebeae469886ee127ebaf47`.
+- The canonical NAO AB input already models `/planner/request`,
+  `/planner/execution_feedback`, `/planner/dialogue_act`, and `/scene/summary`
+  as AB0 objects.
+- Twenty-three portable tests pass using the repository virtual environment and
+  a workspace-local pytest temp root.
+- The implemented H1 slice consumes recorded role outputs. It does not invoke a
+  model provider, ROS node, container, or live robot.
+
 ### What H0 actually implements
 
 The parent-only `src/ab_harness` package is a real portable contract proof. It
@@ -141,6 +182,9 @@ contains no ROS or NAO imports in the core and currently proves:
 | Deterministic role/output gate | `gate.py` | Output ownership, reachability, direct AB level, effect-claim rejection |
 | Append-only trace proof | `trace.py` | JSONL append and round-trip reconstruction |
 | NAO compatibility views | `nao_h0.py` | Chatbot route and planner-step mapping without nested package imports |
+| Semantic implementation bindings | `bindings.py` | Stable AB objects, candidate quarantine, revisioned locators, runtime-mode resolution |
+| Portable environment owner | `environment.py` | Approved AB1 dispatch, owner enforcement, normalized effect evidence |
+| Recorded NAO qualification | `qualification.py` | Chatbot gate, planner gate, fake execution, terminal observable closure |
 | Focused fail-closed tests | `test_h0_nao_harness.py` | Accepted paths, unknown object, inspection-only AB0, effect claim, trace replay |
 
 ### What H0 does not yet implement
@@ -162,8 +206,10 @@ earlier foundation document. These are open seams, not failures:
 - the chatbot adapter assumes `user_intent.type` can be interpreted as one
   object reference, which is not sufficient for all multi-intent or target
   cases;
-- no live chatbot, planner, ROS, simulator, or external worker path invokes the
-  package;
+- no live chatbot, planner, ROS, model provider, container, simulator, or
+  external worker path invokes the package;
+- the recorded qualification path is not yet serialized as complete lifecycle
+  events and does not yet cover freshness, timeout, cancellation, or retry;
 - no same-model harness ablation has measured uplift.
 
 Therefore the correct status is:
@@ -333,6 +379,7 @@ The first stable grammar should contain:
 | `TaskSpec` | Goal, role, frame, required effects, prohibited effects, budgets, terminal checks |
 | `AbstractionFrame` | Substrate, atomicity rule, owners, registry version |
 | `ABObjectSpec` | Typed object, decomposition, effects, observables, permissions, callable status |
+| `ABImplementationBinding` | Replaceable, revisioned pointer from a semantic AB object to an environment API |
 | `ABControlBand` | Inspect, propose, direct-control, and effect-claim bounds |
 | `InteractionModuleSpec` | Closed task projection presented to one role |
 | `ModelProfile` | Provider protocol, schema/tool capabilities, context, latency, trust tier |
@@ -383,6 +430,12 @@ all current H0 tests
 
 **Purpose:** Turn the contracts into a small runnable harness without migrating
 NAO nodes.
+
+**Current state:** One deliberately narrow vertical slice is implemented. It
+replays recorded chatbot and planner outputs, applies role/projection gates,
+resolves an approved in-process AB1 binding, calls a fake environment owner,
+and checks owner-issued terminal evidence. It proves the control seam but is
+not the complete H1 lifecycle or a live model loop.
 
 **Deliverables:**
 
@@ -706,6 +759,51 @@ model + model revision + provider/runtime + harness version + adapter version
 + prompt pack hash + registry hash + environment image/state + task suite version
 ```
 
+### Three evaluation gates
+
+The same test label must not collapse operability, promotion evidence, and
+deployed monitoring:
+
+| Gate | Question | Authority after passing |
+| --- | --- | --- |
+| Boot qualification | Can this exact immutable configuration safely accept bounded work? | Admit it to one bounded role; no general-capability claim |
+| Promotion qualification | Does it improve the frozen intended distribution without unacceptable regression? | Publish a reviewed configuration or proposal with rollback |
+| Runtime evaluation | Is the promoted configuration still inside its approved envelope? | Continue, degrade, quarantine, interrupt, or roll back; never self-promote |
+
+Boot is short and deterministic. Promotion uses repeated, held-out,
+execution-based cases. Runtime evaluation preserves complete traces and may
+generate quarantined Workbench candidates, never trusted mutations.
+
+### Failure attribution
+
+Record one primary observed stage with supporting evidence:
+
+```text
+runtime_preflight | transport_or_provider | context_projection
+model_proposal | gate_or_harness | environment_owner
+evidence_closure | evaluator | resource_budget
+```
+
+This classification is diagnostic, not causal proof. Replay the same proposal
+without the model and substitute one component at a time to sharpen cause.
+
+### First Watson/Bonsai matrix
+
+Run Watson as the strict-workflow control and Bonsai as the memory-efficient
+high-context challenger over identical frozen cases:
+
+1. flat/static interface;
+2. AB projection plus deterministic gates;
+3. AB projection plus success-only trace retrieval;
+4. AB projection plus success, failure, and counterexample retrieval.
+
+The suite covers chatbot handoff, valid AB1 proposals, direct AB0 and
+out-of-projection rejection, stale evidence, false completion, tool failure,
+retry, cancellation, recovery, strict structured output, and long-context
+retrieval. Report terminal effects, milestones, minefields, reliability across
+repeats, latency, and memory. Bonsai's memory advantage is a candidate operating
+point, not agentic parity.
+
 ### Core metrics
 
 | Dimension | Metrics |
@@ -763,6 +861,8 @@ model + model revision + provider/runtime + harness version + adapter version
 | UAH-09 | Offline dual-loop Workbench | Compare frozen baseline to reviewed trace-derived candidates on holdout | Accepted research route | Needs representative traces and calibrated uncertainty |
 | UAH-10 | Capability improvement implies higher AB | Improve an AB4 configuration and test for a new object boundary | Rejected | Performance and abstraction order are different axes |
 | UAH-11 | AB5 policy foundry | Govern held-out populations of AB4 systems under independent evaluation | Blocked research route | No implemented system or evidence yet satisfies the AB5 gate |
+| UAH-12 | Auto-promote every discovered method into an AB object | Compare registry stability across a private-helper refactor | Rejected | Confuses implementation structure with semantic identity and discovery with authority |
+| UAH-13 | Stable AB objects plus reviewed implementation bindings | Replace one fake/live locator while retaining the same semantic tests | Accepted and partially implemented | Needs schema parity, source validation, holdout, and rollback before live approval |
 
 ## 13. Discriminating Probes and Results
 
@@ -778,6 +878,9 @@ model + model revision + provider/runtime + harness version + adapter version
 | Compare Pi, OpenHands, Hermes, OpenClaw | Each solves different runtime mechanics; none supplies our effect/promotion calculus | Accept hybrid semantic-core plus worker/runtime adapters |
 | Review recent harness benchmarks | Same model changes materially across harnesses/adapters | Require frozen model-harness matrix and process traces |
 | Apply AB5 boundary test | Current adaptive design tunes one AB4 system | Keep AB5 blocked until a governed population-of-AB4 object exists |
+| Replace a fake binding locator under the same object | Semantic projection and object identity remain unchanged | Accept explicit object-to-implementation binding seam |
+| Replay valid and out-of-projection recorded NAO proposals | Valid AB1 reaches the fake owner; invalid proposal never dispatches | Continue ROS-free shadow-first qualification |
+| Return failed owner evidence | Terminal observable remains open | Preserve owner-issued evidence as the completion boundary |
 
 ## 14. Adversarial Audit
 
@@ -798,8 +901,11 @@ model + model revision + provider/runtime + harness version + adapter version
 - [x] Registry promotion remains reviewed, versioned, reversible, and
   decomposable.
 - [x] Model-harness configuration is the evaluation unit.
+- [x] Environment methods and endpoints are bindings, not automatic AB objects.
+- [x] Candidate bindings cannot resolve for runtime use.
+- [x] An executable binding cannot claim another package's effect ownership.
 - [ ] Full H0 schemas and lifecycle traces are not implemented.
-- [ ] No synthetic H1 runtime suite exists.
+- [ ] Only one synthetic H1 vertical slice exists; the required failure suite is incomplete.
 - [ ] No NAO shadow-mode adapter has been run.
 - [ ] No external harness adapter has passed conformance.
 - [ ] Entropy proxies and capability posteriors are not calibrated.
@@ -827,13 +933,15 @@ dependency until it passes conformance.
 
 1. Freeze schema versioning and serialization conventions.
 2. Add `HarnessSpec`, `TaskSpec`, `ModelProfile`, and `EnvironmentProfile`.
-3. Expand AB object effect/evidence/permission fields through a read-only
+3. Preserve the implemented semantic-object/implementation-binding split.
+4. Expand AB object effect/evidence/permission fields through a read-only
    adapter over the canonical registry.
-4. Compile one synthetic task from required effects to a closed object graph.
-5. Extend the deterministic gate and reason codes.
-6. Define full lifecycle `TraceEvent` variants and replay.
-7. Add success, rejection, cancellation, and stale-evidence fixtures.
-8. Keep the existing H0 API behind compatibility exports while tests migrate.
+5. Compile one synthetic task from required effects to a closed object graph.
+6. Extend the deterministic gate and reason codes.
+7. Define full lifecycle `TraceEvent` variants and replay.
+8. Add stale evidence, timeout, cancellation, retry exhaustion, and false
+   completion fixtures beside the implemented success and rejection cases.
+9. Keep the existing H0 API behind compatibility exports while tests migrate.
 
 ### Next: H1 executable kernel
 
@@ -936,7 +1044,7 @@ and `delta_AB`, not AB5.
 
 | Risk | Current evidence gap | Next discriminating probe |
 | --- | --- | --- |
-| Core becomes another overbuilt framework | H1 does not exist | Implement one synthetic loop with deletion budget and no plugin system |
+| Core becomes another overbuilt framework | Only one narrow H1 slice exists | Complete lifecycle replay with a deletion budget and no plugin system |
 | AB projection harms model flexibility | No same-model ablation | Flat versus projected task suite with missing-object analysis |
 | External harness semantics leak inward | No adapter conformance | Pi RPC spike using only frozen contracts and normalized events |
 | Sandbox dominates latency | No measured runtime matrix | Direct local runtime versus OpenHands sandbox on identical tasks |
@@ -946,9 +1054,10 @@ and `delta_AB`, not AB5.
 | Frontier worker cannot expose complete trace | Product APIs differ | Define minimum artifact/event contract and classify unavailable fields |
 | AB5 remains relabeled optimization | No higher-order object | Require held-out population-of-AB4 governance experiment |
 
-The immediate next probe is H0 lifecycle completion: serialize a `TaskSpec`,
-compile one synthetic object closure, pass one action through the expanded gate,
-and reconstruct success and stale-evidence failure from append-only events. This
+The immediate next probe is H0 lifecycle completion around the implemented
+binding loop: serialize one configuration and `TaskSpec`, execute the recorded
+success and a stale-evidence counterexample into append-only lifecycle events,
+replay both without a model, and require identical terminal decisions. This
 tests the semantic center without touching the live NAO stack or committing to
 an external harness.
 
