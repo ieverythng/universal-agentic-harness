@@ -6,7 +6,7 @@
 **Seed artifact:** `Universal Agentic Harness Blueprint.html` (user-provided,
 2026-07-12)
 **Primary reference subsystem:** NAO ROS4HRI + Neural Workbench
-**Canonical delivery status:** `universal_agentic_harness_masterplan.md` (2026-07-22)
+**Canonical delivery status:** `../plans/universal_agentic_harness_masterplan.md` (2026-08-04)
 
 The phase tables in this foundation preserve the original extraction plan. Use
 the canonical masterplan for current H0-H5 implementation status, acceptance

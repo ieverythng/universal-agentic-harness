@@ -9,3 +9,6 @@ build/
 dist/
 htmlcov/
 *.jsonl
+.artifacts/
+.test-tmp/
+~$*.docx

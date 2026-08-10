@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Observatory Contract</title>
+  <style>
+    @page {
+      size: A4;
+      margin: 2.6cm 2.2cm 2.4cm 2.2cm;
+    }
+    :root {
+      --ink: #111;
+      --muted: #3a3a3a;
+      --line: #1f1f1f;
+      --soft: #f3f3f3;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: #fff;
+      font-family: "Liberation Serif", "Times New Roman", Times, serif;
+      font-size: 11.5pt;
+      line-height: 1.42;
+    }
+    .doc {
+      max-width: 172mm;
+      margin: 0 auto;
+      padding: 0;
+    }
+    .title-page {
+      min-height: 247mm;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      page-break-after: always;
+    }
+    .title-top {
+      text-align: center;
+      margin-top: 18mm;
+    }
+    .title-top h1 {
+      font-size: 20pt;
+      line-height: 1.28;
+      margin: 20mm 0 8mm;
+      font-weight: 700;
+    }
+    .title-top h2 {
+      font-size: 13pt;
+      margin: 0 0 3mm;
+      font-weight: 600;
+      border-bottom: 0;
+    }
+    .title-top p {
+      margin: 2mm 0;
+      color: var(--muted);
+    }
+    .title-meta {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 0 auto 20mm;
+      font-size: 11pt;
+    }
+    .title-meta td {
+      padding: 2.5mm 0;
+      vertical-align: top;
+      border: 0;
+    }
+    .title-meta td:first-child {
+      width: 38mm;
+      font-weight: 700;
+    }
+    .small { font-size: 10.3pt; color: #222; }
+    h1, h2, h3 {
+      margin: 0 0 3mm;
+      line-height: 1.28;
+      font-weight: 700;
+    }
+    h1 { font-size: 16.5pt; margin-top: 0; }
+    h2 {
+      font-size: 13pt;
+      margin-top: 9mm;
+      border-bottom: 0.5pt solid var(--line);
+      padding-bottom: 1.5mm;
+    }
+    h3 {
+      font-size: 11.8pt;
+      margin-top: 6mm;
+    }
+    p { margin: 2.2mm 0; }
+    ul, ol { margin: 2.5mm 0 2.5mm 6mm; padding: 0; }
+    li { margin: 1.4mm 0; }
+    pre {
+      margin: 2.5mm 0 4mm;
+      background: var(--soft);
+      border: 0.6pt solid #666;
+      padding: 2.6mm 2.8mm;
+      overflow-x: auto;
+      white-space: pre;
+      font-family: "Liberation Mono", "Courier New", monospace;
+      font-size: 9.2pt;
+      line-height: 1.3;
+    }
+    code {
+      font-family: "Liberation Mono", "Courier New", monospace;
+      background: #efefef;
+      padding: 0.2mm 1mm;
+      border: 0.4pt solid #d7d7d7;
+      border-radius: 2px;
+      font-size: 10.3pt;
+    }
+    pre code {
+      background: transparent;
+      padding: 0;
+      border: 0;
+      font-size: inherit;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 3mm 0 4mm;
+      font-size: 10.8pt;
+    }
+    th, td {
+      border: 0.6pt solid #333;
+      padding: 2.2mm 2.3mm;
+      vertical-align: top;
+      overflow-wrap: anywhere;
+      hyphens: auto;
+    }
+    th {
+      background: #fafafa;
+      text-align: left;
+      font-weight: 700;
+    }
+    .diagram {
+      margin: 4mm 0 5mm;
+      border: 0.6pt solid #777;
+      padding: 2mm;
+      background: #fff;
+    }
+    .diagram pre {
+      margin: 0;
+      border: 0;
+      background: #fcfcfc;
+      font-size: 10.2pt;
+      white-space: pre-wrap;
+    }
+    .diagram svg {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+    .diagram-labels {
+      font-family: "Liberation Serif", "Times New Roman", Times, serif;
+      font-size: 25px;
+      font-weight: 700;
+      fill: #111;
+    }
+    .lifelines {
+      stroke: #999;
+      stroke-dasharray: 4 4;
+    }
+    .messages {
+      stroke: #111;
+      stroke-width: 1.35;
+      fill: none;
+    }
+    .messages text {
+      stroke: none;
+      fill: #111;
+      font-family: "Liberation Serif", "Times New Roman", Times, serif;
+      font-size: 22px;
+    }
+    .caption {
+      margin-top: 2mm;
+      font-size: 10.5pt;
+      color: #222;
+      font-style: italic;
+      text-align: center;
+    }
+    blockquote {
+      border: 0.6pt solid #333;
+      background: #fcfcfc;
+      margin: 3mm 0;
+      padding: 2.6mm 3mm;
+      color: var(--muted);
+    }
+    a { color: #111; }
+  </style>
+  <link rel="stylesheet" href="../assets/harness-theme.css" />
+  <script defer src="../assets/harness-theme.js"></script>
+</head>
+<body>
+  <main class="doc">
+
+<h1>Observatory Contract</h1>
+<p><strong>Status:</strong> O1 API frozen; O2 implementation deferred <strong>Date:</strong> 2026-08-04 <strong>Applies to:</strong> UAH H0-H6 and NeuralWorkbench H3+</p>
+<h2>1. Decision</h2>
+<p>The product-facing trace surface is called <strong>Observatory</strong>.</p>
+<p>O1 is a small, read-only API with a static HTML renderer. It is required for H1 lifecycle debugging and H2 NAO parity. O2 is the proper interactive implementation and may evolve through H4 before H5 product polish.</p>
+<p>Observatory is never an execution owner, evidence issuer, policy gate, or registry authority.</p>
+<h2>2. Layered Visualization Contract</h2>
+<table><thead><tr>
+<th>Layer</th>
+<th>Required views</th>
+<th>Source of truth</th>
+</tr></thead><tbody>
+<tr>
+<td>UAH H0-H2</td>
+<td>configuration, task, frame, role, projected AB graph, bindings, proposals, gates, owner evidence, failures, terminal state, replay comparison</td>
+<td>UAH registry snapshots and lifecycle ledger</td>
+</tr>
+<tr>
+<td>NeuralWorkbench H3</td>
+<td>pulse candidates, verification failures, energy terms, entropy proxy, retrieval lineage, counterexamples, recommendation, shadow replacement comparison</td>
+<td>versioned Workbench request/candidate/observation payloads</td>
+</tr>
+<tr>
+<td>H4 review</td>
+<td>crystallization clusters, counterfactual results, holdout results, provenance, promotion review, rollback lineage</td>
+<td>quarantined candidate and review artifacts</td>
+</tr>
+<tr>
+<td>H5 product</td>
+<td>cross-domain and cross-runtime navigation, capability/configuration comparison, live streams</td>
+<td>conformance-qualified adapters and immutable traces</td>
+</tr>
+</tbody></table>
+<h2>3. O1 API</h2>
+<p>O1 accepts immutable, JSON-compatible inputs and returns a self-contained review document:</p>
+<pre><code class="language-text">render_observatory(
+  registry_snapshot,
+  configuration_manifest,
+  lifecycle_events,
+  workbench_payloads = optional,
+  comparison_run = optional
+) -&gt; ObservatoryDocument</code></pre>
+<p><code>ObservatoryDocument</code> contains:</p>
+<ul>
+<li>one static HTML payload;</li>
+<li>trace and configuration identities;</li>
+<li>source revisions and protocol compatibility state;</li>
+<li>filter facets for event type, task, role, object, owner, gate outcome, and failure stage;</li>
+<li>ordered event cards with inspectable raw payloads;</li>
+<li>graph data embedded as inert JSON for later O2 reuse.</li>
+</ul>
+<p>The first renderer may reuse the proven NAO <code>interaction_trace_viewer</code> pattern: JSONL ingestion, normalization, searchable cards, and static HTML. UAH must replace dialogue-only correlation heuristics with explicit configuration, trace, task, frame, proposal, binding, evidence, replay, and Workbench IDs.</p>
+<h3>NAO viewer assimilation boundary</h3>
+<p>The 2026-08-04 source audit found four pieces worth porting as behavior, not as a ROS dependency:</p>
+<table><thead><tr>
+<th>Reuse in O1</th>
+<th>Do not inherit</th>
+</tr></thead><tbody>
+<tr>
+<td>Frozen normalized event records</td>
+<td>ROS subscriptions and <code>rosout</code> parsing</td>
+</tr>
+<tr>
+<td>Append-only JSONL plus deterministic load</td>
+<td>A trace ID synthesized from whichever topic arrives first</td>
+</tr>
+<tr>
+<td>Searchable static cards with raw payload inspection</td>
+<td>An AB level guessed from the presence of a skill name</td>
+</tr>
+<tr>
+<td>Channel-specific normalization and concise summaries</td>
+<td>Treating planner dialogue or robot speech as universally terminal</td>
+</tr>
+</tbody></table>
+<p>O1 assigns distinct event types to the existing authority seams:</p>
+<ul>
+<li><code>/nao_orchestrator/planner_request</code> -&gt; <code>planner_gate_request</code>;</li>
+<li>orchestrator gate decision -&gt; <code>planner_gate_accepted</code> or <code>planner_gate_rejected</code>;</li>
+<li><code>/planner/request</code> -&gt; <code>planner_request_admitted</code>;</li>
+<li><code>/intents</code> -&gt; <code>planner_output_candidate</code>;</li>
+<li><code>/planner/execution_feedback</code> -&gt; owner/execution lifecycle events;</li>
+<li><code>/planner/dialogue_act</code> -&gt; planner communication request, never direct speech proof.</li>
+</ul>
+<p>The source <code>goal_id</code>, <code>request_id</code>, <code>plan_id</code>, <code>plan_version</code>, and <code>step_id</code> remain payload lineage. UAH <code>configuration_id</code>, <code>trace_id</code>, and event sequence are mandatory envelope identity and are never reconstructed heuristically.</p>
+<h2>4. Graph Grammar</h2>
+<p>Graph nodes may represent:</p>
+<ul>
+<li>AB objects and decomposition relations;</li>
+<li>environment components and implementation bindings;</li>
+<li>proposals, pulse programs, verification decisions, and evidence artifacts;</li>
+<li>complete model-harness-domain configurations;</li>
+<li>trace clusters and reviewed candidate abstractions.</li>
+</ul>
+<p>Graph edges must declare a type such as <code>decomposes_to</code>, <code>bound_by</code>, <code>proposed_by</code>, <code>rejected_by</code>, <code>executed_by</code>, <code>evidenced_by</code>, <code>retrieved_from</code>, or <code>compared_with</code>. A visual edge may not imply authorization or causality unless the underlying event or contract proves it.</p>
+<h2>5. Metrics and Honesty Rules</h2>
+<p>Every metric is keyed by the complete content-addressed configuration. Model family names alone are not aggregation keys.</p>
+<p>Metric values carry one of these labels:</p>
+<ul>
+<li><code>conceptual</code> — explanatory geometry with no runtime measurement;</li>
+<li><code>synthetic</code> — generated evaluation data;</li>
+<li><code>recorded</code> — replayed fixture or captured runtime data;</li>
+<li><code>measured</code> — evaluator-produced result under a frozen configuration;</li>
+<li><code>reviewed</code> — measured result accepted through the applicable gate.</li>
+</ul>
+<p>Conceptual NeuralWorkbench capability-space, energy-landscape, entropy, and AB maturity figures are design references. Observatory may reproduce their visual grammar, but it must never present synthetic or conceptual values as runtime evidence.</p>
+<h2>6. O1 Exit Gate</h2>
+<p>O1 is complete when one accepted and one rejected H1 lifecycle plus the H2 NAO planner parity run can be rendered with:</p>
+<ul>
+<li>complete ordered lineage;</li>
+<li>configuration and source identity;</li>
+<li>projected and directly callable object distinction;</li>
+<li>binding and owner-evidence closure;</li>
+<li>failure-stage attribution;</li>
+<li>model-free replay comparison;</li>
+<li>optional H3 shadow candidate lineage without granting it authority.</li>
+</ul>
+<h2>7. O2 Deferred Scope</h2>
+<p>O2 may add live streaming, multi-run comparison, interactive AB/evidence graphs, Watson/Bonsai overlays, replay controls, counterfactual controls, Workbench review queues, promotion/rollback inspection, and cross-domain navigation. Those features must consume the O1 event and graph contracts rather than invent a second trace vocabulary.</p>
+  </main>
+</body>
+</html>

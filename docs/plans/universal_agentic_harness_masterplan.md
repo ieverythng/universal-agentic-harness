@@ -1,10 +1,10 @@
 # Universal Agentic Harness: Implementation Masterplan
 
-**Status:** Canonical implementation plan; H0 contract proof and first H1 synthetic slice implemented, live integration pending
-**Date:** 2026-07-30
+**Status:** Canonical implementation plan; August 10 H2 launch contract active
+**Date:** 2026-08-04
 **Scope:** Model-agnostic and task-agnostic harness kernel with domain-specific AB frames and adapters
-**Extends:** `universal_agentic_harness_foundation.md` and `neural_workbench_adaptive_ab_harness.md`
-**Decision owner:** Neural Workbench research track; NAO remains the first reference environment
+**Extends:** `../architecture/universal_agentic_harness_foundation.md` and `../architecture/neural_workbench_adaptive_ab_harness.md`
+**Decision owner:** UAH H0-H2 core; NeuralWorkbench H3+ companion track; NAO remains the first reference environment
 
 ## 1. Executive Decision
 
@@ -88,6 +88,137 @@ graph. The resulting system must:
   ownership out of their current NAO packages.
 - Calling an adaptive AB4 system AB5 merely because it becomes more capable.
 
+### August 10, 2026 H2 launch contract
+
+The August 10 target closes the static UAH foundation and the first cooperative
+domain proof. H0 and H1 hard gates must pass and the NAO planner ingress/egress
+must complete H2 parity over recorded and fake/simulated contracts. A live robot
+is not required. The date does not relax evidence, ownership, replay, or
+promotion gates.
+
+**H2 launch definition:** an installable portable package identifies a complete
+model-harness-domain configuration, executes accepted and rejected lifecycle
+cases, exposes approved AB1 operations plus inspectable non-callable AB0 seams,
+closes effects only from environment-owner evidence, replays without a model,
+and demonstrates planner parity through an explicit NAO compatibility adapter.
+
+Three qualification labels remain distinct:
+
+| Label | Meaning | Minimum evidence |
+| --- | --- | --- |
+| UAH core qualified | Portable H0-H1 semantic kernel, lifecycle, replay, fake owner, docs and CLI | Deterministic recorded suite; no model or NAO parity claim |
+| UAH H2 NAO planner qualified | Core plus planner ingress/egress projection, gate, fake-owner dispatch, evidence and parity report | Recorded/fake NAO success and failure suite under explicit authority mode |
+| UAH H2 model qualified | H2 planner proof plus a frozen model comparison | Reproducible Watson/Bonsai run under the same configuration-controlled suite |
+
+If model assets are unavailable, H2 may still close with recorded proposals and
+must say that model qualification is absent. If planner parity fails, the
+release remains core-qualified and may not be relabeled H2.
+
+H3 is stretch scope only. A protocol handshake, Observatory view, or shadow
+replacement pulse is useful, but no H3 feature is required to pass H2 and no
+H3 candidate receives execution authority for this release.
+
+#### Launch prerequisites
+
+These conditions must be true before the final launch evaluation begins:
+
+1. `src/ab_harness` remains free of ROS, NAO, provider SDK, and runtime-product
+   imports.
+2. AB objects remain semantic and frame-relative; environment methods and
+   endpoints remain revisioned bindings.
+3. Candidate bindings, Workbench contexts, and learned structures cannot
+   promote or execute themselves.
+4. The accepted path, rejected path, effect owner, registry identity, binding
+   identity, environment identity, and evaluator identity are deterministic.
+5. The task suite and acceptance checks are frozen before NAO parity or
+   Watson/Bonsai tuning.
+6. A clean environment can install the package and run the smoke command.
+7. Canonical Markdown, generated HTML, decision record, development log,
+   research note, Observatory contract, and system-design artifact agree on
+   implemented versus roadmap status.
+8. NeuralWorkbench remains optional through H2. Its submodule revision and
+   protocol are recorded, but it cannot become an undeclared runtime dependency.
+
+#### Dated delivery timeline
+
+| Date | Deliverable | Required exit evidence |
+| --- | --- | --- |
+| Aug 4 | Freeze H2 contract, repository boundaries, Workbench protocol, Observatory O1, and coupling decisions | Decision artifact, pinned submodule, focused protocol tests, synchronized plan |
+| Aug 5 | Complete H1 lifecycle schemas and deterministic failure grammar | Schema round trips; compile-to-terminal events; stale evidence, timeout, cancellation, retry exhaustion, unavailable binding, and false-completion attribution |
+| Aug 6 | Persist/replay lifecycle and implement planner-side NAO projection | Model-free replay equivalence; AB1 callable and AB0 inspect-only closure; provenance retained |
+| Aug 7 | Implement planner compatibility adapter and recorded/fake qualification | Accepted, rejected, clarification, recovery, and owner-evidence cases pass without ROS imports in core |
+| Aug 8 | Run `legacy | uah | shadow` parity fixtures and freeze provider-neutral manifests | Explicit authority mode; classified disagreements; exact model, quant, runtime, context, prompt, registry, adapter, and evaluator identities |
+| Aug 9 | Run H2 launch candidate, clean-install rehearsal, and optional Watson/Bonsai matrix | Core and H2 gates pass in a fresh environment; model report recorded only if assets exist; docs rendered |
+| Aug 10 | Publish H2 status and artifacts | Version/tag decision, result summary, parity report, known limitations, rollback, and H3 gate decision |
+
+Later dates may absorb incomplete work; they may not convert a failed gate into
+a pass. Scope is reduced before evidence requirements are reduced.
+
+#### Evaluation order
+
+Evaluation runs from cheapest and most deterministic to most confounded:
+
+1. **Package and identity:** clean install, import audit, configuration hash,
+   registry hash, and CLI exit behavior.
+2. **Accepted semantic path:** projection, role gate, approved binding, owner
+   dispatch, declared observable, and terminal closure.
+3. **Negative controls:** direct AB0 dispatch, unknown/out-of-projection object,
+   candidate binding, wrong owner, and prohibited effect claim.
+4. **Lifecycle failures:** stale evidence, unavailable owner, timeout,
+   cancellation, retry exhaustion, and false completion.
+5. **Replay:** replace the model with recorded proposals and require identical
+   decisions and evidence obligations.
+6. **NAO planner parity:** compare normalized legacy and UAH planner outcomes
+   under explicit `legacy`, `uah`, and `shadow` authority modes.
+7. **Workbench stretch:** if attached, retrieve supporting and counterexample
+   traces or emit a shadow candidate; remain `candidate` with zero authority.
+8. **Model matrix:** hold task, harness, environment, and evaluator fixed while
+   swapping Watson and Bonsai configurations; then ablate flat versus projected
+   context and failure-aware retrieval.
+
+No later result can rescue an earlier failed hard gate. Faster decode, lower
+memory, or a successful final answer cannot override a scope, ownership,
+evidence, replay, or regression failure.
+
+#### Hard launch gates
+
+| Gate | H2 acceptance |
+| --- | --- |
+| Portability | Forbidden-import audit passes and a fresh venv installs the package |
+| Determinism | Recorded smoke produces stable configuration and candidate identities |
+| Scope | No negative canary dispatches an out-of-projection or AB0 operation |
+| Ownership | Only the registry-declared AB1 owner can issue accepted effect evidence |
+| Evidence | Success, stale evidence, owner failure, and false completion receive correct terminal decisions |
+| Replay | Model-free replay reconstructs the same lifecycle and outcome |
+| NAO planner parity | Planner request, proposal, gate, fake-owner dispatch, evidence, clarification, failure, and replay cases are equivalent or reviewed improvements |
+| Authority mode | `legacy`, `uah`, or `shadow` is explicit; no silent fallback contaminates qualification |
+| Workbench quarantine | Optional H3 seams are versioned, shadow-only, bounded, and unable to mutate code, permissions, evaluators, bindings, or registries |
+| Documentation | Canonical Markdown and generated HTML are synchronized; implementation claims match tests |
+
+For **model-qualified H2**, add a hard paired-run gate: Watson and Bonsai use
+the same frozen suite, with repeated trials and owner/evaluator effects reported
+beside latency and memory. Memory efficiency alone cannot pass this gate.
+
+#### Launch postconditions and next-stage gate
+
+H2 completion produces:
+
+- a versioned package and machine-readable configuration manifest;
+- frozen smoke and failure suites;
+- append-only lifecycle and optional Workbench experience artifacts;
+- a launch result identifying `core`, `H2 NAO planner`, and optional
+  `model-qualified` status;
+- an explicit NAO planner parity and disagreement report;
+- known limitations and blocked external dependencies;
+- a tested rollback target and replay command;
+- a dated next-stage decision.
+
+H3 active replacement remains blocked until H2 parity, replay, failure
+attribution, protocol conformance, counterexamples, holdout evaluation, owner
+review, and rollback gates pass. H3 begins with in-process, transport-neutral,
+shadow-only replacement candidates. Cooperative or live ROS authority remains
+owned and gated by the NAO repository.
+
 ### Protected owners in the NAO reference environment
 
 | Seam | Authoritative owner | Harness relationship |
@@ -117,13 +248,17 @@ AB semantic object
 ```
 
 Multiple bindings may represent one interface. Their implementation owners may
-differ from the registry's semantic owner, as with a chatbot publisher and
-planner consumer of `/planner/request`. Direct AB1 execution is stricter: the
-binding implementation owner must be the registry-declared effect owner.
+differ from the registry's semantic owner. They must not collapse control
+boundaries: the chatbot publishes an unadmitted handoff on
+`/nao_orchestrator/planner_request`, the orchestrator gate emits an admitted
+request on `/planner/request`, and the planner emits its typed executable-plan
+candidate on `/intents`. Direct AB1 execution is stricter: the binding
+implementation owner must be the registry-declared effect owner.
 
 A future method-to-AB tool may discover or propose bindings, but may not
 automatically promote methods into the canonical AB registry. This decision is
-recorded in `docs/adr/0001-semantic-objects-and-shadow-first-bindings.md`.
+recorded in
+`../architecture/decisions/0001-semantic-objects-and-shadow-first-bindings.md`.
 
 ### Acceptance definition
 
@@ -141,8 +276,8 @@ correct scope + correct ownership + valid output + evidence-complete effect
 
 - Parent checkout: `feat/TFM-LLM_planner`, clean and synchronized with origin.
 - `src/chatbot_llm`: `refactor/IRR-turn-engine`, clean and synchronized.
-- Neural Workbench: `feat/base-implementation`; one user-owned documentation
-  relocation is present and deliberately untouched.
+- NeuralWorkbench: clean `feat/base-implementation` at `e76ba7e`, synchronized
+  with the Aily remote and pinned as the `src/Neural-Wokbench` submodule.
 - `python3 scripts/ros4hri_change_audit.py --mode working`: no ROS package
   changes detected before this documentation pass.
 - `PYTHONPATH=src/ab_harness .venv/bin/python -m pytest -q
@@ -152,22 +287,30 @@ correct scope + correct ownership + valid output + evidence-complete effect
 - System `python3` lacks PyYAML; this is an interpreter-environment gap, not a
   registry inconsistency.
 
-### Implementation update checked on 2026-07-30
+### Implementation update checked on 2026-08-04
 
 - UAH checkout: `feat/base-implementation-H0`; existing user work preserved.
 - Latest chatbot integration branch inspected:
-  `nao_chatbot_llm/feat/planner_llm_hooks` at
-  `a1cddc2cf100ac9e1f7a33c1b67d55cd7bf48e37`.
+  `nao_chatbot_llm/origin/feat/planner_llm_hooks` at `a2ecca7`. Its source tree
+  matches the local inspected checkout.
 - Latest integrated NAO planner branch inspected:
-  `nao-ros4hri-bridge/feat/TFM-LLM_planner` at
-  `00aa66e54f55c82719ebeae469886ee127ebaf47`.
-- The canonical NAO AB input already models `/planner/request`,
-  `/planner/execution_feedback`, `/planner/dialogue_act`, and `/scene/summary`
-  as AB0 objects.
-- Twenty-three portable tests pass using the repository virtual environment and
+  `nao-ros4hri-bridge/origin/feat/TFM-LLM_planner` at `9da89c0`. Runtime source
+  matches the local checkout; the remote-only tree change is unrelated career
+  material.
+- The portable NAO AB fixture models the distinct gate ingress
+  `/nao_orchestrator/planner_request`, admitted ingress `/planner/request`,
+  planner egress `/intents`, execution feedback, dialogue act, and scene summary
+  as non-callable AB0 objects.
+- Forty-two portable tests pass using the repository virtual environment and
   a workspace-local pytest temp root.
 - The implemented H1 slice consumes recorded role outputs. It does not invoke a
   model provider, ROS node, container, or live robot.
+- `python -m ab_harness smoke` now runs accepted and rejected boot canaries,
+  emits a content-addressed configuration identity, and retrieves a quarantined
+  Workbench context with supporting and counterexample traces.
+- `ab_harness.workbench_protocol` now freezes JSON-compatible request,
+  candidate-batch, observation, protocol handshake, and fail-closed in-process
+  adapter contracts. A mismatch override is visibly observation-only.
 
 ### What H0 actually implements
 
@@ -434,8 +577,9 @@ NAO nodes.
 **Current state:** One deliberately narrow vertical slice is implemented. It
 replays recorded chatbot and planner outputs, applies role/projection gates,
 resolves an approved in-process AB1 binding, calls a fake environment owner,
-and checks owner-issued terminal evidence. It proves the control seam but is
-not the complete H1 lifecycle or a live model loop.
+checks owner-issued terminal evidence, and exposes a machine-readable smoke
+CLI. It proves the control seam but is not the complete H1 lifecycle or a live
+model loop.
 
 **Deliverables:**
 
@@ -466,20 +610,47 @@ system without moving ownership or degrading behavior.
 **Migration order:**
 
 1. read-only registry projection and trace correlation;
-2. chatbot output shadow-gating;
-3. planner output shadow-gating;
-4. provider capability normalization behind current callers;
-5. optional cooperative gate for one low-risk path;
+2. planner ingress/egress shadow-gating over recorded fixtures;
+3. full planner proposal/gate/fake-owner/evidence implementation;
+4. explicit NAO `legacy | uah | shadow` routing and parity report;
+5. provider capability normalization behind current callers;
 6. failure, cancellation, supersede, replan, and duplicate-speech validation;
-7. live robot validation only after fake/sim parity.
+7. chatbot compatibility projection after planner parity;
+8. live robot validation only after fake/sim parity.
 
 **Shadow mode:** The harness computes projection and decisions but cannot block
 or dispatch. Differences against current validators are logged. This gives us
 counterexamples before authority changes.
 
-**Cooperative mode:** One current node explicitly calls a compatibility adapter
-at a narrow seam. Existing node validation remains authoritative until the
-ablation proves equivalence.
+**Cooperative mode:** The planner ingress/egress is the first authoritative UAH
+seam. Existing `planner_llm` remains a compatibility/reference implementation.
+The NAO repository owns routing and exposes `legacy`, `uah`, and `shadow`
+modes; no silent fallback is allowed during qualification.
+
+The H2 projection includes approved AB1 planner-callable objects and the AB0
+dialogue, KB, transport, execution, and feedback seams needed for inspection
+and traceability. Those AB0 objects remain `runtime_callable=false`. Chatbot and
+planner are separate role projections even when both are represented as
+higher-order components in a system topology frame.
+
+The first parity fixture must preserve this exact source-proven sequence:
+
+```text
+chatbot_llm PlannerHandoff
+  -> /nao_orchestrator/planner_request
+  -> nao_orchestrator PlannerGate.decide
+  -> /planner/request
+  -> planner_llm PlannerEngine/Supervisor
+  -> /intents typed executable-plan candidate
+  -> nao_orchestrator validation and AB1 dispatch
+  -> /planner/execution_feedback
+  -> planner_llm supervision or /planner/dialogue_act
+```
+
+`goal_id`, `request_id`, `plan_id`, `plan_version`, and stable `step_id` values
+cross this flow unchanged except for explicitly recorded supersede/replan
+transitions. UAH may wrap it with its own trace/configuration identity but may
+not replace or infer missing NAO lineage.
 
 **Required task set:**
 
@@ -492,14 +663,30 @@ ablation proves equivalence.
 | Recovery | retryable skill failure | exhausted retry or non-retryable failure |
 | Speech | one acknowledgement and one terminal result | no duplicate utterance authority |
 
-**Acceptance gate:** Same model, prompt pack, task set, fixture, and launch
-profile produce behavioral parity or an explicitly reviewed improvement. No
-prompt wording change enters this phase without SkillOpt.
+**Acceptance gate:** Same proposal/model, prompt pack, task set, fixture, and
+authority mode produce behavioral parity or an explicitly reviewed improvement
+for the full planner path. No prompt wording change enters this phase without
+SkillOpt. Live robot access is not required; recorded and fake/simulated owner
+contracts are sufficient when evidence and failure semantics match.
 
 ### H3: Trace-adaptive Neural Workbench
 
 **Purpose:** Let measured experience shape candidate generation, context, and
 recovery without modifying trusted runtime policy online.
+
+**Package boundary:** NeuralWorkbench is the sole H3+ engine for pulse creation,
+candidate verification/scoring, adaptive trace products, entropy experiments,
+and later crystallization. UAH supplies the model port, task/frame projection,
+registry snapshot, mandatory execution ledger, deterministic gate, and owner
+evidence. The first adapter is in-process but its payloads are transport-neutral.
+Protocol mismatch fails closed; a development override is observation-only.
+
+**Current pre-H3 slice:** `WorkbenchMemory` retrieves a bounded set of relevant
+supporting and failed `TraceExperience` records and emits a deterministic,
+provenance-bearing `WorkbenchContextCandidate`. Missing support or
+counterevidence is explicit and the status remains `candidate`. This is an
+early H3-compatible seam delivered before H3; it is not a capability posterior,
+persistent trace memory, prompt optimizer, crystallizer, or H3 completion.
 
 **Deliverables:**
 
@@ -508,6 +695,8 @@ recovery without modifying trusted runtime policy online.
 - conservative capability posterior with explicit unknown state;
 - retrieval of supporting and counterexample traces;
 - mechanism-diverse candidate portfolio rather than paraphrased duplicates;
+- shadow replacement candidates that may differ from the runtime model's first
+  proposal but have zero execution authority until UAH qualification;
 - deterministic graph verifier and hard-constraint filter;
 - Pareto vector for success, risk, latency, cost, evidence, and uncertainty;
 - symbolic entropy proxy only for declared observable variables;
@@ -531,7 +720,8 @@ delta_H_proxy = H_proxy_before - H_proxy_after
 This is a measured proxy, not Shannon entropy unless a calibrated probability
 distribution exists. Every term must name its observable and owner.
 
-**Acceptance gate:** On held-out tasks, success-plus-failure retrieval must beat
+**Acceptance gate:** On held-out tasks, success-plus-failure retrieval and
+shadow replacement must beat
 no-memory and success-only baselines without degrading calibration, scope,
 evidence completeness, or latency beyond budget.
 
@@ -644,9 +834,10 @@ capability and are what implementation status should report.
 
 ## 8. Package and Subsystem Plan
 
-The first implementation remains in this repository to reduce migration risk.
-Relocation occurs only after H2 parity and one non-NAO adapter prove that moving
-the package changes packaging, not meaning.
+The portable UAH core remains in this repository. NeuralWorkbench remains an
+independently versioned companion repository pinned at `src/Neural-Wokbench`
+and is optional through H2. UAH owns the adapter protocol; NeuralWorkbench owns
+the H3+ search/adaptation engine.
 
 | Proposed module | Responsibility | H release |
 | --- | --- | --- |
@@ -659,13 +850,18 @@ the package changes packaging, not meaning.
 | `ab_harness.trace` | Event grammar, JSONL/artifact stores, replay | H0-H1 |
 | `ab_harness.eval` | Milestones, minefields, acceptance, cost/process metrics | H1-H2 |
 | `ab_harness.providers` | Direct local/API model capability normalization | H1 |
+| `ab_harness.configuration` | Content-addressed model-harness-environment identity | H0-H1 |
+| `ab_harness.workbench` | Bounded success/counterexample retrieval and quarantined context candidates | v0 seam toward H3 |
+| `ab_harness.workbench_protocol` | Transport-neutral request, candidate-batch, observation, handshake, and in-process adapter contracts | H2-H3 seam |
+| `ab_harness.smoke` / `cli` | Deterministic accepted, rejected, and retrieval boot canaries | v0-H1 |
 | `ab_harness.adapters.nao` | Temporary cooperative chatbot/planner/ROS views | H2 |
 | `ab_harness.adapters.workers` | Pi, OpenHands, Hermes, OpenClaw, Codex, Claude | H5 |
 | `ab_harness.adapters.mcp` | Protocol discovery and transport mapping | H5 |
 | `neural_workbench.search` | Candidate families, graph verifier, scoring | H3 |
 | `neural_workbench.capability` | Posterior, calibration, entropy proxies | H3 |
 | `neural_workbench.crystallization` | Counterfactuals, quarantine, promotion | H4 |
-| `skill_common` | Canonical governed multi-frame AB object graph | all |
+| domain packages | Environment-owned registry content, bindings, evidence adapters, and qualification cases | H0+ |
+| NeuralWorkbench registry tools | Generic AB schema/graph helpers and migration fixtures; not universal domain-content authority | H3+ |
 
 ### Dependency rule
 
@@ -675,6 +871,27 @@ domain adapters     -> may depend on domain contracts
 worker adapters     -> may depend on worker protocol/SDK
 Workbench learning  -> consumes traces and registry snapshots, never executor internals
 ```
+
+### Observatory O1 and O2
+
+Observatory is the canonical trace visualization surface. O1 freezes a read-only
+API and static HTML renderer for H1 lifecycle and H2 parity review. O2 is the
+proper interactive implementation developed through H4 and polished at H5.
+It may display registry, binding, proposal, gate, evidence, replay, pulse,
+energy, entropy, retrieval, and crystallization graphs, but it never authorizes
+execution or issues evidence. Conceptual and synthetic graphs are labeled and
+cannot masquerade as measured traces. See
+`../architecture/observatory_contract.md`.
+
+### Domain initialization and model coupling
+
+Automated domain initialization is an H3+ product stream, not an H2 dependency.
+Manual and LLM-assisted frontends produce the same candidate domain package.
+Discovery never activates objects. Deterministic validation, replay/sandbox
+qualification, and environment-owner review are required. Coupling and runtime
+models are separate configuration roles, and admission is attached to the full
+model-harness-domain configuration. See
+`domain_initialization_and_ab_coupling.md`.
 
 ## 9. Build, Borrow, or Wrap
 
@@ -881,6 +1098,8 @@ point, not agentic parity.
 | Replace a fake binding locator under the same object | Semantic projection and object identity remain unchanged | Accept explicit object-to-implementation binding seam |
 | Replay valid and out-of-projection recorded NAO proposals | Valid AB1 reaches the fake owner; invalid proposal never dispatches | Continue ROS-free shadow-first qualification |
 | Return failed owner evidence | Terminal observable remains open | Preserve owner-issued evidence as the completion boundary |
+| Run `python -m ab_harness smoke` | Accepted and rejected canaries pass under one content-addressed configuration | Adopt as the v0 boot qualification surface |
+| Retrieve the smoke success and rejection | Workbench candidate contains both supporting and counterexample provenance | Accept bounded retrieval seam; keep promotion and mutation absent |
 
 ## 14. Adversarial Audit
 
@@ -904,6 +1123,11 @@ point, not agentic parity.
 - [x] Environment methods and endpoints are bindings, not automatic AB objects.
 - [x] Candidate bindings cannot resolve for runtime use.
 - [x] An executable binding cannot claim another package's effect ownership.
+- [x] Configuration identity changes when registry or runtime parameters change.
+- [x] Workbench retrieval is bounded, failure-aware, provenance-bearing, and candidate-only.
+- [x] The smoke command has one accepted path and one no-dispatch rejection canary.
+- [x] NeuralWorkbench is pinned as an independent submodule and the first
+  transport-neutral, fail-closed adapter contracts are tested.
 - [ ] Full H0 schemas and lifecycle traces are not implemented.
 - [ ] Only one synthetic H1 vertical slice exists; the required failure suite is incomplete.
 - [ ] No NAO shadow-mode adapter has been run.
@@ -921,15 +1145,15 @@ point, not agentic parity.
 MCP-first semantics, online self-publication, and AB-level inflation from
 performance alone.
 
-**Bounded handoff:** Implement only the remaining H0 contract/lifecycle schemas
-and H1 synthetic runtime before touching live chatbot/planner behavior. In
-parallel, produce throwaway Pi RPC and OpenHands action-observation adapter
-spikes only after the adapter protocol is frozen. Neither spike becomes a
-dependency until it passes conformance.
+**Bounded handoff:** Complete the remaining H0 contract/lifecycle schemas, H1
+runtime, and recorded/fake H2 planner parity before granting any live ROS or H3
+replacement authority. Chatbot assimilation follows planner parity through a
+compatibility adapter. External-worker spikes remain deferred until their
+protocol is frozen and conformance-tested.
 
 ## 16. Ordered Implementation Queue
 
-### Now: finish H0
+### Now: close H0-H1 for the H2 launch candidate
 
 1. Freeze schema versioning and serialization conventions.
 2. Add `HarnessSpec`, `TaskSpec`, `ModelProfile`, and `EnvironmentProfile`.
@@ -943,7 +1167,7 @@ dependency until it passes conformance.
    completion fixtures beside the implemented success and rejection cases.
 9. Keep the existing H0 API behind compatibility exports while tests migrate.
 
-### Next: H1 executable kernel
+### In parallel: H1 executable kernel
 
 1. Implement the minimal lifecycle state machine.
 2. Add direct local/API model and synthetic runtime adapters.
@@ -953,25 +1177,29 @@ dependency until it passes conformance.
 6. Deslop only after behavior is covered; avoid framework-building beyond
    tested needs.
 
-### Then: H2 cooperative NAO proof
+### August 10 target: H2 cooperative NAO planner proof
 
 1. Record frozen chatbot/planner fixtures and current test results.
-2. Add read-only projection and trace bridge.
-3. Run shadow gates and classify disagreements.
-4. Integrate one low-risk path behind a launch/config flag.
+2. Add read-only AB1/AB0 projection and trace bridge.
+3. Implement planner ingress/egress through projection, gate, fake owner, and
+   evidence closure.
+4. Run explicit `legacy | uah | shadow` parity and classify disagreements.
 5. Run same-model standalone versus harness-backed ablations.
 6. Validate fake/sim success and failure paths.
 7. Run live robot tests only when the operator and robot are available.
 
-### After parity: H3-H5
+### Stretch after parity: H3 shadow seam, then H3-H5
 
-1. Normalize complete traces and implement failure-aware posterior.
-2. Add reviewed retrieval and symbolic uncertainty experiments.
-3. Build counterfactual crystallization quarantine.
-4. Prototype Pi and OpenHands adapters.
-5. Add one persistent-agent or frontier-worker adapter.
-6. Prove a non-NAO AB4 task with the unchanged core.
-7. Publish a conformance matrix and declare Universal Harness v1 only after H5.
+1. Attach the pinned NeuralWorkbench through the in-process transport-neutral
+   protocol and host-supplied model port.
+2. Normalize complete traces and implement failure-aware posterior.
+3. Add shadow replacement candidates, reviewed retrieval, and symbolic
+   uncertainty experiments.
+4. Build counterfactual crystallization quarantine.
+5. Prototype Pi and OpenHands adapters.
+6. Add one persistent-agent or frontier-worker adapter.
+7. Prove a non-NAO AB4 task with the unchanged core.
+8. Publish a conformance matrix and declare Universal Harness v1 only after H5.
 
 ## 17. Key Targets and Success Criteria
 
@@ -1103,8 +1331,11 @@ an external harness.
 
 ### Internal foundations
 
-- `docs/agentic_harness/universal_agentic_harness_foundation.md`
-- `docs/agentic_harness/neural_workbench_adaptive_ab_harness.md`
+- `docs/architecture/universal_agentic_harness_foundation.md`
+- `docs/architecture/neural_workbench_adaptive_ab_harness.md`
+- `docs/architecture/observatory_contract.md`
+- `docs/plans/domain_initialization_and_ab_coupling.md`
+- `docs/artifacts/decisions/2026-08-04_uah_h2_neural_workbench_grill.md`
 - `src/Neural-Wokbench/docs/neural_workbench/08_entropy_machines_and_capability_space.md`
 - `src/Neural-Wokbench/docs/neural_workbench/Neural_Workbench_AB_ML_Object_Theory.html`
 - `src/Neural-Wokbench/docs/plans/Neural_Workbench_Formal_Masterplan_Extended.html`

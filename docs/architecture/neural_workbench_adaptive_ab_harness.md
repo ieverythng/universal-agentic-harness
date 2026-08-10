@@ -4,7 +4,7 @@
 **Date:** 2026-07-13
 **Extends:** `universal_agentic_harness_foundation.md`
 **Primary theory source:** Neural Workbench documentation and current source on `feat/base-implementation`
-**Canonical delivery status:** `universal_agentic_harness_masterplan.md` (2026-07-22)
+**Canonical delivery status:** `../plans/universal_agentic_harness_masterplan.md` (2026-08-04)
 
 This document remains the canonical adaptive theory extension. The masterplan
 owns current H0-H5 release status and extends the ladder with H5 cross-runtime

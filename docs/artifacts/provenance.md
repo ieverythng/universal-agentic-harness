@@ -19,12 +19,14 @@ rewriting the source repository or its history.
   `tests/test_h0_nao_harness.py`.
 - The parent-only canonical registry path in that test was replaced by the
   standalone fixture at `tests/fixtures/ab_registry.json`.
-- `docs/agentic_harness/*` was retained at the same repository-relative path.
+- Canonical documentation was reorganized on 2026-08-04 into `docs/plans`,
+  `docs/architecture`, `docs/artifacts`, and `docs/research`; legacy HTML paths
+  are generated redirects.
 - `scripts/render_agentic_harness_docs.py` and
   `scripts/render_markdown_html.py` were retained.
 - The ROS package metadata was retained at repository root as an optional
   wrapper.
 
-The original package README is preserved at `docs/h0_source_readme.md`.
+The original package README is preserved at `docs/artifacts/h0_source_readme.md`.
 Standalone packaging, CI, repository guidance, and Watson integration notes
 were added after extraction.

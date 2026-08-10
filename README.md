@@ -24,7 +24,10 @@ H0 proves:
 - thin NAO chatbot/planner payload adapters;
 - semantic implementation bindings with candidate quarantine;
 - an in-process environment-owner adapter that issues effect evidence;
-- one recorded, ROS-free chatbot-to-planner-to-fake-owner qualification path.
+- one recorded, ROS-free chatbot-to-planner-to-fake-owner qualification path;
+- content-addressed model-harness-environment configuration identity;
+- bounded Neural Workbench retrieval of supporting and counterexample traces;
+- a machine-readable v0 smoke command.
 
 It does **not** yet provide a complete live agent loop. Provider adapters, full
 task/environment schemas, lifecycle events, stale-evidence handling, model
@@ -53,7 +56,13 @@ Python 3.10 or newer is required.
 python -m venv .venv
 python -m pip install -e ".[test]"
 python -m pytest
+python -m ab_harness smoke
 ```
+
+The smoke command is a deterministic boot qualification over recorded
+proposals and a fake environment. It proves the portable control seam and
+Workbench quarantine; it does not claim live-model, ROS, or general agentic
+capability.
 
 Minimal use:
 
@@ -85,11 +94,16 @@ module = InteractionProjector(registry).compile(
 
 - `src/ab_harness/` — portable H0 contracts, registry adapter, projector, gate,
   trace store, and NAO compatibility views.
+- `src/Neural-Wokbench/` — commit-pinned companion engine submodule; optional
+  before H3 and attached through a versioned adapter protocol.
 - `tests/` — fail-closed H0 tests and a standalone registry fixture.
-- `docs/agentic_harness/` — canonical foundation, adaptive Workbench design,
-  implementation masterplan, practical development log, and generated HTML
-  editions.
-- `docs/watson_inference_seams.md` — concrete seams for local-model and
+- `docs/plans/` — implementation masterplan, development log, and coupling
+  plans.
+- `docs/architecture/` — foundation, Workbench integration, Observatory, ADRs,
+  and runtime seam designs.
+- `docs/artifacts/` — provenance, decision records, and system-design outputs.
+- `docs/research/` — evidence reviews and research notes.
+- `docs/architecture/watson_inference_seams.md` — concrete seams for local-model and
   llama.cpp experimentation.
 - `scripts/` — dependency-free Markdown-to-HTML rendering.
 - `package.xml`, `resource/` — optional ROS 2 `ament_python` packaging wrapper;
@@ -103,9 +117,11 @@ Provider, sandbox, browser, shell, ROS, MCP, and frontier-worker integrations
 belong behind adapters.
 
 See the
-[implementation masterplan](docs/agentic_harness/universal_agentic_harness_masterplan.md)
-for the H0-H6 release spine and [source
-provenance](docs/provenance.md) for the exact extraction revision.
+[implementation masterplan](docs/plans/universal_agentic_harness_masterplan.md)
+for the August 10 v0 launch contract and H0-H6 release spine, the
+[development log](docs/plans/universal_agentic_harness_development_log.md)
+for current gates, and [source
+provenance](docs/artifacts/provenance.md) for the exact extraction revision.
 
 ## License
 

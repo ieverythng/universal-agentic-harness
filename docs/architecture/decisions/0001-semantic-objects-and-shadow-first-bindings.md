@@ -11,10 +11,13 @@ future implementation. Automatically turning every discovered method into an
 AB object would make the registry track private code structure, churn whenever
 helpers are refactored, and confuse discovery with authority.
 
-The current NAO stack demonstrates the issue. `/planner/request` has a chatbot
-publisher, a shared normalization contract, and a planner consumer. These are
-different implementations of one interface, not three new semantic
-capabilities.
+The current NAO stack demonstrates both sides of the boundary. A payload builder,
+shared normalization contract, publisher, and consumer may be replaceable
+implementations of one semantic interface. However,
+`/nao_orchestrator/planner_request` and `/planner/request` are not aliases: the
+first is an unadmitted chatbot handoff and the second is emitted only after the
+orchestrator's deterministic planner gate. Collapsing them would erase an
+authorization transition.
 
 ## Decision
 
@@ -32,6 +35,8 @@ capabilities.
 8. The first NAO integration is ROS-free and shadow-first: recorded
    chatbot/planner outputs, deterministic gates, an in-process fake owner, and
    evidence closure. Live coupling remains an H2 promotion step.
+9. Environment endpoints on opposite sides of an admission, evidence, or owner
+   boundary remain distinct AB0 objects even when they reuse one payload schema.
 
 ## Consequences
 
