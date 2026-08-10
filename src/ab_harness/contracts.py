@@ -59,6 +59,42 @@ class ABObjectView:
 
 
 @dataclass(frozen=True)
+class ABImplementationBinding:
+    """Versioned pointer from one semantic AB object to an environment API."""
+
+    binding_id: str
+    object_id: str
+    environment_id: str
+    implementation_owner: str
+    interface_kind: str
+    locator: str
+    source_revision: str
+    input_schema_ref: str
+    output_schema_ref: str
+    evidence_adapter: str
+    runtime_modes: tuple[str, ...]
+    status: str = 'candidate'
+
+    def __post_init__(self) -> None:
+        required = {
+            'binding_id': self.binding_id,
+            'object_id': self.object_id,
+            'environment_id': self.environment_id,
+            'implementation_owner': self.implementation_owner,
+            'interface_kind': self.interface_kind,
+            'locator': self.locator,
+            'source_revision': self.source_revision,
+        }
+        missing = tuple(name for name, value in required.items() if not value.strip())
+        if missing:
+            raise ValueError('binding fields must not be empty: %s' % ', '.join(missing))
+        if self.status not in {'candidate', 'approved', 'disabled'}:
+            raise ValueError('invalid binding status: %s' % self.status)
+        if not self.runtime_modes:
+            raise ValueError('binding must declare at least one runtime mode')
+
+
+@dataclass(frozen=True)
 class InteractionModuleSpec:
     task_id: str
     role: AgentRoleSpec
@@ -86,6 +122,30 @@ class AgentOutput:
 class GateDecision:
     accepted: bool
     reasons: tuple[str, ...] = ()
+
+
+@dataclass(frozen=True)
+class OwnerExecutionResult:
+    """Raw result issued by the environment component that owns an effect."""
+
+    evidence_ref: str
+    succeeded: bool
+    observed_effects: tuple[str, ...]
+    payload: dict[str, Any] = field(default_factory=dict)
+
+
+@dataclass(frozen=True)
+class EffectEvidence:
+    """Normalized evidence linked to the binding that produced it."""
+
+    evidence_ref: str
+    object_id: str
+    binding_id: str
+    environment_id: str
+    owner: str
+    succeeded: bool
+    observed_effects: tuple[str, ...]
+    payload: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass(frozen=True)

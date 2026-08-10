@@ -3,6 +3,7 @@ from pathlib import Path
 import pytest
 
 from ab_harness import AgentOutput
+from ab_harness import BindingCatalog
 from ab_harness import HarnessTrace
 from ab_harness import InteractionProjector
 from ab_harness import JsonlHarnessTraceStore
@@ -12,6 +13,7 @@ from ab_harness.nao_h0 import CHATBOT_ROLE
 from ab_harness.nao_h0 import PLANNER_ROLE
 from ab_harness.nao_h0 import chatbot_output
 from ab_harness.nao_h0 import nao_frame
+from ab_harness.nao_h0 import nao_contract_bindings
 from ab_harness.nao_h0 import planner_output
 
 
@@ -139,3 +141,37 @@ def test_h0_trace_round_trip_reconstructs_projection_and_gate(tmp_path):
     assert loaded == (trace,)
     assert loaded[0].gate.accepted is True
     assert 'resolve_target_reference' in loaded[0].projected_object_ids
+
+
+def test_latest_nao_contract_seams_preserve_planner_gate_boundary():
+    bindings = nao_contract_bindings(
+        chatbot_revision="a2ecca7c",
+        stack_revision="9da89c0c",
+    )
+    catalog = BindingCatalog(_registry(), bindings)
+    planner_gate_bindings = catalog.bindings_for(
+        "/nao_orchestrator/planner_request"
+    )
+    planner_request_bindings = catalog.bindings_for("/planner/request")
+
+    assert [binding.locator for binding in planner_gate_bindings] == [
+        "chatbot_llm.planner_request_adapter:build_planner_request_payload"
+    ]
+    assert len(planner_request_bindings) == 2
+    assert {
+        binding.locator for binding in planner_request_bindings
+    } == {
+        "nao_orchestrator.planner_gate:PlannerGate.decide",
+        "planner_common.contracts:PlannerRequest",
+    }
+    assert all(binding.status == "candidate" for binding in bindings)
+    assert {
+        binding.object_id for binding in bindings
+    } == {
+        "/nao_orchestrator/planner_request",
+        "/planner/request",
+        "/intents",
+        "/planner/execution_feedback",
+        "/planner/dialogue_act",
+        "/scene/summary",
+    }
