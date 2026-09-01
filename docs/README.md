@@ -26,6 +26,7 @@ and must be regenerated after canonical edits.
 ## Artifacts
 
 - `artifacts/decisions/` — dated design and grill outcomes.
+- `artifacts/reviews/`: dated implementation and release-gate audits.
 - `artifacts/system-design/` — system-design document, retained template, and
   architecture figure.
 - `artifacts/provenance.md` — source and extraction provenance.

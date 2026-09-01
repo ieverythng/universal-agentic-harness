@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>UAH H2 Commit and Operational Readiness Review</title>
+  <style>
+    @page {
+      size: A4;
+      margin: 2.6cm 2.2cm 2.4cm 2.2cm;
+    }
+    :root {
+      --ink: #111;
+      --muted: #3a3a3a;
+      --line: #1f1f1f;
+      --soft: #f3f3f3;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: #fff;
+      font-family: "Liberation Serif", "Times New Roman", Times, serif;
+      font-size: 11.5pt;
+      line-height: 1.42;
+    }
+    .doc {
+      max-width: 172mm;
+      margin: 0 auto;
+      padding: 0;
+    }
+    .title-page {
+      min-height: 247mm;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      page-break-after: always;
+    }
+    .title-top {
+      text-align: center;
+      margin-top: 18mm;
+    }
+    .title-top h1 {
+      font-size: 20pt;
+      line-height: 1.28;
+      margin: 20mm 0 8mm;
+      font-weight: 700;
+    }
+    .title-top h2 {
+      font-size: 13pt;
+      margin: 0 0 3mm;
+      font-weight: 600;
+      border-bottom: 0;
+    }
+    .title-top p {
+      margin: 2mm 0;
+      color: var(--muted);
+    }
+    .title-meta {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 0 auto 20mm;
+      font-size: 11pt;
+    }
+    .title-meta td {
+      padding: 2.5mm 0;
+      vertical-align: top;
+      border: 0;
+    }
+    .title-meta td:first-child {
+      width: 38mm;
+      font-weight: 700;
+    }
+    .small { font-size: 10.3pt; color: #222; }
+    h1, h2, h3 {
+      margin: 0 0 3mm;
+      line-height: 1.28;
+      font-weight: 700;
+    }
+    h1 { font-size: 16.5pt; margin-top: 0; }
+    h2 {
+      font-size: 13pt;
+      margin-top: 9mm;
+      border-bottom: 0.5pt solid var(--line);
+      padding-bottom: 1.5mm;
+    }
+    h3 {
+      font-size: 11.8pt;
+      margin-top: 6mm;
+    }
+    p { margin: 2.2mm 0; }
+    ul, ol { margin: 2.5mm 0 2.5mm 6mm; padding: 0; }
+    li { margin: 1.4mm 0; }
+    pre {
+      margin: 2.5mm 0 4mm;
+      background: var(--soft);
+      border: 0.6pt solid #666;
+      padding: 2.6mm 2.8mm;
+      overflow-x: auto;
+      white-space: pre;
+      font-family: "Liberation Mono", "Courier New", monospace;
+      font-size: 9.2pt;
+      line-height: 1.3;
+    }
+    code {
+      font-family: "Liberation Mono", "Courier New", monospace;
+      background: #efefef;
+      padding: 0.2mm 1mm;
+      border: 0.4pt solid #d7d7d7;
+      border-radius: 2px;
+      font-size: 10.3pt;
+    }
+    pre code {
+      background: transparent;
+      padding: 0;
+      border: 0;
+      font-size: inherit;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 3mm 0 4mm;
+      font-size: 10.8pt;
+    }
+    th, td {
+      border: 0.6pt solid #333;
+      padding: 2.2mm 2.3mm;
+      vertical-align: top;
+      overflow-wrap: anywhere;
+      hyphens: auto;
+    }
+    th {
+      background: #fafafa;
+      text-align: left;
+      font-weight: 700;
+    }
+    .diagram {
+      margin: 4mm 0 5mm;
+      border: 0.6pt solid #777;
+      padding: 2mm;
+      background: #fff;
+    }
+    .diagram pre {
+      margin: 0;
+      border: 0;
+      background: #fcfcfc;
+      font-size: 10.2pt;
+      white-space: pre-wrap;
+    }
+    .diagram svg {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+    .diagram-labels {
+      font-family: "Liberation Serif", "Times New Roman", Times, serif;
+      font-size: 25px;
+      font-weight: 700;
+      fill: #111;
+    }
+    .lifelines {
+      stroke: #999;
+      stroke-dasharray: 4 4;
+    }
+    .messages {
+      stroke: #111;
+      stroke-width: 1.35;
+      fill: none;
+    }
+    .messages text {
+      stroke: none;
+      fill: #111;
+      font-family: "Liberation Serif", "Times New Roman", Times, serif;
+      font-size: 22px;
+    }
+    .caption {
+      margin-top: 2mm;
+      font-size: 10.5pt;
+      color: #222;
+      font-style: italic;
+      text-align: center;
+    }
+    blockquote {
+      border: 0.6pt solid #333;
+      background: #fcfcfc;
+      margin: 3mm 0;
+      padding: 2.6mm 3mm;
+      color: var(--muted);
+    }
+    a { color: #111; }
+  </style>
+  <link rel="stylesheet" href="../../assets/harness-theme.css" />
+  <script defer src="../../assets/harness-theme.js"></script>
+</head>
+<body>
+  <main class="doc">
+
+<h1>UAH H2 Commit and Operational Readiness Review</h1>
+<p><strong>Review date:</strong> 2026-08-17&lt;br&gt; <strong>Reviewed range:</strong> <code>5de73a5...71ae872</code>&lt;br&gt; <strong>Commits:</strong> <code>6708af9</code> and <code>71ae872</code>&lt;br&gt; <strong>UAH branch:</strong> <code>feat/pre-commit-queue</code>&lt;br&gt; <strong>NAO boundary requested:</strong> <code>refactor/deslop_repo</code>&lt;br&gt; <strong>Review status:</strong> H0 synthetic proof accepted with corrections required; H1 and H2 not qualified</p>
+<h2>1. Decision</h2>
+<p>The two commits contain a useful portable contract proof. They do not close the August 10 H2 launch contract. The current package can be installed in a clean Python environment, executes one deterministic recorded success and one out-of-projection rejection, and preserves the basic rule that an environment owner issues effect evidence. The package does not yet implement the complete H1 lifecycle, typed operation admission, model-free lifecycle replay, a provider adapter, or NAO planner parity.</p>
+<p>The current release label should therefore remain <strong>H0 synthetic proof with one partial H1 vertical slice</strong>. It should not be labeled <code>UAH core qualified</code>, <code>UAH H2 NAO planner qualified</code>, or <code>UAH H2 model qualified</code> under the definitions in the <a href="../../plans/universal_agentic_harness_masterplan.md">masterplan</a>.</p>
+<p>The shortest route to an operational Linux test is:</p>
+<ol>
+<li>close the typed proposal and lifecycle/replay seam in UAH;</li>
+<li>freeze one clean NAO <code>refactor/deslop_repo</code> revision and compile package-owned golden fixtures from it;</li>
+<li>implement the provider-neutral model port and an Ollama adapter;</li>
+<li>run recorded and fake-owner NAO parity under an explicit authority mode;</li>
+<li>run the ROS fake stack on this PC, then defer live robot authority to the operator and robot environment.</li>
+</ol>
+<h2>2. Review Basis</h2>
+<h3>2.1 Governing documents</h3>
+<ul>
+<li><a href="../../plans/universal_agentic_harness_masterplan.md">Universal Agentic Harness masterplan</a></li>
+<li><a href="../../plans/universal_agentic_harness_development_log.md">Universal Agentic Harness development log</a></li>
+<li><a href="../decisions/2026-08-04_uah_h2_neural_workbench_grill.md">H2 and NeuralWorkbench design decision</a></li>
+<li><a href="../../plans/domain_initialization_and_ab_coupling.md">Domain initialization and AB coupling</a></li>
+<li><a href="../../architecture/watson_inference_seams.md">Watson and local-inference seams</a></li>
+<li><a href="../../../CONTEXT.md">Root domain model</a></li>
+<li><a href="../../../AGENTS.md">Repository agent guide</a></li>
+</ul>
+<p>The masterplan and development log are internally clear that H1 lifecycle and H2 planner parity are incomplete. This review uses their hard gates rather than the target date as the completion criterion.</p>
+<h3>2.2 Reproduced evidence</h3>
+<table><thead><tr>
+<th>Probe</th>
+<th>Result</th>
+<th>Interpretation</th>
+</tr></thead><tbody>
+<tr>
+<td><code>git diff 5de73a5...HEAD</code></td>
+<td>55 files, 9,566 insertions, 4,301 deletions</td>
+<td>The range is large because it includes generated HTML, moved documents, binary design artifacts, source, and tests.</td>
+</tr>
+<tr>
+<td><code>python scripts/render_agentic_harness_docs.py</code></td>
+<td>Pass, no diff before this review was added</td>
+<td>Canonical Markdown and generated HTML were synchronized.</td>
+</tr>
+<tr>
+<td><code>python -m pytest</code> in the uninstalled checkout</td>
+<td>Collection failed with eight <code>ModuleNotFoundError: ab_harness</code> errors</td>
+<td>The mandated source-check command assumes prior installation or <code>PYTHONPATH=src</code>.</td>
+</tr>
+<tr>
+<td><code>PYTHONPATH=src python -m pytest</code></td>
+<td>42 passed</td>
+<td>Existing behavior tests pass against the source tree.</td>
+</tr>
+<tr>
+<td>Clean archive, fresh venv, <code>pip install &quot;.[test]&quot;</code>, <code>python -m pytest</code></td>
+<td>42 passed</td>
+<td>The package is installable and its clean-install test gate passes.</td>
+</tr>
+<tr>
+<td>Freshly installed <code>python -m ab_harness smoke</code></td>
+<td>Pass</td>
+<td>The recorded smoke surface is reproducible after installation.</td>
+</tr>
+<tr>
+<td><code>git submodule status</code></td>
+<td>No entries</td>
+<td><code>.gitmodules</code> exists, but no Neural Workbench gitlink is committed.</td>
+</tr>
+<tr>
+<td>Core import audit</td>
+<td>Standard library and <code>ab_harness</code> imports only</td>
+<td>The portable source boundary remains free of ROS, NAO, and provider SDK imports.</td>
+</tr>
+<tr>
+<td><code>git diff --check 5de73a5...HEAD</code></td>
+<td>One Markdown hard-break warning</td>
+<td>No source whitespace faults; the development-log purpose line uses two trailing spaces.</td>
+</tr>
+</tbody></table>
+<p>No coverage tool is installed in the current environment, so this review does not make a numeric coverage claim. Passing test counts are not treated as proof of untested lifecycle or parity behavior.</p>
+<h2>3. Current Release Position</h2>
+<table><thead><tr>
+<th>Release requirement</th>
+<th>Current evidence</th>
+<th>State</th>
+</tr></thead><tbody>
+<tr>
+<td>Portable install</td>
+<td>Clean archive installed into a fresh venv</td>
+<td>Green</td>
+</tr>
+<tr>
+<td>ROS/provider isolation</td>
+<td>Core import audit contains no forbidden dependencies</td>
+<td>Green</td>
+</tr>
+<tr>
+<td>Frame-relative AB semantics</td>
+<td>Registry, projection, and role tests pass</td>
+<td>Green for the H0 slice</td>
+</tr>
+<tr>
+<td>Approved binding resolution</td>
+<td>Candidate quarantine, runtime mode, environment, and owner checks are tested</td>
+<td>Partial, because schema and evidence adapter fields can be empty</td>
+</tr>
+<tr>
+<td>Typed admitted operation</td>
+<td>Gate checks output type, object reach, AB level, and effect-claim authority</td>
+<td>Red, because step arguments and operation schema are not admitted as a typed value</td>
+</tr>
+<tr>
+<td>Complete H1 lifecycle</td>
+<td>No compile-to-terminal event grammar or runtime state machine</td>
+<td>Red</td>
+</tr>
+<tr>
+<td>Model-free replay</td>
+<td>Recorded payloads can be supplied again, but no lifecycle ledger is reconstructed</td>
+<td>Red</td>
+</tr>
+<tr>
+<td>Failure suite</td>
+<td>Out-of-projection and failed owner cases exist</td>
+<td>Partial; stale evidence, timeout, cancellation, retry exhaustion, unavailable binding, and false completion are absent</td>
+</tr>
+<tr>
+<td>Configuration identity</td>
+<td>Stable digest over the implemented fields</td>
+<td>Partial; the manifest omits required model/runtime resource and provider-capability fields</td>
+</tr>
+<tr>
+<td>Provider/model port</td>
+<td>No provider-neutral request/result protocol in <code>src/ab_harness</code></td>
+<td>Red</td>
+</tr>
+<tr>
+<td>Ollama qualification</td>
+<td>Local endpoint exists, but UAH cannot call or characterize it</td>
+<td>Red</td>
+</tr>
+<tr>
+<td>NAO ingress/egress adapter</td>
+<td>Candidate pointers and dictionary adapters exist</td>
+<td>Red; no <code>PlannerRequest</code> normalization, lineage, feedback egress, or parity runner</td>
+</tr>
+<tr>
+<td>Explicit `legacy</td>
+<td>uah</td>
+<td>shadow` authority</td>
+<td>Declared only in documents</td>
+<td>Red</td>
+</tr>
+<tr>
+<td>NAO parity report</td>
+<td>No golden fixture run or disagreement classifier</td>
+<td>Red</td>
+</tr>
+<tr>
+<td>O1 Observatory</td>
+<td>Contract document only</td>
+<td>Red for implementation</td>
+</tr>
+<tr>
+<td>Workbench quarantine</td>
+<td>In-memory retrieval remains candidate-only</td>
+<td>Green for the narrow optional seam</td>
+</tr>
+<tr>
+<td>Neural Workbench repository pin</td>
+<td><code>.gitmodules</code> declaration without gitlink</td>
+<td>Red</td>
+</tr>
+<tr>
+<td>Documentation synchronization</td>
+<td>Renderer is deterministic and current companions match</td>
+<td>Green</td>
+</tr>
+</tbody></table>
+<h2>4. Commit <code>6708af9</code>: Documentation Reorganization and New Seams</h2>
+<h3>4.1 Accepted changes</h3>
+<p>The repository reorganization is coherent. Canonical Markdown now lives under <code>docs/plans</code>, <code>docs/architecture</code>, and <code>docs/artifacts</code>; the old <code>docs/agentic_harness/*.html</code> files are small redirects. The shared theme paths resolve from the new locations, and rerendering produced no unexpected changes. <code>docs/README.md</code> provides a useful navigation and ownership summary.</p>
+<p>The masterplan and development log correctly retain the following limitations:</p>
+<ul>
+<li>complete H0 schemas and lifecycle traces are not implemented;</li>
+<li>the H1 failure suite is incomplete;</li>
+<li>no NAO shadow-mode adapter has run;</li>
+<li>the Watson/Bonsai runner has not started;</li>
+<li>live NAO authority is excluded from H2 qualification.</li>
+</ul>
+<p>Those statements are consistent with the source inspected in <code>71ae872</code>.</p>
+<h3>4.2 Critical correction: the submodule is not pinned</h3>
+<p><code>.gitmodules</code> declares <code>src/Neural-Wokbench</code> and names a branch, but commit <code>6708af9</code> does not add a gitlink at that path. <code>git submodule status</code> is empty, and <code>git ls-tree HEAD src/Neural-Wokbench</code> returns no entry. A fresh clone cannot retrieve the companion repository from this commit.</p>
+<p>The following statements are therefore factually incorrect:</p>
+<ul>
+<li><code>README.md</code> calls the companion a commit-pinned submodule;</li>
+<li><code>docs/README.md</code> calls it a commit-pinned companion repository;</li>
+<li>the development dashboard marks the repository boundary green;</li>
+<li>the masterplan adversarial audit marks the independent submodule pin complete.</li>
+</ul>
+<p>Required correction: add the actual gitlink at a reviewed immutable revision, or change all four claims to state that only a proposed submodule configuration exists. A <code>branch = ...</code> entry is update guidance, not a revision pin.</p>
+<h3>4.3 Status taxonomy drift</h3>
+<p>The root README lists configuration identity, Workbench retrieval, and the smoke CLI under “H0 proves.” The masterplan assigns configuration identity to H0-H1, the smoke surface to v0-H1, and Workbench behavior to the H2-H3 seam with H3 authority. Grouping all three under H0 weakens the required separation between implemented H0 claims and later roadmap work.</p>
+<p>Required correction: divide the README status into at least:</p>
+<ul>
+<li>implemented H0 contract proof;</li>
+<li>partial H1 operational slice;</li>
+<li>optional quarantined H2-H3 protocol scaffolding.</li>
+</ul>
+<h3>4.4 Date and status maintenance</h3>
+<p>The masterplan status still says that the August 10 launch contract is active, and the development log still reports the state as of August 4. On August 17, the gate has elapsed without H2 completion. The contract should remain as an historical release gate, but current status should state that it was not met and identify the next candidate date only after the missing gates have owners.</p>
+<h3>4.5 Scope sequencing</h3>
+<p>This commit adds the Workbench protocol decision, Observatory contract, domain initialization plan, system-design DOCX, and associated generated assets. These are relevant designs, but H3 and presentation work arrived before the release critical H1 lifecycle and H2 planner parity slices. This is not a boundary violation by itself. It is sequencing debt because the launch-critical queue remained unimplemented.</p>
+<h3>4.6 File-group disposition</h3>
+<table><thead><tr>
+<th>File group</th>
+<th>Disposition</th>
+<th>Review note</th>
+</tr></thead><tbody>
+<tr>
+<td><code>.gitignore</code></td>
+<td>Accept</td>
+<td>Ignores generated local artifacts and temporary Office files.</td>
+</tr>
+<tr>
+<td><code>.gitmodules</code></td>
+<td>Reject as a completed pin</td>
+<td>Configuration exists without the required gitlink.</td>
+</tr>
+<tr>
+<td>Root and docs READMEs</td>
+<td>Accept with corrections</td>
+<td>Navigation is improved; H0 taxonomy and submodule claims need correction.</td>
+</tr>
+<tr>
+<td>Canonical plan and architecture Markdown</td>
+<td>Accept as design record</td>
+<td>The plans are detailed and mostly explicit about incomplete gates.</td>
+</tr>
+<tr>
+<td>Generated HTML</td>
+<td>Accept</td>
+<td>Current renderer reproduces it. Generated changes should not receive independent semantic review.</td>
+</tr>
+<tr>
+<td>Legacy HTML redirects</td>
+<td>Accept</td>
+<td>The user-facing paths continue to resolve to canonical documents.</td>
+</tr>
+<tr>
+<td>System-design DOCX and PNG</td>
+<td>Retain as artifacts</td>
+<td>They do not constitute runtime or parity evidence.</td>
+</tr>
+</tbody></table>
+<h2>5. Commit <code>71ae872</code>: Main Harness Settings for H0-H1</h2>
+<h3>5.1 Binding catalog, <code>bindings.py:11-67</code></h3>
+<p>Accepted behavior:</p>
+<ul>
+<li>construction rejects bindings to unknown AB objects;</li>
+<li>binding IDs are unique inside a catalog;</li>
+<li>only <code>approved</code> bindings resolve;</li>
+<li>environment and runtime mode participate in resolution;</li>
+<li>ambiguous approved bindings fail closed.</li>
+</ul>
+<p>Required changes:</p>
+<ul>
+<li><code>ABImplementationBinding.__post_init__</code> validates identifiers, owner, locator, and revision, but permits empty <code>input_schema_ref</code>, <code>output_schema_ref</code>, and <code>evidence_adapter</code>. This contradicts the root domain model, which defines all three as recorded binding properties.</li>
+<li>Empty or duplicate runtime-mode strings are accepted. A binding can therefore be syntactically approved while lacking a usable contract for schema parity.</li>
+<li>Approval is represented by an unrestricted string and is not associated with review provenance, approval revision, or rollback target.</li>
+</ul>
+<h3>5.2 Configuration identity, <code>configuration.py:10-72</code></h3>
+<p>Accepted behavior:</p>
+<ul>
+<li>serialization is deterministic;</li>
+<li>runtime-parameter order does not affect the digest;</li>
+<li>duplicate runtime-parameter names are rejected;</li>
+<li>registry and runtime changes alter the configuration ID.</li>
+</ul>
+<p>Required changes:</p>
+<ul>
+<li>runtime parameter names and values can be empty because validation checks the outer dictionary rather than each pair;</li>
+<li>the contract cannot require quantization, effective context, KV settings, batch/concurrency, cache policy, provider protocol, endpoint capability, or resource headroom;</li>
+<li>prompt identity is a single caller-provided string and does not prove which projection, system prompt, or structured-output schema was used;</li>
+<li>the smoke configuration uses only <code>mode=deterministic</code>, so “complete configuration identity: Green” is too strong for model-qualified H2.</li>
+</ul>
+<p>The current type is adequate for the recorded smoke fixture. It is not yet the complete model-harness-environment manifest described by the H2 boot gate.</p>
+<h3>5.3 Environment owner, <code>environment.py:12-85</code></h3>
+<p>Accepted behavior:</p>
+<ul>
+<li>AB0 objects cannot dispatch;</li>
+<li>catalog resolution occurs before handler lookup;</li>
+<li>the executable AB1 implementation owner must match the semantic owner;</li>
+<li>handlers must return <code>OwnerExecutionResult</code>;</li>
+<li>successful executions with declared success observables must return evidence;</li>
+<li>undeclared observables are rejected.</li>
+</ul>
+<p>Required changes:</p>
+<ul>
+<li>the binding input schema is not applied to arguments before the handler runs;</li>
+<li>the output schema and named evidence adapter are recorded but never invoked;</li>
+<li>evidence has no observation time, freshness horizon, execution ID, or lineage;</li>
+<li>there is no timeout, cancellation, retry, idempotency, or owner-unavailable result grammar;</li>
+<li>a failed result may still carry success observables. Closure currently ignores them, but the invalid combination is not rejected.</li>
+</ul>
+<h3>5.4 NAO compatibility declarations, <code>nao_h0.py:13-163</code></h3>
+<p>Accepted behavior:</p>
+<ul>
+<li>chatbot and planner roles remain separate;</li>
+<li>both roles have frame-relative control bands;</li>
+<li>effect claims remain disabled;</li>
+<li>all inspected ROS and Python seams remain candidate bindings;</li>
+<li>AB0 interface declarations remain non-callable through the registry;</li>
+<li>the planner parser collects referenced skill names for reachability checks.</li>
+</ul>
+<p>Boundary verification against the recorded <code>origin/refactor/deslop_repo</code> ref found <code>PlannerGate.decide</code>, <code>PlannerRequest</code>, <code>ExecutionFeedback</code>, <code>PlannerDialogueAct</code>, <code>SceneSummary</code>, and <code>PlannerNode._publish_decision</code> at the declared module locations. The chatbot publisher belongs to a nested/separate chatbot repository and was not proven by the top-level NAO ref.</p>
+<p>Required changes:</p>
+<ul>
+<li>no persisted binding catalog records the reviewed NAO revision;</li>
+<li>source revisions are arbitrary function arguments rather than verified object IDs;</li>
+<li>schema references are locator strings, not compiled fixtures or hashes;</li>
+<li>the declared modes are <code>shadow</code> and <code>cooperative</code>, while the H2 decision uses explicit <code>legacy</code>, <code>uah</code>, and <code>shadow</code> authority modes;</li>
+<li><code>planner_output</code> and <code>_skill_steps</code> duplicate raw plan parsing and can drift.</li>
+</ul>
+<h3>5.5 Qualification path, <code>qualification.py:17-179</code></h3>
+<p>This file contains the highest-risk implementation issue in the reviewed range.</p>
+<p>The gate evaluates an <code>AgentOutput</code> constructed from <code>planner_payload</code>, but the gate validates only output type, referenced object reach, AB level, and claimed effects. After acceptance, <code>_skill_steps(planner_payload)</code> reparses the original raw dictionary and sends its unvalidated argument dictionaries to the owner. There is no typed admitted operation whose exact value is passed from gate to dispatch.</p>
+<p>This breaks the intended sequence:</p>
+<pre><code class="language-text">model output -&gt; typed proposal -&gt; deterministic admission -&gt; exact admitted operation -&gt; owner</code></pre>
+<p>The implemented sequence is:</p>
+<pre><code class="language-text">raw dictionary -&gt; object-name summary -&gt; reachability decision
+raw dictionary -&gt; second parser -&gt; owner arguments</code></pre>
+<p>The two parsers currently select the same skill names, so the existing rejection test prevents an out-of-projection name from dispatching. They do not validate argument shape, required arguments, step IDs, duplicate IDs, plan lineage, or mutation between admission and dispatch.</p>
+<p>The class name also overstates replay. It accepts two fixture dictionaries but does not reconstruct a persisted lifecycle. The chatbot payload and planner payload are gated independently. No <code>PlannerRequest</code> output from the chatbot stage becomes the planner input, so the test does not prove chatbot-to-planner lineage.</p>
+<p>Required correction: introduce one immutable typed proposal containing normalized operations and lineage. The gate returns an admitted value or a rejection. Dispatch consumes only the admitted value. Record lifecycle events for compilation, proposal, gate, dispatch, evidence, and terminal decision, then replay those events without invoking the model.</p>
+<h3>5.6 Smoke and CLI, <code>smoke.py:19-203</code>, <code>cli.py:12-25</code></h3>
+<p>Accepted behavior:</p>
+<ul>
+<li>output is machine-readable JSON;</li>
+<li>success depends on all four canaries;</li>
+<li>the command exits nonzero when the aggregate status fails;</li>
+<li>identities are deterministic across repeated clean-install runs;</li>
+<li>the rejection canary does not reach the mounted owner;</li>
+<li>Workbench retrieval returns support and counterexample provenance.</li>
+</ul>
+<p>Limitations:</p>
+<ul>
+<li>registry and fixtures are compiled into <code>smoke.py</code>, so the command cannot qualify a supplied registry, suite, model manifest, or environment;</li>
+<li>no malformed structured-output canary exists;</li>
+<li>no stale evidence or owner-unavailable canary exists;</li>
+<li>the command does not emit lifecycle events or a replay artifact;</li>
+<li>the command labels its adapter <code>nao-shadow-v1</code> without exercising a NAO compatibility adapter or an explicit authority router;</li>
+<li>the rejected report includes <code>passed: false</code>, which is the case outcome rather than the expected-canary outcome. This is valid but easy for consumers to misread.</li>
+</ul>
+<h3>5.7 Workbench memory, <code>workbench.py:10-174</code></h3>
+<p>Accepted behavior:</p>
+<ul>
+<li>experiences are immutable dataclasses;</li>
+<li>trace IDs are unique;</li>
+<li>success and failure states are constrained;</li>
+<li>retrieval is deterministic and bounded per outcome;</li>
+<li>missing support or counterexamples become explicit gaps;</li>
+<li>the result remains <code>candidate</code> and has no promotion or write path.</li>
+</ul>
+<p>Limitations:</p>
+<ul>
+<li>trace, task, configuration, registry, and object identifiers are not checked for non-empty values;</li>
+<li>retrieval mixes registry and configuration versions and reports the mixture after selection rather than constraining compatibility before selection;</li>
+<li>overlap ranking has no freshness, evidence validity, task-suite, or failure attribution compatibility gate;</li>
+<li>storage is in memory, not append-only or replay-addressed.</li>
+</ul>
+<p>These are acceptable for a quarantined H3-facing sketch, but they prevent using the result as operational context in H2.</p>
+<h3>5.8 Workbench protocol, <code>workbench_protocol.py:11-293</code></h3>
+<p>Accepted behavior:</p>
+<ul>
+<li>request, candidate batch, and observation payloads reject non-JSON values;</li>
+<li>request IDs correlate responses;</li>
+<li>duplicate candidate IDs are rejected;</li>
+<li>unsupported handshakes fail closed by default;</li>
+<li>the unsafe version override disables proposals and remains observation-only;</li>
+<li>candidates have a fixed <code>candidate</code> status.</li>
+</ul>
+<p>Required changes:</p>
+<ul>
+<li><code>observe()</code> checks the <code>observe</code> capability but does not require the observation protocol to match the engine descriptor. A mismatched observation reaches the engine even when the normal proposal path would fail closed;</li>
+<li>proposal responses are not checked to ensure <code>engine_version</code> and <code>source_revision</code> match the descriptor captured during handshake;</li>
+<li>descriptors do not reject duplicate, empty, or unknown capability names;</li>
+<li><code>activation_mode=&#x27;gated&#x27;</code> is allowed without a defined activation authority;</li>
+<li>empty candidate collections are allowed without an explicit no-candidate reason;</li>
+<li>JSON-compatible dictionaries remain structurally untyped at the protocol boundary.</li>
+</ul>
+<h3>5.9 Tests, <code>tests/</code></h3>
+<p>The tests are concise and exercise public classes rather than private methods. The strongest cases prove candidate quarantine, wrong-owner rejection, AB0 non-callability, out-of-projection no-dispatch, failed evidence closure, deterministic retrieval, and protocol mismatch behavior.</p>
+<p>Missing high-value cases:</p>
+<ul>
+<li>admitted operation arguments match the exact normalized value checked by the gate;</li>
+<li>malformed or missing step arguments reject before owner dispatch;</li>
+<li>chatbot handoff lineage becomes planner request lineage;</li>
+<li>stale evidence, timeout, cancellation, retry exhaustion, unavailable owner, and false completion;</li>
+<li>replay equivalence from a persisted event ledger;</li>
+<li>binding schema/evidence fields reject empty values;</li>
+<li>runtime parameter names and values reject empty strings;</li>
+<li>observation protocol mismatch fails closed;</li>
+<li>response engine identity mismatch fails closed;</li>
+<li>clean source-check ergonomics for the mandated <code>python -m pytest</code> command.</li>
+</ul>
+<h3>5.10 Documentation tooling</h3>
+<p>The renderer changes correctly cover the reorganized canonical documents and legacy redirects. <code>create_uah_system_design_docx.py</code> is presentation tooling and does not provide H1 lifecycle or H2 parity evidence. It can remain in the repository, but its maintenance should not precede the release-critical runtime slices.</p>
+<h2>6. Standards and Specification Axes</h2>
+<h3>6.1 Standards findings</h3>
+<p>Hard findings:</p>
+<ol>
+<li>H0 claims in the root README include H1 and H3-facing work, contrary to the repository requirement to keep H0 implementation claims distinct.</li>
+<li>Approved bindings may omit schemas and an evidence adapter, contrary to the root domain definition.</li>
+<li>Raw planner arguments are dispatched after a summary gate rather than as the exact typed operation admitted by the deterministic gate.</li>
+<li>Documentation claims a pinned submodule that is absent from the Git tree.</li>
+</ol>
+<p>Design-smell findings:</p>
+<ul>
+<li>plan-step parsing is duplicated between <code>nao_h0.py</code> and <code>qualification.py</code>;</li>
+<li>content-address construction repeats across configuration, Workbench memory, and Workbench protocol modules;</li>
+<li>authority-bearing states use unrestricted strings across several modules.</li>
+</ul>
+<h3>6.2 Specification findings</h3>
+<p>Missing or partial requirements:</p>
+<ol>
+<li>full planner ingress/egress and fake/simulated parity;</li>
+<li>explicit <code>legacy | uah | shadow</code> routing and disagreement classification;</li>
+<li>provider-neutral model port and Ollama/runtime preflight;</li>
+<li>lifecycle ledger, replay, and O1 renderer;</li>
+<li>source-schema parity artifacts for NAO candidate bindings.</li>
+</ol>
+<p>Implemented-looking requirements that need correction:</p>
+<ol>
+<li>chatbot and planner fixtures have no handoff lineage;</li>
+<li>complete configuration identity is not complete for a served model;</li>
+<li>binding validation does not require all contract fields;</li>
+<li>Neural Workbench is configured in <code>.gitmodules</code> but not commit-pinned.</li>
+</ol>
+<p>Scope introduced ahead of the critical path:</p>
+<ul>
+<li>Workbench memory and protocol;</li>
+<li>Observatory contract;</li>
+<li>domain initialization design;</li>
+<li>system-design Office artifacts.</li>
+</ul>
+<p>These assets can remain, but they must not displace H1 lifecycle and H2 planner parity in the next implementation queue.</p>
+<h2>7. NAO and Ollama Readiness on This Linux PC</h2>
+<h3>7.1 Local runtime inventory</h3>
+<table><thead><tr>
+<th>Component</th>
+<th>Observed state on 2026-08-17</th>
+<th>Consequence</th>
+</tr></thead><tbody>
+<tr>
+<td>Ollama executable</td>
+<td><code>/snap/bin/ollama</code>, version <code>0.32.5</code></td>
+<td>Provider process is available.</td>
+</tr>
+<tr>
+<td>Ollama <code>127.0.0.1:11434</code></td>
+<td>Listening; <code>/api/tags</code> returns HTTP 200</td>
+<td>One real provider endpoint can be probed now.</td>
+</tr>
+<tr>
+<td>Model inventory</td>
+<td>Eleven cloud-backed manifests; no local-weight model observed</td>
+<td>Endpoint tests may depend on Ollama cloud authorization and network availability.</td>
+</tr>
+<tr>
+<td>Ollama <code>127.0.0.1:11435</code></td>
+<td>Not listening</td>
+<td>Split chatbot/planner endpoint profile is not ready.</td>
+</tr>
+<tr>
+<td>OpenAI-compatible <code>127.0.0.1:8001</code></td>
+<td>Not listening</td>
+<td>Hermes-style local gateway is unavailable.</td>
+</tr>
+<tr>
+<td>Lab endpoint <code>127.0.0.1:8004</code></td>
+<td>Not listening locally</td>
+<td>Current NAO default lab route is unavailable from localhost.</td>
+</tr>
+<tr>
+<td>ROS 2</td>
+<td>Jazzy exists under <code>/opt/ros/jazzy</code>; not sourced in the default shell</td>
+<td>ROS commands work after sourcing the distribution.</td>
+</tr>
+<tr>
+<td>Built NAO packages</td>
+<td><code>planner_llm</code>, <code>nao_orchestrator</code>, and <code>fake_skills</code> resolve after sourcing the existing install</td>
+<td>Independent NAO fake-stack tests are feasible.</td>
+</tr>
+</tbody></table>
+<p>The Ollama inventory probe did not invoke a model. A scored model request should wait for a frozen manifest, suite, and failure-attribution record.</p>
+<h3>7.2 NAO revision boundary</h3>
+<p>The primary NAO checkout remains on <code>feat/TFM-LLM_planner</code> at <code>9da89c0</code>, which is the revision named by the UAH development log. A separate worktree exists for <code>refactor/deslop_repo</code> at <code>b22ddfd</code>. That branch is two commits behind its recorded remote and has extensive tracked and untracked work in progress.</p>
+<p>This means there is no immutable current deslop boundary to use as H2 parity evidence. Before golden fixtures are captured, the owner must select one of:</p>
+<ul>
+<li>the committed local deslop revision <code>b22ddfd</code>;</li>
+<li>the recorded remote revision <code>9418e34</code>;</li>
+<li>a new reviewed commit containing the current worktree changes.</li>
+</ul>
+<p>The UAH review must not copy or normalize the dirty NAO worktree as collateral work. NAO remains the semantic and execution owner.</p>
+<h3>7.3 Distance from meaningful tests</h3>
+<p>Three distinct tests should not be conflated:</p>
+<table><thead><tr>
+<th>Test</th>
+<th>Can run now?</th>
+<th>Missing UAH work</th>
+</tr></thead><tbody>
+<tr>
+<td>Independent NAO provider readiness against Ollama</td>
+<td>Yes, through the existing <code>planner_llm</code> live provider seam after selecting a model and accepting cloud use</td>
+<td>None for the NAO-only probe; it does not qualify UAH.</td>
+</tr>
+<tr>
+<td>Independent NAO ROS fake-stack test</td>
+<td>Technically feasible after sourcing Jazzy and rebuilding a clean selected NAO revision</td>
+<td>It remains NAO evidence only.</td>
+</tr>
+<tr>
+<td>UAH-integrated H2 NAO planner parity</td>
+<td>No</td>
+<td>Typed admitted operation, lifecycle ledger/replay, NAO adapter, frozen fixtures, explicit authority mode, and parity evaluator.</td>
+</tr>
+</tbody></table>
+<p>The PC is not blocked by the absence of the robot. H2 explicitly permits recorded and fake/simulated closure. The blockers are software contracts and a frozen NAO boundary, not hardware.</p>
+<h2>8. Recommended Implementation Queue</h2>
+<p>All source changes below should use vertical red-green TDD slices. Tests must observe public seams and must not mock UAH internals.</p>
+<h3>Slice 1: typed operation admission</h3>
+<p><strong>Proposed public seam:</strong> a planner adapter parses raw output into an immutable typed proposal; the gate returns an admitted proposal; the environment owner executes that exact value.</p>
+<p>First failing behavior: malformed or missing <code>find_object.label</code> is rejected before owner dispatch, while a valid normalized operation reaches the owner unchanged.</p>
+<h3>Slice 2: lifecycle ledger and replay</h3>
+<p><strong>Proposed public seam:</strong> one runtime entry point returns an append-only sequence of versioned events and a terminal decision; replay consumes those events without a model and reaches the same decision.</p>
+<p>First failing behavior: recorded success and one stale-evidence counterexample produce compile-to-terminal events and replay identically.</p>
+<h3>Slice 3: complete binding and configuration contracts</h3>
+<p><strong>Proposed public seams:</strong> <code>ABImplementationBinding</code> construction and a configuration-manifest loader.</p>
+<p>First failing behaviors: approved bindings reject missing schema/evidence fields, and served-model manifests reject missing provider, quantization, context, or endpoint-capability identity.</p>
+<h3>Slice 4: frozen NAO compatibility adapter</h3>
+<p><strong>Proposed public seam:</strong> pure JSON-compatible normalization functions map the selected NAO <code>PlannerRequest</code>, planner decision, execution feedback, and dialogue act into UAH types without importing ROS into <code>src/ab_harness</code>.</p>
+<p>First failing behavior: package-owned golden fixtures from the selected deslop revision round-trip with goal, plan, version, step, and evidence lineage intact.</p>
+<h3>Slice 5: explicit parity runner</h3>
+<p><strong>Proposed public seam:</strong> a parity evaluator receives normalized legacy and UAH results under a declared authority mode and emits classified agreements and disagreements.</p>
+<p>First failing behavior: no qualification run starts without exactly one of <code>legacy</code>, <code>uah</code>, or <code>shadow</code>; silent fallback is a hard failure.</p>
+<h3>Slice 6: provider-neutral model port and Ollama adapter</h3>
+<p><strong>Proposed public seam:</strong> an immutable model request/result protocol plus a boot preflight that records endpoint protocol, model digest, structured-output behavior, context/resource settings, latency, and failure attribution.</p>
+<p>First failing behavior: a recorded provider returns a typed planner proposal; an unavailable endpoint returns <code>transport_or_provider</code> without changing the semantic gate. The live Ollama canary follows only after the recorded adapter case is green.</p>
+<h3>Slice 7: Linux ROS fake-stack parity</h3>
+<p>Build the selected NAO revision cleanly, run the explicit shadow profile with fake skills, and capture request, proposal, gate, dispatch, feedback, dialogue, evidence, and terminal events. Compare against the frozen legacy output and review every disagreement before any UAH authority is enabled.</p>
+<h2>9. Proposed TDD Seams Requiring Owner Confirmation</h2>
+<p>No implementation test should be written until these public seams are accepted:</p>
+<ol>
+<li>typed proposal to admitted proposal to owner execution;</li>
+<li>runtime execution to lifecycle ledger and model-free replay;</li>
+<li>binding construction and configuration-manifest loading;</li>
+<li>pure NAO contract normalization at a frozen revision;</li>
+<li>explicit authority-mode parity evaluation;</li>
+<li>provider-neutral model request/result and boot preflight.</li>
+</ol>
+<p>The recommended first seam is <strong>typed proposal to admitted proposal to owner execution</strong>. It repairs an execution-authority defect in the current synthetic path and creates the value that lifecycle replay, NAO parity, and Ollama serving all need.</p>
+<h2>10. Release Recommendation</h2>
+<p>Retain both commits on the pre-commit review branch after applying documentation corrections. Do not merge them to <code>main</code> as an H2 release in their current form. The clean-install smoke result supports preserving the implementation as an H0 baseline. Source changes should begin only after the first TDD seam and the immutable NAO revision are confirmed through the design grill.</p>
+  </main>
+</body>
+</html>

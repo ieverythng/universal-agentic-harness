@@ -19,6 +19,7 @@ DOCS = (
     Path("architecture/neural_workbench_adaptive_ab_harness"),
     Path("architecture/observatory_contract"),
     Path("artifacts/decisions/2026-08-04_uah_h2_neural_workbench_grill"),
+    Path("artifacts/reviews/2026-08-17_uah_h2_commit_review"),
 )
 LEGACY_REDIRECTS = {
     "universal_agentic_harness_masterplan": "../plans/universal_agentic_harness_masterplan.html",

@@ -47,10 +47,45 @@ owner is the semantic effect owner.
 The minimal, task- and role-scoped projection of inspectable and directly
 controllable AB objects presented to a model or worker.
 
+### Agent role configuration
+
+An immutable, reusable definition that fixes an agent role, domain, abstraction
+frame, projected AB objects, binding policy, control band, budgets, and
+authority policy. It does not select a model, prompt pack, or harness build.
+
+### Model configuration
+
+An immutable definition of the model artifact, provider runtime, decoding
+parameters, and declared protocol capabilities used by an agent.
+
+### Agent
+
+A persistent actor whose immutable manifest composes one agent role
+configuration with one model configuration, prompt pack, and harness build.
+Changing any member of that composition creates a different agent.
+
+### Agent run
+
+One bounded activation of an agent under one agent role configuration. It owns
+activation-scoped state and contains domain tasks until shutdown, failure, or
+replacement ends the activation.
+
 ### Proposal
 
 A typed model output that requests an operation. It is not execution and cannot
 prove an effect.
+
+### UAH trace
+
+The causally connected record rooted in one admitted interaction or workflow.
+A trace may contain several AB operations and domain-lifecycle references, but
+it is not a conversation session or an authority source.
+
+### Operation
+
+One identified AB-object request within a UAH trace as it moves through
+proposal, semantic admission, domain lifecycle admission, execution, and
+owner-issued evidence.
 
 ### Effect evidence
 
