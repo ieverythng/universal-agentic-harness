@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+from dataclasses import dataclass
 import html
 import re
 from pathlib import Path
@@ -68,10 +69,213 @@ def _render_mermaid(code_text: str) -> str:
     stripped = code_text.strip()
     if stripped.startswith("sequenceDiagram"):
         return _runtime_sequence_svg()
+    rendered = _render_marked_uah_flowchart(code_text)
+    if rendered is not None:
+        return rendered
     escaped = _escape(code_text)
     return (
         '<div class="diagram"><pre><code '
         'class="language-mermaid">%s</code></pre></div>' % escaped
+    )
+
+
+@dataclass(frozen=True)
+class _FlowNode:
+    node_id: str
+    label: str
+    kind: str
+
+
+@dataclass(frozen=True)
+class _FlowEdge:
+    source: str
+    target: str
+    label: str
+    kind: str
+
+
+def _render_marked_uah_flowchart(code_text: str) -> str | None:
+    lines = [line.strip() for line in code_text.splitlines() if line.strip()]
+    if not lines or not lines[0].startswith("%% uah-render:"):
+        return None
+
+    title = lines[0].split(":", 1)[1].strip()
+    if len(lines) < 2:
+        return None
+    flow = re.fullmatch(r"flowchart\s+(TB|LR)", lines[1])
+    if flow is None:
+        return None
+
+    nodes: dict[str, _FlowNode] = {}
+    edges: list[_FlowEdge] = []
+    node_pattern = re.compile(
+        r'^([A-Za-z][\w-]*)\["([^"]+)"\](?:(?:[:]){3}([\w-]+))?$'
+    )
+    edge_pattern = re.compile(
+        r"^([A-Za-z][\w-]*)\s+(-->|-\.->|==>)\s*"
+        r"(?:\|([^|]+)\|\s*)?([A-Za-z][\w-]*)$"
+    )
+    for line in lines[2:]:
+        node_match = node_pattern.fullmatch(line)
+        if node_match:
+            node_id, label, kind = node_match.groups()
+            nodes[node_id] = _FlowNode(node_id, label, kind or "default")
+            continue
+        edge_match = edge_pattern.fullmatch(line)
+        if edge_match:
+            source, kind, label, target = edge_match.groups()
+            edges.append(_FlowEdge(source, target, label or "", kind))
+            continue
+        if line.startswith(("class ", "classDef ")):
+            continue
+        return None
+
+    if not nodes or any(edge.source not in nodes or edge.target not in nodes for edge in edges):
+        return None
+
+    levels = _flow_levels(tuple(nodes), edges)
+    positions, width, height = _flow_positions(tuple(nodes), levels, flow.group(1))
+    palette = {
+        "identity": ("#e8edff", "#5268d8"),
+        "semantic": ("#e5f5f2", "#168778"),
+        "projection": ("#e8f2ff", "#2879c7"),
+        "compiler": ("#e9f6e7", "#3d8b4e"),
+        "model": ("#f0eaff", "#7657b8"),
+        "proposal": ("#f5ecff", "#8b5bb7"),
+        "gate": ("#efe6ff", "#6c4ca5"),
+        "domain": ("#fff0e2", "#cb6d26"),
+        "execution": ("#ffe7e5", "#bf5048"),
+        "evidence": ("#fff6cf", "#b18416"),
+        "trace": ("#e5f4f4", "#247e83"),
+        "observatory": ("#e8edf2", "#536475"),
+        "default": ("#f4f5f7", "#626a73"),
+    }
+
+    edge_svg = []
+    for edge in edges:
+        x1, y1 = positions[edge.source]
+        x2, y2 = positions[edge.target]
+        if flow.group(1) == "TB":
+            start = (x1, y1 + 38)
+            end = (x2, y2 - 38)
+            middle = (start[1] + end[1]) / 2
+            path = (
+                f"M {start[0]:.1f} {start[1]:.1f} "
+                f"C {start[0]:.1f} {middle:.1f}, {end[0]:.1f} {middle:.1f}, "
+                f"{end[0]:.1f} {end[1]:.1f}"
+            )
+        else:
+            start = (x1 + 112, y1)
+            end = (x2 - 112, y2)
+            middle = (start[0] + end[0]) / 2
+            path = (
+                f"M {start[0]:.1f} {start[1]:.1f} "
+                f"C {middle:.1f} {start[1]:.1f}, {middle:.1f} {end[1]:.1f}, "
+                f"{end[0]:.1f} {end[1]:.1f}"
+            )
+        dash = ' stroke-dasharray="8 7"' if edge.kind == "-.->" else ""
+        stroke_width = "3" if edge.kind == "==>" else "2"
+        edge_svg.append(
+            f'<path d="{path}" fill="none" stroke="#9aa8bd" '
+            f'stroke-width="{stroke_width}"{dash} marker-end="url(#uah-arrow)" />'
+        )
+        if edge.label:
+            label_x = (start[0] + end[0]) / 2
+            label_y = (start[1] + end[1]) / 2 - 7
+            label_width = max(78, len(edge.label) * 7 + 18)
+            edge_svg.append(
+                f'<rect x="{label_x - label_width / 2:.1f}" y="{label_y - 15:.1f}" '
+                f'width="{label_width}" height="22" rx="8" fill="#172033" />'
+            )
+            edge_svg.append(
+                f'<text x="{label_x:.1f}" y="{label_y:.1f}" text-anchor="middle" '
+                f'font-size="13" fill="#dce6f7">{_escape(edge.label)}</text>'
+            )
+
+    node_svg = []
+    for node_id, node in nodes.items():
+        x, y = positions[node_id]
+        fill, stroke = palette.get(node.kind, palette["default"])
+        node_svg.append(
+            f'<rect x="{x - 112:.1f}" y="{y - 38:.1f}" width="224" height="76" '
+            f'rx="15" fill="{fill}" stroke="{stroke}" stroke-width="2" />'
+        )
+        node_svg.append(_flow_node_text(node.label, x, y))
+
+    return f'''<div class="diagram uah-flow-diagram">
+  <svg viewBox="0 0 {width} {height}" role="img" aria-label="{_escape(title)}">
+    <defs>
+      <marker id="uah-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M 0 0 L 10 5 L 0 10 z" fill="#9aa8bd"></path>
+      </marker>
+    </defs>
+    <g font-family="Inter, Liberation Sans, Arial, sans-serif">{"".join(edge_svg)}{"".join(node_svg)}</g>
+  </svg>
+  <div class="caption">{_escape(title)}</div>
+</div>'''
+
+
+def _flow_levels(node_ids: tuple[str, ...], edges: list[_FlowEdge]) -> dict[str, int]:
+    levels = {node_id: 0 for node_id in node_ids}
+    for _ in node_ids:
+        changed = False
+        for edge in edges:
+            candidate = levels[edge.source] + 1
+            if candidate > levels[edge.target]:
+                levels[edge.target] = candidate
+                changed = True
+        if not changed:
+            break
+    return levels
+
+
+def _flow_positions(
+    node_ids: tuple[str, ...],
+    levels: dict[str, int],
+    direction: str,
+) -> tuple[dict[str, tuple[float, float]], int, int]:
+    grouped: dict[int, list[str]] = {}
+    for node_id in node_ids:
+        grouped.setdefault(levels[node_id], []).append(node_id)
+    max_level = max(grouped)
+    max_count = max(len(items) for items in grouped.values())
+    positions: dict[str, tuple[float, float]] = {}
+
+    if direction == "TB":
+        width = max(1040, max_count * 270 + 80)
+        height = max(260, (max_level + 1) * 138 + 70)
+        for level, items in grouped.items():
+            spacing = width / (len(items) + 1)
+            for index, node_id in enumerate(items, start=1):
+                positions[node_id] = (spacing * index, 68 + level * 138)
+        return positions, width, height
+
+    width = max(900, (max_level + 1) * 290 + 80)
+    height = max(360, max_count * 112 + 80)
+    for level, items in grouped.items():
+        spacing = height / (len(items) + 1)
+        for index, node_id in enumerate(items, start=1):
+            positions[node_id] = (145 + level * 290, spacing * index)
+    return positions, width, height
+
+
+def _flow_node_text(label: str, x: float, y: float) -> str:
+    parts = [part.strip() for part in re.split(r"<br\s*/?>", label) if part.strip()]
+    if not parts:
+        parts = [label]
+    longest = max(len(part) for part in parts)
+    font_size = 12 if longest > 28 else 13 if longest > 23 else 15
+    start_y = y - ((len(parts) - 1) * 9)
+    spans = []
+    for index, part in enumerate(parts):
+        weight = "700" if index == 0 else "500"
+        spans.append(
+            f'<tspan x="{x:.1f}" y="{start_y + index * 20:.1f}" '
+            f'font-weight="{weight}">{_escape(part)}</tspan>'
+        )
+    return (
+        f'<text x="{x:.1f}" y="{y:.1f}" text-anchor="middle" '
+        f'font-size="{font_size}" fill="#172033">{"".join(spans)}</text>'
     )
 
 

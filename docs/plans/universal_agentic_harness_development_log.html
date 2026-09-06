@@ -196,7 +196,7 @@
   <main class="doc">
 
 <h1>Universal Agentic Harness: Development Log</h1>
-<p><strong>Purpose:</strong> Practical implementation ledger linked to the semantic masterplan <strong>Updated:</strong> 2026-08-04 <strong>Target:</strong> UAH H2 NAO planner launch gate by 2026-08-10 <strong>Current release boundary:</strong> H0 contract spine, one H1 synthetic vertical slice, smoke CLI, quarantined Workbench retrieval, and frozen Workbench adapter protocol; H1 lifecycle and H2 planner parity remain incomplete</p>
+<p><strong>Purpose:</strong> Practical implementation ledger linked to the semantic masterplan <strong>Updated:</strong> 2026-09-07 <strong>Target:</strong> UAH H2 NAO planner qualification after ordered evidence gates pass <strong>Current release boundary:</strong> H0 contract spine, one H1 synthetic vertical slice, smoke CLI, quarantined Workbench retrieval, and frozen Workbench adapter protocol; H1 lifecycle and H2 planner parity remain incomplete</p>
 <h2>Current state</h2>
 <table><thead><tr>
 <th>Area</th>
@@ -231,7 +231,7 @@
 <tr>
 <td>H2 planner coupling</td>
 <td>Active target</td>
-<td>Planner ingress/egress projection, gate, fake owner, evidence and parity suite required</td>
+<td>NAO <code>v1.0.0</code> planner ingress/egress projection, two-stage admission, fake owner, evidence and parity suite required</td>
 </tr>
 <tr>
 <td>Chatbot coupling</td>
@@ -245,8 +245,8 @@
 </tr>
 <tr>
 <td>Configuration identity</td>
-<td>Green</td>
-<td>Complete model-harness-environment tuple is content-addressed</td>
+<td>Partial</td>
+<td>Monolithic model-harness-environment tuple is content-addressed; role, agent, run, trace and operation identities are specified but not implemented</td>
 </tr>
 <tr>
 <td>Launch smoke CLI</td>
@@ -265,8 +265,8 @@
 </tr>
 <tr>
 <td>NeuralWorkbench repository</td>
-<td>Green boundary</td>
-<td>Clean Aily branch pinned as <code>src/Neural-Wokbench</code> submodule</td>
+<td>Boundary defined, gitlink missing</td>
+<td>Intended companion revision is <code>e76ba7e</code>; <code>.gitmodules</code> exists but the UAH tree does not currently mount the gitlink</td>
 </tr>
 <tr>
 <td>Workbench adapter protocol</td>
@@ -274,8 +274,18 @@
 <td>Focused tests cover serialization, handshake, mismatch, and observation-only override</td>
 </tr>
 <tr>
+<td>Prompt compiler</td>
+<td>Specified, not implemented</td>
+<td>Layered UAH kernel, role, domain, AB projection and task context contract is documented</td>
+</tr>
+<tr>
+<td>Two-stage admission</td>
+<td>Specified, not implemented</td>
+<td>Typed proposal to immutable admitted operation to domain execution lease</td>
+</tr>
+<tr>
 <td>Observatory</td>
-<td>O1 contract frozen</td>
+<td>O1 identity/event contract frozen</td>
 <td>Static renderer implementation required for H1/H2 review; O2 deferred</td>
 </tr>
 </tbody></table>
@@ -300,9 +310,9 @@
 <td><code>build_planner_request_payload</code>, <code>DialogueTurnEngine</code>, <code>PlannerHandoff</code>; remote tree matches the inspected local source</td>
 </tr>
 <tr>
-<td><code>ieverythng/nao-ros4hri-bridge</code>, <code>origin/feat/TFM-LLM_planner</code></td>
-<td><code>9da89c0</code></td>
-<td><code>PlannerRequest</code>, <code>PlannerGate.decide</code>, <code>PlannerEngine.plan_request</code>, supervisor, orchestrator dispatch, <code>FakeSkillEngine</code>; runtime tree differs from the local checkout only by unrelated career artifacts</td>
+<td><code>ieverythng/nao-ros4hri-bridge</code>, tag <code>v1.0.0</code> on <code>feat/TFM-LLM_planner</code></td>
+<td><code>ebffe93a74be4e013ce0f60fdfc41268dba73fc3</code></td>
+<td>Immutable H2 compatibility baseline for <code>PlannerRequest</code>, <code>PlannerGate.decide</code>, planner/supervisor lineage, orchestrator dispatch and fake execution</td>
 </tr>
 <tr>
 <td><code>juanbendek-aily/Neural-Wokbench</code>, <code>feat/base-implementation</code></td>
@@ -316,9 +326,9 @@
 </tr>
 </tbody></table>
 <p>The UAH source does not import either NAO repository. The inspected seams are represented as candidate pointers or reproduced as portable behavioral contracts.</p>
-<p>The 2026-08-04 revalidation fetched both remote branch heads without switching the dirty NAO workspace. The chatbot remote and local source trees are identical. The NAO remote adds only unrelated career artifacts over the local runtime tree. Direct source and focused tests, rather than the stale 2026-05-31 GitNexus index, are the evidence for the current seam map.</p>
+<p>The current <code>feat/TFM-LLM_planner</code> head is comparative evidence only. H2 parity targets the peeled <code>v1.0.0</code> commit so later documentation or unrelated branch changes cannot move the baseline. Direct source and focused tests, rather than the stale 2026-05-31 GitNexus index, are the evidence for the seam map.</p>
 <h2>Implementation ledger</h2>
-<h3>2026-07-30 — Semantic binding slice</h3>
+<h3>2026-07-30: Semantic binding slice</h3>
 <p>Added:</p>
 <ul>
 <li><code>ABImplementationBinding</code></li>
@@ -336,7 +346,7 @@
 <li>executable AB1 bindings must be implemented by the semantic effect owner;</li>
 <li>successful evidence must use declared observables and a durable reference.</li>
 </ul>
-<h3>2026-07-30 — Recorded NAO qualification slice</h3>
+<h3>2026-07-30: Recorded NAO qualification slice</h3>
 <p>Added:</p>
 <ul>
 <li><code>QualificationCase</code></li>
@@ -352,7 +362,7 @@
   -&gt; fake object_finder result
   -&gt; terminal observable closure</code></pre>
 <p>The negative cases prove that an out-of-projection planner proposal never dispatches and a failed owner result cannot close the task.</p>
-<h3>2026-08-04 — Latest NAO contract bindings</h3>
+<h3>2026-08-04: Latest NAO contract bindings</h3>
 <p>Declared candidate bindings for:</p>
 <ul>
 <li><code>/nao_orchestrator/planner_request</code> chatbot handoff publisher;</li>
@@ -363,10 +373,10 @@
 <li><code>/scene/summary</code> <code>SceneSummary</code> contract.</li>
 </ul>
 <p>They remain candidates because declaration and discovery are not approval. The gate-ingress and admitted-request topics are deliberately separate AB0 objects even though they reuse the planner request schema. This preserves the deterministic admission boundary already implemented by <code>nao_orchestrator</code>.</p>
-<h3>2026-08-04 — Quarantined Workbench memory</h3>
+<h3>2026-08-04: Quarantined Workbench memory</h3>
 <p>Added <code>TraceExperience</code>, <code>WorkbenchMemory</code>, and <code>WorkbenchContextCandidate</code>. Retrieval is deterministic, query-scoped, and bounded separately for supporting traces and counterexamples. Missing support or counterevidence is surfaced as an explicit gap. The output status is always <code>candidate</code>; the module has no promotion or registry-write path.</p>
 <p>This is a concrete Neural Workbench coupling seam, not an H3 completion claim. It prepares structured context for a later model adapter while keeping prompt policy, trusted code, permissions, evaluator rules, and canonical AB objects outside online mutation.</p>
-<h3>2026-08-04 — Content-addressed v0 smoke launch surface</h3>
+<h3>2026-08-04: Content-addressed v0 smoke launch surface</h3>
 <p>Added <code>ConfigurationIdentity</code> and <code>python -m ab_harness smoke</code>. The smoke run:</p>
 <ol>
 <li>identifies the complete recorded model, runtime, harness, adapter, registry, environment, suite, and evaluator configuration;</li>
@@ -376,7 +386,7 @@
 <li>proves retrieval returns both supporting and opposing evidence.</li>
 </ol>
 <p>This command is the initial boot qualification surface. It uses a recorded fixture, not Watson, Bonsai, ROS, or a claim of general agent capability.</p>
-<h3>2026-08-04 — H2 and NeuralWorkbench boundary freeze</h3>
+<h3>2026-08-04: H2 and NeuralWorkbench boundary freeze</h3>
 <p>The design grill established:</p>
 <ul>
 <li>H2 closes planner ingress/egress over recorded and fake NAO contracts;</li>
@@ -389,8 +399,8 @@
 <li>automated domain initialization is H3+ and emits candidate artifacts only.</li>
 </ul>
 <p>The full decision record is <code>../artifacts/decisions/2026-08-04_uah_h2_neural_workbench_grill.md</code>.</p>
-<h3>2026-08-04 — Pinned Workbench protocol seam</h3>
-<p>Added the NeuralWorkbench submodule and <code>ab_harness.workbench_protocol</code>:</p>
+<h3>2026-08-04: Workbench protocol seam and intended pin</h3>
+<p>Recorded the intended NeuralWorkbench revision and added <code>ab_harness.workbench_protocol</code>. The current tree does not contain the gitlink, so mounting the companion repository remains open:</p>
 <ul>
 <li>content-addressed, JSON-compatible <code>WorkbenchRequest</code>;</li>
 <li>candidate-only <code>WorkbenchCandidate</code> and <code>WorkbenchCandidateBatch</code>;</li>
@@ -400,6 +410,49 @@
 <li>visible development override restricted to observation-only.</li>
 </ul>
 <p>The protocol is transport-neutral. Network/service transports are deferred.</p>
+<h3>2026-09-03: Identity, prompt, admission, and Observatory architecture checkpoint</h3>
+<p>The post-review architecture grill resolved these contracts:</p>
+<ul>
+<li><code>AgentRoleConfiguration</code> is immutable and model-independent. It names one primary abstraction frame plus explicit, versioned auxiliary frame projections and capability packs.</li>
+<li><code>agent_id</code> identifies one immutable composition of role, model configuration, prompt pack, harness build, and adapter revisions. <code>agent_run_id</code> identifies one activation.</li>
+<li><code>task_id</code> remains a domain work identity. <code>trace_id</code> identifies a causal workflow, while <code>operation_id</code> identifies one frame-relative AB-object lifecycle and may form a parent/child decomposition tree.</li>
+<li><code>PromptCompiler</code> deterministically assembles the UAH protocol kernel, role contract, minimal domain policy, task AB projection, and current context. The semantic admission gate consumes the same <code>InteractionModuleSpec</code>.</li>
+<li>UAH semantic admission emits an immutable <code>AdmittedOperation</code>. Domain lifecycle admission may then emit an <code>ExecutionLease</code> after readiness, duplicate, concurrency, cancellation, supersession, and version checks.</li>
+<li>Mandatory trace emission belongs to the UAH kernel. Agent-visible trace inspection is a separate, normally read-only and task-scoped capability.</li>
+<li><code>SkillArtifact</code> is an optional binding target in a named frame. NAO objects may bind directly to ROS or Python contracts; coding-frame objects may bind to TDD, SkillOpt, deslop, or other developer skills.</li>
+<li><code>uah-domain-onboarding</code> produces a candidate <code>DomainContractPack</code>, applies structural validation and prompt SkillOpt gates, and cannot approve itself.</li>
+<li>A fixed multi-agent system is not automatically AB5. AB5 remains reserved for independently evaluated governance over a family of AB4 systems.</li>
+</ul>
+<p>The canonical diagrams and node-level responsibilities are in <code>../architecture/universal_agentic_harness_foundation.md</code>. The trace identity and event grammar are in <code>../architecture/observatory_contract.md</code>.</p>
+<p>This checkpoint changes no runtime authority. It defines the next TDD seams; the current implementation still uses <code>AgentRoleSpec</code>, <code>HarnessTrace</code>, and the monolithic <code>ConfigurationIdentity</code> compatibility contracts.</p>
+<h3>2026-09-04: Auxiliary-frame access and Workbench attachment checkpoint</h3>
+<p>The grill resolved the maximum access modes for each role-authorized additional frame projection:</p>
+<ul>
+<li><code>inspect_only</code> permits bounded observation without state-changing proposals;</li>
+<li><code>direct_proposal</code> permits typed proposals but grants no admission or execution authority;</li>
+<li><code>delegate_only</code> permits only a typed handoff to an agent whose primary frame matches the target frame.</li>
+</ul>
+<p>The declaration belongs to <code>role_configuration_id</code>; <code>agent_id</code> inherits it and the task compiler may only narrow it. Effect-bearing cross-frame work defaults to <code>delegate_only</code>, while read-only foreign state and Observatory views default to <code>inspect_only</code>.</p>
+<p>NeuralWorkbench remains an optional H3 companion engine rather than an abstraction frame. UAH may issue a bounded frame-relative <code>WorkbenchRequest</code> before a configured model call and an immutable <code>WorkbenchObservation</code> after terminal trace closure. Candidate artifacts pass a UAH filter before prompt or shadow use. The existing transport-neutral <code>WorkbenchEnginePort</code> remains the semantic seam; an MCP connection would be another adapter, not a different contract or authority path.</p>
+<p>Hardware allocation is now separate from logical agent identity. A <code>provider_pool_id</code> supplies compatible <code>model_instance_id</code> resources; UAH reserves one through <code>model_lease_id</code>, and every prompt-to-output call receives a <code>model_invocation_id</code>. The invocation joins the actual model resource to <code>agent_run_id</code> and <code>trace_id</code>. Reallocation among equivalent instances leaves <code>agent_id</code> unchanged, while a different <code>model_configuration_id</code> creates a new agent.</p>
+<h3>2026-09-06: Stable agent handle and fidelity checkpoint</h3>
+<p><code>agent_handle_id</code> is the minimal stable routing identity for names such as <code>watson.system.primary</code>. It does not replace immutable agent identity. Each <code>AgentHandleRevision</code> points to one active <code>agent_id</code>, pins the required <code>role_configuration_id</code>, records a fidelity report, and retains a rollback revision.</p>
+<p>The model allocator may move the active agent among compatible instances of its declared model configuration. It may not silently select another model configuration. A model, prompt, harness, or adapter change produces a new <code>agent_id</code>; the stable handle moves only after role-fidelity qualification and an immutable revision update. This keeps the routing interface small while preserving evaluation and Observatory provenance.</p>
+<h3>2026-09-07: Outside-in provisioning and release staging</h3>
+<p>The canonical construction order is now:</p>
+<pre><code class="language-text">DomainContractPack
+  -&gt; AgentRoleConfiguration
+  -&gt; AgentManifest and agent_id
+  -&gt; AgentHandleRevision
+  -&gt; AgentRun
+  -&gt; Task and trace
+  -&gt; ModelLease
+  -&gt; ModelInvocation
+  -&gt; Operation lifecycles</code></pre>
+<p>An <code>agent_id</code> is an immutable embodiment of its handle; an <code>agent_run_id</code> is the runtime activation. Each run pins the resolved handle revision, so later rebinding cannot rewrite past work or silently alter an in-flight task.</p>
+<p>Identity contracts and static handle resolution belong in H0-H1. H2 uses named NAO handles and fixed provider/resource leases. Dynamic provider pools, hardware scheduling, lease arbitration, and fidelity-gated hot replacement belong in H3. H4 may evaluate candidate embodiments, and H5 adds cross-runtime allocation conformance.</p>
+<p>The hardware module remains <code>ModelAllocator</code>. <code>AgentRegistry</code> owns immutable agent construction and lookup; the handle registry owns continuity and promotion. Calling the hardware scheduler <code>AgentAllocator</code> would merge semantic identity with resource placement.</p>
+<p>Every role will reference a versioned <code>model_admission_profile_id</code> containing provider-neutral capability and behavioral requirements. Handle fidelity tests candidate models against that profile plus deployment-specific provider and hardware constraints. The allocator still receives one resolved model configuration and cannot choose a merely similar model on its own.</p>
 <h2>Verification dashboard</h2>
 <table><thead><tr>
 <th>Command</th>
@@ -460,7 +513,7 @@
 </tbody></table>
 <p>The workspace-local pytest temp root is used because the managed session cannot write the inherited Windows pytest temp directory. This is an environment constraint, not a product failure.</p>
 <h2>Evaluation lifecycle</h2>
-<h3>Gate A — Boot qualification</h3>
+<h3>Gate A: Boot qualification</h3>
 <p>Question: can this exact immutable configuration safely accept bounded work?</p>
 <p>Minimum record:</p>
 <ul>
@@ -472,7 +525,7 @@
 <li>strict structured-output canary.</li>
 </ul>
 <p>Boot acceptance proves operability only.</p>
-<h3>Gate B — Promotion qualification</h3>
+<h3>Gate B: Promotion qualification</h3>
 <p>Question: does the candidate improve its intended task distribution without an unacceptable regression?</p>
 <p>Minimum record:</p>
 <ul>
@@ -483,7 +536,7 @@
 <li>quality, latency, memory, and cost Pareto comparison;</li>
 <li>owner review, provenance, rollback target, and rollback rehearsal.</li>
 </ul>
-<h3>Gate C — Runtime evaluation</h3>
+<h3>Gate C: Runtime evaluation</h3>
 <p>Question: is a promoted configuration still inside its approved envelope?</p>
 <p>Runtime evaluation may continue, degrade, quarantine, interrupt, or roll back. It may create Workbench candidates but cannot promote itself.</p>
 <h2>Failure attribution</h2>
@@ -570,37 +623,42 @@
 </tbody></table>
 <p>Specific Bonsai experiments must treat FP16 versus calibrated KV4 and speculative decoding as distinct configurations because their cache, concurrency, latency, and quality envelopes differ.</p>
 <h2>Ordered work queue</h2>
-<h3>P0 — Complete the synthetic contract</h3>
+<h3>P0: Complete the synthetic contract</h3>
 <ul>
 <li>[x] Freeze semantic object versus implementation binding.</li>
 <li>[x] Enforce candidate quarantine and approved resolution.</li>
 <li>[x] Mount one deterministic owner without ROS.</li>
 <li>[x] Replay success, gate rejection, and failed evidence.</li>
 <li>[x] Add content-addressed configuration identity.</li>
+<li>[ ] Split immutable role, model, agent, run, trace, task, and operation identities behind compatibility exports.</li>
 <li>[ ] Add serialized <code>TaskSpec</code> and complete environment policy.</li>
+<li>[ ] Add <code>TypedProposal</code>, <code>AdmittedOperation</code>, and <code>ExecutionLease</code> contracts.</li>
+<li>[ ] Add deterministic <code>PromptCompiler</code> output and artifact hashing from the same <code>InteractionModuleSpec</code> consumed by semantic admission.</li>
 <li>[ ] Append lifecycle events for compile, proposal, gate, dispatch, evidence, and terminal decision.</li>
 <li>[ ] Add stale evidence, timeout, cancellation, retry exhaustion, and false-completion cases.</li>
 </ul>
-<h3>P1 — Build the evaluation runner</h3>
+<h3>P1: Build the evaluation runner</h3>
 <ul>
 <li>[ ] Store frozen case suites and configuration manifests.</li>
 <li>[ ] Add milestones, minefields, repeated trials, and reliability aggregation.</li>
 <li>[ ] Add failure-injection fixtures and attribution checks.</li>
 <li>[ ] Add model adapter protocol and recorded-proposal replay mode.</li>
+<li>[ ] Render raw model output, proposal, admission, lease, result, evidence and terminal judgment as separate Observatory artifacts.</li>
 <li>[x] Add recorded-proposal boot smoke mode.</li>
 <li>[ ] Produce Watson/Bonsai comparison artifacts without touching live ROS.</li>
 </ul>
-<h3>P2 — NAO planner parity</h3>
+<h3>P2: NAO planner parity</h3>
 <ul>
-<li>[ ] Capture package-owned chatbot and planner golden fixtures.</li>
+<li>[ ] Capture package-owned chatbot and planner golden fixtures from NAO tag <code>v1.0.0</code> and chatbot revision <code>a2ecca796...</code>.</li>
 <li>[ ] Validate candidate AB0 bindings against their exact source revisions.</li>
 <li>[ ] Implement full planner projection, proposal gate, fake-owner dispatch, evidence closure, and replay.</li>
 <li>[ ] Run explicit <code>legacy | uah | shadow</code> planner parity.</li>
 <li>[ ] Classify every disagreement before enabling UAH authority.</li>
 <li>[ ] Preserve dialogue, planning, orchestrator, perception, and execution owners.</li>
 <li>[ ] Keep chatbot assimilation behind planner parity.</li>
+<li>[ ] Preserve native <code>goal_id</code>, <code>request_id</code>, <code>plan_id</code>, <code>plan_version</code>, and <code>step_id</code> beneath UAH task, trace and operation identities.</li>
 </ul>
-<h3>P3 — Neural Workbench coupling</h3>
+<h3>P3: Neural Workbench coupling</h3>
 <ul>
 <li>[x] Ingest immutable success and counterexample experiences in memory.</li>
 <li>[x] Emit bounded, provenance-bearing retrieval candidates only.</li>
@@ -610,12 +668,12 @@
 <li>[ ] Add replay, opposing traces, disjoint holdout, owner review, provenance, and rollback gates.</li>
 <li>[ ] Keep code, canonical registry, permissions, evaluator, and promotion thresholds outside online mutation.</li>
 </ul>
-<h2>August 10 H2 launch gate</h2>
-<p>The date is a focus mechanism, not permission to overclaim. H2 is launch-ready when the core rows and planner parity rows are green:</p>
+<h2>H2 qualification gate</h2>
+<p>H2 is qualified only when the core rows and planner parity rows are green:</p>
 <table><thead><tr>
 <th>Gate</th>
-<th>State on 2026-08-04</th>
-<th>Required before launch</th>
+<th>State on 2026-09-04</th>
+<th>Required before qualification</th>
 </tr></thead><tbody>
 <tr>
 <td>Installable portable package</td>
@@ -639,8 +697,8 @@
 </tr>
 <tr>
 <td>Complete configuration identity</td>
-<td>Green</td>
-<td>Add manifest input for Watson/Bonsai configurations</td>
+<td>Partial</td>
+<td>Split role, model, agent, run, trace and operation identities while preserving the current content hash as a compatibility snapshot</td>
 </tr>
 <tr>
 <td>Lifecycle replay</td>
@@ -654,8 +712,8 @@
 </tr>
 <tr>
 <td>Documentation</td>
-<td>Active reorganization</td>
-<td>Keep plans, architecture, artifacts, research, HTML, decisions, and system design synchronized</td>
+<td>Architecture checkpoint active</td>
+<td>Keep Markdown/HTML diagrams, plans, contracts, artifacts and implementation status synchronized</td>
 </tr>
 <tr>
 <td>Watson/Bonsai runner</td>
@@ -706,15 +764,51 @@
 </tr>
 <tr>
 <td>UAH-D05</td>
-<td>No configuration manifest</td>
-<td>Results cannot be compared reproducibly</td>
-<td>Hash the complete model-harness-environment tuple</td>
+<td>Identity layers specified but not implemented</td>
+<td>Agent, activation, trace and operation state remain conflated in current contracts</td>
+<td>Add immutable identity contracts behind compatibility exports</td>
 </tr>
 <tr>
 <td>UAH-D06</td>
 <td>No Workbench trace bridge</td>
 <td>Adaptation remains a paper design</td>
-<td>Define append-only candidate input, never direct mutation</td>
+<td>Implement terminal-ledger to <code>WorkbenchObservation</code> adaptation without direct mutation</td>
+</tr>
+<tr>
+<td>UAH-D07</td>
+<td>No PromptCompiler</td>
+<td>Prompt, projection and deterministic admission can drift</td>
+<td>Compile a prompt artifact and gate from the same immutable interaction module</td>
+</tr>
+<tr>
+<td>UAH-D08</td>
+<td>No two-stage admission contracts</td>
+<td>Domain lifecycle cannot grant or deny authority independently</td>
+<td>Add <code>TypedProposal</code>, <code>AdmittedOperation</code> and <code>ExecutionLease</code> vertical slice</td>
+</tr>
+<tr>
+<td>UAH-D09</td>
+<td>NeuralWorkbench gitlink absent</td>
+<td>Intended companion revision is documented but not mounted</td>
+<td>Restore and verify gitlink at <code>e76ba7e</code> without changing core dependency rules</td>
+</tr>
+<tr>
+<td>UAH-D10</td>
+<td>Workbench protocol uses legacy <code>configuration_id</code></td>
+<td>Per-agent and per-run candidate provenance cannot be reconstructed under the new identity model</td>
+<td>Version the protocol after identity contracts define exact request and model-call correlation</td>
+</tr>
+<tr>
+<td>UAH-D11</td>
+<td>No hardware-aware model allocator</td>
+<td>Local RAM, VRAM, context and concurrency constraints cannot govern model reuse or eviction</td>
+<td>Implement an H1 fixed-instance lease interface, then add dynamic scheduling at H3</td>
+</tr>
+<tr>
+<td>UAH-D12</td>
+<td>No agent-handle registry or fidelity evaluator</td>
+<td>A named deployment cannot change model configuration without losing continuity or hiding an identity change</td>
+<td>Add immutable handle-revision resolution and held-out fidelity evidence after core identity contracts</td>
 </tr>
 </tbody></table>
 <h2>Next discriminating probe</h2>

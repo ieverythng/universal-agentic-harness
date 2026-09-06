@@ -196,7 +196,7 @@
   <main class="doc">
 
 <h1>Universal Agentic Harness: Implementation Masterplan</h1>
-<p><strong>Status:</strong> Canonical implementation plan; August 10 H2 launch contract active <strong>Date:</strong> 2026-08-04 <strong>Scope:</strong> Model-agnostic and task-agnostic harness kernel with domain-specific AB frames and adapters <strong>Extends:</strong> <code>../architecture/universal_agentic_harness_foundation.md</code> and <code>../architecture/neural_workbench_adaptive_ab_harness.md</code> <strong>Decision owner:</strong> UAH H0-H2 core; NeuralWorkbench H3+ companion track; NAO remains the first reference environment</p>
+<p><strong>Status:</strong> Canonical implementation plan; H2 qualification gates active <strong>Date:</strong> 2026-09-07 <strong>Scope:</strong> Model-agnostic and task-agnostic harness kernel with domain-specific AB frames and adapters <strong>Extends:</strong> <code>../architecture/universal_agentic_harness_foundation.md</code> and <code>../architecture/neural_workbench_adaptive_ab_harness.md</code> <strong>Decision owner:</strong> UAH H0-H2 core; NeuralWorkbench H3+ companion track; NAO remains the first reference environment</p>
 <h2>1. Executive Decision</h2>
 <p>The project should build a Universal Agentic Harness, but not by replacing the model loop, tool runtime, sandbox, session store, or provider layer of every existing agent.</p>
 <p>The defensible architecture is a hybrid:</p>
@@ -248,8 +248,8 @@ H6  AB5 policy-foundry hypothesis                         RESEARCH ONLY, NOT COM
 <li>Moving dialogue, planning, execution, knowledge, perception, or speech ownership out of their current NAO packages.</li>
 <li>Calling an adaptive AB4 system AB5 merely because it becomes more capable.</li>
 </ul>
-<h3>August 10, 2026 H2 launch contract</h3>
-<p>The August 10 target closes the static UAH foundation and the first cooperative domain proof. H0 and H1 hard gates must pass and the NAO planner ingress/egress must complete H2 parity over recorded and fake/simulated contracts. A live robot is not required. The date does not relax evidence, ownership, replay, or promotion gates.</p>
+<h3>Current H2 qualification contract</h3>
+<p>H2 closes the static UAH foundation and the first cooperative domain proof only after H0 and H1 hard gates pass and the NAO planner ingress/egress completes parity over recorded and fake/simulated contracts. A live robot is not required. Schedule pressure does not relax evidence, ownership, replay, or promotion gates.</p>
 <p><strong>H2 launch definition:</strong> an installable portable package identifies a complete model-harness-domain configuration, executes accepted and rejected lifecycle cases, exposes approved AB1 operations plus inspectable non-callable AB0 seams, closes effects only from environment-owner evidence, replays without a model, and demonstrates planner parity through an explicit NAO compatibility adapter.</p>
 <p>Three qualification labels remain distinct:</p>
 <table><thead><tr>
@@ -275,7 +275,7 @@ H6  AB5 policy-foundry hypothesis                         RESEARCH ONLY, NOT COM
 </tbody></table>
 <p>If model assets are unavailable, H2 may still close with recorded proposals and must say that model qualification is absent. If planner parity fails, the release remains core-qualified and may not be relabeled H2.</p>
 <p>H3 is stretch scope only. A protocol handshake, Observatory view, or shadow replacement pulse is useful, but no H3 feature is required to pass H2 and no H3 candidate receives execution authority for this release.</p>
-<h4>Launch prerequisites</h4>
+<h4>Qualification prerequisites</h4>
 <p>These conditions must be true before the final launch evaluation begins:</p>
 <ol>
 <li><code>src/ab_harness</code> remains free of ROS, NAO, provider SDK, and runtime-product imports.</li>
@@ -287,51 +287,51 @@ H6  AB5 policy-foundry hypothesis                         RESEARCH ONLY, NOT COM
 <li>Canonical Markdown, generated HTML, decision record, development log, research note, Observatory contract, and system-design artifact agree on implemented versus roadmap status.</li>
 <li>NeuralWorkbench remains optional through H2. Its submodule revision and protocol are recorded, but it cannot become an undeclared runtime dependency.</li>
 </ol>
-<h4>Dated delivery timeline</h4>
+<h4>Ordered delivery gates</h4>
 <table><thead><tr>
-<th>Date</th>
+<th>Order</th>
 <th>Deliverable</th>
 <th>Required exit evidence</th>
 </tr></thead><tbody>
 <tr>
-<td>Aug 4</td>
-<td>Freeze H2 contract, repository boundaries, Workbench protocol, Observatory O1, and coupling decisions</td>
-<td>Decision artifact, pinned submodule, focused protocol tests, synchronized plan</td>
+<td>1</td>
+<td>Freeze H2 contracts, repository boundaries, Workbench protocol, Observatory O1, and coupling decisions</td>
+<td>Decision artifact, intended companion revision, focused protocol tests, synchronized plan</td>
 </tr>
 <tr>
-<td>Aug 5</td>
+<td>2</td>
 <td>Complete H1 lifecycle schemas and deterministic failure grammar</td>
 <td>Schema round trips; compile-to-terminal events; stale evidence, timeout, cancellation, retry exhaustion, unavailable binding, and false-completion attribution</td>
 </tr>
 <tr>
-<td>Aug 6</td>
+<td>3</td>
 <td>Persist/replay lifecycle and implement planner-side NAO projection</td>
 <td>Model-free replay equivalence; AB1 callable and AB0 inspect-only closure; provenance retained</td>
 </tr>
 <tr>
-<td>Aug 7</td>
+<td>4</td>
 <td>Implement planner compatibility adapter and recorded/fake qualification</td>
 <td>Accepted, rejected, clarification, recovery, and owner-evidence cases pass without ROS imports in core</td>
 </tr>
 <tr>
-<td>Aug 8</td>
+<td>5</td>
 <td>Run `legacy</td>
 <td>uah</td>
 <td>shadow` parity fixtures and freeze provider-neutral manifests</td>
 <td>Explicit authority mode; classified disagreements; exact model, quant, runtime, context, prompt, registry, adapter, and evaluator identities</td>
 </tr>
 <tr>
-<td>Aug 9</td>
-<td>Run H2 launch candidate, clean-install rehearsal, and optional Watson/Bonsai matrix</td>
+<td>6</td>
+<td>Run the H2 candidate, clean-install rehearsal, and optional model matrix</td>
 <td>Core and H2 gates pass in a fresh environment; model report recorded only if assets exist; docs rendered</td>
 </tr>
 <tr>
-<td>Aug 10</td>
+<td>7</td>
 <td>Publish H2 status and artifacts</td>
 <td>Version/tag decision, result summary, parity report, known limitations, rollback, and H3 gate decision</td>
 </tr>
 </tbody></table>
-<p>Later dates may absorb incomplete work; they may not convert a failed gate into a pass. Scope is reduced before evidence requirements are reduced.</p>
+<p>Incomplete work remains at its current gate. Scope may be reduced before evidence requirements are reduced, but a failed gate cannot be relabeled as a pass.</p>
 <h4>Evaluation order</h4>
 <p>Evaluation runs from cheapest and most deterministic to most confounded:</p>
 <ol>
@@ -345,7 +345,7 @@ H6  AB5 policy-foundry hypothesis                         RESEARCH ONLY, NOT COM
 <li><strong>Model matrix:</strong> hold task, harness, environment, and evaluator fixed while swapping Watson and Bonsai configurations; then ablate flat versus projected context and failure-aware retrieval.</li>
 </ol>
 <p>No later result can rescue an earlier failed hard gate. Faster decode, lower memory, or a successful final answer cannot override a scope, ownership, evidence, replay, or regression failure.</p>
-<h4>Hard launch gates</h4>
+<h4>Hard H2 gates</h4>
 <table><thead><tr>
 <th>Gate</th>
 <th>H2 acceptance</th>
@@ -392,7 +392,7 @@ H6  AB5 policy-foundry hypothesis                         RESEARCH ONLY, NOT COM
 </tr>
 </tbody></table>
 <p>For <strong>model-qualified H2</strong>, add a hard paired-run gate: Watson and Bonsai use the same frozen suite, with repeated trials and owner/evaluator effects reported beside latency and memory. Memory efficiency alone cannot pass this gate.</p>
-<h4>Launch postconditions and next-stage gate</h4>
+<h4>H2 postconditions and next-stage gate</h4>
 <p>H2 completion produces:</p>
 <ul>
 <li>a versioned package and machine-readable configuration manifest;</li>
@@ -471,7 +471,7 @@ H6  AB5 policy-foundry hypothesis                         RESEARCH ONLY, NOT COM
 <ul>
 <li>Parent checkout: <code>feat/TFM-LLM_planner</code>, clean and synchronized with origin.</li>
 <li><code>src/chatbot_llm</code>: <code>refactor/IRR-turn-engine</code>, clean and synchronized.</li>
-<li>NeuralWorkbench: clean <code>feat/base-implementation</code> at <code>e76ba7e</code>, synchronized with the Aily remote and pinned as the <code>src/Neural-Wokbench</code> submodule.</li>
+<li>NeuralWorkbench: clean <code>feat/base-implementation</code> at <code>e76ba7e</code> and synchronized with the Aily remote. This was the intended companion revision; the current UAH tree does not contain the declared gitlink.</li>
 <li><code>python3 scripts/ros4hri_change_audit.py --mode working</code>: no ROS package changes detected before this documentation pass.</li>
 <li><code>PYTHONPATH=src/ab_harness .venv/bin/python -m pytest -q src/ab_harness/test</code>: seven tests passed.</li>
 <li><code>.venv/bin/python scripts/check_skill_registry_consistency.py</code>: canonical registry and projections passed consistency checks.</li>
@@ -481,12 +481,23 @@ H6  AB5 policy-foundry hypothesis                         RESEARCH ONLY, NOT COM
 <ul>
 <li>UAH checkout: <code>feat/base-implementation-H0</code>; existing user work preserved.</li>
 <li>Latest chatbot integration branch inspected: <code>nao_chatbot_llm/origin/feat/planner_llm_hooks</code> at <code>a2ecca7</code>. Its source tree matches the local inspected checkout.</li>
-<li>Latest integrated NAO planner branch inspected: <code>nao-ros4hri-bridge/origin/feat/TFM-LLM_planner</code> at <code>9da89c0</code>. Runtime source matches the local checkout; the remote-only tree change is unrelated career material.</li>
+<li>Latest integrated NAO planner branch inspected: <code>nao-ros4hri-bridge/origin/feat/TFM-LLM_planner</code> at <code>9da89c0</code>. Runtime source matches the local checkout; the remote-only tree change is unrelated career material. This is a historical inspection snapshot, not the H2 qualification baseline. Qualification uses annotated tag <code>v1.0.0</code> at peeled commit <code>ebffe93a74be4e013ce0f60fdfc41268dba73fc3</code>.</li>
 <li>The portable NAO AB fixture models the distinct gate ingress <code>/nao_orchestrator/planner_request</code>, admitted ingress <code>/planner/request</code>, planner egress <code>/intents</code>, execution feedback, dialogue act, and scene summary as non-callable AB0 objects.</li>
 <li>Forty-two portable tests pass using the repository virtual environment and a workspace-local pytest temp root.</li>
 <li>The implemented H1 slice consumes recorded role outputs. It does not invoke a model provider, ROS node, container, or live robot.</li>
 <li><code>python -m ab_harness smoke</code> now runs accepted and rejected boot canaries, emits a content-addressed configuration identity, and retrieves a quarantined Workbench context with supporting and counterexample traces.</li>
 <li><code>ab_harness.workbench_protocol</code> now freezes JSON-compatible request, candidate-batch, observation, protocol handshake, and fail-closed in-process adapter contracts. A mismatch override is visibly observation-only.</li>
+</ul>
+<h3>Architecture and baseline correction checked on 2026-09-03</h3>
+<ul>
+<li>The immutable NAO compatibility baseline is annotated tag <code>v1.0.0</code>, peeled commit <code>ebffe93a74be4e013ce0f60fdfc41268dba73fc3</code>, on <code>feat/TFM-LLM_planner</code>. Later branch commits are comparative evidence only.</li>
+<li>The chatbot compatibility baseline remains <code>feat/planner_llm_hooks</code> at <code>a2ecca796...</code>.</li>
+<li>NeuralWorkbench revision <code>e76ba7eafbd90f9ed239a65f741d2598ecd033cb</code> remains the intended companion pin. <code>.gitmodules</code> declares the path, but the current UAH tree has no gitlink; documentation must not claim that the submodule is mounted until it is restored and verified.</li>
+<li>The role, model, agent, activation, task, trace, and operation identities are now distinct. <code>AgentRoleConfiguration</code> is model-independent.</li>
+<li><code>agent_handle_id</code> supplies a stable deployment-facing identity such as <code>watson.system.primary</code>. Each immutable handle revision resolves to one <code>agent_id</code>, preserves the required role configuration, records fidelity evidence and retains rollback lineage. Hardware allocation cannot rebind the handle.</li>
+<li>The <code>PromptCompiler</code> produces a deterministic layered prompt from the UAH kernel, role contract, minimal domain policy, task AB projection, and current context. Prompt text cannot widen deterministic admission.</li>
+<li>UAH semantic admission and domain lifecycle admission are separate. Only a domain-issued <code>ExecutionLease</code> permits the exact immutable <code>AdmittedOperation</code> to reach its owner.</li>
+<li>Every role names one primary abstraction frame. Auxiliary frames are explicit versioned projections with <code>inspect_only</code>, <code>direct_proposal</code>, or <code>delegate_only</code> access. Task compilation may narrow but cannot widen the role-level declaration. Cross-frame equivalence remains unresolved unless a reviewed mapping proves it.</li>
 </ul>
 <h3>What H0 actually implements</h3>
 <p>The parent-only <code>src/ab_harness</code> package is a real portable contract proof. It contains no ROS or NAO imports in the core and currently proves:</p>
@@ -628,43 +639,18 @@ AB5 candidate: designs/governs a population of AB4 policies or Workbenches,
 </ol>
 <p>Until those conditions are met, the honest description is an increasingly capable, adaptive, and efficient AB4 system.</p>
 <h2>5. Canonical System Architecture</h2>
-<pre><code class="language-text">                         UNIVERSAL SEMANTIC PLANE
-
- TaskContract + AgentRole + ABFrame + RegistrySnapshot + EnvironmentIdentity
-                                  |
-                                  v
-                    Task Interaction Compiler
-       projection + decomposition + permissions + evidence closure
-                                  |
-                                  v
-                     InteractionModuleSpec
-                                  |
-              +-------------------+-------------------+
-              |                                       |
-              v                                       v
-      Model/Harness Adapter                      Runtime Adapter
- local API | remote API | Pi | Codex       ROS | shell | browser | MCP
- Claude | Hermes | OpenClaw | OpenHands    API | sandbox | simulator
-              |                                       |
-              +-------------------+-------------------+
-                                  v
-                     Deterministic Control Plane
-          schema gate + AB reach + permissions + budgets + approvals
-                                  |
-                                  v
-                    Environment-owned execution
-                                  |
-                                  v
-              Observation + EffectEvidence + TerminalState
-                                  |
-                                  v
-                       Append-only Trace Store
-                                  |
-                   +--------------+--------------+
-                   |                             |
-                   v                             v
-             Evaluation Plane             Neural Workbench
-       milestones/minefields/holdout   posterior/search/crystallization</code></pre>
+<div class="diagram uah-flow-diagram">
+  <svg viewBox="0 0 1040 1588" role="img" aria-label="Canonical UAH delivery architecture">
+    <defs>
+      <marker id="uah-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M 0 0 L 10 5 L 0 10 z" fill="#9aa8bd"></path>
+      </marker>
+    </defs>
+    <g font-family="Inter, Liberation Sans, Arial, sans-serif"><path d="M 260.0 106.0 C 260.0 137.0, 520.0 137.0, 520.0 168.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><path d="M 520.0 106.0 C 520.0 137.0, 520.0 137.0, 520.0 168.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><path d="M 780.0 106.0 C 780.0 137.0, 520.0 137.0, 520.0 168.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><path d="M 520.0 244.0 C 520.0 275.0, 520.0 275.0, 520.0 306.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><path d="M 520.0 382.0 C 520.0 413.0, 520.0 413.0, 520.0 444.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><path d="M 520.0 520.0 C 520.0 551.0, 520.0 551.0, 520.0 582.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><path d="M 520.0 658.0 C 520.0 689.0, 520.0 689.0, 520.0 720.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><path d="M 520.0 382.0 C 520.0 551.0, 520.0 551.0, 520.0 720.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><path d="M 520.0 796.0 C 520.0 827.0, 520.0 827.0, 520.0 858.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><path d="M 520.0 934.0 C 520.0 965.0, 520.0 965.0, 520.0 996.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><path d="M 520.0 1072.0 C 520.0 1103.0, 520.0 1103.0, 520.0 1134.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><path d="M 520.0 1210.0 C 520.0 1241.0, 520.0 1241.0, 520.0 1272.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><path d="M 520.0 1348.0 C 520.0 1379.0, 346.7 1379.0, 346.7 1410.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><path d="M 520.0 1348.0 C 520.0 1379.0, 693.3 1379.0, 693.3 1410.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><rect x="148.0" y="30.0" width="224" height="76" rx="15" fill="#e8edff" stroke="#5268d8" stroke-width="2" /><text x="260.0" y="68.0" text-anchor="middle" font-size="12" fill="#172033"><tspan x="260.0" y="59.0" font-weight="700">Identity Plane</tspan><tspan x="260.0" y="79.0" font-weight="500">role + handle + agent + model + run</tspan></text><rect x="408.0" y="30.0" width="224" height="76" rx="15" fill="#e5f5f2" stroke="#168778" stroke-width="2" /><text x="520.0" y="68.0" text-anchor="middle" font-size="12" fill="#172033"><tspan x="520.0" y="59.0" font-weight="700">Semantic Plane</tspan><tspan x="520.0" y="79.0" font-weight="500">DomainContractPack + frames + AB graph</tspan></text><rect x="668.0" y="30.0" width="224" height="76" rx="15" fill="#e5f5f2" stroke="#168778" stroke-width="2" /><text x="780.0" y="68.0" text-anchor="middle" font-size="12" fill="#172033"><tspan x="780.0" y="59.0" font-weight="700">Task Plane</tspan><tspan x="780.0" y="79.0" font-weight="500">domain task + effects + acceptance</tspan></text><rect x="408.0" y="168.0" width="224" height="76" rx="15" fill="#e9f6e7" stroke="#3d8b4e" stroke-width="2" /><text x="520.0" y="206.0" text-anchor="middle" font-size="12" fill="#172033"><tspan x="520.0" y="197.0" font-weight="700">InteractionModuleCompiler</tspan><tspan x="520.0" y="217.0" font-weight="500">closed frame-relative projection</tspan></text><rect x="408.0" y="306.0" width="224" height="76" rx="15" fill="#e8f2ff" stroke="#2879c7" stroke-width="2" /><text x="520.0" y="344.0" text-anchor="middle" font-size="12" fill="#172033"><tspan x="520.0" y="335.0" font-weight="700">InteractionModuleSpec</tspan><tspan x="520.0" y="355.0" font-weight="500">capabilities + policy + evidence closure</tspan></text><rect x="408.0" y="444.0" width="224" height="76" rx="15" fill="#f0eaff" stroke="#7657b8" stroke-width="2" /><text x="520.0" y="482.0" text-anchor="middle" font-size="12" fill="#172033"><tspan x="520.0" y="473.0" font-weight="700">PromptCompiler + ModelAdapter</tspan><tspan x="520.0" y="493.0" font-weight="500">bounded context + typed schemas</tspan></text><rect x="408.0" y="582.0" width="224" height="76" rx="15" fill="#f5ecff" stroke="#8b5bb7" stroke-width="2" /><text x="520.0" y="620.0" text-anchor="middle" font-size="15" fill="#172033"><tspan x="520.0" y="611.0" font-weight="700">TypedProposal</tspan><tspan x="520.0" y="631.0" font-weight="500">model claim only</tspan></text><rect x="408.0" y="720.0" width="224" height="76" rx="15" fill="#efe6ff" stroke="#6c4ca5" stroke-width="2" /><text x="520.0" y="758.0" text-anchor="middle" font-size="15" fill="#172033"><tspan x="520.0" y="749.0" font-weight="700">UAH Semantic Admission</tspan><tspan x="520.0" y="769.0" font-weight="500">typed AdmittedOperation</tspan></text><rect x="408.0" y="858.0" width="224" height="76" rx="15" fill="#fff0e2" stroke="#cb6d26" stroke-width="2" /><text x="520.0" y="896.0" text-anchor="middle" font-size="13" fill="#172033"><tspan x="520.0" y="887.0" font-weight="700">Domain Lifecycle Admission</tspan><tspan x="520.0" y="907.0" font-weight="500">ExecutionLease or rejection</tspan></text><rect x="408.0" y="996.0" width="224" height="76" rx="15" fill="#ffe7e5" stroke="#bf5048" stroke-width="2" /><text x="520.0" y="1034.0" text-anchor="middle" font-size="13" fill="#172033"><tspan x="520.0" y="1025.0" font-weight="700">Environment Owner</tspan><tspan x="520.0" y="1045.0" font-weight="500">exact operation execution</tspan></text><rect x="408.0" y="1134.0" width="224" height="76" rx="15" fill="#fff6cf" stroke="#b18416" stroke-width="2" /><text x="520.0" y="1172.0" text-anchor="middle" font-size="15" fill="#172033"><tspan x="520.0" y="1163.0" font-weight="700">Result + EffectEvidence</tspan><tspan x="520.0" y="1183.0" font-weight="500">terminal judgment</tspan></text><rect x="408.0" y="1272.0" width="224" height="76" rx="15" fill="#e5f4f4" stroke="#247e83" stroke-width="2" /><text x="520.0" y="1310.0" text-anchor="middle" font-size="12" fill="#172033"><tspan x="520.0" y="1301.0" font-weight="700">Lifecycle Ledger + Observatory</tspan><tspan x="520.0" y="1321.0" font-weight="500">append-only replayable record</tspan></text><rect x="234.7" y="1410.0" width="224" height="76" rx="15" fill="#e8edf2" stroke="#536475" stroke-width="2" /><text x="346.7" y="1448.0" text-anchor="middle" font-size="12" fill="#172033"><tspan x="346.7" y="1439.0" font-weight="700">Evaluation</tspan><tspan x="346.7" y="1459.0" font-weight="500">qualification + failure attribution</tspan></text><rect x="581.3" y="1410.0" width="224" height="76" rx="15" fill="#e9f6e7" stroke="#3d8b4e" stroke-width="2" /><text x="693.3" y="1448.0" text-anchor="middle" font-size="15" fill="#172033"><tspan x="693.3" y="1439.0" font-weight="700">NeuralWorkbench H3+</tspan><tspan x="693.3" y="1459.0" font-weight="500">quarantined candidates</tspan></text></g>
+  </svg>
+  <div class="caption">Canonical UAH delivery architecture</div>
+</div>
+<p>The detailed identity, prompt, admission, lineage, and operation-tree diagrams are canonical in <code>../architecture/universal_agentic_harness_foundation.md</code>. Observatory event and graph semantics are canonical in <code>../architecture/observatory_contract.md</code>.</p>
 <h3>Six planes</h3>
 <table><thead><tr>
 <th>Plane</th>
@@ -713,8 +699,36 @@ AB5 candidate: designs/governs a population of AB4 policies or Workbenches,
 <td>Kernel version, policies, adapters, trace/eval configuration</td>
 </tr>
 <tr>
+<td><code>AgentRoleConfiguration</code></td>
+<td>Model-independent semantic role, model admission profile, primary frame, auxiliary frame allowlists, capability packs, control bands and authority</td>
+</tr>
+<tr>
+<td><code>ModelConfiguration</code></td>
+<td>Model artifact, provider runtime, decoding parameters and protocol capabilities</td>
+</tr>
+<tr>
+<td><code>ModelAdmissionProfile</code></td>
+<td>Provider-neutral capability, behavior, evaluation, and minimum resource requirements for models embodying one role</td>
+</tr>
+<tr>
+<td><code>AgentManifest</code></td>
+<td>Immutable role, model, prompt pack, harness and adapter composition identified by <code>agent_id</code></td>
+</tr>
+<tr>
+<td><code>AgentHandleRevision</code></td>
+<td>Stable handle to active agent mapping, required role, fidelity evidence and rollback lineage</td>
+</tr>
+<tr>
+<td><code>AgentRun</code></td>
+<td>One bounded activation identified by <code>agent_run_id</code></td>
+</tr>
+<tr>
 <td><code>TaskSpec</code></td>
 <td>Goal, role, frame, required effects, prohibited effects, budgets, terminal checks</td>
+</tr>
+<tr>
+<td><code>DomainContractPack</code></td>
+<td>Environment-owned frames, objects, binding policy, evidence rules, qualification cases and minimal prompt policy</td>
 </tr>
 <tr>
 <td><code>AbstractionFrame</code></td>
@@ -737,16 +751,28 @@ AB5 candidate: designs/governs a population of AB4 policies or Workbenches,
 <td>Closed task projection presented to one role</td>
 </tr>
 <tr>
+<td><code>PromptPack</code></td>
+<td>Immutable model-facing wording and output-format artifact selected by the agent manifest</td>
+</tr>
+<tr>
 <td><code>ModelProfile</code></td>
-<td>Provider protocol, schema/tool capabilities, context, latency, trust tier</td>
+<td>Measured provider protocol, schema/tool capabilities, context, latency, trust tier</td>
 </tr>
 <tr>
 <td><code>EnvironmentProfile</code></td>
 <td>Runtime identity, adapters, resources, security and freshness policy</td>
 </tr>
 <tr>
-<td><code>ActionProposal</code></td>
-<td>Model-proposed typed operation without effect truth</td>
+<td><code>TypedProposal</code></td>
+<td>Model-proposed typed operation without effect truth or authority</td>
+</tr>
+<tr>
+<td><code>AdmittedOperation</code></td>
+<td>Immutable UAH semantic decision carrying exact arguments, identities, binding and evidence obligations</td>
+</tr>
+<tr>
+<td><code>ExecutionLease</code></td>
+<td>Domain-owner lifecycle authority or rejection linked to one admitted operation</td>
 </tr>
 <tr>
 <td><code>GateDecision</code></td>
@@ -770,6 +796,38 @@ AB5 candidate: designs/governs a population of AB4 policies or Workbenches,
 </tr>
 </tbody></table>
 <h2>6. H0-H6 Delivery Spine</h2>
+<h3>Identity and allocation staging</h3>
+<p>The semantic identity spine is required before dynamic allocation. The runtime scheduler is not.</p>
+<table><thead><tr>
+<th>Phase</th>
+<th>Required identity and allocation scope</th>
+</tr></thead><tbody>
+<tr>
+<td>H0</td>
+<td>Freeze serializable role, model, agent, handle, run, task, trace, operation, and invocation identities. No dynamic scheduler.</td>
+</tr>
+<tr>
+<td>H1</td>
+<td>Implement immutable agent manifests, handle resolution, run pinning, and a deterministic allocator interface with a fake or single fixed instance.</td>
+</tr>
+<tr>
+<td>H2</td>
+<td>Configure named NAO handles such as <code>nao.chatbot.primary</code> and <code>nao.planner.primary</code>; run provider/resource preflight and fixed leases. Multiple named agents are allowed, but hot model rebinding is not required.</td>
+</tr>
+<tr>
+<td>H3</td>
+<td>Implement provider pools, hardware-aware <code>ModelAllocator</code>, lease/release policy, concurrent or serialized agent runs, and fidelity-gated handle promotion alongside the NeuralWorkbench attachment.</td>
+</tr>
+<tr>
+<td>H4</td>
+<td>Permit reviewed Workbench or evaluator candidates to propose new agent embodiments or handle revisions; promotion remains external, versioned, and reversible.</td>
+</tr>
+<tr>
+<td>H5</td>
+<td>Federate local and remote provider pools and require allocation, isolation, trace, and handle-fidelity conformance across runtimes.</td>
+</tr>
+</tbody></table>
+<p>The hardware module is called <code>ModelAllocator</code>, not <code>AgentAllocator</code>. <code>AgentRegistry</code> creates and resolves immutable agent embodiments and handle revisions. <code>ModelAllocator</code> only selects compatible runtime capacity for an already resolved agent run. A later high-level <code>AgentRuntime</code> may coordinate both interfaces without merging their ownership.</p>
 <h3>H0: AB contract spine</h3>
 <p><strong>Purpose:</strong> Prove that one model role can be scoped to a real task-relative AB projection and rejected deterministically when it exceeds that projection.</p>
 <p><strong>Current state:</strong> The parent package proves the smallest core, but not the full lifecycle.</p>
@@ -873,7 +931,8 @@ AB5 candidate: designs/governs a population of AB4 policies or Workbenches,
 <p><strong>Acceptance gate:</strong> Same proposal/model, prompt pack, task set, fixture, and authority mode produce behavioral parity or an explicitly reviewed improvement for the full planner path. No prompt wording change enters this phase without SkillOpt. Live robot access is not required; recorded and fake/simulated owner contracts are sufficient when evidence and failure semantics match.</p>
 <h3>H3: Trace-adaptive Neural Workbench</h3>
 <p><strong>Purpose:</strong> Let measured experience shape candidate generation, context, and recovery without modifying trusted runtime policy online.</p>
-<p><strong>Package boundary:</strong> NeuralWorkbench is the sole H3+ engine for pulse creation, candidate verification/scoring, adaptive trace products, entropy experiments, and later crystallization. UAH supplies the model port, task/frame projection, registry snapshot, mandatory execution ledger, deterministic gate, and owner evidence. The first adapter is in-process but its payloads are transport-neutral. Protocol mismatch fails closed; a development override is observation-only.</p>
+<p><strong>Package boundary:</strong> NeuralWorkbench is the sole H3+ engine for pulse creation, candidate verification/scoring, adaptive trace products, entropy experiments, and later crystallization. UAH supplies the model port, task/frame projection, registry snapshot, mandatory execution ledger, deterministic gate, and owner evidence. The first adapter is in-process but its payloads are transport-neutral. Protocol mismatch fails closed; a development override is observation-only. NeuralWorkbench is not an abstraction frame. <code>WorkbenchRequest</code> supplies the named frame and closed object projection within which it searches. An MCP transport may be added as another adapter to <code>WorkbenchEnginePort</code>, but cannot replace or widen that semantic interface.</p>
+<p>The H3 interaction hook has two directions. Before a configured model call, UAH may request bounded candidates and filter them before any context artifact reaches <code>PromptCompiler</code> or any replacement enters shadow evaluation. After a run reaches terminal trace closure, UAH submits an immutable <code>WorkbenchObservation</code>. The Workbench may update future search state but cannot alter the active interaction module, admission decision, lease, registry, or promotion state.</p>
 <p><strong>Current pre-H3 slice:</strong> <code>WorkbenchMemory</code> retrieves a bounded set of relevant supporting and failed <code>TraceExperience</code> records and emits a deterministic, provenance-bearing <code>WorkbenchContextCandidate</code>. Missing support or counterevidence is explicit and the status remains <code>candidate</code>. This is an early H3-compatible seam delivered before H3; it is not a capability posterior, persistent trace memory, prompt optimizer, crystallizer, or H3 completion.</p>
 <p><strong>Deliverables:</strong></p>
 <ul>
@@ -1052,6 +1111,11 @@ delta_H_proxy = H_proxy_before - H_proxy_after</code></pre>
 <td>H0</td>
 </tr>
 <tr>
+<td><code>ab_harness.identity</code></td>
+<td>Role, model, agent, activation, task, trace and operation identity invariants</td>
+<td>H0-H1</td>
+</tr>
+<tr>
 <td><code>ab_harness.registry</code></td>
 <td>Read-only snapshots, frame maps, object resolution</td>
 <td>H0</td>
@@ -1062,9 +1126,19 @@ delta_H_proxy = H_proxy_before - H_proxy_after</code></pre>
 <td>H0-H1</td>
 </tr>
 <tr>
+<td><code>ab_harness.prompt_compiler</code></td>
+<td>Deterministic UAH kernel, role, domain, projection and task-context assembly</td>
+<td>H1-H2</td>
+</tr>
+<tr>
 <td><code>ab_harness.policy</code></td>
 <td>Role authority, permissions, budgets, approvals</td>
 <td>H1</td>
+</tr>
+<tr>
+<td><code>ab_harness.admission</code></td>
+<td>Typed proposal normalization and UAH semantic admission</td>
+<td>H0-H1</td>
 </tr>
 <tr>
 <td><code>ab_harness.gate</code></td>
@@ -1073,7 +1147,7 @@ delta_H_proxy = H_proxy_before - H_proxy_after</code></pre>
 </tr>
 <tr>
 <td><code>ab_harness.runtime</code></td>
-<td>Lifecycle state machine and adapter orchestration</td>
+<td>Domain lifecycle admission, execution leases and adapter orchestration</td>
 <td>H1</td>
 </tr>
 <tr>
@@ -1147,6 +1221,16 @@ delta_H_proxy = H_proxy_before - H_proxy_after</code></pre>
 <td>H0+</td>
 </tr>
 <tr>
+<td><code>uah-domain-onboarding</code> skill</td>
+<td>Candidate DomainContractPack authoring, deterministic validation, SkillOpt, replay and owner-review preparation</td>
+<td>H3+</td>
+</tr>
+<tr>
+<td><code>uah-trace-debug-loop</code> skill</td>
+<td>Trace review, owner-seam diagnosis, TDD, focused repair, replay and comparison</td>
+<td>H1-H2</td>
+</tr>
+<tr>
 <td>NeuralWorkbench registry tools</td>
 <td>Generic AB schema/graph helpers and migration fixtures; not universal domain-content authority</td>
 <td>H3+</td>
@@ -1159,8 +1243,10 @@ worker adapters     -&gt; may depend on worker protocol/SDK
 Workbench learning  -&gt; consumes traces and registry snapshots, never executor internals</code></pre>
 <h3>Observatory O1 and O2</h3>
 <p>Observatory is the canonical trace visualization surface. O1 freezes a read-only API and static HTML renderer for H1 lifecycle and H2 parity review. O2 is the proper interactive implementation developed through H4 and polished at H5. It may display registry, binding, proposal, gate, evidence, replay, pulse, energy, entropy, retrieval, and crystallization graphs, but it never authorizes execution or issues evidence. Conceptual and synthetic graphs are labeled and cannot masquerade as measured traces. See <code>../architecture/observatory_contract.md</code>.</p>
+<p>The kernel always emits lifecycle events. Agent-visible observability is a separate, explicit frame projection and is normally read-only and task-scoped. The universal prompt explains evidence and trace semantics without exposing the complete trace store to every role.</p>
 <h3>Domain initialization and model coupling</h3>
-<p>Automated domain initialization is an H3+ product stream, not an H2 dependency. Manual and LLM-assisted frontends produce the same candidate domain package. Discovery never activates objects. Deterministic validation, replay/sandbox qualification, and environment-owner review are required. Coupling and runtime models are separate configuration roles, and admission is attached to the full model-harness-domain configuration. See <code>domain_initialization_and_ab_coupling.md</code>.</p>
+<p>Automated domain initialization is an H3+ product stream, not an H2 dependency. Manual and LLM-assisted frontends produce the same <code>DomainContractPackCandidate</code>. Discovery never activates objects. Deterministic validation, replay/sandbox qualification, and environment-owner review are required. Coupling and runtime models are separate configuration roles, and admission is attached to the full model-harness-domain configuration. See <code>domain_initialization_and_ab_coupling.md</code>.</p>
+<p>The onboarding workflow may use a domain guardrail skill, TDD, SkillOpt and deslop. Those developer workflows do not become runtime AB objects unless a named abstraction frame and approved binding explicitly make them so.</p>
 <h2>9. Build, Borrow, or Wrap</h2>
 <h3>Decision matrix</h3>
 <table><thead><tr>
@@ -1349,8 +1435,25 @@ Workbench learning  -&gt; consumes traces and registry snapshots, never executor
 <h2>11. Evaluation and Ablation Program</h2>
 <h3>Configuration identity</h3>
 <p>Every result must identify:</p>
-<pre><code class="language-text">model + model revision + provider/runtime + harness version + adapter version
-+ prompt pack hash + registry hash + environment image/state + task suite version</code></pre>
+<pre><code class="language-text">role_configuration_id
++ model_configuration_id
++ agent_handle_id + agent_handle_revision_id
++ agent_id + agent_run_id
++ provider_pool_id + resource_snapshot_id
++ model_instance_id + model_lease_id + model_invocation_id
++ provider/runtime + harness version + adapter version
++ prompt pack hash + registry hash + environment image/state + task suite version
++ trace_id + task_id + operation_id</code></pre>
+<p>Changing the model, prompt pack, harness build or adapter composition creates a new <code>agent_id</code>. Restarting that unchanged agent creates a new <code>agent_run_id</code>. The same frozen task suite may be replayed across different agents for a valid comparison. Hardware reallocation among compatible instances of the same model configuration does not change <code>agent_id</code>; each lease and invocation records the actual runtime used. Hidden fallback to another model configuration is an agent transition, not an allocator decision. A stable handle may point to the newly qualified agent only through a new immutable revision whose fidelity evidence preserves the required role contract and supports rollback.</p>
+<p>An agent-handle fidelity report must prove:</p>
+<ol>
+<li>the required <code>role_configuration_id</code> is unchanged;</li>
+<li>frame access and authority are unchanged or narrower;</li>
+<li>the candidate agent passes the role&#x27;s held-out behavioral and failure suite;</li>
+<li>provider protocol and resource limits satisfy the deployment profile;</li>
+<li>the prior handle revision remains available for rollback.</li>
+</ol>
+<p>This mechanism is optional for H2 execution. It becomes the stable routing surface for local model replacement, production replicas, and later Watson deployment without weakening immutable evaluation identities.</p>
 <h3>Three evaluation gates</h3>
 <p>The same test label must not collapse operability, promotion evidence, and deployed monitoring:</p>
 <table><thead><tr>
@@ -1665,7 +1768,7 @@ evidence_closure | evaluator | resource_budget</code></pre>
 <li>[x] Configuration identity changes when registry or runtime parameters change.</li>
 <li>[x] Workbench retrieval is bounded, failure-aware, provenance-bearing, and candidate-only.</li>
 <li>[x] The smoke command has one accepted path and one no-dispatch rejection canary.</li>
-<li>[x] NeuralWorkbench is pinned as an independent submodule and the first transport-neutral, fail-closed adapter contracts are tested.</li>
+<li>[~] The first transport-neutral, fail-closed Workbench adapter contracts are tested; the declared NeuralWorkbench gitlink remains to be restored at the intended revision.</li>
 <li>[ ] Full H0 schemas and lifecycle traces are not implemented.</li>
 <li>[ ] Only one synthetic H1 vertical slice exists; the required failure suite is incomplete.</li>
 <li>[ ] No NAO shadow-mode adapter has been run.</li>
@@ -1701,7 +1804,7 @@ evidence_closure | evaluator | resource_budget</code></pre>
 <li>Run the frozen synthetic conformance suite.</li>
 <li>Deslop only after behavior is covered; avoid framework-building beyond tested needs.</li>
 </ol>
-<h3>August 10 target: H2 cooperative NAO planner proof</h3>
+<h3>H2 target: cooperative NAO planner proof</h3>
 <ol>
 <li>Record frozen chatbot/planner fixtures and current test results.</li>
 <li>Add read-only AB1/AB0 projection and trace bridge.</li>
@@ -1789,8 +1892,10 @@ evidence_closure | evaluator | resource_budget</code></pre>
 <p>AB scope reduces reach but does not eliminate prompt injection, malicious tool descriptions, credential leakage, or poisoned memories. Security must follow the lifecycle: input provenance, causal/action checks, privilege separation, artifact scanning, rollback, and degradation.</p>
 <h3>Multi-agent and AB4 composition</h3>
 <p>Subagents are not automatically higher AB objects. A multi-agent system is AB4 when the coupled coordination policy, memory, environment, and verification form the task-facing object. More agents can also mean more uncorrelated state, cost, and authority; orchestration must earn its complexity in ablation.</p>
+<p>Each role has one primary frame. A Watson-style system may receive explicit auxiliary frame projections, but the task compiler still emits a bounded graph and the primary frame supplies the policy for choosing or delegating into those frames. Each additional projection declares one maximum access mode: <code>inspect_only</code>, <code>direct_proposal</code>, or <code>delegate_only</code>. Effect-bearing cross-frame work defaults to <code>delegate_only</code>, so a separately configured agent whose primary frame matches the target receives the task. Read-only foreign state and Observatory views default to <code>inspect_only</code>. <code>direct_proposal</code> requires explicit role authorization and reviewed cross-frame ownership and mapping contracts.</p>
 <h3>AB5 boundary</h3>
 <p>The decisive experiment is not “can the system optimize itself?” It is “does a new governed object operate over a family of AB4 systems with independently verified cross-system effects?” Until then, research should report AB4 maturity and <code>delta_AB</code>, not AB5.</p>
+<p>A fixed swarm of AB4 agents remains AB4. AB5 becomes defensible only when a higher-order, independently evaluated policy creates, selects, revises, or coordinates a family of AB4 configurations and preserves rollback and provenance.</p>
 <h2>19. Residual Risk and Next Probe</h2>
 <table><thead><tr>
 <th>Risk</th>

@@ -196,7 +196,7 @@
   <main class="doc">
 
 <h1>Domain Initialization and AB Coupling</h1>
-<p><strong>Status:</strong> Design staged for H3+; contracts informed by H0-H2 reference domains <strong>Date:</strong> 2026-08-04 <strong>Reference domains:</strong> NAO, iTrader, Watson/Hermes</p>
+<p><strong>Status:</strong> Contract design active; assisted authoring remains H3+ <strong>Date:</strong> 2026-09-07 <strong>Reference domains:</strong> NAO, iTrader, Watson/Hermes</p>
 <h2>1. Product Goal</h2>
 <p>Domain initialization turns an unfamiliar environment into a candidate UAH domain package without treating discovery, model confidence, or documentation as authorization or execution evidence.</p>
 <p>The intended onboarding experience is:</p>
@@ -206,18 +206,32 @@
 <p>Initialization is not required to close H2. H0-H2 uses hand-authored and reviewed reference-domain contracts. Automated or LLM-assisted initialization begins after those contracts prove the grammar.</p>
 <h2>2. One Artifact, Two Authoring Frontends</h2>
 <p>Manual and LLM-assisted initialization emit the same typed candidate package:</p>
-<pre><code class="language-text">DomainPackageCandidate
+<pre><code class="language-text">DomainContractPackCandidate
   domain profile
-  abstraction frames and atomicity rules
+  primary and auxiliary abstraction frames with atomicity rules
   AB registry objects and decompositions
+  capability packs and role allowlists
   implementation binding candidates
   input/output/effect/evidence contracts
   permissions and approval requirements
   evidence adapters and freshness rules
+  minimal domain prompt policy
   qualification cases and counterexamples
   source and model provenance</code></pre>
 <p>Manual authoring directly maps known APIs and internal seams. LLM-assisted authoring reads operator-supplied sources and proposes the same objects through a bounded coupling workflow. Neither frontend can approve its own output.</p>
+<p>An approved <code>DomainContractPack</code> is the runtime source. A domain-specific developer skill may explain how to inspect and validate it, but the <code>PromptCompiler</code> never consumes developer-skill prose as domain authority.</p>
 <h2>3. Coupling Pipeline</h2>
+<div class="diagram uah-flow-diagram">
+  <svg viewBox="0 0 1040 1450" role="img" aria-label="Figure 1. Candidate-only domain onboarding and activation">
+    <defs>
+      <marker id="uah-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M 0 0 L 10 5 L 0 10 z" fill="#9aa8bd"></path>
+      </marker>
+    </defs>
+    <g font-family="Inter, Liberation Sans, Arial, sans-serif"><path d="M 346.7 106.0 C 346.7 137.0, 520.0 137.0, 520.0 168.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><path d="M 693.3 106.0 C 693.3 137.0, 520.0 137.0, 520.0 168.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><path d="M 520.0 244.0 C 520.0 275.0, 520.0 275.0, 520.0 306.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><path d="M 520.0 382.0 C 520.0 413.0, 520.0 413.0, 520.0 444.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><path d="M 520.0 520.0 C 520.0 551.0, 520.0 551.0, 520.0 582.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><path d="M 520.0 658.0 C 520.0 689.0, 520.0 689.0, 520.0 720.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><path d="M 520.0 796.0 C 520.0 827.0, 520.0 827.0, 520.0 858.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><path d="M 520.0 934.0 C 520.0 965.0, 520.0 965.0, 520.0 996.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><path d="M 520.0 1072.0 C 520.0 1103.0, 520.0 1103.0, 520.0 1134.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><rect x="481.0" y="1081.0" width="78" height="22" rx="8" fill="#172033" /><text x="520.0" y="1096.0" text-anchor="middle" font-size="13" fill="#dce6f7">approved</text><path d="M 520.0 1210.0 C 520.0 1241.0, 520.0 1241.0, 520.0 1272.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><rect x="234.7" y="30.0" width="224" height="76" rx="15" fill="#e5f5f2" stroke="#168778" stroke-width="2" /><text x="346.7" y="68.0" text-anchor="middle" font-size="12" fill="#172033"><tspan x="346.7" y="59.0" font-weight="700">Owned Sources</tspan><tspan x="346.7" y="79.0" font-weight="500">contracts + APIs + documentation</tspan></text><rect x="581.3" y="30.0" width="224" height="76" rx="15" fill="#e8f2ff" stroke="#2879c7" stroke-width="2" /><text x="693.3" y="68.0" text-anchor="middle" font-size="12" fill="#172033"><tspan x="693.3" y="59.0" font-weight="700">Domain Guardrail Skill</tspan><tspan x="693.3" y="79.0" font-weight="500">inspection and ownership workflow</tspan></text><rect x="408.0" y="168.0" width="224" height="76" rx="15" fill="#e9f6e7" stroke="#3d8b4e" stroke-width="2" /><text x="520.0" y="206.0" text-anchor="middle" font-size="13" fill="#172033"><tspan x="520.0" y="197.0" font-weight="700">uah-domain-onboarding</tspan><tspan x="520.0" y="217.0" font-weight="500">candidate authoring only</tspan></text><rect x="408.0" y="306.0" width="224" height="76" rx="15" fill="#f5ecff" stroke="#8b5bb7" stroke-width="2" /><text x="520.0" y="344.0" text-anchor="middle" font-size="12" fill="#172033"><tspan x="520.0" y="335.0" font-weight="700">DomainContractPackCandidate</tspan><tspan x="520.0" y="355.0" font-weight="500">frames + objects + bindings + policy</tspan></text><rect x="408.0" y="444.0" width="224" height="76" rx="15" fill="#efe6ff" stroke="#6c4ca5" stroke-width="2" /><text x="520.0" y="482.0" text-anchor="middle" font-size="12" fill="#172033"><tspan x="520.0" y="473.0" font-weight="700">Deterministic Validation</tspan><tspan x="520.0" y="493.0" font-weight="500">schemas + graph + owner checks</tspan></text><rect x="408.0" y="582.0" width="224" height="76" rx="15" fill="#e9f6e7" stroke="#3d8b4e" stroke-width="2" /><text x="520.0" y="620.0" text-anchor="middle" font-size="12" fill="#172033"><tspan x="520.0" y="611.0" font-weight="700">PromptCompiler Preview</tspan><tspan x="520.0" y="631.0" font-weight="500">bounded model-facing projection</tspan></text><rect x="408.0" y="720.0" width="224" height="76" rx="15" fill="#f0eaff" stroke="#7657b8" stroke-width="2" /><text x="520.0" y="758.0" text-anchor="middle" font-size="12" fill="#172033"><tspan x="520.0" y="749.0" font-weight="700">SkillOpt Loop</tspan><tspan x="520.0" y="769.0" font-weight="500">train + untouched holdout + ledger</tspan></text><rect x="408.0" y="858.0" width="224" height="76" rx="15" fill="#ffe7e5" stroke="#bf5048" stroke-width="2" /><text x="520.0" y="896.0" text-anchor="middle" font-size="12" fill="#172033"><tspan x="520.0" y="887.0" font-weight="700">Sandbox and Replay Qualification</tspan><tspan x="520.0" y="907.0" font-weight="500">effects + evidence + failure closure</tspan></text><rect x="408.0" y="996.0" width="224" height="76" rx="15" fill="#efe6ff" stroke="#6c4ca5" stroke-width="2" /><text x="520.0" y="1034.0" text-anchor="middle" font-size="12" fill="#172033"><tspan x="520.0" y="1025.0" font-weight="700">Human and Domain-Owner Review</tspan><tspan x="520.0" y="1045.0" font-weight="500">approval authority</tspan></text><rect x="408.0" y="1134.0" width="224" height="76" rx="15" fill="#fff6cf" stroke="#b18416" stroke-width="2" /><text x="520.0" y="1172.0" text-anchor="middle" font-size="12" fill="#172033"><tspan x="520.0" y="1163.0" font-weight="700">Approved DomainContractPack</tspan><tspan x="520.0" y="1183.0" font-weight="500">content-addressed runtime input</tspan></text><rect x="408.0" y="1272.0" width="224" height="76" rx="15" fill="#e5f4f4" stroke="#247e83" stroke-width="2" /><text x="520.0" y="1310.0" text-anchor="middle" font-size="12" fill="#172033"><tspan x="520.0" y="1301.0" font-weight="700">UAH Runtime</tspan><tspan x="520.0" y="1321.0" font-weight="500">role-selected task projection</tspan></text></g>
+  </svg>
+  <div class="caption">Figure 1. Candidate-only domain onboarding and activation</div>
+</div>
 <pre><code class="language-text">environment sources + documentation + API inventory + owner constraints
   -&gt; inspect environment
   -&gt; propose AB frame
@@ -231,7 +245,7 @@
   -&gt; UAH H0-H2 runtime
   -&gt; NeuralWorkbench H3 adaptation</code></pre>
 <p>Discovery output is always <code>candidate</code>. Availability does not prove semantic meaning, authorization, safe callability, observable effects, or evidence quality.</p>
-<h2>4. AB Domain Coupling Skill</h2>
+<h2>4. <code>uah-domain-onboarding</code> Skill</h2>
 <p>The assisted workflow should eventually be exposed as a composed skill whose operations remain individually traceable:</p>
 <pre><code class="language-text">inspect_environment
 extract_candidate_surfaces
@@ -245,9 +259,19 @@ run_coupling_evals
 repair_candidates
 emit_review_package</code></pre>
 <p>The skill may iterate after deterministic rejection. It cannot activate a registry, approve a binding, widen a role control band, or mark evidence valid.</p>
+<p>The skill coordinates specialized development workflows without converting them into domain-runtime objects:</p>
+<ul>
+<li>domain modeling fixes terminology, owners, and frame atomicity;</li>
+<li>code and contract inspection extracts source facts;</li>
+<li>TDD proves schema, projection, admission, and failure behavior through public interfaces;</li>
+<li>SkillOpt changes only model-facing descriptions, examples, domain-policy wording, or prompt-pack presentation after a baseline is frozen;</li>
+<li>deslop runs after behavior is green and remains limited to touched implementation code.</li>
+</ul>
+<p>Every SkillOpt iteration locks the exact target artifact, one objective, train set, untouched holdout set, and acceptance gate. An improved train result may not activate a candidate when the holdout regresses or structural validators fail.</p>
 <h2>5. Environment Coupling Versus Model Coupling</h2>
 <p>Environment coupling defines domain semantics, APIs, ownership, permissions, bindings, and evidence. Model coupling defines projection presentation, context packaging, structured-output behavior, tool-use reliability, limits, and an empirical capability profile.</p>
 <p>The canonical domain registry must not change meaning merely because a different model generated or consumes it. Model-specific familiarity belongs in projections and configuration-specific capability profiles.</p>
+<p>Prompt coupling is a third, derived activity. The deterministic <code>PromptCompiler</code> combines the stable UAH protocol kernel, role contract, minimal domain policy, task-scoped AB projection, and current task context. It records the prompt artifact hash but grants no authority and does not expose raw binding locators to the model.</p>
 <h2>6. Coupling and Runtime Model Roles</h2>
 <p><code>coupling_model</code> and <code>runtime_model</code> are independent configuration roles.</p>
 <ul>
@@ -256,8 +280,9 @@ emit_review_package</code></pre>
 <li>A domain generated by one model may be operated by another only after the complete runtime configuration passes its own admission suite.</li>
 <li>Both identities, prompts, context limits, runtimes, quantizations, and source artifacts remain in provenance.</li>
 </ul>
+<p>Each agent role references one versioned <code>model_admission_profile_id</code>. The profile defines provider-neutral capability and behavioral requirements. Deployment policy may narrow eligible providers, privacy modes, placements, RAM, VRAM, context, and concurrency limits without changing the role semantics.</p>
 <h2>7. Model Admission Profile</h2>
-<p>Architecture, parameter count, and provider history are advisory metadata—not proof of capability. Qualification measures the complete model-harness-domain configuration:</p>
+<p>Architecture, parameter count, and provider history are advisory metadata, not proof of capability. Qualification measures the complete model-harness-domain configuration:</p>
 <ul>
 <li>structured-output reliability;</li>
 <li>AB frame and level consistency;</li>
@@ -299,6 +324,51 @@ emit_review_package</code></pre>
 <h2>8. Configuration Identity and Selective Retesting</h2>
 <p>Qualification attaches to a content-addressed configuration containing model, weights/quantization, runtime, context/KV settings, prompt/projection version, registry snapshot, adapter revision, environment revision, evaluator, and task suite. Material changes invalidate or narrow the prior admission result.</p>
 <p>Selective retesting is allowed when the dependency map proves which gates are unaffected. Documentation-only changes do not rerun runtime qualification; registry, adapter, prompt, quantization, or model changes rerun their affected contract and behavior suites.</p>
+<p>The identity registry separates:</p>
+<pre><code class="language-text">Outside-in semantic construction
+domain sources
+  -&gt; DomainContractPackCandidate
+  -&gt; approved DomainContractPack
+  -&gt; role_configuration_id
+
+Agent embodiment
+role_configuration_id
++ model_configuration_id
++ prompt_pack_id
++ harness_build_id
+  -&gt; agent_id
+
+Stable named actor
+agent_handle_id
+  -&gt; agent_handle_revision_id
+  -&gt; active agent_id
+
+Activation and work
+active agent_id
+  -&gt; agent_run_id
+  -&gt; task_id -&gt; trace_id -&gt; operation_id
+
+Runtime allocation
+provider_pool_id
+  -&gt; compatible model_instance_id
+  -&gt; model_lease_id
+agent_run_id + trace_id + model_lease_id
+  -&gt; model_invocation_id</code></pre>
+<p>The chains join at <code>model_invocation_id</code>, which records <code>agent_run_id</code>, <code>trace_id</code>, and the actual <code>model_lease_id</code>. Reallocation among compatible instances of the same model configuration does not change the agent identity. A different model configuration produces a different <code>agent_id</code>. A stable <code>agent_handle_id</code> may move to that agent only through a new immutable revision after role-fidelity qualification; allocation alone cannot change it.</p>
+<p>Handles use the stable namespace <code>&lt;domain&gt;.&lt;role&gt;.&lt;slot&gt;</code>. The initial slot is <code>primary</code> even when only one embodiment exists:</p>
+<pre><code class="language-text">watson.system.primary
+nao.chatbot.primary
+nao.planner.primary
+itrader.proposer.primary</code></pre>
+<p><code>primary</code> names a deployment role, not an unqualified default. It leaves room for explicit owner-defined slots without changing the role configuration or overloading the agent identity.</p>
+<p>Every role names one primary abstraction frame. Additional frame projections are explicit, versioned allowlists with their own control bands and access modes. A broad auxiliary capability pack may be approved at role level, but each task still receives a bounded interaction projection.</p>
+<p>Each additional projection declares a maximum <code>access_mode</code>:</p>
+<ul>
+<li><code>inspect_only</code> permits bounded observations but no state-changing proposal;</li>
+<li><code>direct_proposal</code> permits typed proposals that still pass UAH and domain admission;</li>
+<li><code>delegate_only</code> permits a typed handoff to an agent whose primary frame is the target frame.</li>
+</ul>
+<p>The role configuration owns this limit. <code>agent_id</code> inherits it as part of the role composition, and task compilation may only narrow it. Effect-bearing cross-frame work defaults to <code>delegate_only</code>; read-only foreign state defaults to <code>inspect_only</code>.</p>
 <h2>9. Activation and Governance</h2>
 <p>Generated registries and bindings remain candidates until explicit environment owner review. Read-only discovery can expose sensitive surfaces or false semantics, so it does not auto-activate by default.</p>
 <p>H3 NeuralWorkbench may use approved traces to propose better projections, replacement pulse candidates, or candidate AB chains. H4 crystallization remains quarantined behind replay, counterexamples, holdouts, provenance, owner review, and rollback.</p>
@@ -310,6 +380,8 @@ emit_review_package</code></pre>
 <li>admission thresholds and confidence intervals;</li>
 <li>customer-facing review UI in Observatory O2;</li>
 <li>signed domain packages and registry distribution.</li>
+<li>qualification requirements for rare <code>direct_proposal</code> cross-frame mappings;</li>
+<li>calibrated cross-frame mappings that preserve effects and evidence.</li>
 </ul>
   </main>
 </body>

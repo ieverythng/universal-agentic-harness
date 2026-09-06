@@ -5,36 +5,36 @@ and must be regenerated after canonical edits.
 
 ## Plans
 
-- `plans/universal_agentic_harness_masterplan.md` — canonical H0-H6 delivery
-  spine and August 10 contract.
-- `plans/universal_agentic_harness_development_log.md` — implementation and
+- `plans/universal_agentic_harness_masterplan.md`: canonical H0-H6 delivery
+  spine and current H2 qualification gates.
+- `plans/universal_agentic_harness_development_log.md`: implementation and
   verification ledger.
-- `plans/domain_initialization_and_ab_coupling.md` — manual and LLM-assisted
+- `plans/domain_initialization_and_ab_coupling.md`: manual and LLM-assisted
   domain onboarding, qualification, and activation gates.
 
 ## Architecture
 
-- `architecture/universal_agentic_harness_foundation.md` — project thesis and
+- `architecture/universal_agentic_harness_foundation.md`: project thesis and
   portable kernel architecture.
-- `architecture/neural_workbench_adaptive_ab_harness.md` — H3+ adaptive engine
+- `architecture/neural_workbench_adaptive_ab_harness.md`: H3+ adaptive engine
   integration and AB research synthesis.
-- `architecture/observatory_contract.md` — O1 read-only API and O2 interactive
+- `architecture/observatory_contract.md`: O1 read-only API and O2 interactive
   Observatory boundary.
-- `architecture/watson_inference_seams.md` — local-model inference seams.
-- `architecture/decisions/` — architectural decision records.
+- `architecture/watson_inference_seams.md`: local-model inference seams.
+- `architecture/decisions/`: architectural decision records.
 
 ## Artifacts
 
-- `artifacts/decisions/` — dated design and grill outcomes.
+- `artifacts/decisions/`: dated design and grill outcomes.
 - `artifacts/reviews/`: dated implementation and release-gate audits.
-- `artifacts/system-design/` — system-design document, retained template, and
+- `artifacts/system-design/`: system-design document, retained template, and
   architecture figure.
-- `artifacts/provenance.md` — source and extraction provenance.
-- `artifacts/h0_source_readme.md` — retained H0 source note.
+- `artifacts/provenance.md`: source and extraction provenance.
+- `artifacts/h0_source_readme.md`: retained H0 source note.
 
 ## Research
 
-- `research/` — primary-source reviews and experimental notes. Research claims
+- `research/`: primary-source reviews and experimental notes. Research claims
   remain separate from implementation status.
 
 ## Repository Relationship
@@ -46,7 +46,7 @@ and the mandatory execution ledger.
 `src/Neural-Wokbench` is a commit-pinned companion repository. NeuralWorkbench
 remains independently usable and begins its authoritative role at H3 through a
 versioned adapter. It owns pulse search, adaptive trace products, scoring,
-entropy experiments, and quarantined crystallization—not UAH execution
+entropy experiments, and quarantined crystallization, not UAH execution
 authority or environment registry content.
 
 NAO is the first reference domain. Existing chatbot, planner, orchestrator,

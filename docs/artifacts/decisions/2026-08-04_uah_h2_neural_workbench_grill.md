@@ -3,7 +3,7 @@
 **Date:** 2026-08-04
 **Status:** Shared understanding confirmed; implementation authorized
 
-## 1. August 10 Scope
+## 1. H2 Scope
 
 - H2 closes with a full planner ingress/egress implementation over recorded and
   fake/simulated NAO contracts.

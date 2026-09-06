@@ -4,13 +4,18 @@
 **Reviewed range:** `5de73a5...71ae872`<br>
 **Commits:** `6708af9` and `71ae872`<br>
 **UAH branch:** `feat/pre-commit-queue`<br>
-**NAO boundary requested:** `refactor/deslop_repo`<br>
+**NAO qualification boundary:** annotated tag `v1.0.0`, peeled commit
+`ebffe93a74be4e013ce0f60fdfc41268dba73fc3` on the
+`feat/TFM-LLM_planner` development line<br>
+**Architecture reconciliation:** 2026-09-03<br>
+**Frame-access reconciliation:** 2026-09-04<br>
+**Agent-handle reconciliation:** 2026-09-06<br>
 **Review status:** H0 synthetic proof accepted with corrections required; H1 and H2 not qualified
 
 ## 1. Decision
 
 The two commits contain a useful portable contract proof. They do not close the
-August 10 H2 launch contract. The current package can be installed in a clean
+then-active dated H2 launch contract. The current package can be installed in a clean
 Python environment, executes one deterministic recorded success and one
 out-of-projection rejection, and preserves the basic rule that an environment
 owner issues effect evidence. The package does not yet implement the complete
@@ -25,8 +30,8 @@ in the [masterplan](../../plans/universal_agentic_harness_masterplan.md).
 The shortest route to an operational Linux test is:
 
 1. close the typed proposal and lifecycle/replay seam in UAH;
-2. freeze one clean NAO `refactor/deslop_repo` revision and compile package-owned
-   golden fixtures from it;
+2. compile package-owned golden fixtures from the immutable NAO `v1.0.0`
+   baseline and record its peeled commit in every parity artifact;
 3. implement the provider-neutral model port and an Ollama adapter;
 4. run recorded and fake-owner NAO parity under an explicit authority mode;
 5. run the ROS fake stack on this PC, then defer live robot authority to the
@@ -143,11 +148,11 @@ Required correction: divide the README status into at least:
 
 ### 4.4 Date and status maintenance
 
-The masterplan status still says that the August 10 launch contract is active,
-and the development log still reports the state as of August 4. On August 17,
-the gate has elapsed without H2 completion. The contract should remain as an
-historical release gate, but current status should state that it was not met and
-identify the next candidate date only after the missing gates have owners.
+The masterplan status still described the dated launch contract as active, and
+the development log still reported the state as of its original architecture
+freeze. The gate had elapsed without H2 completion. Current status should use
+ordered evidence gates and identify any future target only after the missing
+gates have owners.
 
 ### 4.5 Scope sequencing
 
@@ -249,7 +254,8 @@ Accepted behavior:
 - AB0 interface declarations remain non-callable through the registry;
 - the planner parser collects referenced skill names for reachability checks.
 
-Boundary verification against the recorded `origin/refactor/deslop_repo` ref
+Boundary verification against the immutable NAO `v1.0.0` baseline
+(`ebffe93a74be4e013ce0f60fdfc41268dba73fc3`)
 found `PlannerGate.decide`, `PlannerRequest`, `ExecutionFeedback`,
 `PlannerDialogueAct`, `SceneSummary`, and `PlannerNode._publish_decision` at the
 declared module locations. The chatbot publisher belongs to a nested/separate
@@ -477,20 +483,16 @@ wait for a frozen manifest, suite, and failure-attribution record.
 
 ### 7.2 NAO revision boundary
 
-The primary NAO checkout remains on `feat/TFM-LLM_planner` at `9da89c0`, which
-is the revision named by the UAH development log. A separate worktree exists for
-`refactor/deslop_repo` at `b22ddfd`. That branch is two commits behind its
-recorded remote and has extensive tracked and untracked work in progress.
+The NAO qualification baseline is the annotated `v1.0.0` tag, which peels to
+`ebffe93a74be4e013ce0f60fdfc41268dba73fc3`. The tag belongs to the
+`feat/TFM-LLM_planner` development line and is the immutable source for H2
+contracts, fixtures, and parity evidence. The moving branch head may advance
+without changing that qualification input.
 
-This means there is no immutable current deslop boundary to use as H2 parity
-evidence. Before golden fixtures are captured, the owner must select one of:
-
-- the committed local deslop revision `b22ddfd`;
-- the recorded remote revision `9418e34`;
-- a new reviewed commit containing the current worktree changes.
-
-The UAH review must not copy or normalize the dirty NAO worktree as collateral
-work. NAO remains the semantic and execution owner.
+The earlier review inspected `refactor/deslop_repo` as a prospective cleanup
+boundary. That branch is not the H2 source of truth and its worktree state must
+not enter UAH fixtures or compatibility claims. The imported deslop skill is a
+development workflow aid only. NAO remains the semantic and execution owner.
 
 ### 7.3 Distance from meaningful tests
 
@@ -504,9 +506,34 @@ Three distinct tests should not be conflated:
 
 The PC is not blocked by the absence of the robot. H2 explicitly permits
 recorded and fake/simulated closure. The blockers are software contracts and a
-frozen NAO boundary, not hardware.
+fixture suite derived from the frozen NAO boundary, not hardware.
 
-## 8. Recommended Implementation Queue
+## 8. Architecture Reconciliation on 2026-09-03
+
+The design grill resolved the vocabulary that was still ambiguous in the
+reviewed commits. The canonical diagrams and complete node ownership table are
+in the [foundation](../../architecture/universal_agentic_harness_foundation.md).
+
+| Concern | Resolved contract |
+| --- | --- |
+| Reusable role | `role_configuration_id` identifies the model-independent role, model admission profile, primary frame, auxiliary allowlists, capability packs, control bands, budgets and authority policy. |
+| Concrete agent | `agent_id` identifies the immutable embodiment composed from role, model configuration, prompt pack, harness build and adapter revisions. Changing any member creates a new agent. |
+| Stable agent handle | `agent_handle_id` resolves through an immutable revision to one active agent with the same required role configuration, fidelity evidence and rollback lineage. |
+| Activation | `agent_run_id` identifies one bounded activation of an unchanged agent. |
+| Domain work | `task_id` is a domain-owned work instance with explicit domain type and native lineage. It is not a domain name or a model turn. |
+| Causal trace | `trace_id` identifies one causally connected workflow and may contain several operations. It is not a chat session alias. |
+| Operation | `operation_id` identifies one frame-relative AB-object lifecycle. Decomposition creates parent and child operation identities rather than assigning several levels to one operation. |
+| Model surface | `InteractionModuleCompiler` creates a closed task projection. `PromptCompiler` presents that same projection with the UAH kernel, role contract, minimal domain policy, task state and typed output schemas. |
+| Execution authority | UAH semantic admission creates an immutable `AdmittedOperation`; domain lifecycle admission may issue an `ExecutionLease`; only the environment owner executes and issues effect evidence. |
+| Observatory | Mandatory kernel events preserve raw output, proposal, admission, lease, result and evidence as separate artifacts. Agent-visible trace inspection is a distinct read-only frame projection. |
+| Additional frames | Roles may authorize substantial auxiliary frames, but each task receives only a bounded projection. Access is limited by `inspect_only`, `direct_proposal`, or `delegate_only`; effect-bearing cross-frame work defaults to delegation. |
+
+The current verification after these documentation and renderer changes is
+`PYTHONPATH=src python -m pytest`: 44 passed. The plain uninstalled invocation
+still fails during collection because the repository uses a `src` layout
+without configuring that path for direct test discovery.
+
+## 9. Recommended Implementation Queue
 
 All source changes below should use vertical red-green TDD slices. Tests must
 observe public seams and must not mock UAH internals.
@@ -514,8 +541,8 @@ observe public seams and must not mock UAH internals.
 ### Slice 1: typed operation admission
 
 **Proposed public seam:** a planner adapter parses raw output into an immutable
-typed proposal; the gate returns an admitted proposal; the environment owner
-executes that exact value.
+`TypedProposal`; the gate returns an immutable `AdmittedOperation`; the
+environment owner executes that exact value after domain lifecycle admission.
 
 First failing behavior: malformed or missing `find_object.label` is rejected
 before owner dispatch, while a valid normalized operation reaches the owner
@@ -545,8 +572,8 @@ context, or endpoint-capability identity.
 selected NAO `PlannerRequest`, planner decision, execution feedback, and
 dialogue act into UAH types without importing ROS into `src/ab_harness`.
 
-First failing behavior: package-owned golden fixtures from the selected deslop
-revision round-trip with goal, plan, version, step, and evidence lineage intact.
+First failing behavior: package-owned golden fixtures from NAO `v1.0.0`
+round-trip with goal, plan, version, step, and evidence lineage intact.
 
 ### Slice 5: explicit parity runner
 
@@ -575,23 +602,23 @@ fake skills, and capture request, proposal, gate, dispatch, feedback, dialogue,
 evidence, and terminal events. Compare against the frozen legacy output and
 review every disagreement before any UAH authority is enabled.
 
-## 9. Proposed TDD Seams Requiring Owner Confirmation
+## 10. Proposed TDD Seams Requiring Owner Confirmation
 
 No implementation test should be written until these public seams are accepted:
 
-1. typed proposal to admitted proposal to owner execution;
+1. `TypedProposal` to `AdmittedOperation` to domain lease and owner execution;
 2. runtime execution to lifecycle ledger and model-free replay;
 3. binding construction and configuration-manifest loading;
 4. pure NAO contract normalization at a frozen revision;
 5. explicit authority-mode parity evaluation;
 6. provider-neutral model request/result and boot preflight.
 
-The recommended first seam is **typed proposal to admitted proposal to owner
-execution**. It repairs an execution-authority defect in the current synthetic
-path and creates the value that lifecycle replay, NAO parity, and Ollama serving
-all need.
+The recommended first seam is **`TypedProposal` to `AdmittedOperation` to
+domain lease and owner execution**. It repairs an execution-authority defect in
+the current synthetic path and creates the values that lifecycle replay, NAO
+parity, and Ollama serving all need.
 
-## 10. Release Recommendation
+## 11. Release Recommendation
 
 Retain both commits on the pre-commit review branch after applying documentation
 corrections. Do not merge them to `main` as an H2 release in their current form.

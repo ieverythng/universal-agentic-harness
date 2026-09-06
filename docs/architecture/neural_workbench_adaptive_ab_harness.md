@@ -1,10 +1,10 @@
 # Adaptive AB Harness: Neural Workbench Search, Memory, and Crystallization
 
 **Status:** Research extension; H0 parent-repo proof implemented
-**Date:** 2026-07-13
+**Date:** 2026-09-04
 **Extends:** `universal_agentic_harness_foundation.md`
 **Primary theory source:** Neural Workbench documentation and current source on `feat/base-implementation`
-**Canonical delivery status:** `../plans/universal_agentic_harness_masterplan.md` (2026-08-04)
+**Canonical delivery status:** `../plans/universal_agentic_harness_masterplan.md` (2026-09-04)
 
 This document remains the canonical adaptive theory extension. The masterplan
 owns current H0-H5 release status and extends the ladder with H5 cross-runtime
@@ -269,6 +269,64 @@ output is admissible iff
 
 This is a practical gate around model capability, not a claim that the harness
 creates reasoning the pretrained or post-trained model does not possess.
+
+### NeuralWorkbench attachment is not an abstraction frame
+
+NeuralWorkbench searches the trace and candidate space of the frame supplied by
+UAH. It is not a universal frame layered above NAO, SWE, iTrader, or Watson.
+Treating it as one would mix adaptive machinery with domain semantics and would
+give candidate generation an implied authority it does not possess.
+
+The external seam remains the small `WorkbenchEnginePort` interface:
+
+```text
+describe() -> protocol and capability descriptor
+propose(bounded WorkbenchRequest) -> candidate batch
+observe(immutable WorkbenchObservation) -> no authority-bearing result
+```
+
+The initial adapter is in-process. A later MCP or process transport may satisfy
+the same interface, but transport discovery cannot widen the request, activate
+a candidate, or redefine the frame. UAH owns when the hook runs and filters all
+candidate artifacts before prompt compilation or shadow evaluation.
+
+The intended H3 cadence is:
+
+```text
+closed InteractionModuleSpec
+  -> bounded WorkbenchRequest before a configured model call
+  -> candidate filter
+  -> selected read-only context artifact or shadow candidate
+  -> normal proposal, admission, lease, execution, and evidence lifecycle
+  -> terminal lifecycle ledger
+  -> immutable WorkbenchObservation for future search
+```
+
+This permits retrieval to participate in almost every configured interaction
+without making the H2 kernel depend on Workbench availability. Workbench
+timeout and failure behavior must be explicit in deployment policy.
+
+```mermaid
+%% uah-render: Figure 1. Bounded Workbench search before a call and observation after a run
+flowchart TB
+    Module["InteractionModuleSpec<br/>closed task projection"]:::projection
+    Request["WorkbenchRequest<br/>frame + objects + constraints + budget"]:::compiler
+    Search["NeuralWorkbench Search<br/>support + counterexamples + candidates"]:::model
+    Candidate["WorkbenchCandidateBatch<br/>candidate authority only"]:::proposal
+    Filter["UAH Candidate Filter<br/>scope + provenance + policy"]:::gate
+    Prompt["PromptCompiler<br/>accepted context artifacts only"]:::compiler
+    Ledger["Terminal Lifecycle Ledger<br/>events + result + evidence"]:::trace
+    Observation["WorkbenchObservation<br/>immutable completed trace"]:::evidence
+    Learning["NeuralWorkbench Update<br/>future search state only"]:::model
+    Module --> Request
+    Request --> Search
+    Search --> Candidate
+    Candidate --> Filter
+    Module --> Filter
+    Filter --> Prompt
+    Ledger --> Observation
+    Observation --> Learning
+```
 
 ```mermaid
 flowchart TB

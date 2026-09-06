@@ -325,7 +325,7 @@ def populate(reference: Path, output: Path, figure: Path) -> None:
         document,
         87,
         "Approve the semantic-object/implementation-binding boundary and the "
-        "August 10 v0 launch contract. Continue shadow-first. Next, serialize "
+        "H2 v0 qualification contract. Continue shadow-first. Next, serialize "
         "the complete configuration and TaskSpec, "
         "append lifecycle events for the recorded success and a stale-evidence "
         "counterexample, and require replay-identical terminal decisions. Only "

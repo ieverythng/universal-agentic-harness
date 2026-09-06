@@ -196,7 +196,7 @@
   <main class="doc">
 
 <h1>Universal Agentic Harness: AB-Aware Foundation and Implementation Plan</h1>
-<p><strong>Status:</strong> Architecture baseline; parent-repo H0 proof implemented <strong>Date:</strong> 2026-07-13 <strong>Branch baseline:</strong> <code>refactor/deslop_repo</code> at <code>4604343</code> <strong>Seed artifact:</strong> <code>Universal Agentic Harness Blueprint.html</code> (user-provided, 2026-07-12) <strong>Primary reference subsystem:</strong> NAO ROS4HRI + Neural Workbench <strong>Canonical delivery status:</strong> <code>../plans/universal_agentic_harness_masterplan.md</code> (2026-08-04)</p>
+<p><strong>Status:</strong> Architecture baseline; H0 synthetic proof implemented; H1-H2 incomplete <strong>Date:</strong> 2026-09-07 <strong>Branch baseline:</strong> <code>feat/pre-commit-queue</code> at <code>8582ab9</code> <strong>Seed artifact:</strong> <code>Universal Agentic Harness Blueprint.html</code> (user-provided, 2026-07-12) <strong>Primary reference subsystem:</strong> NAO ROS4HRI + Neural Workbench <strong>Canonical delivery status:</strong> <code>../plans/universal_agentic_harness_masterplan.md</code> (2026-09-07)</p>
 <p>The phase tables in this foundation preserve the original extraction plan. Use the canonical masterplan for current H0-H5 implementation status, acceptance gates, and the AB4/AB5 boundary.</p>
 <h2>1. Project Claim</h2>
 <p>For bounded domain work, the practical capability of an LLM depends as much on its interaction harness as on the model itself. The reusable system object is not a prompt and is not a global bag of tools. It is a typed, observable, permissioned, evaluated compiler from a task and an environment capability graph to the smallest interaction surface that lets a model act and be verified.</p>
@@ -205,7 +205,8 @@
 AB1 = runtime abilities with declared effects and observable success
 AB2 = bounded composite abilities assembled from lower AB objects
 AB3 = task strategies, recovery policies, and role policies
-AB4 = subsystem operating profile over a capability graph</code></pre>
+AB4 = subsystem operating profile over a capability graph
+AB5 = governed policy over a family of AB4 systems, when independently verified</code></pre>
 <p>AB levels are relative to an environment contract. An HTTP call, ROS action, shell command, or GUI event can ground an AB0 interaction atom, but the endpoint name alone is not the semantic object. The semantic object describes the effect, evidence, risk, ownership, and composition constraints that matter to reasoning.</p>
 <p>The resulting thesis is:</p>
 <blockquote>
@@ -322,28 +323,217 @@ Phi   = measured capability profile</code></pre>
 <li>evidence graph: what proves or disproves the claimed effect.</li>
 </ul>
 <h2>4. Core Architecture</h2>
-<div class="diagram"><pre><code class="language-mermaid">flowchart TB
-    Task[&quot;Task request + acceptance contract&quot;] --&gt; Compiler[&quot;Task compiler&quot;]
-    State[&quot;Current state + memory + traces&quot;] --&gt; Compiler
-    AB[&quot;Canonical AB capability graph&quot;] --&gt; Compiler
-    Policy[&quot;Risk, scope, permissions, approvals&quot;] --&gt; Compiler
+<h3>Identity and activation spine</h3>
+<div class="diagram uah-flow-diagram">
+  <svg viewBox="0 0 1430 760" role="img" aria-label="Figure 1. Immutable role, agent, and activation identities">
+    <defs>
+      <marker id="uah-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M 0 0 L 10 5 L 0 10 z" fill="#9aa8bd"></path>
+      </marker>
+    </defs>
+    <g font-family="Inter, Liberation Sans, Arial, sans-serif"><path d="M 238.3 106.0 C 238.3 137.0, 715.0 137.0, 715.0 168.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><path d="M 476.7 106.0 C 476.7 137.0, 715.0 137.0, 715.0 168.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><path d="M 715.0 106.0 C 715.0 137.0, 715.0 137.0, 715.0 168.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><path d="M 953.3 106.0 C 953.3 137.0, 715.0 137.0, 715.0 168.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><path d="M 715.0 244.0 C 715.0 275.0, 715.0 275.0, 715.0 306.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><path d="M 1191.7 106.0 C 1191.7 275.0, 715.0 275.0, 715.0 444.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><path d="M 715.0 382.0 C 715.0 413.0, 715.0 413.0, 715.0 444.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><path d="M 715.0 520.0 C 715.0 551.0, 715.0 551.0, 715.0 582.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><rect x="126.3" y="30.0" width="224" height="76" rx="15" fill="#e5f5f2" stroke="#168778" stroke-width="2" /><text x="238.3" y="68.0" text-anchor="middle" font-size="12" fill="#172033"><tspan x="238.3" y="59.0" font-weight="700">AgentRoleConfiguration</tspan><tspan x="238.3" y="79.0" font-weight="500">primary frame + packs + authority</tspan></text><rect x="364.7" y="30.0" width="224" height="76" rx="15" fill="#f0eaff" stroke="#7657b8" stroke-width="2" /><text x="476.7" y="68.0" text-anchor="middle" font-size="12" fill="#172033"><tspan x="476.7" y="59.0" font-weight="700">ModelConfiguration</tspan><tspan x="476.7" y="79.0" font-weight="500">artifact + runtime + decoding</tspan></text><rect x="603.0" y="30.0" width="224" height="76" rx="15" fill="#e8f2ff" stroke="#2879c7" stroke-width="2" /><text x="715.0" y="68.0" text-anchor="middle" font-size="12" fill="#172033"><tspan x="715.0" y="59.0" font-weight="700">PromptPack</tspan><tspan x="715.0" y="79.0" font-weight="500">versioned wording + output contract</tspan></text><rect x="841.3" y="30.0" width="224" height="76" rx="15" fill="#e9f6e7" stroke="#3d8b4e" stroke-width="2" /><text x="953.3" y="68.0" text-anchor="middle" font-size="13" fill="#172033"><tspan x="953.3" y="59.0" font-weight="700">HarnessBuild</tspan><tspan x="953.3" y="79.0" font-weight="500">kernel + adapter revisions</tspan></text><rect x="603.0" y="168.0" width="224" height="76" rx="15" fill="#e8edff" stroke="#5268d8" stroke-width="2" /><text x="715.0" y="206.0" text-anchor="middle" font-size="15" fill="#172033"><tspan x="715.0" y="197.0" font-weight="700">AgentManifest</tspan><tspan x="715.0" y="217.0" font-weight="500">immutable composition</tspan></text><rect x="603.0" y="306.0" width="224" height="76" rx="15" fill="#e8edff" stroke="#5268d8" stroke-width="2" /><text x="715.0" y="344.0" text-anchor="middle" font-size="15" fill="#172033"><tspan x="715.0" y="335.0" font-weight="700">agent_id</tspan><tspan x="715.0" y="355.0" font-weight="500">immutable embodiment</tspan></text><rect x="1079.7" y="30.0" width="224" height="76" rx="15" fill="#e5f5f2" stroke="#168778" stroke-width="2" /><text x="1191.7" y="68.0" text-anchor="middle" font-size="15" fill="#172033"><tspan x="1191.7" y="59.0" font-weight="700">agent_handle_id</tspan><tspan x="1191.7" y="79.0" font-weight="500">stable routed identity</tspan></text><rect x="603.0" y="444.0" width="224" height="76" rx="15" fill="#efe6ff" stroke="#6c4ca5" stroke-width="2" /><text x="715.0" y="482.0" text-anchor="middle" font-size="12" fill="#172033"><tspan x="715.0" y="473.0" font-weight="700">AgentHandleRevision</tspan><tspan x="715.0" y="493.0" font-weight="500">active agent + fidelity evidence</tspan></text><rect x="603.0" y="582.0" width="224" height="76" rx="15" fill="#e8edff" stroke="#5268d8" stroke-width="2" /><text x="715.0" y="620.0" text-anchor="middle" font-size="15" fill="#172033"><tspan x="715.0" y="611.0" font-weight="700">agent_run_id</tspan><tspan x="715.0" y="631.0" font-weight="500">one bounded activation</tspan></text></g>
+  </svg>
+  <div class="caption">Figure 1. Immutable role, agent, and activation identities</div>
+</div>
+<p><code>AgentRoleConfiguration</code> is model-independent. Changing the role, model, prompt pack, or harness build creates a new <code>agent_id</code>. Restarting the same immutable agent creates only a new <code>agent_run_id</code>. A stable <code>agent_handle_id</code>, such as <code>watson.system.primary</code>, may be rebound to a newly qualified agent while preserving every prior immutable handle revision.</p>
+<p>Canonical handles use <code>&lt;domain&gt;.&lt;role&gt;.&lt;slot&gt;</code>, for example <code>watson.system.primary</code>, <code>nao.chatbot.primary</code>, <code>nao.planner.primary</code>, and <code>itrader.proposer.primary</code>. The <code>agent_id</code> is the handle&#x27;s immutable embodiment for one revision; <code>agent_run_id</code> is an activation of that embodiment.</p>
+<h3>Hardware-aware model allocation spine</h3>
+<p>Logical agent identity and model placement are orthogonal. UAH schedules an agent&#x27;s fixed <code>ModelConfiguration</code> onto a compatible runtime from a provider pool, records the reservation as a model lease, and identifies every prompt-to-output call separately.</p>
+<div class="diagram uah-flow-diagram">
+  <svg viewBox="0 0 1160 898" role="img" aria-label="Figure 1B. Logical agent identity joined to hardware allocation at invocation">
+    <defs>
+      <marker id="uah-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M 0 0 L 10 5 L 0 10 z" fill="#9aa8bd"></path>
+      </marker>
+    </defs>
+    <g font-family="Inter, Liberation Sans, Arial, sans-serif"><path d="M 232.0 106.0 C 232.0 137.0, 386.7 137.0, 386.7 168.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><path d="M 464.0 106.0 C 464.0 137.0, 386.7 137.0, 386.7 168.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><path d="M 386.7 244.0 C 386.7 275.0, 580.0 275.0, 580.0 306.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><path d="M 696.0 106.0 C 696.0 137.0, 773.3 137.0, 773.3 168.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><path d="M 464.0 106.0 C 464.0 137.0, 773.3 137.0, 773.3 168.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><path d="M 773.3 244.0 C 773.3 344.0, 580.0 344.0, 580.0 444.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><path d="M 580.0 382.0 C 580.0 413.0, 580.0 413.0, 580.0 444.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><path d="M 580.0 520.0 C 580.0 551.0, 580.0 551.0, 580.0 582.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><path d="M 928.0 106.0 C 928.0 344.0, 580.0 344.0, 580.0 582.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><path d="M 580.0 658.0 C 580.0 689.0, 580.0 689.0, 580.0 720.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><rect x="120.0" y="30.0" width="224" height="76" rx="15" fill="#e5f5f2" stroke="#168778" stroke-width="2" /><text x="232.0" y="68.0" text-anchor="middle" font-size="15" fill="#172033"><tspan x="232.0" y="59.0" font-weight="700">role_configuration_id</tspan><tspan x="232.0" y="79.0" font-weight="500">semantic role</tspan></text><rect x="352.0" y="30.0" width="224" height="76" rx="15" fill="#f0eaff" stroke="#7657b8" stroke-width="2" /><text x="464.0" y="68.0" text-anchor="middle" font-size="15" fill="#172033"><tspan x="464.0" y="59.0" font-weight="700">model_configuration_id</tspan><tspan x="464.0" y="79.0" font-weight="500">model behavior contract</tspan></text><rect x="274.7" y="168.0" width="224" height="76" rx="15" fill="#e8edff" stroke="#5268d8" stroke-width="2" /><text x="386.7" y="206.0" text-anchor="middle" font-size="12" fill="#172033"><tspan x="386.7" y="197.0" font-weight="700">agent_id</tspan><tspan x="386.7" y="217.0" font-weight="500">immutable role + model composition</tspan></text><rect x="468.0" y="306.0" width="224" height="76" rx="15" fill="#e8edff" stroke="#5268d8" stroke-width="2" /><text x="580.0" y="344.0" text-anchor="middle" font-size="15" fill="#172033"><tspan x="580.0" y="335.0" font-weight="700">agent_run_id</tspan><tspan x="580.0" y="355.0" font-weight="500">logical activation</tspan></text><rect x="584.0" y="30.0" width="224" height="76" rx="15" fill="#fff0e2" stroke="#cb6d26" stroke-width="2" /><text x="696.0" y="68.0" text-anchor="middle" font-size="12" fill="#172033"><tspan x="696.0" y="59.0" font-weight="700">provider_pool_id</tspan><tspan x="696.0" y="79.0" font-weight="500">available compatible runtimes</tspan></text><rect x="661.3" y="168.0" width="224" height="76" rx="15" fill="#ffe7e5" stroke="#bf5048" stroke-width="2" /><text x="773.3" y="206.0" text-anchor="middle" font-size="12" fill="#172033"><tspan x="773.3" y="197.0" font-weight="700">model_instance_id</tspan><tspan x="773.3" y="217.0" font-weight="500">loaded process or endpoint replica</tspan></text><rect x="468.0" y="444.0" width="224" height="76" rx="15" fill="#efe6ff" stroke="#6c4ca5" stroke-width="2" /><text x="580.0" y="482.0" text-anchor="middle" font-size="13" fill="#172033"><tspan x="580.0" y="473.0" font-weight="700">model_lease_id</tspan><tspan x="580.0" y="493.0" font-weight="500">bounded capacity reservation</tspan></text><rect x="816.0" y="30.0" width="224" height="76" rx="15" fill="#e5f4f4" stroke="#247e83" stroke-width="2" /><text x="928.0" y="68.0" text-anchor="middle" font-size="15" fill="#172033"><tspan x="928.0" y="59.0" font-weight="700">trace_id</tspan><tspan x="928.0" y="79.0" font-weight="500">causal workflow</tspan></text><rect x="468.0" y="582.0" width="224" height="76" rx="15" fill="#f5ecff" stroke="#8b5bb7" stroke-width="2" /><text x="580.0" y="620.0" text-anchor="middle" font-size="13" fill="#172033"><tspan x="580.0" y="611.0" font-weight="700">model_invocation_id</tspan><tspan x="580.0" y="631.0" font-weight="500">one prompt-to-output call</tspan></text><rect x="468.0" y="720.0" width="224" height="76" rx="15" fill="#fff6cf" stroke="#b18416" stroke-width="2" /><text x="580.0" y="758.0" text-anchor="middle" font-size="12" fill="#172033"><tspan x="580.0" y="749.0" font-weight="700">RawModelOutput</tspan><tspan x="580.0" y="769.0" font-weight="500">prompt + response artifact hashes</tspan></text></g>
+  </svg>
+  <div class="caption">Figure 1B. Logical agent identity joined to hardware allocation at invocation</div>
+</div>
+<pre><code class="language-text">Semantic identity
+role_configuration_id
++ model_configuration_id
++ prompt_pack_id
++ harness_build_id
+  -&gt; agent_id
 
-    Compiler --&gt; Module[&quot;InteractionModuleSpec: task-scoped AB subgraph&quot;]
-    Module --&gt; Context[&quot;Context and visibility projection&quot;]
-    Module --&gt; Tools[&quot;Tool/resource/validator projection&quot;]
-    Module --&gt; ModelRouter[&quot;Model capability router&quot;]
+Stable routing identity
+agent_handle_id
+  -&gt; agent_handle_revision_id
+  -&gt; active agent_id
+  -&gt; agent_run_id -&gt; trace_id -&gt; operation_id
 
-    ModelRouter --&gt; Model[&quot;Local or remote LLM&quot;]
-    Context --&gt; Model
-    Tools --&gt; Model
-    Model --&gt; Candidate[&quot;Structured candidate action/plan&quot;]
+Hardware allocation
+provider_pool_id
+  -&gt; model_instance_id
+  -&gt; model_lease_id
+  -&gt; model_invocation_id
 
-    Candidate --&gt; Verifier[&quot;Schema + AB + policy verifier&quot;]
-    Verifier --&gt; Runtime[&quot;Environment adapter&quot;]
-    Runtime --&gt; Evidence[&quot;Typed result + observations&quot;]
-    Evidence --&gt; Trace[&quot;Append-only trace and eval bus&quot;]
-    Trace --&gt; State
-    Trace --&gt; Profile[&quot;Capability and entropy profile&quot;]</code></pre></div>
+Join
+agent_run_id + trace_id + model_lease_id
+  -&gt; model_invocation_id</code></pre>
+<p>A local 27B process and several smaller Bonsai processes are separate model instances. They may coexist only when the pool&#x27;s measured RAM, VRAM, context, and concurrency limits permit it. UAH may unload, reload, or move a compatible instance without changing <code>agent_id</code>. Routing the role to a different <code>model_configuration_id</code> creates a different agent identity. Provider-held conversation state is not authoritative agent state and cannot cross a model lease without an explicit isolation contract.</p>
+<h3>Frame projection and prompt compilation</h3>
+<div class="diagram uah-flow-diagram">
+  <svg viewBox="0 0 1430 898" role="img" aria-label="Figure 2. Role-authorized frames compiled into one task projection">
+    <defs>
+      <marker id="uah-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M 0 0 L 10 5 L 0 10 z" fill="#9aa8bd"></path>
+      </marker>
+    </defs>
+    <g font-family="Inter, Liberation Sans, Arial, sans-serif"><path d="M 238.3 106.0 C 238.3 137.0, 715.0 137.0, 715.0 168.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><path d="M 476.7 106.0 C 476.7 137.0, 715.0 137.0, 715.0 168.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><path d="M 715.0 106.0 C 715.0 137.0, 715.0 137.0, 715.0 168.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><path d="M 953.3 106.0 C 953.3 137.0, 715.0 137.0, 715.0 168.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><path d="M 1191.7 106.0 C 1191.7 137.0, 715.0 137.0, 715.0 168.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><path d="M 715.0 244.0 C 715.0 275.0, 715.0 275.0, 715.0 306.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><path d="M 715.0 382.0 C 715.0 413.0, 715.0 413.0, 715.0 444.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><path d="M 715.0 520.0 C 715.0 551.0, 715.0 551.0, 715.0 582.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><path d="M 715.0 658.0 C 715.0 689.0, 715.0 689.0, 715.0 720.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><rect x="126.3" y="30.0" width="224" height="76" rx="15" fill="#e5f5f2" stroke="#168778" stroke-width="2" /><text x="238.3" y="68.0" text-anchor="middle" font-size="13" fill="#172033"><tspan x="238.3" y="59.0" font-weight="700">TaskContract</tspan><tspan x="238.3" y="79.0" font-weight="500">goal + effects + budgets</tspan></text><rect x="364.7" y="30.0" width="224" height="76" rx="15" fill="#e5f5f2" stroke="#168778" stroke-width="2" /><text x="476.7" y="68.0" text-anchor="middle" font-size="12" fill="#172033"><tspan x="476.7" y="59.0" font-weight="700">DomainContractPack</tspan><tspan x="476.7" y="79.0" font-weight="500">frames + objects + binding policy</tspan></text><rect x="603.0" y="30.0" width="224" height="76" rx="15" fill="#e8edff" stroke="#5268d8" stroke-width="2" /><text x="715.0" y="68.0" text-anchor="middle" font-size="13" fill="#172033"><tspan x="715.0" y="59.0" font-weight="700">PrimaryFramePolicy</tspan><tspan x="715.0" y="79.0" font-weight="500">default semantics + routing</tspan></text><rect x="841.3" y="30.0" width="224" height="76" rx="15" fill="#e8edff" stroke="#5268d8" stroke-width="2" /><text x="953.3" y="68.0" text-anchor="middle" font-size="13" fill="#172033"><tspan x="953.3" y="59.0" font-weight="700">AuxiliaryFrameAllowlists</tspan><tspan x="953.3" y="79.0" font-weight="500">broad role-level catalog</tspan></text><rect x="1079.7" y="30.0" width="224" height="76" rx="15" fill="#e8f2ff" stroke="#2879c7" stroke-width="2" /><text x="1191.7" y="68.0" text-anchor="middle" font-size="12" fill="#172033"><tspan x="1191.7" y="59.0" font-weight="700">CurrentState</tspan><tspan x="1191.7" y="79.0" font-weight="500">fresh domain context + lineage</tspan></text><rect x="603.0" y="168.0" width="224" height="76" rx="15" fill="#e9f6e7" stroke="#3d8b4e" stroke-width="2" /><text x="715.0" y="206.0" text-anchor="middle" font-size="13" fill="#172033"><tspan x="715.0" y="197.0" font-weight="700">InteractionModuleCompiler</tspan><tspan x="715.0" y="217.0" font-weight="500">closed task AB projection</tspan></text><rect x="603.0" y="306.0" width="224" height="76" rx="15" fill="#e8f2ff" stroke="#2879c7" stroke-width="2" /><text x="715.0" y="344.0" text-anchor="middle" font-size="12" fill="#172033"><tspan x="715.0" y="335.0" font-weight="700">InteractionModuleSpec</tspan><tspan x="715.0" y="355.0" font-weight="500">objects + permissions + evidence closure</tspan></text><rect x="603.0" y="444.0" width="224" height="76" rx="15" fill="#e9f6e7" stroke="#3d8b4e" stroke-width="2" /><text x="715.0" y="482.0" text-anchor="middle" font-size="12" fill="#172033"><tspan x="715.0" y="473.0" font-weight="700">PromptCompiler</tspan><tspan x="715.0" y="493.0" font-weight="500">kernel + role + domain + task</tspan></text><rect x="603.0" y="582.0" width="224" height="76" rx="15" fill="#f0eaff" stroke="#7657b8" stroke-width="2" /><text x="715.0" y="620.0" text-anchor="middle" font-size="15" fill="#172033"><tspan x="715.0" y="611.0" font-weight="700">ModelAdapter</tspan><tspan x="715.0" y="631.0" font-weight="500">local or remote LLM</tspan></text><rect x="603.0" y="720.0" width="224" height="76" rx="15" fill="#f5ecff" stroke="#8b5bb7" stroke-width="2" /><text x="715.0" y="758.0" text-anchor="middle" font-size="13" fill="#172033"><tspan x="715.0" y="749.0" font-weight="700">TypedProposal</tspan><tspan x="715.0" y="769.0" font-weight="500">zero execution authority</tspan></text></g>
+  </svg>
+  <div class="caption">Figure 2. Role-authorized frames compiled into one task projection</div>
+</div>
+<p>The auxiliary allowlist may describe a substantial approved frame. The <code>InteractionModuleCompiler</code> still emits only the task-closed subset, and the primary-frame policy determines whether the projected capability is inspected, used directly, or reached through typed delegation. The model never receives a wholesale registry dump.</p>
+<h3>Two-stage admission and execution authority</h3>
+<div class="diagram uah-flow-diagram">
+  <svg viewBox="0 0 1040 1312" role="img" aria-label="Figure 3. Semantic admission before domain lifecycle authority">
+    <defs>
+      <marker id="uah-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M 0 0 L 10 5 L 0 10 z" fill="#9aa8bd"></path>
+      </marker>
+    </defs>
+    <g font-family="Inter, Liberation Sans, Arial, sans-serif"><path d="M 693.3 106.0 C 693.3 137.0, 520.0 137.0, 520.0 168.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><path d="M 346.7 106.0 C 346.7 137.0, 520.0 137.0, 520.0 168.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><path d="M 520.0 244.0 C 520.0 275.0, 520.0 275.0, 520.0 306.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><rect x="481.0" y="253.0" width="78" height="22" rx="8" fill="#172033" /><text x="520.0" y="268.0" text-anchor="middle" font-size="13" fill="#dce6f7">accepted</text><path d="M 520.0 382.0 C 520.0 413.0, 520.0 413.0, 520.0 444.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><path d="M 520.0 520.0 C 520.0 551.0, 520.0 551.0, 520.0 582.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><rect x="481.0" y="529.0" width="78" height="22" rx="8" fill="#172033" /><text x="520.0" y="544.0" text-anchor="middle" font-size="13" fill="#dce6f7">leased</text><path d="M 520.0 658.0 C 520.0 689.0, 520.0 689.0, 520.0 720.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><path d="M 520.0 796.0 C 520.0 827.0, 520.0 827.0, 520.0 858.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><path d="M 520.0 934.0 C 520.0 965.0, 520.0 965.0, 520.0 996.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><path d="M 520.0 1072.0 C 520.0 1103.0, 520.0 1103.0, 520.0 1134.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><rect x="234.7" y="30.0" width="224" height="76" rx="15" fill="#e8f2ff" stroke="#2879c7" stroke-width="2" /><text x="346.7" y="68.0" text-anchor="middle" font-size="13" fill="#172033"><tspan x="346.7" y="59.0" font-weight="700">InteractionModuleSpec</tspan><tspan x="346.7" y="79.0" font-weight="500">admission source of truth</tspan></text><rect x="581.3" y="30.0" width="224" height="76" rx="15" fill="#f5ecff" stroke="#8b5bb7" stroke-width="2" /><text x="693.3" y="68.0" text-anchor="middle" font-size="13" fill="#172033"><tspan x="693.3" y="59.0" font-weight="700">TypedProposal</tspan><tspan x="693.3" y="79.0" font-weight="500">zero execution authority</tspan></text><rect x="408.0" y="168.0" width="224" height="76" rx="15" fill="#efe6ff" stroke="#6c4ca5" stroke-width="2" /><text x="520.0" y="206.0" text-anchor="middle" font-size="12" fill="#172033"><tspan x="520.0" y="197.0" font-weight="700">UAH Semantic Admission</tspan><tspan x="520.0" y="217.0" font-weight="500">schema + frame + role + binding</tspan></text><rect x="408.0" y="306.0" width="224" height="76" rx="15" fill="#efe6ff" stroke="#6c4ca5" stroke-width="2" /><text x="520.0" y="344.0" text-anchor="middle" font-size="13" fill="#172033"><tspan x="520.0" y="335.0" font-weight="700">AdmittedOperation</tspan><tspan x="520.0" y="355.0" font-weight="500">immutable semantic decision</tspan></text><rect x="408.0" y="444.0" width="224" height="76" rx="15" fill="#fff0e2" stroke="#cb6d26" stroke-width="2" /><text x="520.0" y="482.0" text-anchor="middle" font-size="13" fill="#172033"><tspan x="520.0" y="473.0" font-weight="700">Domain Lifecycle Admission</tspan><tspan x="520.0" y="493.0" font-weight="500">readiness + dedupe + fencing</tspan></text><rect x="408.0" y="582.0" width="224" height="76" rx="15" fill="#ffe7e5" stroke="#bf5048" stroke-width="2" /><text x="520.0" y="620.0" text-anchor="middle" font-size="15" fill="#172033"><tspan x="520.0" y="611.0" font-weight="700">ExecutionLease</tspan><tspan x="520.0" y="631.0" font-weight="500">owner-granted authority</tspan></text><rect x="408.0" y="720.0" width="224" height="76" rx="15" fill="#ffe7e5" stroke="#bf5048" stroke-width="2" /><text x="520.0" y="758.0" text-anchor="middle" font-size="15" fill="#172033"><tspan x="520.0" y="749.0" font-weight="700">Environment Owner</tspan><tspan x="520.0" y="769.0" font-weight="500">exact binding execution</tspan></text><rect x="408.0" y="858.0" width="224" height="76" rx="15" fill="#fff6cf" stroke="#b18416" stroke-width="2" /><text x="520.0" y="896.0" text-anchor="middle" font-size="12" fill="#172033"><tspan x="520.0" y="887.0" font-weight="700">Terminal Result + EffectEvidence</tspan><tspan x="520.0" y="907.0" font-weight="500">owner-issued observations</tspan></text><rect x="408.0" y="996.0" width="224" height="76" rx="15" fill="#e5f4f4" stroke="#247e83" stroke-width="2" /><text x="520.0" y="1034.0" text-anchor="middle" font-size="13" fill="#172033"><tspan x="520.0" y="1025.0" font-weight="700">Append-only Lifecycle Ledger</tspan><tspan x="520.0" y="1045.0" font-weight="500">events + artifacts + replay</tspan></text><rect x="408.0" y="1134.0" width="224" height="76" rx="15" fill="#e8edf2" stroke="#536475" stroke-width="2" /><text x="520.0" y="1172.0" text-anchor="middle" font-size="13" fill="#172033"><tspan x="520.0" y="1163.0" font-weight="700">Observatory</tspan><tspan x="520.0" y="1183.0" font-weight="500">read-only trace projection</tspan></text></g>
+  </svg>
+  <div class="caption">Figure 3. Semantic admission before domain lifecycle authority</div>
+</div>
+<p>The proposal has no authority. UAH semantic admission validates the frame-relative object, role reach, canonical arguments, approved binding, and evidence obligations. The environment owner then applies native readiness, duplicate suppression, concurrency, cancellation, supersession, and stale version checks before granting an <code>ExecutionLease</code>. The owner executes the immutable admitted value, not a reparsed copy of raw model output.</p>
+<h3>Prompt compilation seam</h3>
+<p>The <code>PromptCompiler</code> renders one model-facing view from the same immutable <code>InteractionModuleSpec</code> consumed by semantic admission:</p>
+<pre><code class="language-text">stable UAH protocol kernel
+  + role contract from role_configuration_id
+  + minimal versioned domain policy
+  + task-scoped AB object and capability projection
+  + current task, lineage, fresh state, and selected evidence
+  -&gt; compiled prompt + structured operation schemas + prompt artifact hash</code></pre>
+<p>Raw transport locators remain harness-side. The model sees normalized AB objects and structured operation schemas, not direct ROS topics, Python functions, provider URLs, or other implementation shortcuts. Prompt wording cannot widen the objects or authority admitted by <code>InteractionModuleSpec</code>.</p>
+<h3>H3 Neural Workbench attachment seam</h3>
+<p>NeuralWorkbench is an optional adaptive engine attached through the transport-neutral <code>WorkbenchEnginePort</code>. It is not itself an abstraction frame. Each request names the frame, registry version, projected objects, constraints, and search budget within which the Workbench may search. An MCP connection may later implement this interface, but MCP is a transport adapter rather than the semantic contract.</p>
+<div class="diagram uah-flow-diagram">
+  <svg viewBox="0 0 1040 898" role="img" aria-label="Figure 4. Bounded Workbench search before a call and observation after a run">
+    <defs>
+      <marker id="uah-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M 0 0 L 10 5 L 0 10 z" fill="#9aa8bd"></path>
+      </marker>
+    </defs>
+    <g font-family="Inter, Liberation Sans, Arial, sans-serif"><path d="M 346.7 106.0 C 346.7 137.0, 346.7 137.0, 346.7 168.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><path d="M 346.7 244.0 C 346.7 275.0, 346.7 275.0, 346.7 306.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><path d="M 346.7 382.0 C 346.7 413.0, 520.0 413.0, 520.0 444.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><path d="M 520.0 520.0 C 520.0 551.0, 520.0 551.0, 520.0 582.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><path d="M 346.7 106.0 C 346.7 344.0, 520.0 344.0, 520.0 582.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><path d="M 520.0 658.0 C 520.0 689.0, 520.0 689.0, 520.0 720.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><path d="M 693.3 106.0 C 693.3 137.0, 693.3 137.0, 693.3 168.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><path d="M 693.3 244.0 C 693.3 275.0, 693.3 275.0, 693.3 306.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><rect x="234.7" y="30.0" width="224" height="76" rx="15" fill="#e8f2ff" stroke="#2879c7" stroke-width="2" /><text x="346.7" y="68.0" text-anchor="middle" font-size="15" fill="#172033"><tspan x="346.7" y="59.0" font-weight="700">InteractionModuleSpec</tspan><tspan x="346.7" y="79.0" font-weight="500">closed task projection</tspan></text><rect x="234.7" y="168.0" width="224" height="76" rx="15" fill="#e9f6e7" stroke="#3d8b4e" stroke-width="2" /><text x="346.7" y="206.0" text-anchor="middle" font-size="12" fill="#172033"><tspan x="346.7" y="197.0" font-weight="700">WorkbenchRequest</tspan><tspan x="346.7" y="217.0" font-weight="500">frame + objects + constraints + budget</tspan></text><rect x="234.7" y="306.0" width="224" height="76" rx="15" fill="#f0eaff" stroke="#7657b8" stroke-width="2" /><text x="346.7" y="344.0" text-anchor="middle" font-size="12" fill="#172033"><tspan x="346.7" y="335.0" font-weight="700">NeuralWorkbench Search</tspan><tspan x="346.7" y="355.0" font-weight="500">support + counterexamples + candidates</tspan></text><rect x="408.0" y="444.0" width="224" height="76" rx="15" fill="#f5ecff" stroke="#8b5bb7" stroke-width="2" /><text x="520.0" y="482.0" text-anchor="middle" font-size="13" fill="#172033"><tspan x="520.0" y="473.0" font-weight="700">WorkbenchCandidateBatch</tspan><tspan x="520.0" y="493.0" font-weight="500">candidate authority only</tspan></text><rect x="408.0" y="582.0" width="224" height="76" rx="15" fill="#efe6ff" stroke="#6c4ca5" stroke-width="2" /><text x="520.0" y="620.0" text-anchor="middle" font-size="13" fill="#172033"><tspan x="520.0" y="611.0" font-weight="700">UAH Candidate Filter</tspan><tspan x="520.0" y="631.0" font-weight="500">scope + provenance + policy</tspan></text><rect x="408.0" y="720.0" width="224" height="76" rx="15" fill="#e9f6e7" stroke="#3d8b4e" stroke-width="2" /><text x="520.0" y="758.0" text-anchor="middle" font-size="12" fill="#172033"><tspan x="520.0" y="749.0" font-weight="700">PromptCompiler</tspan><tspan x="520.0" y="769.0" font-weight="500">accepted context artifacts only</tspan></text><rect x="581.3" y="30.0" width="224" height="76" rx="15" fill="#e5f4f4" stroke="#247e83" stroke-width="2" /><text x="693.3" y="68.0" text-anchor="middle" font-size="13" fill="#172033"><tspan x="693.3" y="59.0" font-weight="700">Terminal Lifecycle Ledger</tspan><tspan x="693.3" y="79.0" font-weight="500">events + result + evidence</tspan></text><rect x="581.3" y="168.0" width="224" height="76" rx="15" fill="#fff6cf" stroke="#b18416" stroke-width="2" /><text x="693.3" y="206.0" text-anchor="middle" font-size="13" fill="#172033"><tspan x="693.3" y="197.0" font-weight="700">WorkbenchObservation</tspan><tspan x="693.3" y="217.0" font-weight="500">immutable completed trace</tspan></text><rect x="581.3" y="306.0" width="224" height="76" rx="15" fill="#f0eaff" stroke="#7657b8" stroke-width="2" /><text x="693.3" y="344.0" text-anchor="middle" font-size="13" fill="#172033"><tspan x="693.3" y="335.0" font-weight="700">NeuralWorkbench Update</tspan><tspan x="693.3" y="355.0" font-weight="500">future search state only</tspan></text></g>
+  </svg>
+  <div class="caption">Figure 4. Bounded Workbench search before a call and observation after a run</div>
+</div>
+<p>H3 may invoke bounded candidate retrieval before each configured model call and submit an immutable observation after terminal trace closure. UAH filters every returned artifact before prompt compilation or shadow evaluation. Workbench unavailability and latency policy remain role/deployment decisions, but the H2 kernel must operate without it. The engine cannot widen the interaction module, admit an operation, issue a lease, mutate a trusted registry, or promote its own candidate.</p>
+<h3>Identity, task, trace, and operation lineage</h3>
+<div class="diagram uah-flow-diagram">
+  <svg viewBox="0 0 1040 1036" role="img" aria-label="Figure 5. Runtime identity and causal lineage">
+    <defs>
+      <marker id="uah-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M 0 0 L 10 5 L 0 10 z" fill="#9aa8bd"></path>
+      </marker>
+    </defs>
+    <g font-family="Inter, Liberation Sans, Arial, sans-serif"><path d="M 520.0 106.0 C 520.0 137.0, 520.0 137.0, 520.0 168.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><path d="M 520.0 244.0 C 520.0 275.0, 520.0 275.0, 520.0 306.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><path d="M 520.0 382.0 C 520.0 413.0, 520.0 413.0, 520.0 444.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><path d="M 520.0 520.0 C 520.0 551.0, 346.7 551.0, 346.7 582.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><path d="M 520.0 520.0 C 520.0 551.0, 693.3 551.0, 693.3 582.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><path d="M 693.3 658.0 C 693.3 689.0, 346.7 689.0, 346.7 720.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><path d="M 693.3 658.0 C 693.3 689.0, 693.3 689.0, 693.3 720.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><path d="M 346.7 796.0 C 346.7 827.0, 520.0 827.0, 520.0 858.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><path d="M 693.3 796.0 C 693.3 827.0, 520.0 827.0, 520.0 858.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><rect x="408.0" y="30.0" width="224" height="76" rx="15" fill="#e8edff" stroke="#5268d8" stroke-width="2" /><text x="520.0" y="68.0" text-anchor="middle" font-size="15" fill="#172033"><tspan x="520.0" y="59.0" font-weight="700">role_configuration_id</tspan><tspan x="520.0" y="79.0" font-weight="500">immutable semantic role</tspan></text><rect x="408.0" y="168.0" width="224" height="76" rx="15" fill="#e8edff" stroke="#5268d8" stroke-width="2" /><text x="520.0" y="206.0" text-anchor="middle" font-size="12" fill="#172033"><tspan x="520.0" y="197.0" font-weight="700">agent_id</tspan><tspan x="520.0" y="217.0" font-weight="500">role + model + prompt + harness</tspan></text><rect x="408.0" y="306.0" width="224" height="76" rx="15" fill="#e8edff" stroke="#5268d8" stroke-width="2" /><text x="520.0" y="344.0" text-anchor="middle" font-size="15" fill="#172033"><tspan x="520.0" y="335.0" font-weight="700">agent_run_id</tspan><tspan x="520.0" y="355.0" font-weight="500">activation lifetime</tspan></text><rect x="408.0" y="444.0" width="224" height="76" rx="15" fill="#e5f4f4" stroke="#247e83" stroke-width="2" /><text x="520.0" y="482.0" text-anchor="middle" font-size="13" fill="#172033"><tspan x="520.0" y="473.0" font-weight="700">trace_id</tspan><tspan x="520.0" y="493.0" font-weight="500">causally connected workflow</tspan></text><rect x="234.7" y="582.0" width="224" height="76" rx="15" fill="#e5f5f2" stroke="#168778" stroke-width="2" /><text x="346.7" y="620.0" text-anchor="middle" font-size="12" fill="#172033"><tspan x="346.7" y="611.0" font-weight="700">DomainTaskReference</tspan><tspan x="346.7" y="631.0" font-weight="500">domain + type + task + native lineage</tspan></text><rect x="581.3" y="582.0" width="224" height="76" rx="15" fill="#f5ecff" stroke="#8b5bb7" stroke-width="2" /><text x="693.3" y="620.0" text-anchor="middle" font-size="13" fill="#172033"><tspan x="693.3" y="611.0" font-weight="700">operation_id</tspan><tspan x="693.3" y="631.0" font-weight="500">one frame-relative AB object</tspan></text><rect x="234.7" y="720.0" width="224" height="76" rx="15" fill="#f5ecff" stroke="#8b5bb7" stroke-width="2" /><text x="346.7" y="758.0" text-anchor="middle" font-size="15" fill="#172033"><tspan x="346.7" y="749.0" font-weight="700">child operation_id</tspan><tspan x="346.7" y="769.0" font-weight="500">decomposed AB object</tspan></text><rect x="581.3" y="720.0" width="224" height="76" rx="15" fill="#f5ecff" stroke="#8b5bb7" stroke-width="2" /><text x="693.3" y="758.0" text-anchor="middle" font-size="15" fill="#172033"><tspan x="693.3" y="749.0" font-weight="700">child operation_id</tspan><tspan x="693.3" y="769.0" font-weight="500">decomposed AB object</tspan></text><rect x="408.0" y="858.0" width="224" height="76" rx="15" fill="#fff6cf" stroke="#b18416" stroke-width="2" /><text x="520.0" y="896.0" text-anchor="middle" font-size="13" fill="#172033"><tspan x="520.0" y="887.0" font-weight="700">proposal + admission + lease</tspan><tspan x="520.0" y="907.0" font-weight="500">result + evidence identities</tspan></text></g>
+  </svg>
+  <div class="caption">Figure 5. Runtime identity and causal lineage</div>
+</div>
+<p><code>task_id</code> is a domain-owned work instance, not a domain name or a model turn. <code>trace_id</code> identifies the causal whole and may contain several operations. <code>operation_id</code> identifies one AB-object lifecycle. Domain lineage such as NAO <code>goal_id</code>, <code>request_id</code>, <code>plan_id</code>, <code>plan_version</code>, and <code>step_id</code> crosses the flow unchanged and is never reconstructed from timestamps or payload guesses.</p>
+<h3>Frame-relative operation decomposition</h3>
+<div class="diagram uah-flow-diagram">
+  <svg viewBox="0 0 1040 622" role="img" aria-label="Figure 6. One trace containing a frame-relative operation tree">
+    <defs>
+      <marker id="uah-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M 0 0 L 10 5 L 0 10 z" fill="#9aa8bd"></path>
+      </marker>
+    </defs>
+    <g font-family="Inter, Liberation Sans, Arial, sans-serif"><path d="M 520.0 106.0 C 520.0 137.0, 520.0 137.0, 520.0 168.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><path d="M 520.0 244.0 C 520.0 275.0, 260.0 275.0, 260.0 306.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><path d="M 520.0 244.0 C 520.0 275.0, 520.0 275.0, 520.0 306.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><path d="M 520.0 244.0 C 520.0 275.0, 780.0 275.0, 780.0 306.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><path d="M 260.0 382.0 C 260.0 413.0, 520.0 413.0, 520.0 444.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><rect x="408.0" y="30.0" width="224" height="76" rx="15" fill="#e5f4f4" stroke="#247e83" stroke-width="2" /><text x="520.0" y="68.0" text-anchor="middle" font-size="15" fill="#172033"><tspan x="520.0" y="59.0" font-weight="700">trace_42</tspan><tspan x="520.0" y="79.0" font-weight="500">bring apple to kitchen</tspan></text><rect x="408.0" y="168.0" width="224" height="76" rx="15" fill="#e5f5f2" stroke="#168778" stroke-width="2" /><text x="520.0" y="206.0" text-anchor="middle" font-size="15" fill="#172033"><tspan x="520.0" y="197.0" font-weight="700">op_root</tspan><tspan x="520.0" y="217.0" font-weight="500">deliver_object at AB2</tspan></text><rect x="148.0" y="306.0" width="224" height="76" rx="15" fill="#ffe7e5" stroke="#bf5048" stroke-width="2" /><text x="260.0" y="344.0" text-anchor="middle" font-size="15" fill="#172033"><tspan x="260.0" y="335.0" font-weight="700">op_navigate</tspan><tspan x="260.0" y="355.0" font-weight="500">navigate at AB1</tspan></text><rect x="408.0" y="306.0" width="224" height="76" rx="15" fill="#ffe7e5" stroke="#bf5048" stroke-width="2" /><text x="520.0" y="344.0" text-anchor="middle" font-size="15" fill="#172033"><tspan x="520.0" y="335.0" font-weight="700">op_pick</tspan><tspan x="520.0" y="355.0" font-weight="500">pick at AB1</tspan></text><rect x="668.0" y="306.0" width="224" height="76" rx="15" fill="#ffe7e5" stroke="#bf5048" stroke-width="2" /><text x="780.0" y="344.0" text-anchor="middle" font-size="15" fill="#172033"><tspan x="780.0" y="335.0" font-weight="700">op_place</tspan><tspan x="780.0" y="355.0" font-weight="500">place at AB1</tspan></text><rect x="408.0" y="444.0" width="224" height="76" rx="15" fill="#fff0e2" stroke="#cb6d26" stroke-width="2" /><text x="520.0" y="482.0" text-anchor="middle" font-size="13" fill="#172033"><tspan x="520.0" y="473.0" font-weight="700">op_transport_call</tspan><tspan x="520.0" y="493.0" font-weight="500">navigation interface at AB0</tspan></text></g>
+  </svg>
+  <div class="caption">Figure 6. One trace containing a frame-relative operation tree</div>
+</div>
+<p>Every operation is anchored to exactly one object coordinate in one frame. Higher-order operations own child operation identities. The Observatory may derive the highest and lowest visited levels or level homogeneity from the tree, but those summaries never replace the source coordinates. A replan keeps the root semantic operation when the desired effect is unchanged; new <code>plan_id</code> or <code>plan_version</code> values remain domain lineage beneath that operation.</p>
+<h3>Node and seam responsibilities</h3>
+<table><thead><tr>
+<th>Node</th>
+<th>Interface</th>
+<th>Owns</th>
+<th>Must not own</th>
+</tr></thead><tbody>
+<tr>
+<td><code>AgentRoleConfiguration</code></td>
+<td>Immutable role manifest</td>
+<td>Primary frame, explicit auxiliary frame projections, control bands, capability packs, budgets, authority policy</td>
+<td>Model or provider selection</td>
+</tr>
+<tr>
+<td><code>AgentManifest</code></td>
+<td>Content-addressed composition</td>
+<td>Role, model configuration, prompt pack, harness and adapter revisions</td>
+<td>Mutable run state</td>
+</tr>
+<tr>
+<td>Agent registry</td>
+<td><code>register(agent_manifest)</code> and <code>get(agent_id)</code></td>
+<td>Immutable agent embodiments and content-addressed lookup</td>
+<td>Handle continuity, hardware placement, or runtime state</td>
+</tr>
+<tr>
+<td>Agent handle registry</td>
+<td><code>resolve(agent_handle_id)</code> and <code>promote(candidate_agent_id, fidelity_report)</code></td>
+<td>Immutable handle revisions, one active agent, role invariance and rollback lineage</td>
+<td>Hardware placement or silent model fallback</td>
+</tr>
+<tr>
+<td><code>InteractionModuleCompiler</code></td>
+<td><code>compile(role, task, domain, state)</code></td>
+<td>Minimal closed AB graph, permissions, evidence closure</td>
+<td>Prompt wording or execution</td>
+</tr>
+<tr>
+<td><code>PromptCompiler</code></td>
+<td><code>compile_prompt(agent, module, task_context)</code></td>
+<td>Stable kernel prefix, role/domain presentation, schemas, artifact hash</td>
+<td>Admission or binding resolution</td>
+</tr>
+<tr>
+<td>Model allocator</td>
+<td><code>lease(agent_run, resource_request)</code></td>
+<td>Compatible instance selection, measured capacity, lease lifetime, isolation and release</td>
+<td>Changing the agent&#x27;s model configuration or semantic authority</td>
+</tr>
+<tr>
+<td>Model adapter</td>
+<td><code>invoke(model_lease, compiled_prompt)</code></td>
+<td>One identified provider call and raw response artifact</td>
+<td>Agent context ownership, semantic admission, or hidden fallback</td>
+</tr>
+<tr>
+<td>UAH semantic admission</td>
+<td><code>admit(proposal, module)</code></td>
+<td>Typed normalization, role/frame reach, binding and evidence obligations</td>
+<td>Native lifecycle readiness or effects</td>
+</tr>
+<tr>
+<td>Domain lifecycle admission</td>
+<td><code>request_execution(admitted_operation)</code></td>
+<td>Readiness, dedupe, concurrency, cancellation, supersession, version fencing</td>
+<td>Reinterpreting model text or UAH semantics</td>
+</tr>
+<tr>
+<td>Environment owner</td>
+<td><code>execute(execution_lease)</code></td>
+<td>Native effect and owner-issued result/evidence</td>
+<td>Planner policy or Observatory rendering</td>
+</tr>
+<tr>
+<td>Lifecycle ledger</td>
+<td>Append-only events and artifact references</td>
+<td>Exact causal record and replay inputs</td>
+<td>Policy, evidence issuance, or history rewriting</td>
+</tr>
+<tr>
+<td>Observatory</td>
+<td><code>render_observatory(...)</code></td>
+<td>Read-only configuration, graph, event, evidence, failure, and comparison views</td>
+<td>Execution, admission, registry mutation, or evidence issuance</td>
+</tr>
+</tbody></table>
 <h3>Kernel planes</h3>
 <table><thead><tr>
 <th>Plane</th>
@@ -392,6 +582,99 @@ Phi   = measured capability profile</code></pre>
 </tr>
 </tbody></table>
 <h2>5. Proposed Contract Grammar</h2>
+<h3>AgentRoleConfiguration</h3>
+<pre><code class="language-yaml">role_configuration_id: role:nao_planner:v1
+role_id: planner_llm
+model_admission_profile_id: nao.planner.models.v1
+primary_frame:
+  frame_id: nao_runtime
+  registry_version: sha256:...
+  capability_pack_id: nao.planner.core.v1
+  control_band: {min_direct: 1, preferred: 1, max_direct: 2, inspect_down_to: 0}
+additional_frame_projections:
+  - frame_id: uah_observability
+    registry_version: sha256:...
+    capability_pack_id: uah.trace.task_read.v1
+    access_mode: inspect_only
+authority_policy:
+  may_propose: true
+  may_claim_effects: false
+  may_execute_without_domain_lease: false</code></pre>
+<p>Every role has one primary frame. Additional frames are explicit, versioned, and role-authorized. A capability pack may authorize a broad auxiliary frame, but the per-task interaction module still exposes only the closed graph needed for the task. No wildcard or discovery-driven frame exposure is permitted.</p>
+<table><thead><tr>
+<th>Access mode</th>
+<th>Maximum role-level authority</th>
+<th>Typical use</th>
+</tr></thead><tbody>
+<tr>
+<td><code>inspect_only</code></td>
+<td>Observe a bounded task projection; no state-changing proposal</td>
+<td>Observatory, foreign-frame state, evidence inspection</td>
+</tr>
+<tr>
+<td><code>direct_proposal</code></td>
+<td>Propose typed operations in the additional frame; normal semantic and domain admission still apply</td>
+<td>Explicitly coupled frames with reviewed ownership and mappings</td>
+</tr>
+<tr>
+<td><code>delegate_only</code></td>
+<td>Create a typed delegation for an agent whose primary frame matches the target; no direct target-frame operation</td>
+<td>Effect-bearing cross-frame work, including Watson delegating SWE execution</td>
+</tr>
+</tbody></table>
+<p>An <code>agent_id</code> inherits these limits through its <code>role_configuration_id</code>; it does not define them independently. Task compilation may reduce the exposed objects, control band, or access mode but cannot increase any of them.</p>
+<h3>AgentManifest and AgentRun</h3>
+<pre><code class="language-yaml">agent_id: agent:nao_planner:qwen:v1
+role_configuration_id: role:nao_planner:v1
+model_configuration_id: model:qwen_planner:q4:v3
+prompt_pack_id: prompt:nao_planner:v1
+harness_build_id: git:...
+adapter_versions: {nao: git:..., provider: openai-compatible:v1}
+
+agent_handle_id: handle:nao.planner.primary
+agent_handle_revision_id: handle-revision:sha256:...
+active_agent_id: agent:nao_planner:qwen:v1
+required_role_configuration_id: role:nao_planner:v1
+prior_agent_id: agent:nao_planner:qwen:v0
+fidelity_report_id: fidelity-report:sha256:...
+rollback_revision_id: handle-revision:sha256:...
+
+agent_run_id: run:01J...
+started_from_agent_id: agent:nao_planner:qwen:v1
+resolved_handle_revision_id: handle-revision:sha256:...
+environment_id: nao_recorded_v1
+authority_mode: shadow</code></pre>
+<p>The agent manifest is immutable. A role, model, prompt, harness, or adapter change creates a new <code>agent_id</code>. A restart of the unchanged agent creates a new <code>agent_run_id</code>. A handle may move to a different agent only when the new agent uses the required role configuration and its fidelity report passes the deployment&#x27;s structural, behavioral, resource, and rollback gates. The handle does not own conversation state or weaken the authority policy.</p>
+<p>The role&#x27;s <code>model_admission_profile_id</code> defines provider-neutral protocol, context, structured-output, behavioral, and evaluation requirements. A deployment policy may narrow eligible providers, placements, and resource budgets. Neither policy permits the hardware allocator to substitute another model configuration silently.</p>
+<p>An agent run pins the resolved handle revision. Every task, trace, model invocation, and operation beneath that run records or resolves the same <code>agent_handle_id</code>, <code>agent_handle_revision_id</code>, and <code>agent_id</code>. A later handle revision cannot rewrite which embodiment performed earlier work or silently alter an in-flight task.</p>
+<h3>ProviderPool, ModelLease, and ModelInvocation</h3>
+<pre><code class="language-yaml">provider_pool_id: pool:local_workstation:v1
+resource_snapshot_id: resource-snapshot:sha256:...
+members:
+  - model_instance_id: instance:qwen27b:ollama:01
+    model_configuration_id: model:qwen27b:iq3s:100k:v1
+    placement: {host_id: main_pc, device_ids: [gpu0]}
+    measured_capacity: {ram_mib: ..., vram_mib: ..., max_context_tokens: 100000}
+  - model_instance_id: instance:bonsai:ollama:01
+    model_configuration_id: model:bonsai:q4:v1
+    placement: {host_id: main_pc, device_ids: [gpu0]}
+    measured_capacity: {ram_mib: ..., vram_mib: ..., max_context_tokens: ...}
+
+model_lease_id: lease:01J...
+agent_run_id: run:01J...
+model_instance_id: instance:qwen27b:ollama:01
+scope: task
+resource_budget: {context_tokens: 100000, concurrent_invocations: 1}
+isolation_policy: reset_provider_session
+
+model_invocation_id: invocation:01J...
+model_lease_id: lease:01J...
+agent_run_id: run:01J...
+task_id: task_123
+trace_id: trace_42
+prompt_artifact_id: prompt:sha256:...
+raw_output_artifact_id: output:sha256:...</code></pre>
+<p>The allocator may choose another instance only when it satisfies the immutable model configuration and isolation contract. A fallback to another model configuration creates a different <code>agent_id</code> and must be represented as an explicit agent transition rather than hidden provider routing.</p>
 <h3>HarnessSpec</h3>
 <pre><code class="language-yaml">schema_version: ab_harness/v0
 name: nao_research_harness
@@ -415,12 +698,17 @@ trace_policy:
   record_prompt_hash: true
   record_capability_projection: true</code></pre>
 <h3>TaskSpec</h3>
-<pre><code class="language-yaml">task_id: turn_123
-task_kind: execute_and_report
+<pre><code class="language-yaml">domain_id: nao_ros4hri
+task_type_id: execute_and_report
+task_id: task_123
 goal: find the red cup and report what is observed
+native_lineage:
+  schema: nao_planner_lineage/v1
+  goal_id: goal_123
+  request_id: request_123
 requested_effects: [target_observed, grounded_report_available]
 constraints:
-  max_ab_level: 2
+  primary_frame_id: nao_runtime
   allowed_side_effects: [robot_motion, perception_refresh]
   denied_side_effects: [direct_kb_write, direct_speech]
 acceptance:
@@ -431,7 +719,10 @@ budgets:
   model_calls: 3
   tool_calls: 12</code></pre>
 <h3>InteractionModuleSpec</h3>
-<pre><code class="language-yaml">task_id: turn_123
+<pre><code class="language-yaml">role_configuration_id: role:nao_planner:v1
+task_id: task_123
+primary_frame_id: nao_runtime
+capability_pack_ids: [nao.planner.core.v1, uah.trace.task_read.v1]
 selected_ab_objects:
   - scan
   - find_object
@@ -445,9 +736,10 @@ exposed_actions: [scan, find_object]
 exposed_resources: [scene_summary, target_reference, recent_relevant_traces]
 required_validators: [registry_validation, evidence_payload_validation]
 approval_points: [robot_motion]
-completion_evidence: [fresh_scene_summary, target_entity_id]</code></pre>
-<h3>ModelProfile</h3>
-<pre><code class="language-yaml">profile_id: planner_structured
+completion_evidence: [fresh_scene_summary, target_entity_id]
+projection_hash: sha256:...</code></pre>
+<h3>ModelConfiguration</h3>
+<pre><code class="language-yaml">model_configuration_id: model:qwen_planner:q4:v3
 provider: openai_compatible
 endpoint_ref: local_vllm_primary
 model_ref: qwen_planner
@@ -466,12 +758,23 @@ routing:
 <h3>TraceEvent</h3>
 <pre><code class="language-json">{
   &quot;trace_id&quot;: &quot;trace_123&quot;,
-  &quot;task_id&quot;: &quot;turn_123&quot;,
+  &quot;operation_id&quot;: &quot;operation_find_123&quot;,
+  &quot;parent_operation_id&quot;: &quot;operation_goal_123&quot;,
+  &quot;role_configuration_id&quot;: &quot;role:nao_planner:v1&quot;,
+  &quot;agent_id&quot;: &quot;agent:nao_planner:qwen:v1&quot;,
+  &quot;agent_run_id&quot;: &quot;run:01J...&quot;,
+  &quot;domain_id&quot;: &quot;nao_ros4hri&quot;,
+  &quot;task_id&quot;: &quot;task_123&quot;,
   &quot;event_id&quot;: &quot;evt_009&quot;,
   &quot;parent_event_id&quot;: &quot;evt_008&quot;,
-  &quot;stage&quot;: &quot;runtime_result&quot;,
+  &quot;stage&quot;: &quot;owner_evidence_issued&quot;,
+  &quot;frame_id&quot;: &quot;nao_runtime&quot;,
   &quot;ab_object_id&quot;: &quot;find_object&quot;,
-  &quot;model_profile&quot;: &quot;planner_structured&quot;,
+  &quot;proposal_id&quot;: &quot;proposal_123&quot;,
+  &quot;admission_id&quot;: &quot;admission_123&quot;,
+  &quot;execution_lease_id&quot;: &quot;lease_123&quot;,
+  &quot;model_configuration_id&quot;: &quot;model:qwen_planner:q4:v3&quot;,
+  &quot;prompt_artifact_hash&quot;: &quot;sha256:...&quot;,
   &quot;capability_projection_hash&quot;: &quot;sha256:...&quot;,
   &quot;status&quot;: &quot;succeeded&quot;,
   &quot;input_ref&quot;: &quot;artifact://...&quot;,
@@ -565,6 +868,9 @@ routing:
 <li>Both emit trace stages but lack one shared event contract.</li>
 </ul>
 <p>These are appropriate extraction candidates. The hundreds of tests around route semantics, grounding, report wording, planner retry, lineage, and duplicate speech are evidence that those policies are domain contracts, not generic kernel code.</p>
+<h3>Aily SQL-agent lesson</h3>
+<p>The recorded Aily experience adds a non-robotic warning. Task-scoped skills reduced exposure, but the model could still face several similarly named domain skills and select the wrong semantic route. Curated table descriptions, business meaning, access restrictions, package-owned question sets, and trace review made the failure attributable to semantic context, routing, tool choice, or execution instead of treating every weak answer as a model defect.</p>
+<p>UAH addresses the same failure class with one primary frame, explicit capability packs, and a task-closed projection. An auxiliary frame may contain many approved objects at role level, but the model-facing interaction module still exposes only the objects required for the current task and recovery paths. Primary-frame policy determines when an auxiliary frame may be queried, used directly, or delegated to another agent.</p>
 <p>The migration target is cooperation, not replacement. <code>chatbot_llm</code> and <code>planner_llm</code> remain domain agents while progressively delegating provider probing, structured-output transport, prompt-pack mechanics, task capability projection, and trace emission to the harness. This lets the current node behavior serve as the oracle for each extraction slice.</p>
 <h2>7. Primary-Source Harness Survey</h2>
 <table><thead><tr>
@@ -700,15 +1006,15 @@ routing:
 <h3>Decision</h3>
 <p>Proceed with H-02 as the architecture baseline, H-03 as a runtime-adapter track, and a narrow extraction slice from H-01. Reject H-04 and H-06 as the semantic core. Keep current nodes operational while the compatibility layer is proven.</p>
 <h2>9. Proposed Package Boundary</h2>
-<p>The first package should live in the Neural Workbench repository because the AB registry is its substrate and the package must remain independent of ROS.</p>
-<pre><code class="language-text">src/Neural-Wokbench/src/ab_harness/
-  package.xml                  # optional ROS packaging wrapper, no ROS imports in core
-  setup.py
-  ab_harness/
-    contracts.py               # HarnessSpec, TaskSpec, InteractionModuleSpec
-    capability_projection.py   # AB graph closure and task projection
+<p>The portable package lives in this repository. NeuralWorkbench remains an independently versioned H3+ companion. UAH consumes content-addressed registry snapshots and does not import ROS, NAO packages, provider SDKs, or runtime products.</p>
+<pre><code class="language-text">src/ab_harness/
+    contracts.py               # role, frame, task, operation, admission, evidence
+    identity.py                # role, model, agent, run, trace, and operation identities
+    projection.py              # AB graph closure and task interaction modules
+    prompt_compiler.py         # layered deterministic prompt assembly
     structured_output.py       # schema-aware parse/repair result types
-    prompt_packs.py             # versioned pack loading, no domain prompt text
+    prompt_packs.py            # versioned pack loading, no embedded domain policy
+    admission.py               # UAH semantic admission
     providers/
       base.py
       ollama.py
@@ -720,6 +1026,8 @@ routing:
       budgets.py
     runtime/
       adapter.py
+      lifecycle.py
+      lease.py
       result.py
     trace/
       events.py
@@ -727,7 +1035,7 @@ routing:
     evals/
       runner.py
       metrics.py</code></pre>
-<p>Adapters remain outside the core:</p>
+<p>Runtime and domain adapters remain outside the portable semantic core:</p>
 <pre><code class="language-text">adapters/
   nao_ros4hri/
   codex/
@@ -737,13 +1045,13 @@ routing:
   shell_sandbox/</code></pre>
 <p><code>ab_harness</code> depends on <code>skill_common</code>. It must not own or duplicate <code>ab_registry.json</code>.</p>
 <h3>Reference-port rule</h3>
-<p>The first implementation may be staged directly in the NAO repository when that makes parity testing and review easier. A core module qualifies for later promotion into Neural Workbench only if:</p>
+<p>The first NAO integration may be staged in the NAO repository when that makes parity testing and review easier. A module belongs in the portable UAH core only if:</p>
 <ol>
 <li>it imports no ROS, NAO, dialogue, planner, or orchestrator package;</li>
 <li>its public schemas contain no NAO-specific field names;</li>
 <li>both LLM nodes can consume it through thin compatibility adapters;</li>
-<li>at least one synthetic non-NAO adapter can use the same API; and</li>
-<li>moving the module changes only package metadata and imports, not semantics.</li>
+<li>a fake adapter and one domain adapter exercise the same interface; and</li>
+<li>moving domain integration code changes only adapter wiring, not semantics.</li>
 </ol>
 <p>This reverses the dependency direction that created the current SWE cost: domain nodes configure and consume the harness; the harness does not import or coordinate domain nodes.</p>
 <h2>10. Model Serving and Fast Provider Management</h2>
@@ -815,31 +1123,35 @@ routing:
 <p>Prefix caching reduces shared-prefix prefill cost, not token generation time. It therefore benefits stable harness/schema prefixes and repeated task classes, but it does not excuse verbose output or unbounded context.</p>
 <h2>11. Control Loop</h2>
 <pre><code class="language-text">compile(task, subsystem):
-    harness_spec = load_harness_spec(subsystem)
-    task_spec = normalize_task(task, harness_spec)
-    state = context_adapter.snapshot(task_spec)
+    role = load_role_configuration(subsystem)
+    agent = load_immutable_agent_manifest(role)
+    run = start_agent_run(agent)
+    task_spec = normalize_domain_task(task, role)
+    state = context_adapter.snapshot(task_spec, run)
 
-    interaction = project_ab_subgraph(
+    interaction = interaction_compiler.compile(
+        role=role,
+        task=task_spec,
+        domain=approved_domain_contract,
         registry=canonical_ab_registry,
-        requested_effects=task_spec.requested_effects,
         state=state,
-        policy=harness_spec.execution_policy,
     )
 
-    model_profile = model_router.select(task_spec, interaction)
-    context = context_router.build(task_spec, interaction, state)
-    candidate = model.generate(context, interaction.schemas)
+    prompt = prompt_compiler.compile(agent, interaction, task_spec, state)
+    raw_output = model_adapter.generate(prompt)
+    proposal = normalize_typed_proposal(raw_output, interaction.schemas)
 
-    verified = verifier.check(candidate, interaction, task_spec)
-    if verified.requires_approval:
-        approval = policy_engine.request(verified.risk)
-    result = runtime_adapter.execute(verified)
-    evidence = verifier.check_result(result, task_spec.acceptance)
+    admitted = semantic_admission.admit(proposal, interaction)
+    lease = domain_runtime.request_execution(admitted)
+    result = environment_owner.execute(lease, admitted)
+    evidence = terminal_verifier.check(result, task_spec.acceptance)
 
-    trace_bus.append(task_spec, interaction, candidate, result, evidence)
-    eval_runner.score(task_spec, trace_bus.current_trace())
-    return evidence</code></pre>
-<p>The model never receives direct execution authority. The runtime adapter accepts only verified operations represented in the compiled interaction module.</p>
+    lifecycle_ledger.append_all(
+        run, task_spec, interaction, prompt, raw_output, proposal,
+        admitted, lease, result, evidence,
+    )
+    return terminal_judgment(evidence)</code></pre>
+<p>The model never receives direct execution authority. The domain runtime accepts only immutable <code>AdmittedOperation</code> values and returns a distinct <code>ExecutionLease</code> or rejection. The exact admitted value reaches the owner; raw model output remains trace evidence and is never dispatchable.</p>
 <h2>12. Evaluation and Ablation Protocol</h2>
 <h3>Core metrics</h3>
 <table><thead><tr>

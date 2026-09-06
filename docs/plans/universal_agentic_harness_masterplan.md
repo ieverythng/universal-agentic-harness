@@ -1,7 +1,7 @@
 # Universal Agentic Harness: Implementation Masterplan
 
-**Status:** Canonical implementation plan; August 10 H2 launch contract active
-**Date:** 2026-08-04
+**Status:** Canonical implementation plan; H2 qualification gates active
+**Date:** 2026-09-07
 **Scope:** Model-agnostic and task-agnostic harness kernel with domain-specific AB frames and adapters
 **Extends:** `../architecture/universal_agentic_harness_foundation.md` and `../architecture/neural_workbench_adaptive_ab_harness.md`
 **Decision owner:** UAH H0-H2 core; NeuralWorkbench H3+ companion track; NAO remains the first reference environment
@@ -88,13 +88,13 @@ graph. The resulting system must:
   ownership out of their current NAO packages.
 - Calling an adaptive AB4 system AB5 merely because it becomes more capable.
 
-### August 10, 2026 H2 launch contract
+### Current H2 qualification contract
 
-The August 10 target closes the static UAH foundation and the first cooperative
-domain proof. H0 and H1 hard gates must pass and the NAO planner ingress/egress
-must complete H2 parity over recorded and fake/simulated contracts. A live robot
-is not required. The date does not relax evidence, ownership, replay, or
-promotion gates.
+H2 closes the static UAH foundation and the first cooperative domain proof only
+after H0 and H1 hard gates pass and the NAO planner ingress/egress completes
+parity over recorded and fake/simulated contracts. A live robot is not required.
+Schedule pressure does not relax evidence, ownership, replay, or promotion
+gates.
 
 **H2 launch definition:** an installable portable package identifies a complete
 model-harness-domain configuration, executes accepted and rejected lifecycle
@@ -118,7 +118,7 @@ H3 is stretch scope only. A protocol handshake, Observatory view, or shadow
 replacement pulse is useful, but no H3 feature is required to pass H2 and no
 H3 candidate receives execution authority for this release.
 
-#### Launch prerequisites
+#### Qualification prerequisites
 
 These conditions must be true before the final launch evaluation begins:
 
@@ -139,20 +139,21 @@ These conditions must be true before the final launch evaluation begins:
 8. NeuralWorkbench remains optional through H2. Its submodule revision and
    protocol are recorded, but it cannot become an undeclared runtime dependency.
 
-#### Dated delivery timeline
+#### Ordered delivery gates
 
-| Date | Deliverable | Required exit evidence |
+| Order | Deliverable | Required exit evidence |
 | --- | --- | --- |
-| Aug 4 | Freeze H2 contract, repository boundaries, Workbench protocol, Observatory O1, and coupling decisions | Decision artifact, pinned submodule, focused protocol tests, synchronized plan |
-| Aug 5 | Complete H1 lifecycle schemas and deterministic failure grammar | Schema round trips; compile-to-terminal events; stale evidence, timeout, cancellation, retry exhaustion, unavailable binding, and false-completion attribution |
-| Aug 6 | Persist/replay lifecycle and implement planner-side NAO projection | Model-free replay equivalence; AB1 callable and AB0 inspect-only closure; provenance retained |
-| Aug 7 | Implement planner compatibility adapter and recorded/fake qualification | Accepted, rejected, clarification, recovery, and owner-evidence cases pass without ROS imports in core |
-| Aug 8 | Run `legacy | uah | shadow` parity fixtures and freeze provider-neutral manifests | Explicit authority mode; classified disagreements; exact model, quant, runtime, context, prompt, registry, adapter, and evaluator identities |
-| Aug 9 | Run H2 launch candidate, clean-install rehearsal, and optional Watson/Bonsai matrix | Core and H2 gates pass in a fresh environment; model report recorded only if assets exist; docs rendered |
-| Aug 10 | Publish H2 status and artifacts | Version/tag decision, result summary, parity report, known limitations, rollback, and H3 gate decision |
+| 1 | Freeze H2 contracts, repository boundaries, Workbench protocol, Observatory O1, and coupling decisions | Decision artifact, intended companion revision, focused protocol tests, synchronized plan |
+| 2 | Complete H1 lifecycle schemas and deterministic failure grammar | Schema round trips; compile-to-terminal events; stale evidence, timeout, cancellation, retry exhaustion, unavailable binding, and false-completion attribution |
+| 3 | Persist/replay lifecycle and implement planner-side NAO projection | Model-free replay equivalence; AB1 callable and AB0 inspect-only closure; provenance retained |
+| 4 | Implement planner compatibility adapter and recorded/fake qualification | Accepted, rejected, clarification, recovery, and owner-evidence cases pass without ROS imports in core |
+| 5 | Run `legacy | uah | shadow` parity fixtures and freeze provider-neutral manifests | Explicit authority mode; classified disagreements; exact model, quant, runtime, context, prompt, registry, adapter, and evaluator identities |
+| 6 | Run the H2 candidate, clean-install rehearsal, and optional model matrix | Core and H2 gates pass in a fresh environment; model report recorded only if assets exist; docs rendered |
+| 7 | Publish H2 status and artifacts | Version/tag decision, result summary, parity report, known limitations, rollback, and H3 gate decision |
 
-Later dates may absorb incomplete work; they may not convert a failed gate into
-a pass. Scope is reduced before evidence requirements are reduced.
+Incomplete work remains at its current gate. Scope may be reduced before
+evidence requirements are reduced, but a failed gate cannot be relabeled as a
+pass.
 
 #### Evaluation order
 
@@ -180,7 +181,7 @@ No later result can rescue an earlier failed hard gate. Faster decode, lower
 memory, or a successful final answer cannot override a scope, ownership,
 evidence, replay, or regression failure.
 
-#### Hard launch gates
+#### Hard H2 gates
 
 | Gate | H2 acceptance |
 | --- | --- |
@@ -199,7 +200,7 @@ For **model-qualified H2**, add a hard paired-run gate: Watson and Bonsai use
 the same frozen suite, with repeated trials and owner/evaluator effects reported
 beside latency and memory. Memory efficiency alone cannot pass this gate.
 
-#### Launch postconditions and next-stage gate
+#### H2 postconditions and next-stage gate
 
 H2 completion produces:
 
@@ -276,8 +277,9 @@ correct scope + correct ownership + valid output + evidence-complete effect
 
 - Parent checkout: `feat/TFM-LLM_planner`, clean and synchronized with origin.
 - `src/chatbot_llm`: `refactor/IRR-turn-engine`, clean and synchronized.
-- NeuralWorkbench: clean `feat/base-implementation` at `e76ba7e`, synchronized
-  with the Aily remote and pinned as the `src/Neural-Wokbench` submodule.
+- NeuralWorkbench: clean `feat/base-implementation` at `e76ba7e` and
+  synchronized with the Aily remote. This was the intended companion revision;
+  the current UAH tree does not contain the declared gitlink.
 - `python3 scripts/ros4hri_change_audit.py --mode working`: no ROS package
   changes detected before this documentation pass.
 - `PYTHONPATH=src/ab_harness .venv/bin/python -m pytest -q
@@ -296,7 +298,9 @@ correct scope + correct ownership + valid output + evidence-complete effect
 - Latest integrated NAO planner branch inspected:
   `nao-ros4hri-bridge/origin/feat/TFM-LLM_planner` at `9da89c0`. Runtime source
   matches the local checkout; the remote-only tree change is unrelated career
-  material.
+  material. This is a historical inspection snapshot, not the H2 qualification
+  baseline. Qualification uses annotated tag `v1.0.0` at peeled commit
+  `ebffe93a74be4e013ce0f60fdfc41268dba73fc3`.
 - The portable NAO AB fixture models the distinct gate ingress
   `/nao_orchestrator/planner_request`, admitted ingress `/planner/request`,
   planner egress `/intents`, execution feedback, dialogue act, and scene summary
@@ -311,6 +315,36 @@ correct scope + correct ownership + valid output + evidence-complete effect
 - `ab_harness.workbench_protocol` now freezes JSON-compatible request,
   candidate-batch, observation, protocol handshake, and fail-closed in-process
   adapter contracts. A mismatch override is visibly observation-only.
+
+### Architecture and baseline correction checked on 2026-09-03
+
+- The immutable NAO compatibility baseline is annotated tag `v1.0.0`, peeled
+  commit `ebffe93a74be4e013ce0f60fdfc41268dba73fc3`, on
+  `feat/TFM-LLM_planner`. Later branch commits are comparative evidence only.
+- The chatbot compatibility baseline remains `feat/planner_llm_hooks` at
+  `a2ecca796...`.
+- NeuralWorkbench revision
+  `e76ba7eafbd90f9ed239a65f741d2598ecd033cb` remains the intended companion
+  pin. `.gitmodules` declares the path, but the current UAH tree has no gitlink;
+  documentation must not claim that the submodule is mounted until it is
+  restored and verified.
+- The role, model, agent, activation, task, trace, and operation identities are
+  now distinct. `AgentRoleConfiguration` is model-independent.
+- `agent_handle_id` supplies a stable deployment-facing identity such as
+  `watson.system.primary`. Each immutable handle revision resolves to one `agent_id`,
+  preserves the required role configuration, records fidelity evidence and
+  retains rollback lineage. Hardware allocation cannot rebind the handle.
+- The `PromptCompiler` produces a deterministic layered prompt from the UAH
+  kernel, role contract, minimal domain policy, task AB projection, and current
+  context. Prompt text cannot widen deterministic admission.
+- UAH semantic admission and domain lifecycle admission are separate. Only a
+  domain-issued `ExecutionLease` permits the exact immutable
+  `AdmittedOperation` to reach its owner.
+- Every role names one primary abstraction frame. Auxiliary frames are explicit
+  versioned projections with `inspect_only`, `direct_proposal`, or
+  `delegate_only` access. Task compilation may narrow but cannot widen the
+  role-level declaration. Cross-frame equivalence remains unresolved unless a
+  reviewed mapping proves it.
 
 ### What H0 actually implements
 
@@ -461,45 +495,44 @@ capable, adaptive, and efficient AB4 system.
 
 ## 5. Canonical System Architecture
 
-```text
-                         UNIVERSAL SEMANTIC PLANE
-
- TaskContract + AgentRole + ABFrame + RegistrySnapshot + EnvironmentIdentity
-                                  |
-                                  v
-                    Task Interaction Compiler
-       projection + decomposition + permissions + evidence closure
-                                  |
-                                  v
-                     InteractionModuleSpec
-                                  |
-              +-------------------+-------------------+
-              |                                       |
-              v                                       v
-      Model/Harness Adapter                      Runtime Adapter
- local API | remote API | Pi | Codex       ROS | shell | browser | MCP
- Claude | Hermes | OpenClaw | OpenHands    API | sandbox | simulator
-              |                                       |
-              +-------------------+-------------------+
-                                  v
-                     Deterministic Control Plane
-          schema gate + AB reach + permissions + budgets + approvals
-                                  |
-                                  v
-                    Environment-owned execution
-                                  |
-                                  v
-              Observation + EffectEvidence + TerminalState
-                                  |
-                                  v
-                       Append-only Trace Store
-                                  |
-                   +--------------+--------------+
-                   |                             |
-                   v                             v
-             Evaluation Plane             Neural Workbench
-       milestones/minefields/holdout   posterior/search/crystallization
+```mermaid
+%% uah-render: Canonical UAH delivery architecture
+flowchart TB
+    Identity["Identity Plane<br/>role + handle + agent + model + run"]:::identity
+    Domain["Semantic Plane<br/>DomainContractPack + frames + AB graph"]:::semantic
+    Task["Task Plane<br/>domain task + effects + acceptance"]:::semantic
+    Compiler["InteractionModuleCompiler<br/>closed frame-relative projection"]:::compiler
+    Module["InteractionModuleSpec<br/>capabilities + policy + evidence closure"]:::projection
+    Prompt["PromptCompiler + ModelAdapter<br/>bounded context + typed schemas"]:::model
+    Proposal["TypedProposal<br/>model claim only"]:::proposal
+    Admission["UAH Semantic Admission<br/>typed AdmittedOperation"]:::gate
+    Lifecycle["Domain Lifecycle Admission<br/>ExecutionLease or rejection"]:::domain
+    Owner["Environment Owner<br/>exact operation execution"]:::execution
+    Evidence["Result + EffectEvidence<br/>terminal judgment"]:::evidence
+    Trace["Lifecycle Ledger + Observatory<br/>append-only replayable record"]:::trace
+    Eval["Evaluation<br/>qualification + failure attribution"]:::observatory
+    Workbench["NeuralWorkbench H3+<br/>quarantined candidates"]:::compiler
+    Identity --> Compiler
+    Domain --> Compiler
+    Task --> Compiler
+    Compiler --> Module
+    Module --> Prompt
+    Prompt --> Proposal
+    Proposal --> Admission
+    Module --> Admission
+    Admission --> Lifecycle
+    Lifecycle --> Owner
+    Owner --> Evidence
+    Evidence --> Trace
+    Trace --> Eval
+    Trace --> Workbench
 ```
+
+The detailed identity, prompt, admission, lineage, and operation-tree diagrams
+are canonical in
+`../architecture/universal_agentic_harness_foundation.md`. Observatory event
+and graph semantics are canonical in
+`../architecture/observatory_contract.md`.
 
 ### Six planes
 
@@ -519,15 +552,25 @@ The first stable grammar should contain:
 | Contract | Purpose |
 | --- | --- |
 | `HarnessSpec` | Kernel version, policies, adapters, trace/eval configuration |
+| `AgentRoleConfiguration` | Model-independent semantic role, model admission profile, primary frame, auxiliary frame allowlists, capability packs, control bands and authority |
+| `ModelConfiguration` | Model artifact, provider runtime, decoding parameters and protocol capabilities |
+| `ModelAdmissionProfile` | Provider-neutral capability, behavior, evaluation, and minimum resource requirements for models embodying one role |
+| `AgentManifest` | Immutable role, model, prompt pack, harness and adapter composition identified by `agent_id` |
+| `AgentHandleRevision` | Stable handle to active agent mapping, required role, fidelity evidence and rollback lineage |
+| `AgentRun` | One bounded activation identified by `agent_run_id` |
 | `TaskSpec` | Goal, role, frame, required effects, prohibited effects, budgets, terminal checks |
+| `DomainContractPack` | Environment-owned frames, objects, binding policy, evidence rules, qualification cases and minimal prompt policy |
 | `AbstractionFrame` | Substrate, atomicity rule, owners, registry version |
 | `ABObjectSpec` | Typed object, decomposition, effects, observables, permissions, callable status |
 | `ABImplementationBinding` | Replaceable, revisioned pointer from a semantic AB object to an environment API |
 | `ABControlBand` | Inspect, propose, direct-control, and effect-claim bounds |
 | `InteractionModuleSpec` | Closed task projection presented to one role |
-| `ModelProfile` | Provider protocol, schema/tool capabilities, context, latency, trust tier |
+| `PromptPack` | Immutable model-facing wording and output-format artifact selected by the agent manifest |
+| `ModelProfile` | Measured provider protocol, schema/tool capabilities, context, latency, trust tier |
 | `EnvironmentProfile` | Runtime identity, adapters, resources, security and freshness policy |
-| `ActionProposal` | Model-proposed typed operation without effect truth |
+| `TypedProposal` | Model-proposed typed operation without effect truth or authority |
+| `AdmittedOperation` | Immutable UAH semantic decision carrying exact arguments, identities, binding and evidence obligations |
+| `ExecutionLease` | Domain-owner lifecycle authority or rejection linked to one admitted operation |
 | `GateDecision` | Deterministic acceptance/rejection with machine-readable reasons |
 | `EffectEvidence` | Owner-issued observation satisfying a declared effect obligation |
 | `TraceEvent` | Append-only lifecycle event with lineage and artifact references |
@@ -535,6 +578,26 @@ The first stable grammar should contain:
 | `InteractionSkillProposal` | Quarantined higher-order composition with proofs and counterexamples |
 
 ## 6. H0-H6 Delivery Spine
+
+### Identity and allocation staging
+
+The semantic identity spine is required before dynamic allocation. The runtime
+scheduler is not.
+
+| Phase | Required identity and allocation scope |
+| --- | --- |
+| H0 | Freeze serializable role, model, agent, handle, run, task, trace, operation, and invocation identities. No dynamic scheduler. |
+| H1 | Implement immutable agent manifests, handle resolution, run pinning, and a deterministic allocator interface with a fake or single fixed instance. |
+| H2 | Configure named NAO handles such as `nao.chatbot.primary` and `nao.planner.primary`; run provider/resource preflight and fixed leases. Multiple named agents are allowed, but hot model rebinding is not required. |
+| H3 | Implement provider pools, hardware-aware `ModelAllocator`, lease/release policy, concurrent or serialized agent runs, and fidelity-gated handle promotion alongside the NeuralWorkbench attachment. |
+| H4 | Permit reviewed Workbench or evaluator candidates to propose new agent embodiments or handle revisions; promotion remains external, versioned, and reversible. |
+| H5 | Federate local and remote provider pools and require allocation, isolation, trace, and handle-fidelity conformance across runtimes. |
+
+The hardware module is called `ModelAllocator`, not `AgentAllocator`.
+`AgentRegistry` creates and resolves immutable agent embodiments and handle
+revisions. `ModelAllocator` only selects compatible runtime capacity for an
+already resolved agent run. A later high-level `AgentRuntime` may coordinate
+both interfaces without merging their ownership.
 
 ### H0: AB contract spine
 
@@ -680,6 +743,18 @@ and later crystallization. UAH supplies the model port, task/frame projection,
 registry snapshot, mandatory execution ledger, deterministic gate, and owner
 evidence. The first adapter is in-process but its payloads are transport-neutral.
 Protocol mismatch fails closed; a development override is observation-only.
+NeuralWorkbench is not an abstraction frame. `WorkbenchRequest` supplies the
+named frame and closed object projection within which it searches. An MCP
+transport may be added as another adapter to `WorkbenchEnginePort`, but cannot
+replace or widen that semantic interface.
+
+The H3 interaction hook has two directions. Before a configured model call, UAH
+may request bounded candidates and filter them before any context artifact
+reaches `PromptCompiler` or any replacement enters shadow evaluation. After a
+run reaches terminal trace closure, UAH submits an immutable
+`WorkbenchObservation`. The Workbench may update future search state but cannot
+alter the active interaction module, admission decision, lease, registry, or
+promotion state.
 
 **Current pre-H3 slice:** `WorkbenchMemory` retrieves a bounded set of relevant
 supporting and failed `TraceExperience` records and emits a deterministic,
@@ -842,11 +917,14 @@ the H3+ search/adaptation engine.
 | Proposed module | Responsibility | H release |
 | --- | --- | --- |
 | `ab_harness.contracts` | Frozen portable schemas and versions | H0 |
+| `ab_harness.identity` | Role, model, agent, activation, task, trace and operation identity invariants | H0-H1 |
 | `ab_harness.registry` | Read-only snapshots, frame maps, object resolution | H0 |
 | `ab_harness.compiler` | Task/effect to minimal AB closure | H0-H1 |
+| `ab_harness.prompt_compiler` | Deterministic UAH kernel, role, domain, projection and task-context assembly | H1-H2 |
 | `ab_harness.policy` | Role authority, permissions, budgets, approvals | H1 |
+| `ab_harness.admission` | Typed proposal normalization and UAH semantic admission | H0-H1 |
 | `ab_harness.gate` | Schema, reach, effect, evidence, and terminal checks | H0-H1 |
-| `ab_harness.runtime` | Lifecycle state machine and adapter orchestration | H1 |
+| `ab_harness.runtime` | Domain lifecycle admission, execution leases and adapter orchestration | H1 |
 | `ab_harness.trace` | Event grammar, JSONL/artifact stores, replay | H0-H1 |
 | `ab_harness.eval` | Milestones, minefields, acceptance, cost/process metrics | H1-H2 |
 | `ab_harness.providers` | Direct local/API model capability normalization | H1 |
@@ -861,6 +939,8 @@ the H3+ search/adaptation engine.
 | `neural_workbench.capability` | Posterior, calibration, entropy proxies | H3 |
 | `neural_workbench.crystallization` | Counterfactuals, quarantine, promotion | H4 |
 | domain packages | Environment-owned registry content, bindings, evidence adapters, and qualification cases | H0+ |
+| `uah-domain-onboarding` skill | Candidate DomainContractPack authoring, deterministic validation, SkillOpt, replay and owner-review preparation | H3+ |
+| `uah-trace-debug-loop` skill | Trace review, owner-seam diagnosis, TDD, focused repair, replay and comparison | H1-H2 |
 | NeuralWorkbench registry tools | Generic AB schema/graph helpers and migration fixtures; not universal domain-content authority | H3+ |
 
 ### Dependency rule
@@ -883,15 +963,25 @@ execution or issues evidence. Conceptual and synthetic graphs are labeled and
 cannot masquerade as measured traces. See
 `../architecture/observatory_contract.md`.
 
+The kernel always emits lifecycle events. Agent-visible observability is a
+separate, explicit frame projection and is normally read-only and task-scoped.
+The universal prompt explains evidence and trace semantics without exposing the
+complete trace store to every role.
+
 ### Domain initialization and model coupling
 
 Automated domain initialization is an H3+ product stream, not an H2 dependency.
-Manual and LLM-assisted frontends produce the same candidate domain package.
+Manual and LLM-assisted frontends produce the same
+`DomainContractPackCandidate`.
 Discovery never activates objects. Deterministic validation, replay/sandbox
 qualification, and environment-owner review are required. Coupling and runtime
 models are separate configuration roles, and admission is attached to the full
 model-harness-domain configuration. See
 `domain_initialization_and_ab_coupling.md`.
+
+The onboarding workflow may use a domain guardrail skill, TDD, SkillOpt and
+deslop. Those developer workflows do not become runtime AB objects unless a
+named abstraction frame and approved binding explicitly make them so.
 
 ## 9. Build, Borrow, or Wrap
 
@@ -972,9 +1062,38 @@ These remain explicit experiments in H2-H6.
 Every result must identify:
 
 ```text
-model + model revision + provider/runtime + harness version + adapter version
+role_configuration_id
++ model_configuration_id
++ agent_handle_id + agent_handle_revision_id
++ agent_id + agent_run_id
++ provider_pool_id + resource_snapshot_id
++ model_instance_id + model_lease_id + model_invocation_id
++ provider/runtime + harness version + adapter version
 + prompt pack hash + registry hash + environment image/state + task suite version
++ trace_id + task_id + operation_id
 ```
+
+Changing the model, prompt pack, harness build or adapter composition creates a
+new `agent_id`. Restarting that unchanged agent creates a new `agent_run_id`.
+The same frozen task suite may be replayed across different agents for a valid
+comparison. Hardware reallocation among compatible instances of the same model
+configuration does not change `agent_id`; each lease and invocation records the
+actual runtime used. Hidden fallback to another model configuration is an agent
+transition, not an allocator decision. A stable handle may point to the newly
+qualified agent only through a new immutable revision whose fidelity evidence
+preserves the required role contract and supports rollback.
+
+An agent-handle fidelity report must prove:
+
+1. the required `role_configuration_id` is unchanged;
+2. frame access and authority are unchanged or narrower;
+3. the candidate agent passes the role's held-out behavioral and failure suite;
+4. provider protocol and resource limits satisfy the deployment profile;
+5. the prior handle revision remains available for rollback.
+
+This mechanism is optional for H2 execution. It becomes the stable routing
+surface for local model replacement, production replicas, and later Watson
+deployment without weakening immutable evaluation identities.
 
 ### Three evaluation gates
 
@@ -1126,8 +1245,9 @@ point, not agentic parity.
 - [x] Configuration identity changes when registry or runtime parameters change.
 - [x] Workbench retrieval is bounded, failure-aware, provenance-bearing, and candidate-only.
 - [x] The smoke command has one accepted path and one no-dispatch rejection canary.
-- [x] NeuralWorkbench is pinned as an independent submodule and the first
-  transport-neutral, fail-closed adapter contracts are tested.
+- [~] The first transport-neutral, fail-closed Workbench adapter contracts are
+  tested; the declared NeuralWorkbench gitlink remains to be restored at the
+  intended revision.
 - [ ] Full H0 schemas and lifecycle traces are not implemented.
 - [ ] Only one synthetic H1 vertical slice exists; the required failure suite is incomplete.
 - [ ] No NAO shadow-mode adapter has been run.
@@ -1177,7 +1297,7 @@ protocol is frozen and conformance-tested.
 6. Deslop only after behavior is covered; avoid framework-building beyond
    tested needs.
 
-### August 10 target: H2 cooperative NAO planner proof
+### H2 target: cooperative NAO planner proof
 
 1. Record frozen chatbot/planner fixtures and current test results.
 2. Add read-only AB1/AB0 projection and trace bridge.
@@ -1261,12 +1381,28 @@ when the coupled coordination policy, memory, environment, and verification
 form the task-facing object. More agents can also mean more uncorrelated state,
 cost, and authority; orchestration must earn its complexity in ablation.
 
+Each role has one primary frame. A Watson-style system may receive explicit
+auxiliary frame projections, but the task compiler still emits a bounded graph
+and the primary frame supplies the policy for choosing or delegating into those
+frames. Each additional projection declares one maximum access mode:
+`inspect_only`, `direct_proposal`, or `delegate_only`. Effect-bearing
+cross-frame work defaults to `delegate_only`, so a separately configured agent
+whose primary frame matches the target receives the task. Read-only foreign
+state and Observatory views default to `inspect_only`. `direct_proposal`
+requires explicit role authorization and reviewed cross-frame ownership and
+mapping contracts.
+
 ### AB5 boundary
 
 The decisive experiment is not “can the system optimize itself?” It is “does a
 new governed object operate over a family of AB4 systems with independently
 verified cross-system effects?” Until then, research should report AB4 maturity
 and `delta_AB`, not AB5.
+
+A fixed swarm of AB4 agents remains AB4. AB5 becomes defensible only when a
+higher-order, independently evaluated policy creates, selects, revises, or
+coordinates a family of AB4 configurations and preserves rollback and
+provenance.
 
 ## 19. Residual Risk and Next Probe
 

@@ -196,12 +196,26 @@
   <main class="doc">
 
 <h1>Observatory Contract</h1>
-<p><strong>Status:</strong> O1 API frozen; O2 implementation deferred <strong>Date:</strong> 2026-08-04 <strong>Applies to:</strong> UAH H0-H6 and NeuralWorkbench H3+</p>
+<p><strong>Status:</strong> O1 API and identity grammar frozen; O2 implementation deferred <strong>Date:</strong> 2026-09-07 <strong>Applies to:</strong> UAH H0-H6 and NeuralWorkbench H3+</p>
 <h2>1. Decision</h2>
 <p>The product-facing trace surface is called <strong>Observatory</strong>.</p>
 <p>O1 is a small, read-only API with a static HTML renderer. It is required for H1 lifecycle debugging and H2 NAO parity. O2 is the proper interactive implementation and may evolve through H4 before H5 product polish.</p>
 <p>Observatory is never an execution owner, evidence issuer, policy gate, or registry authority.</p>
-<h2>2. Layered Visualization Contract</h2>
+<p>Trace emission and trace inspection are separate authorities. The UAH kernel records every admitted lifecycle automatically. A model receives Observatory access only through an explicit, task-scoped, read-only frame projection.</p>
+<h2>2. Authority and Data Flow</h2>
+<div class="diagram uah-flow-diagram">
+  <svg viewBox="0 0 1040 1588" role="img" aria-label="Figure 1. Admission, execution, and Observatory data flow">
+    <defs>
+      <marker id="uah-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M 0 0 L 10 5 L 0 10 z" fill="#9aa8bd"></path>
+      </marker>
+    </defs>
+    <g font-family="Inter, Liberation Sans, Arial, sans-serif"><path d="M 520.0 106.0 C 520.0 137.0, 520.0 137.0, 520.0 168.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><path d="M 520.0 244.0 C 520.0 275.0, 520.0 275.0, 520.0 306.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><path d="M 520.0 382.0 C 520.0 413.0, 520.0 413.0, 520.0 444.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><path d="M 520.0 520.0 C 520.0 551.0, 520.0 551.0, 520.0 582.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><rect x="481.0" y="529.0" width="78" height="22" rx="8" fill="#172033" /><text x="520.0" y="544.0" text-anchor="middle" font-size="13" fill="#dce6f7">accepted</text><path d="M 520.0 658.0 C 520.0 689.0, 520.0 689.0, 520.0 720.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><path d="M 520.0 796.0 C 520.0 827.0, 520.0 827.0, 520.0 858.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><rect x="481.0" y="805.0" width="78" height="22" rx="8" fill="#172033" /><text x="520.0" y="820.0" text-anchor="middle" font-size="13" fill="#dce6f7">leased</text><path d="M 520.0 934.0 C 520.0 965.0, 520.0 965.0, 520.0 996.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><path d="M 520.0 1072.0 C 520.0 1103.0, 520.0 1103.0, 520.0 1134.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><path d="M 520.0 1210.0 C 520.0 1241.0, 520.0 1241.0, 520.0 1272.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><path d="M 520.0 1348.0 C 520.0 1379.0, 346.7 1379.0, 346.7 1410.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><path d="M 520.0 1348.0 C 520.0 1379.0, 693.3 1379.0, 693.3 1410.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><rect x="408.0" y="30.0" width="224" height="76" rx="15" fill="#e8f2ff" stroke="#2879c7" stroke-width="2" /><text x="520.0" y="68.0" text-anchor="middle" font-size="13" fill="#172033"><tspan x="520.0" y="59.0" font-weight="700">Compiled Prompt + Schemas</tspan><tspan x="520.0" y="79.0" font-weight="500">model-facing projection</tspan></text><rect x="408.0" y="168.0" width="224" height="76" rx="15" fill="#f0eaff" stroke="#7657b8" stroke-width="2" /><text x="520.0" y="206.0" text-anchor="middle" font-size="15" fill="#172033"><tspan x="520.0" y="197.0" font-weight="700">Model Output</tspan><tspan x="520.0" y="217.0" font-weight="500">raw immutable artifact</tspan></text><rect x="408.0" y="306.0" width="224" height="76" rx="15" fill="#f5ecff" stroke="#8b5bb7" stroke-width="2" /><text x="520.0" y="344.0" text-anchor="middle" font-size="15" fill="#172033"><tspan x="520.0" y="335.0" font-weight="700">TypedProposal</tspan><tspan x="520.0" y="355.0" font-weight="500">operation request</tspan></text><rect x="408.0" y="444.0" width="224" height="76" rx="15" fill="#efe6ff" stroke="#6c4ca5" stroke-width="2" /><text x="520.0" y="482.0" text-anchor="middle" font-size="12" fill="#172033"><tspan x="520.0" y="473.0" font-weight="700">UAH Semantic Admission</tspan><tspan x="520.0" y="493.0" font-weight="500">role + frame + object + binding</tspan></text><rect x="408.0" y="582.0" width="224" height="76" rx="15" fill="#efe6ff" stroke="#6c4ca5" stroke-width="2" /><text x="520.0" y="620.0" text-anchor="middle" font-size="13" fill="#172033"><tspan x="520.0" y="611.0" font-weight="700">AdmittedOperation</tspan><tspan x="520.0" y="631.0" font-weight="500">immutable semantic value</tspan></text><rect x="408.0" y="720.0" width="224" height="76" rx="15" fill="#fff0e2" stroke="#cb6d26" stroke-width="2" /><text x="520.0" y="758.0" text-anchor="middle" font-size="13" fill="#172033"><tspan x="520.0" y="749.0" font-weight="700">Domain Lifecycle Admission</tspan><tspan x="520.0" y="769.0" font-weight="500">readiness + dedupe + fencing</tspan></text><rect x="408.0" y="858.0" width="224" height="76" rx="15" fill="#ffe7e5" stroke="#bf5048" stroke-width="2" /><text x="520.0" y="896.0" text-anchor="middle" font-size="15" fill="#172033"><tspan x="520.0" y="887.0" font-weight="700">ExecutionLease</tspan><tspan x="520.0" y="907.0" font-weight="500">owner-granted authority</tspan></text><rect x="408.0" y="996.0" width="224" height="76" rx="15" fill="#ffe7e5" stroke="#bf5048" stroke-width="2" /><text x="520.0" y="1034.0" text-anchor="middle" font-size="15" fill="#172033"><tspan x="520.0" y="1025.0" font-weight="700">Environment Owner</tspan><tspan x="520.0" y="1045.0" font-weight="500">native execution</tspan></text><rect x="408.0" y="1134.0" width="224" height="76" rx="15" fill="#fff6cf" stroke="#b18416" stroke-width="2" /><text x="520.0" y="1172.0" text-anchor="middle" font-size="12" fill="#172033"><tspan x="520.0" y="1163.0" font-weight="700">Terminal Result + EffectEvidence</tspan><tspan x="520.0" y="1183.0" font-weight="500">owner-issued</tspan></text><rect x="408.0" y="1272.0" width="224" height="76" rx="15" fill="#e5f4f4" stroke="#247e83" stroke-width="2" /><text x="520.0" y="1310.0" text-anchor="middle" font-size="12" fill="#172033"><tspan x="520.0" y="1301.0" font-weight="700">Lifecycle Ledger</tspan><tspan x="520.0" y="1321.0" font-weight="500">append-only events + artifacts</tspan></text><rect x="234.7" y="1410.0" width="224" height="76" rx="15" fill="#e8edf2" stroke="#536475" stroke-width="2" /><text x="346.7" y="1448.0" text-anchor="middle" font-size="15" fill="#172033"><tspan x="346.7" y="1439.0" font-weight="700">Observatory O1/O2</tspan><tspan x="346.7" y="1459.0" font-weight="500">read-only views</tspan></text><rect x="581.3" y="1410.0" width="224" height="76" rx="15" fill="#e9f6e7" stroke="#3d8b4e" stroke-width="2" /><text x="693.3" y="1448.0" text-anchor="middle" font-size="15" fill="#172033"><tspan x="693.3" y="1439.0" font-weight="700">NeuralWorkbench H3+</tspan><tspan x="693.3" y="1459.0" font-weight="500">candidate analysis only</tspan></text></g>
+  </svg>
+  <div class="caption">Figure 1. Admission, execution, and Observatory data flow</div>
+</div>
+<p>Every stage, including rejection, appends its own event. The diagram shows the accepted path for readability. Neither Observatory nor NeuralWorkbench sits in the execution call chain.</p>
+<h2>3. Layered Visualization Contract</h2>
 <table><thead><tr>
 <th>Layer</th>
 <th>Required views</th>
@@ -228,7 +242,7 @@
 <td>conformance-qualified adapters and immutable traces</td>
 </tr>
 </tbody></table>
-<h2>3. O1 API</h2>
+<h2>4. O1 API</h2>
 <p>O1 accepts immutable, JSON-compatible inputs and returns a self-contained review document:</p>
 <pre><code class="language-text">render_observatory(
   registry_snapshot,
@@ -246,6 +260,80 @@
 <li>ordered event cards with inspectable raw payloads;</li>
 <li>graph data embedded as inert JSON for later O2 reuse.</li>
 </ul>
+<h3>Mandatory identity envelope</h3>
+<p>Every lifecycle event carries or resolves without heuristic reconstruction:</p>
+<table><thead><tr>
+<th>Identity</th>
+<th>Scope</th>
+</tr></thead><tbody>
+<tr>
+<td><code>role_configuration_id</code></td>
+<td>Immutable semantic role, model admission profile, primary frame, auxiliary frame allowlists and access modes, authority and capability packs</td>
+</tr>
+<tr>
+<td><code>model_configuration_id</code></td>
+<td>Model artifact, runtime and decoding contract</td>
+</tr>
+<tr>
+<td><code>agent_handle_id</code>, <code>agent_handle_revision_id</code></td>
+<td>Stable routed identity and the immutable active-agent mapping resolved for this run</td>
+</tr>
+<tr>
+<td><code>agent_id</code></td>
+<td>Immutable role, model, prompt pack and harness composition</td>
+</tr>
+<tr>
+<td><code>agent_run_id</code></td>
+<td>One bounded activation of the agent</td>
+</tr>
+<tr>
+<td><code>provider_pool_id</code>, <code>resource_snapshot_id</code></td>
+<td>Runtime supply considered and the measured capacity state used by allocation</td>
+</tr>
+<tr>
+<td><code>model_instance_id</code>, <code>model_lease_id</code></td>
+<td>Loaded process or endpoint replica and its bounded reservation</td>
+</tr>
+<tr>
+<td><code>model_invocation_id</code></td>
+<td>One exact prompt-to-output call joining an agent run, trace and model lease</td>
+</tr>
+<tr>
+<td><code>trace_id</code></td>
+<td>One causally connected workflow containing one or more operations</td>
+</tr>
+<tr>
+<td><code>domain_id</code>, <code>task_type_id</code>, <code>task_id</code></td>
+<td>Domain namespace, task family and work instance</td>
+</tr>
+<tr>
+<td><code>operation_id</code>, <code>parent_operation_id</code></td>
+<td>One frame-relative AB-object lifecycle and its decomposition parent</td>
+</tr>
+<tr>
+<td><code>proposal_id</code>, <code>admission_id</code>, <code>execution_lease_id</code></td>
+<td>Proposal, UAH semantic decision and domain-granted authority</td>
+</tr>
+<tr>
+<td><code>event_id</code>, <code>parent_event_id</code>, <code>sequence</code></td>
+<td>Append-only event ordering and causality</td>
+</tr>
+</tbody></table>
+<p>Each operation also records <code>frame_id</code>, <code>registry_version</code>, <code>ab_object_id</code>, <code>binding_id</code>, prompt and projection hashes, evidence obligations, native domain lineage, and owner-issued result references.</p>
+<h3>Required lifecycle event families</h3>
+<pre><code class="language-text">prompt_compiled
+agent_handle_resolved | agent_handle_revision_promoted | agent_handle_revision_rolled_back
+model_lease_requested | model_lease_acquired | model_lease_rejected | model_lease_released
+model_invocation_started | model_invocation_completed | model_invocation_failed
+model_output_recorded
+proposal_normalized | proposal_rejected
+semantic_admission_accepted | semantic_admission_rejected
+domain_admission_leased | domain_admission_rejected
+execution_started | execution_feedback
+execution_completed | execution_failed | execution_cancelled
+evidence_issued | evidence_rejected
+terminal_task_accepted | terminal_task_rejected | terminal_task_suspended</code></pre>
+<p>The raw model output, normalized proposal, <code>AdmittedOperation</code>, execution lease, native owner result, normalized evidence, and terminal judgment remain distinct artifacts. Observatory may place them beside each other but may not collapse them into one generated summary.</p>
 <p>The first renderer may reuse the proven NAO <code>interaction_trace_viewer</code> pattern: JSONL ingestion, normalization, searchable cards, and static HTML. UAH must replace dialogue-only correlation heuristics with explicit configuration, trace, task, frame, proposal, binding, evidence, replay, and Workbench IDs.</p>
 <h3>NAO viewer assimilation boundary</h3>
 <p>The 2026-08-04 source audit found four pieces worth porting as behavior, not as a ROS dependency:</p>
@@ -279,8 +367,8 @@
 <li><code>/planner/execution_feedback</code> -&gt; owner/execution lifecycle events;</li>
 <li><code>/planner/dialogue_act</code> -&gt; planner communication request, never direct speech proof.</li>
 </ul>
-<p>The source <code>goal_id</code>, <code>request_id</code>, <code>plan_id</code>, <code>plan_version</code>, and <code>step_id</code> remain payload lineage. UAH <code>configuration_id</code>, <code>trace_id</code>, and event sequence are mandatory envelope identity and are never reconstructed heuristically.</p>
-<h2>4. Graph Grammar</h2>
+<p>The source <code>goal_id</code>, <code>request_id</code>, <code>plan_id</code>, <code>plan_version</code>, and <code>step_id</code> remain payload lineage. UAH role, model, agent, run, trace, operation, and event identities are mandatory envelope fields and are never reconstructed heuristically.</p>
+<h2>5. Graph Grammar</h2>
 <p>Graph nodes may represent:</p>
 <ul>
 <li>AB objects and decomposition relations;</li>
@@ -289,30 +377,32 @@
 <li>complete model-harness-domain configurations;</li>
 <li>trace clusters and reviewed candidate abstractions.</li>
 </ul>
-<p>Graph edges must declare a type such as <code>decomposes_to</code>, <code>bound_by</code>, <code>proposed_by</code>, <code>rejected_by</code>, <code>executed_by</code>, <code>evidenced_by</code>, <code>retrieved_from</code>, or <code>compared_with</code>. A visual edge may not imply authorization or causality unless the underlying event or contract proves it.</p>
-<h2>5. Metrics and Honesty Rules</h2>
+<p>Graph edges must declare a type such as <code>decomposes_to</code>, <code>bound_by</code>, <code>proposed_by</code>, <code>admitted_by</code>, <code>leased_by</code>, <code>rejected_by</code>, <code>executed_by</code>, <code>evidenced_by</code>, <code>supersedes</code>, <code>retrieved_from</code>, or <code>compared_with</code>. A visual edge may not imply authorization or causality unless the underlying event or contract proves it.</p>
+<p>An operation node has exactly one source coordinate <code>(frame_id, ab_object_id, ab_level, registry_version)</code>. A parent operation may decompose into children at other levels in the same frame. Cross-frame edges remain explicit mappings or delegations and never inherit a coordinate automatically.</p>
+<h2>6. Metrics and Honesty Rules</h2>
 <p>Every metric is keyed by the complete content-addressed configuration. Model family names alone are not aggregation keys.</p>
 <p>Metric values carry one of these labels:</p>
 <ul>
-<li><code>conceptual</code> — explanatory geometry with no runtime measurement;</li>
-<li><code>synthetic</code> — generated evaluation data;</li>
-<li><code>recorded</code> — replayed fixture or captured runtime data;</li>
-<li><code>measured</code> — evaluator-produced result under a frozen configuration;</li>
-<li><code>reviewed</code> — measured result accepted through the applicable gate.</li>
+<li><code>conceptual</code>: explanatory geometry with no runtime measurement;</li>
+<li><code>synthetic</code>: generated evaluation data;</li>
+<li><code>recorded</code>: replayed fixture or captured runtime data;</li>
+<li><code>measured</code>: evaluator-produced result under a frozen configuration;</li>
+<li><code>reviewed</code>: measured result accepted through the applicable gate.</li>
 </ul>
 <p>Conceptual NeuralWorkbench capability-space, energy-landscape, entropy, and AB maturity figures are design references. Observatory may reproduce their visual grammar, but it must never present synthetic or conceptual values as runtime evidence.</p>
-<h2>6. O1 Exit Gate</h2>
+<h2>7. O1 Exit Gate</h2>
 <p>O1 is complete when one accepted and one rejected H1 lifecycle plus the H2 NAO planner parity run can be rendered with:</p>
 <ul>
 <li>complete ordered lineage;</li>
 <li>configuration and source identity;</li>
+<li>raw model output, proposal, admission, lease, result, evidence, and terminal judgment as separate artifacts;</li>
 <li>projected and directly callable object distinction;</li>
 <li>binding and owner-evidence closure;</li>
 <li>failure-stage attribution;</li>
 <li>model-free replay comparison;</li>
 <li>optional H3 shadow candidate lineage without granting it authority.</li>
 </ul>
-<h2>7. O2 Deferred Scope</h2>
+<h2>8. O2 Deferred Scope</h2>
 <p>O2 may add live streaming, multi-run comparison, interactive AB/evidence graphs, Watson/Bonsai overlays, replay controls, counterfactual controls, Workbench review queues, promotion/rollback inspection, and cross-domain navigation. Those features must consume the O1 event and graph contracts rather than invent a second trace vocabulary.</p>
   </main>
 </body>
