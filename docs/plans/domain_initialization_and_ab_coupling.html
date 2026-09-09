@@ -196,7 +196,7 @@
   <main class="doc">
 
 <h1>Domain Initialization and AB Coupling</h1>
-<p><strong>Status:</strong> Contract design active; assisted authoring remains H3+ <strong>Date:</strong> 2026-09-07 <strong>Reference domains:</strong> NAO, iTrader, Watson/Hermes</p>
+<p><strong>Status:</strong> Contract design active; assisted authoring remains H3+ <strong>Date:</strong> 2026-09-08 <strong>Reference domains:</strong> NAO, iTrader, Watson/Hermes</p>
 <h2>1. Product Goal</h2>
 <p>Domain initialization turns an unfamiliar environment into a candidate UAH domain package without treating discovery, model confidence, or documentation as authorization or execution evidence.</p>
 <p>The intended onboarding experience is:</p>
@@ -208,18 +208,21 @@
 <p>Manual and LLM-assisted initialization emit the same typed candidate package:</p>
 <pre><code class="language-text">DomainContractPackCandidate
   domain profile
+  environment profile and stable agent-handle roster
   primary and auxiliary abstraction frames with atomicity rules
   AB registry objects and decompositions
   capability packs and role allowlists
   implementation binding candidates
   input/output/effect/evidence contracts
+  operation-edge grammar and task-ingress policy
+  required and best-effort effect-obligation templates
   permissions and approval requirements
   evidence adapters and freshness rules
   minimal domain prompt policy
   qualification cases and counterexamples
   source and model provenance</code></pre>
 <p>Manual authoring directly maps known APIs and internal seams. LLM-assisted authoring reads operator-supplied sources and proposes the same objects through a bounded coupling workflow. Neither frontend can approve its own output.</p>
-<p>An approved <code>DomainContractPack</code> is the runtime source. A domain-specific developer skill may explain how to inspect and validate it, but the <code>PromptCompiler</code> never consumes developer-skill prose as domain authority.</p>
+<p>An approved <code>DomainContractPack</code> is the runtime source. A domain-specific developer skill may explain how to inspect and validate it, but the <code>PromptCompiler</code> never consumes developer-skill prose as domain authority. Each environment run pins one approved pack revision. Registry changes produce a new reviewed revision; they are never synchronized live into an active run.</p>
 <h2>3. Coupling Pipeline</h2>
 <div class="diagram uah-flow-diagram">
   <svg viewBox="0 0 1040 1450" role="img" aria-label="Figure 1. Candidate-only domain onboarding and activation">
@@ -253,6 +256,9 @@ propose_ab_frame
 propose_registry_objects
 propose_bindings
 define_evidence_adapters
+define_environment_profile
+define_task_ingress_policy
+define_effect_obligations
 generate_counterexamples
 validate_graph
 run_coupling_evals
@@ -344,8 +350,10 @@ agent_handle_id
   -&gt; active agent_id
 
 Activation and work
-active agent_id
-  -&gt; agent_run_id
+environment_profile_id
+  -&gt; environment_run_id
+  -&gt; active agent_id -&gt; agent_run_id
+  -&gt; environment_ingress_id
   -&gt; task_id -&gt; trace_id -&gt; operation_id
 
 Runtime allocation
@@ -354,12 +362,14 @@ provider_pool_id
   -&gt; model_lease_id
 agent_run_id + trace_id + model_lease_id
   -&gt; model_invocation_id</code></pre>
-<p>The chains join at <code>model_invocation_id</code>, which records <code>agent_run_id</code>, <code>trace_id</code>, and the actual <code>model_lease_id</code>. Reallocation among compatible instances of the same model configuration does not change the agent identity. A different model configuration produces a different <code>agent_id</code>. A stable <code>agent_handle_id</code> may move to that agent only through a new immutable revision after role-fidelity qualification; allocation alone cannot change it.</p>
+<p>The chains join at <code>model_invocation_id</code>, which records <code>environment_run_id</code>, <code>agent_run_id</code>, <code>trace_id</code>, and the actual <code>model_lease_id</code>. Reallocation among compatible instances of the same model configuration does not change the agent identity. A different model configuration produces a different <code>agent_id</code>. A stable <code>agent_handle_id</code> may move to that agent only through a new immutable revision after role-fidelity qualification; allocation alone cannot change it.</p>
 <p>Handles use the stable namespace <code>&lt;domain&gt;.&lt;role&gt;.&lt;slot&gt;</code>. The initial slot is <code>primary</code> even when only one embodiment exists:</p>
 <pre><code class="language-text">watson.system.primary
 nao.chatbot.primary
 nao.planner.primary
 itrader.proposer.primary</code></pre>
+<p>The environment owner attests one native activation after readiness checks. UAH validates that attestation, resolves the profile&#x27;s roster, and attaches agent runs. Approved bindings normalize native stimuli into <code>EnvironmentIngress</code>; deterministic task-ingress policy assigns state-update, start, resume, notify, or reject semantics before any model call.</p>
+<p>Every operation receives one coordinate in one abstraction frame. Same-frame structure uses <code>decomposes_to</code>; cross-frame work uses an explicit <code>delegates_to</code> edge. Domain onboarding must include the target role or handle, typed input and output artifacts, and authority boundary for every delegation. Task templates declare required and best-effort effect obligations so terminal acceptance can be derived from owner evidence without model-authored criteria.</p>
 <p><code>primary</code> names a deployment role, not an unqualified default. It leaves room for explicit owner-defined slots without changing the role configuration or overloading the agent identity.</p>
 <p>Every role names one primary abstraction frame. Additional frame projections are explicit, versioned allowlists with their own control bands and access modes. A broad auxiliary capability pack may be approved at role level, but each task still receives a bounded interaction projection.</p>
 <p>Each additional projection declares a maximum <code>access_mode</code>:</p>

@@ -196,7 +196,7 @@
   <main class="doc">
 
 <h1>Observatory Contract</h1>
-<p><strong>Status:</strong> O1 API and identity grammar frozen; O2 implementation deferred <strong>Date:</strong> 2026-09-07 <strong>Applies to:</strong> UAH H0-H6 and NeuralWorkbench H3+</p>
+<p><strong>Status:</strong> O1 API and identity grammar frozen; O2 implementation deferred <strong>Date:</strong> 2026-09-08 <strong>Applies to:</strong> UAH H0-H6 and NeuralWorkbench H3+</p>
 <h2>1. Decision</h2>
 <p>The product-facing trace surface is called <strong>Observatory</strong>.</p>
 <p>O1 is a small, read-only API with a static HTML renderer. It is required for H1 lifecycle debugging and H2 NAO parity. O2 is the proper interactive implementation and may evolve through H4 before H5 product polish.</p>
@@ -223,7 +223,7 @@
 </tr></thead><tbody>
 <tr>
 <td>UAH H0-H2</td>
-<td>configuration, task, frame, role, projected AB graph, bindings, proposals, gates, owner evidence, failures, terminal state, replay comparison</td>
+<td>domain and environment-run index; environment, task, actor, and operation-graph views; configuration, frame, role, projected AB graph, bindings, proposals, gates, owner evidence, obligation status, failures, terminal state, replay comparison</td>
 <td>UAH registry snapshots and lifecycle ledger</td>
 </tr>
 <tr>
@@ -256,7 +256,7 @@
 <li>one static HTML payload;</li>
 <li>trace and configuration identities;</li>
 <li>source revisions and protocol compatibility state;</li>
-<li>filter facets for event type, task, role, object, owner, gate outcome, and failure stage;</li>
+<li>filter facets for environment run, task, actor agent run, role, object, owner, gate outcome, event type, and failure stage;</li>
 <li>ordered event cards with inspectable raw payloads;</li>
 <li>graph data embedded as inert JSON for later O2 reuse.</li>
 </ul>
@@ -283,8 +283,16 @@
 <td>Immutable role, model, prompt pack and harness composition</td>
 </tr>
 <tr>
+<td><code>environment_profile_id</code>, <code>environment_run_id</code></td>
+<td>Reusable native-environment contract and one attested activation that groups agent runs, tasks, traces, and native evidence</td>
+</tr>
+<tr>
+<td><code>environment_ingress_id</code></td>
+<td>One immutable native observation, request, feedback item, or control stimulus before deterministic task association</td>
+</tr>
+<tr>
 <td><code>agent_run_id</code></td>
-<td>One bounded activation of the agent</td>
+<td>One bounded actor activation attached to exactly one environment run; it may span many tasks, leases, and invocations</td>
 </tr>
 <tr>
 <td><code>provider_pool_id</code>, <code>resource_snapshot_id</code></td>
@@ -299,6 +307,10 @@
 <td>One exact prompt-to-output call joining an agent run, trace and model lease</td>
 </tr>
 <tr>
+<td><code>registration_preflight_id</code>, <code>startup_preflight_id</code></td>
+<td>Non-reserving compatibility result and post-lease readiness result</td>
+</tr>
+<tr>
 <td><code>trace_id</code></td>
 <td>One causally connected workflow containing one or more operations</td>
 </tr>
@@ -307,8 +319,8 @@
 <td>Domain namespace, task family and work instance</td>
 </tr>
 <tr>
-<td><code>operation_id</code>, <code>parent_operation_id</code></td>
-<td>One frame-relative AB-object lifecycle and its decomposition parent</td>
+<td><code>operation_id</code>, <code>parent_operation_id</code>, <code>operation_relation</code></td>
+<td>One frame-relative AB-object lifecycle, related operation, and governed edge type such as decomposition or delegation</td>
 </tr>
 <tr>
 <td><code>proposal_id</code>, <code>admission_id</code>, <code>execution_lease_id</code></td>
@@ -320,10 +332,19 @@
 </tr>
 </tbody></table>
 <p>Each operation also records <code>frame_id</code>, <code>registry_version</code>, <code>ab_object_id</code>, <code>binding_id</code>, prompt and projection hashes, evidence obligations, native domain lineage, and owner-issued result references.</p>
+<p>One <code>trace_id</code> may include several actor agent runs. The environment, task, handle, and actor views are query projections over one append-only ledger. They must not become independent trace stores whose ordering or terminal judgments can diverge.</p>
 <h3>Required lifecycle event families</h3>
-<pre><code class="language-text">prompt_compiled
-agent_handle_resolved | agent_handle_revision_promoted | agent_handle_revision_rolled_back
-model_lease_requested | model_lease_acquired | model_lease_rejected | model_lease_released
+<pre><code class="language-text">registration_preflight_started | registration_preflight_passed | registration_preflight_failed
+agent_registered
+agent_handle_revision_promoted | agent_handle_revision_rolled_back | agent_handle_resolved
+environment_run_start_requested | environment_run_attested | environment_run_ready | environment_run_failed
+environment_ingress_recorded | environment_ingress_classified | environment_ingress_rejected
+task_started | task_resumed | task_notified | environment_state_updated
+agent_run_start_requested | agent_run_initializing | agent_run_attached
+model_lease_requested | model_lease_acquired | model_lease_rejected
+startup_preflight_started | startup_preflight_passed | startup_preflight_failed
+agent_run_ready | agent_run_standby | agent_run_startup_failed
+prompt_compiled
 model_invocation_started | model_invocation_completed | model_invocation_failed
 model_output_recorded
 proposal_normalized | proposal_rejected
@@ -332,8 +353,14 @@ domain_admission_leased | domain_admission_rejected
 execution_started | execution_feedback
 execution_completed | execution_failed | execution_cancelled
 evidence_issued | evidence_rejected
-terminal_task_accepted | terminal_task_rejected | terminal_task_suspended</code></pre>
+effect_obligation_satisfied | effect_obligation_failed | effect_obligation_pending
+terminal_task_accepted | terminal_task_accepted_with_deficit | terminal_task_rejected | terminal_task_suspended
+model_lease_released
+agent_run_detached | agent_run_terminated
+environment_run_closing | environment_run_closed</code></pre>
+<p>This is the common startup-to-task order, not a rule that every lease ends with one task. A lease may be invocation-, task-, or run-scoped; its declared scope determines the release edge.</p>
 <p>The raw model output, normalized proposal, <code>AdmittedOperation</code>, execution lease, native owner result, normalized evidence, and terminal judgment remain distinct artifacts. Observatory may place them beside each other but may not collapse them into one generated summary.</p>
+<p><code>execution_feedback</code> is evidence-bearing input, not terminal proof by name. A task closes only after the task acceptance evaluator compares its immutable required and best-effort obligations with owner-issued evidence. A failed best-effort report may therefore produce <code>accepted_with_deficit</code> while a failed required manipulation effect produces rejection or suspension. The operation that succeeded remains succeeded even when a later reporting operation fails.</p>
 <p>The first renderer may reuse the proven NAO <code>interaction_trace_viewer</code> pattern: JSONL ingestion, normalization, searchable cards, and static HTML. UAH must replace dialogue-only correlation heuristics with explicit configuration, trace, task, frame, proposal, binding, evidence, replay, and Workbench IDs.</p>
 <h3>NAO viewer assimilation boundary</h3>
 <p>The 2026-08-04 source audit found four pieces worth porting as behavior, not as a ROS dependency:</p>
@@ -367,6 +394,7 @@ terminal_task_accepted | terminal_task_rejected | terminal_task_suspended</code>
 <li><code>/planner/execution_feedback</code> -&gt; owner/execution lifecycle events;</li>
 <li><code>/planner/dialogue_act</code> -&gt; planner communication request, never direct speech proof.</li>
 </ul>
+<p>The NAO <code>report_result</code> flow remains one causal trace. The planner-owned AB1 operation may delegate grounded language composition to the chatbot agent run, which receives its own operation and model-invocation identities. The returned text cannot prove robot motion or manipulation. Native report dispatch and speech evidence remain owned by the NAO runtime.</p>
 <p>The source <code>goal_id</code>, <code>request_id</code>, <code>plan_id</code>, <code>plan_version</code>, and <code>step_id</code> remain payload lineage. UAH role, model, agent, run, trace, operation, and event identities are mandatory envelope fields and are never reconstructed heuristically.</p>
 <h2>5. Graph Grammar</h2>
 <p>Graph nodes may represent:</p>
@@ -377,8 +405,8 @@ terminal_task_accepted | terminal_task_rejected | terminal_task_suspended</code>
 <li>complete model-harness-domain configurations;</li>
 <li>trace clusters and reviewed candidate abstractions.</li>
 </ul>
-<p>Graph edges must declare a type such as <code>decomposes_to</code>, <code>bound_by</code>, <code>proposed_by</code>, <code>admitted_by</code>, <code>leased_by</code>, <code>rejected_by</code>, <code>executed_by</code>, <code>evidenced_by</code>, <code>supersedes</code>, <code>retrieved_from</code>, or <code>compared_with</code>. A visual edge may not imply authorization or causality unless the underlying event or contract proves it.</p>
-<p>An operation node has exactly one source coordinate <code>(frame_id, ab_object_id, ab_level, registry_version)</code>. A parent operation may decompose into children at other levels in the same frame. Cross-frame edges remain explicit mappings or delegations and never inherit a coordinate automatically.</p>
+<p>Graph edges must declare a type such as <code>decomposes_to</code>, <code>delegates_to</code>, <code>continues_with</code>, <code>bound_by</code>, <code>proposed_by</code>, <code>admitted_by</code>, <code>leased_by</code>, <code>rejected_by</code>, <code>executed_by</code>, <code>evidenced_by</code>, <code>supersedes</code>, <code>retrieved_from</code>, or <code>compared_with</code>. A visual edge may not imply authorization or causality unless the underlying event or contract proves it.</p>
+<p>An operation node has exactly one source coordinate <code>(frame_id, ab_object_id, ab_level, registry_version)</code>. A parent operation may decompose into children at other levels in the same frame. <code>decomposes_to</code> never crosses a frame boundary. Cross-frame work uses <code>delegates_to</code> and records the source operation, target frame, target role or handle, closed input artifact, expected output artifact, and authority boundary. <code>continues_with</code> records ordered workflow progression without claiming abstraction decomposition.</p>
 <h2>6. Metrics and Honesty Rules</h2>
 <p>Every metric is keyed by the complete content-addressed configuration. Model family names alone are not aggregation keys.</p>
 <p>Metric values carry one of these labels:</p>
@@ -394,16 +422,18 @@ terminal_task_accepted | terminal_task_rejected | terminal_task_suspended</code>
 <p>O1 is complete when one accepted and one rejected H1 lifecycle plus the H2 NAO planner parity run can be rendered with:</p>
 <ul>
 <li>complete ordered lineage;</li>
+<li>environment-run activation, ingress classification, attached actor runs, and standby or lease transitions;</li>
 <li>configuration and source identity;</li>
 <li>raw model output, proposal, admission, lease, result, evidence, and terminal judgment as separate artifacts;</li>
 <li>projected and directly callable object distinction;</li>
 <li>binding and owner-evidence closure;</li>
+<li>required and best-effort obligation evaluation with explicit deficits;</li>
 <li>failure-stage attribution;</li>
 <li>model-free replay comparison;</li>
 <li>optional H3 shadow candidate lineage without granting it authority.</li>
 </ul>
 <h2>8. O2 Deferred Scope</h2>
-<p>O2 may add live streaming, multi-run comparison, interactive AB/evidence graphs, Watson/Bonsai overlays, replay controls, counterfactual controls, Workbench review queues, promotion/rollback inspection, and cross-domain navigation. Those features must consume the O1 event and graph contracts rather than invent a second trace vocabulary.</p>
+<p>O2 may add a domain index that drills into environment runs, tasks, actor runs, and operation graphs; live streaming; multi-run comparison; interactive AB/evidence graphs; Watson/Bonsai overlays; replay controls; counterfactual controls; Workbench review queues; promotion/rollback inspection; and cross-domain navigation. Those features must consume the O1 event and graph contracts rather than invent a second trace vocabulary.</p>
   </main>
 </body>
 </html>

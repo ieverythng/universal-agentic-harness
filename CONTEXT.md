@@ -29,11 +29,22 @@ The immutable role-level limit on an additional frame projection:
 `inspect_only`, `direct_proposal`, or `delegate_only`. Task compilation may
 narrow this limit but cannot widen it.
 
+### Cross-frame delegation
+
+A typed causal relationship in which an operation requests work from an agent
+whose primary frame matches the target frame. Delegation creates a distinct
+target operation and grants no implied coordinate, admission, or execution
+authority across frames.
+
 ### AB object
 
 A stable semantic object in an abstraction frame. It describes a contract,
 primitive, skill, composition, or governed system boundary independently of the
 method, topic, endpoint, or provider that happens to implement it.
+
+An object's level follows the atomicity rule of its frame. Internal step count,
+implementation complexity, or delegation to an object in another frame does
+not promote the object automatically.
 
 ### AB implementation binding
 
@@ -104,6 +115,18 @@ One identified prompt-to-output call made by an agent run using a model lease.
 It records the exact model instance and artifacts used but does not own agent
 state.
 
+### Registration preflight
+
+A non-reserving validation that an agent manifest, role, provider policy, and
+declared resource requirements are compatible. It never loads or invokes a
+model.
+
+### Startup preflight
+
+A readiness evaluation performed after a model lease is acquired and before an
+agent run accepts work. It may use bounded liveness and role-shaped probes but
+does not establish task capability.
+
 ### Agent
 
 An immutable embodiment whose manifest composes one agent role configuration
@@ -117,12 +140,53 @@ A stable human-facing or deployment-facing identity that resolves through an
 immutable revision to one active agent. Rebinding preserves the role contract
 but requires fidelity evidence and rollback lineage.
 
+### Agent registration
+
+The publication of an immutable agent embodiment and, when requested, a handle
+revision. Registration creates no agent run, model lease, or model invocation.
+
 ### Agent run
 
-One bounded activation of an agent under one agent role configuration. It owns
-activation-scoped state and contains domain tasks until shutdown, failure, or
-replacement ends the activation.
-_Avoid_: Agent embodiment
+One bounded activation of an agent, attached to exactly one environment run.
+It owns activation-scoped state and may span several domain tasks, model
+leases, and model invocations until shutdown, failure, or replacement ends the
+activation.
+_Avoid_: Agent embodiment; model invocation; turn
+
+### Agent standby
+
+The state of an active agent run that remains attached to its environment and
+retains activation-scoped continuity without holding a model lease or executing
+an invocation.
+_Avoid_: Stopped agent; unloaded model
+
+### Environment run
+
+One bounded activation of a concrete domain environment that groups the agent
+runs, tasks, traces, and native evidence produced while that environment is
+active. Restarting or replacing the environment creates a new environment run
+even when its domain contracts and participating agents are unchanged.
+_Avoid_: Domain; environment profile; session
+
+### Environment profile
+
+A reusable, content-addressed domain runtime contract that pins a
+DomainContractPack, native interface requirements, readiness policy, and stable
+agent-handle roster. Activating the profile produces a new environment run.
+
+### Environment ingress
+
+A normalized observation, request, or feedback item received from an approved
+environment binding during an environment run. Ingress is not automatically a
+task, trace, model invocation, or execution authority.
+_Avoid_: Prompt; task
+
+### Task ingress policy
+
+The deterministic, environment-scoped policy that associates environment
+ingress with state updates, new tasks, resumed tasks, notifications, or
+rejection. A model may interpret admitted content but cannot rewrite its task
+or trace lineage.
 
 ### Prompt compiler
 
@@ -173,9 +237,17 @@ change the admitted operation.
 
 ### UAH trace
 
-The causally connected record rooted in one admitted interaction or workflow.
-A trace may contain several AB operations and domain-lifecycle references, but
-it is not a conversation session or an authority source.
+The causally connected, potentially cross-agent record of one domain workflow
+inside an environment run. A trace may contain events from several agent runs,
+AB operations, and domain-lifecycle references, but it is not a conversation
+session or an authority source.
+
+### Trace projection
+
+A derived, read-only view of one UAH trace filtered by actor, role, handle
+lineage, frame, task, or operation. Agent and environment views are projections
+of the same causal record rather than separately authored traces.
+_Avoid_: Agent trace; environment trace
 
 ### Operation
 
@@ -183,11 +255,46 @@ One identified AB-object request within a UAH trace as it moves through
 proposal, semantic admission, domain lifecycle admission, execution, and
 owner-issued evidence.
 
+### Operation edge
+
+A governed relationship between two operations. `decomposes_to` refines an
+object inside one abstraction frame, `delegates_to` crosses into another frame
+through an explicit role or handle and typed artifact contract, and
+`continues_with` records workflow order without claiming decomposition.
+
 ### Effect evidence
 
 An owner-issued observation tied to the object, binding, environment, and
 execution result that produced it. Successful model text is not effect
 evidence.
+
+### Effect obligation
+
+A typed task requirement naming an expected effect, its evidence rule, owner,
+freshness policy, and whether satisfaction is required or best effort. An
+operation result may satisfy one obligation without deciding the task outcome.
+
+### Task acceptance
+
+The deterministic terminal judgment compiled from a task's effect obligations.
+All required obligations must be satisfied; an unsatisfied best-effort
+obligation is retained as a deficit without invalidating otherwise complete
+work.
+_Avoid_: Plan completed; model-declared completion
+
+### Verified trace digest
+
+A deterministic, model-free projection of immutable task, operation,
+admission, execution, evidence, and effect-obligation events. Observatory and
+NeuralWorkbench may index or display the digest, but the lifecycle ledger
+remains authoritative and model-authored reflection is excluded.
+
+### Memory policy
+
+A versioned rule that limits which verified trace digests an agent may inspect
+or retrieve by domain, environment profile, frame, role, task family, object,
+outcome, and approved handle lineage. The policy grants read scope only and
+does not transfer evidence or execution authority.
 
 ### Lifecycle ledger
 
@@ -231,6 +338,30 @@ rollback gates pass.
 An optional adaptive-engine relationship that receives bounded frame-relative
 search requests and completed trace observations from UAH. It returns
 candidate artifacts with no admission, execution, or promotion authority.
+
+### Neural Workbench search
+
+The bounded construction and comparison of a mechanism-diverse candidate
+portfolio within one supplied abstraction frame. Candidate sources may include
+deterministic templates, host-model generation, retrieved-and-adapted traces,
+and hybrids. Search includes deterministic verification, auditable scoring,
+selection, and provenance. It is not synonymous with deterministic lookup and
+does not confer execution authority.
+
+### Typed action memory
+
+An indexed store of complete operation and trace experience, including support,
+counterexamples, outcomes, evidence, frame-relative AB coordinates, and exact
+configuration provenance. It is distinct from conversation history. H3 may use
+it to retrieve and adapt candidates or context; it cannot mutate the active
+task, trusted registry, or admission state.
+
+### Crystallization
+
+The H4 process that turns repeated, causally supported structures into reviewed
+higher-order candidate artifacts. Frequency is supporting evidence only.
+Replay, counterexamples, disjoint holdout, owner review, provenance, and
+rollback are required before any trusted promotion.
 
 ## Reference NAO ownership
 

@@ -94,8 +94,9 @@ module = InteractionProjector(registry).compile(
 
 - `src/ab_harness/` — portable H0 contracts, registry adapter, projector, gate,
   trace store, and NAO compatibility views.
-- `src/Neural-Wokbench/` — commit-pinned companion engine submodule; optional
-  before H3 and attached through a versioned adapter protocol.
+- `src/Neural-Wokbench/` is the declared companion-engine submodule path. The
+  intended revision is `e76ba7e`, but the current UAH tree has no gitlink. It
+  remains optional before H3 and attaches through a versioned adapter protocol.
 - `tests/` — fail-closed H0 tests and a standalone registry fixture.
 - `docs/plans/` — implementation masterplan, development log, and coupling
   plans.
@@ -118,7 +119,7 @@ belong behind adapters.
 
 See the
 [implementation masterplan](docs/plans/universal_agentic_harness_masterplan.md)
-for the August 10 v0 launch contract and H0-H6 release spine, the
+for the evidence-gated H0-H6 release spine, the
 [development log](docs/plans/universal_agentic_harness_development_log.md)
 for current gates, and [source
 provenance](docs/artifacts/provenance.md) for the exact extraction revision.

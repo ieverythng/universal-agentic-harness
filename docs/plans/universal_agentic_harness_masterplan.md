@@ -1,7 +1,7 @@
 # Universal Agentic Harness: Implementation Masterplan
 
 **Status:** Canonical implementation plan; H2 qualification gates active
-**Date:** 2026-09-07
+**Date:** 2026-09-08
 **Scope:** Model-agnostic and task-agnostic harness kernel with domain-specific AB frames and adapters
 **Extends:** `../architecture/universal_agentic_harness_foundation.md` and `../architecture/neural_workbench_adaptive_ab_harness.md`
 **Decision owner:** UAH H0-H2 core; NeuralWorkbench H3+ companion track; NAO remains the first reference environment
@@ -346,6 +346,34 @@ correct scope + correct ownership + valid output + evidence-complete effect
   role-level declaration. Cross-frame equivalence remains unresolved unless a
   reviewed mapping proves it.
 
+### Environment, ingress, and task-closure correction checked on 2026-09-08
+
+- `environment_profile_id` identifies a reusable domain runtime contract and
+  agent roster. `environment_run_id` identifies one owner-attested native
+  activation and groups its agent runs, tasks, traces, ingress, and evidence.
+- One `agent_run_id` is attached to exactly one environment run and may span
+  many tasks, model leases, and model invocations. Releasing a lease moves the
+  actor to standby; it does not terminate the run.
+- Every native stimulus enters as immutable `EnvironmentIngress`.
+  `TaskIngressPolicy` deterministically classifies it as a state update, new
+  task, resumed task, notification, or rejection before any model call.
+- One `trace_id` may contain several actor agent runs. Environment, task, and
+  actor traces are read-only projections over the same append-only ledger.
+- Each operation has one frame-relative coordinate. Same-frame refinement uses
+  `decomposes_to`; cross-frame work uses a typed `delegates_to` edge.
+- Task closure is compiled from typed required and best-effort
+  `EffectObligation` values. Owner-issued evidence, not model text or an event
+  named `execution_feedback`, determines acceptance.
+- `VerifiedTraceDigest` is a deterministic, model-free memory projection for
+  O1/O2 and H3 retrieval. It does not contain model-authored reflection.
+- The NAO `report_result` skill remains AB1 in the planner runtime frame. It
+  verifies runtime evidence, delegates grounded response composition to the
+  chatbot agent run, and returns to the native communication owner within the
+  original task and trace.
+- The intended NeuralWorkbench registry revision contains an older
+  `report_result` decomposition. H2 must reconcile it with NAO `v1.0.0` and the
+  pinned chatbot source through an owner-reviewed DomainContractPack revision.
+
 ### What H0 actually implements
 
 The parent-only `src/ab_harness` package is a real portable contract proof. It
@@ -499,8 +527,9 @@ capable, adaptive, and efficient AB4 system.
 %% uah-render: Canonical UAH delivery architecture
 flowchart TB
     Identity["Identity Plane<br/>role + handle + agent + model + run"]:::identity
+    Environment["Environment Plane<br/>profile + attested run + ingress"]:::domain
     Domain["Semantic Plane<br/>DomainContractPack + frames + AB graph"]:::semantic
-    Task["Task Plane<br/>domain task + effects + acceptance"]:::semantic
+    Task["Task Plane<br/>deterministic ingress + effect obligations"]:::semantic
     Compiler["InteractionModuleCompiler<br/>closed frame-relative projection"]:::compiler
     Module["InteractionModuleSpec<br/>capabilities + policy + evidence closure"]:::projection
     Prompt["PromptCompiler + ModelAdapter<br/>bounded context + typed schemas"]:::model
@@ -508,11 +537,13 @@ flowchart TB
     Admission["UAH Semantic Admission<br/>typed AdmittedOperation"]:::gate
     Lifecycle["Domain Lifecycle Admission<br/>ExecutionLease or rejection"]:::domain
     Owner["Environment Owner<br/>exact operation execution"]:::execution
-    Evidence["Result + EffectEvidence<br/>terminal judgment"]:::evidence
+    Evidence["Result + EffectEvidence<br/>owner-issued facts"]:::evidence
+    Acceptance["TaskAcceptanceEvaluator<br/>required + best-effort closure"]:::gate
     Trace["Lifecycle Ledger + Observatory<br/>append-only replayable record"]:::trace
     Eval["Evaluation<br/>qualification + failure attribution"]:::observatory
     Workbench["NeuralWorkbench H3+<br/>quarantined candidates"]:::compiler
     Identity --> Compiler
+    Environment --> Task
     Domain --> Compiler
     Task --> Compiler
     Compiler --> Module
@@ -523,7 +554,9 @@ flowchart TB
     Admission --> Lifecycle
     Lifecycle --> Owner
     Owner --> Evidence
-    Evidence --> Trace
+    Evidence --> Acceptance
+    Task --> Acceptance
+    Acceptance --> Trace
     Trace --> Eval
     Trace --> Workbench
 ```
@@ -557,8 +590,13 @@ The first stable grammar should contain:
 | `ModelAdmissionProfile` | Provider-neutral capability, behavior, evaluation, and minimum resource requirements for models embodying one role |
 | `AgentManifest` | Immutable role, model, prompt pack, harness and adapter composition identified by `agent_id` |
 | `AgentHandleRevision` | Stable handle to active agent mapping, required role, fidelity evidence and rollback lineage |
-| `AgentRun` | One bounded activation identified by `agent_run_id` |
-| `TaskSpec` | Goal, role, frame, required effects, prohibited effects, budgets, terminal checks |
+| `EnvironmentProfile` | Reusable domain runtime, interface, resource, security, freshness, and agent-roster contract |
+| `EnvironmentRunAttestation` | Owner-issued native readiness evidence used to register one environment activation |
+| `EnvironmentRun` | One attested activation grouping ingress, agent runs, tasks, traces, and native evidence |
+| `EnvironmentIngress` | Immutable normalized native stimulus before task association |
+| `TaskIngressDecision` | Deterministic state-update, start, resume, notify, or reject result with lineage |
+| `AgentRun` | One bounded actor activation attached to exactly one environment run and able to enter standby |
+| `TaskSpec` | Goal, role, frame, effect obligations, prohibited effects, budgets, and acceptance policy |
 | `DomainContractPack` | Environment-owned frames, objects, binding policy, evidence rules, qualification cases and minimal prompt policy |
 | `AbstractionFrame` | Substrate, atomicity rule, owners, registry version |
 | `ABObjectSpec` | Typed object, decomposition, effects, observables, permissions, callable status |
@@ -567,12 +605,15 @@ The first stable grammar should contain:
 | `InteractionModuleSpec` | Closed task projection presented to one role |
 | `PromptPack` | Immutable model-facing wording and output-format artifact selected by the agent manifest |
 | `ModelProfile` | Measured provider protocol, schema/tool capabilities, context, latency, trust tier |
-| `EnvironmentProfile` | Runtime identity, adapters, resources, security and freshness policy |
 | `TypedProposal` | Model-proposed typed operation without effect truth or authority |
 | `AdmittedOperation` | Immutable UAH semantic decision carrying exact arguments, identities, binding and evidence obligations |
 | `ExecutionLease` | Domain-owner lifecycle authority or rejection linked to one admitted operation |
+| `OperationEdge` | Typed relationship such as same-frame decomposition, cross-frame delegation, or workflow continuation |
 | `GateDecision` | Deterministic acceptance/rejection with machine-readable reasons |
-| `EffectEvidence` | Owner-issued observation satisfying a declared effect obligation |
+| `EffectObligation` | Required or best-effort effect plus its evidence contract and terminal policy |
+| `EffectEvidence` | Owner-issued observation satisfying or refuting a declared effect obligation |
+| `TaskAcceptance` | Deterministic accepted, accepted-with-deficit, suspended, or rejected judgment |
+| `VerifiedTraceDigest` | Model-free memory projection derived from immutable lifecycle and obligation events |
 | `TraceEvent` | Append-only lifecycle event with lineage and artifact references |
 | `CapabilityProfile` | Failure-aware empirical belief over object/task/environment slices |
 | `InteractionSkillProposal` | Quarantined higher-order composition with proofs and counterexamples |
@@ -586,12 +627,13 @@ scheduler is not.
 
 | Phase | Required identity and allocation scope |
 | --- | --- |
-| H0 | Freeze serializable role, model, agent, handle, run, task, trace, operation, and invocation identities. No dynamic scheduler. |
-| H1 | Implement immutable agent manifests, handle resolution, run pinning, and a deterministic allocator interface with a fake or single fixed instance. |
-| H2 | Configure named NAO handles such as `nao.chatbot.primary` and `nao.planner.primary`; run provider/resource preflight and fixed leases. Multiple named agents are allowed, but hot model rebinding is not required. |
+| H0 | Freeze serializable environment profile/run, ingress, role, model, agent, handle, run, task, trace, operation, edge, obligation, acceptance, and invocation identities. No dynamic scheduler. |
+| H1 | Implement immutable agent manifests, handle resolution, environment registration, task ingress, run pinning and standby, obligation evaluation, and a deterministic allocator interface with a fake or single fixed instance. |
+| H2 | Configure the NAO environment profile and named handles such as `nao.chatbot.primary` and `nao.planner.primary`; run provider/resource preflight and fixed leases; preserve multi-actor traces and `report_result` delegation. Hot model rebinding is not required. |
 | H3 | Implement provider pools, hardware-aware `ModelAllocator`, lease/release policy, concurrent or serialized agent runs, and fidelity-gated handle promotion alongside the NeuralWorkbench attachment. |
 | H4 | Permit reviewed Workbench or evaluator candidates to propose new agent embodiments or handle revisions; promotion remains external, versioned, and reversible. |
 | H5 | Federate local and remote provider pools and require allocation, isolation, trace, and handle-fidelity conformance across runtimes. |
+| H6 | Evaluate higher-order policy governance over AB4 harness and allocation configurations. H6 remains optional research and grants no automatic authority. |
 
 The hardware module is called `ModelAllocator`, not `AgentAllocator`.
 `AgentRegistry` creates and resolves immutable agent embodiments and handle
@@ -610,7 +652,7 @@ lifecycle.
 **Complete H0 deliverables:**
 
 - serialize and version `HarnessSpec`, `TaskSpec`, `ModelProfile`, and
-  `EnvironmentProfile`;
+  `EnvironmentProfile`, plus environment-run and ingress envelopes;
 - expand `ABObjectView` with input/output, effect, evidence, freshness, side
   effect, permission, and owner fields;
 - compile projection from required task effects and role policy, not only a
@@ -619,6 +661,7 @@ lifecycle.
   authority;
 - add payload-schema and canonical-alias validation;
 - define complete lifecycle event types and trace identity;
+- define operation-edge grammar and required/best-effort effect obligations;
 - create golden fixtures for dialogue, KB query, execution handoff, rejected
   reach, cancellation, and failed evidence closure.
 
@@ -649,6 +692,11 @@ model loop.
 - deterministic lifecycle state machine: compile, observe, propose, gate,
   dispatch, receive, verify, recover, terminate;
 - provider interface for local and OpenAI-compatible API calls;
+- immutable agent registration and handle resolution with no model invocation;
+- owner-attested environment registration, deterministic task ingress, attached
+  agent-run standby, and task acceptance evaluation;
+- non-reserving registration preflight plus a fixed-instance model lease and
+  post-lease startup preflight;
 - structured-output adapter with explicit parse/repair provenance;
 - runtime adapter protocol for shell/API/simulator/MCP/worker calls;
 - cancellation, time, token, tool, retry, and cost budgets;
@@ -678,8 +726,10 @@ system without moving ownership or degrading behavior.
 4. explicit NAO `legacy | uah | shadow` routing and parity report;
 5. provider capability normalization behind current callers;
 6. failure, cancellation, supersede, replan, and duplicate-speech validation;
-7. chatbot compatibility projection after planner parity;
-8. live robot validation only after fake/sim parity.
+7. owner-reviewed `report_result` registry reconciliation and cross-frame
+   chatbot delegation parity;
+8. chatbot compatibility projection after planner parity;
+9. live robot validation only after fake/sim parity.
 
 **Shadow mode:** The harness computes projection and decisions but cannot block
 or dispatch. Differences against current validators are logged. This gives us
@@ -714,6 +764,43 @@ chatbot_llm PlannerHandoff
 cross this flow unchanged except for explicitly recorded supersede/replan
 transitions. UAH may wrap it with its own trace/configuration identity but may
 not replace or infer missing NAO lineage.
+
+#### NAO startup and preflight lessons
+
+The immutable NAO baselines already prove the activation pattern that UAH
+should preserve as behavior:
+
+- chatbot revision `a2ecca796` builds configuration, transport, prompt/skill
+  projection, and diagnostics during its lifecycle `on_configure`; it runs tiny
+  and optional role-shaped model probes before `on_activate` exposes dialogue
+  services;
+- a required chatbot preflight failure returns lifecycle failure, while a
+  successful configuration may start a bounded keepalive timer;
+- NAO `v1.0.0` planner configuration runs a tiny structured JSON probe and an
+  optional planner-shaped probe before subscriptions and publishers are
+  considered ready; required failure aborts node startup;
+- the launch graph configures `dialogue_manager` only after `chatbot_llm`
+  reaches its active lifecycle state.
+
+UAH generalizes this into three distinct gates:
+
+```text
+agent registration
+  -> RegistrationPreflight: schemas + role + provider policy + capacity snapshot
+     no model load, lease, or invocation
+  -> AgentRun startup request
+  -> ModelLease acquisition
+  -> StartupPreflight: endpoint + model identity + tiny structured probe
+     + optional role-shaped probe
+  -> agent_run ready and task ingress exposed
+```
+
+The NAO probes are real model calls and therefore correspond to
+`StartupPreflight`, not registration. UAH should reuse their configurable
+timeouts, bounded attempts, required/advisory policy, role-shaped canary, visible
+failure logs, and activation ordering. It must not import ROS lifecycle code or
+copy the launch shell loops into the portable core. Keepalive belongs to model
+lease policy and cannot extend a lease or an agent run implicitly.
 
 **Required task set:**
 
@@ -763,6 +850,23 @@ counterevidence is explicit and the status remains `candidate`. This is an
 early H3-compatible seam delivered before H3; it is not a capability posterior,
 persistent trace memory, prompt optimizer, crystallizer, or H3 completion.
 
+**Pinned companion audit:** NeuralWorkbench revision `e76ba7e` supplies a
+deterministic template generator, registry verifier, hand-tuned energy scorer,
+lowest-energy valid selector, append-only JSONL trace store, and offline
+macro-candidate proposer. The proposal client does not yet retrieve and adapt
+stored traces. Its specification nevertheless defines the H3 target as a
+mechanism-diverse portfolio of deterministic, model-generated,
+retrieved-and-adapted, and hybrid candidates. UAH therefore treats the pinned
+code as the symbolic bootstrap rather than equating Workbench search with
+deterministic lookup.
+
+H3 does not require online model training. It first closes the loop through
+typed trace ingestion, bounded retrieval, candidate adaptation, symbolic
+verification, and shadow comparison. Learned embeddings or scorers are later
+versioned adapters whose candidates must pass the same provenance, replay, and
+UAH admission boundaries. H4 remains the first release that may evaluate
+crystallization proposals for reviewed promotion.
+
 **Deliverables:**
 
 - normalized complete traces indexed by task, AB object, mechanism,
@@ -776,7 +880,11 @@ persistent trace memory, prompt optimizer, crystallizer, or H3 completion.
 - Pareto vector for success, risk, latency, cost, evidence, and uncertainty;
 - symbolic entropy proxy only for declared observable variables;
 - reviewed pulse heuristics with provenance and expiry;
-- exploration floor so early trace errors cannot permanently collapse search.
+- exploration floor so early trace errors cannot permanently collapse search;
+- hardware-aware provider-pool snapshots and model-lease arbitration supporting
+  serialized or concurrent agent runs without changing semantic identity;
+- fidelity-gated handle promotion for qualified replacement embodiments, with
+  immutable prior revisions and rollback.
 
 **Running uncertainty:**
 
@@ -798,12 +906,21 @@ distribution exists. Every term must name its observable and owner.
 **Acceptance gate:** On held-out tasks, success-plus-failure retrieval and
 shadow replacement must beat
 no-memory and success-only baselines without degrading calibration, scope,
-evidence completeness, or latency beyond budget.
+evidence completeness, or latency beyond budget. Allocation tests must also
+reject impossible RAM, VRAM, context, and concurrency combinations, release
+leases deterministically, and reassign compatible instances without changing
+the resolved agent or trace identity.
 
 ### H4: Crystallization and reviewed AB promotion
 
 **Purpose:** Convert repeated, causally supported interaction structures into
 maintained higher-level AB proposals.
+
+H4 crystallization may produce several candidate artifact types: a higher-order
+AB object, capability or prompt pack revision, agent embodiment, or handle
+revision. These remain distinct artifacts with their own evaluators. Repeated
+model allocation or successful handle use is supporting evidence only and
+cannot promote any candidate by frequency.
 
 **Candidate lifecycle:**
 
@@ -918,6 +1035,7 @@ the H3+ search/adaptation engine.
 | --- | --- | --- |
 | `ab_harness.contracts` | Frozen portable schemas and versions | H0 |
 | `ab_harness.identity` | Role, model, agent, activation, task, trace and operation identity invariants | H0-H1 |
+| `ab_harness.agent_registry` | Immutable agent manifests, handle revisions, run pinning and fidelity evidence lookup | H1, dynamic promotion H3 |
 | `ab_harness.registry` | Read-only snapshots, frame maps, object resolution | H0 |
 | `ab_harness.compiler` | Task/effect to minimal AB closure | H0-H1 |
 | `ab_harness.prompt_compiler` | Deterministic UAH kernel, role, domain, projection and task-context assembly | H1-H2 |
@@ -928,6 +1046,7 @@ the H3+ search/adaptation engine.
 | `ab_harness.trace` | Event grammar, JSONL/artifact stores, replay | H0-H1 |
 | `ab_harness.eval` | Milestones, minefields, acceptance, cost/process metrics | H1-H2 |
 | `ab_harness.providers` | Direct local/API model capability normalization | H1 |
+| `ab_harness.model_allocator` | Fixed-instance lease interface and startup preflight in H1-H2; provider-pool scheduling and arbitration in H3 | H1-H3 |
 | `ab_harness.configuration` | Content-addressed model-harness-environment identity | H0-H1 |
 | `ab_harness.workbench` | Bounded success/counterexample retrieval and quarantined context candidates | v0 seam toward H3 |
 | `ab_harness.workbench_protocol` | Transport-neutral request, candidate-batch, observation, handshake, and in-process adapter contracts | H2-H3 seam |
@@ -1259,7 +1378,8 @@ point, not agentic parity.
 
 ## 15. Decision
 
-**Accept** the hybrid semantic-kernel architecture and H0-H5 release spine.
+**Accept** the hybrid semantic-kernel architecture, H0-H6 delivery spine, with
+H6 retained as an optional research boundary.
 
 **Reject** a wholesale fork of a broad agent product as the default core,
 MCP-first semantics, online self-publication, and AB-level inflation from
@@ -1276,37 +1396,52 @@ protocol is frozen and conformance-tested.
 ### Now: close H0-H1 for the H2 launch candidate
 
 1. Freeze schema versioning and serialization conventions.
-2. Add `HarnessSpec`, `TaskSpec`, `ModelProfile`, and `EnvironmentProfile`.
-3. Preserve the implemented semantic-object/implementation-binding split.
-4. Expand AB object effect/evidence/permission fields through a read-only
+2. Add `HarnessSpec`, `TaskSpec`, `ModelProfile`, `EnvironmentProfile`,
+   `EnvironmentRun`, `EnvironmentIngress`, and `TaskIngressDecision`.
+3. Freeze `OperationEdge`, `EffectObligation`, `TaskAcceptance`, and
+   `VerifiedTraceDigest` before adding runtime policy.
+4. Confirm the first public TDD seam. The current recommendation is the pure
+   obligation evaluator, then environment registration and task ingress.
+5. Preserve the implemented semantic-object/implementation-binding split.
+6. Expand AB object effect/evidence/permission fields through a read-only
    adapter over the canonical registry.
-5. Compile one synthetic task from required effects to a closed object graph.
-6. Extend the deterministic gate and reason codes.
-7. Define full lifecycle `TraceEvent` variants and replay.
-8. Add stale evidence, timeout, cancellation, retry exhaustion, and false
+7. Compile one synthetic task from required effects to a closed object graph.
+8. Extend the deterministic gate and reason codes.
+9. Define full lifecycle `TraceEvent` variants and replay.
+10. Add stale evidence, timeout, cancellation, retry exhaustion, and false
    completion fixtures beside the implemented success and rejection cases.
-9. Keep the existing H0 API behind compatibility exports while tests migrate.
+11. Keep the existing H0 API behind compatibility exports while tests migrate.
 
 ### In parallel: H1 executable kernel
 
-1. Implement the minimal lifecycle state machine.
-2. Add direct local/API model and synthetic runtime adapters.
-3. Add budget, approval, cancellation, and terminal-evidence controls.
-4. Implement milestones and minefields.
-5. Run the frozen synthetic conformance suite.
-6. Deslop only after behavior is covered; avoid framework-building beyond
+1. Implement environment-run registration, ingress classification, attached
+   agent-run lifecycle, and standby transitions.
+2. Implement the minimal operation lifecycle state machine.
+3. Add direct local/API model and synthetic runtime adapters.
+4. Add budget, approval, cancellation, and obligation-based acceptance.
+5. Implement milestones and minefields.
+6. Run the frozen synthetic conformance suite and produce deterministic trace
+   digests.
+7. Deslop only after behavior is covered; avoid framework-building beyond
    tested needs.
 
 ### H2 target: cooperative NAO planner proof
 
-1. Record frozen chatbot/planner fixtures and current test results.
-2. Add read-only AB1/AB0 projection and trace bridge.
-3. Implement planner ingress/egress through projection, gate, fake owner, and
+1. Record frozen chatbot/planner fixtures and current test results against NAO
+   tag `v1.0.0` and chatbot revision `a2ecca796...`.
+2. Freeze a content-addressed NAO DomainContractPack and correct the
+   `report_result` projection with owner review.
+3. Add environment-run registration, deterministic ingress, named attached
+   chatbot/planner runs, and the read-only AB1/AB0 trace bridge.
+4. Implement planner ingress/egress through projection, gate, fake owner, and
    evidence closure.
-4. Run explicit `legacy | uah | shadow` parity and classify disagreements.
-5. Run same-model standalone versus harness-backed ablations.
-6. Validate fake/sim success and failure paths.
-7. Run live robot tests only when the operator and robot are available.
+5. Reproduce `report_result` as an AB1 planner operation with explicit chatbot
+   delegation and native speech ownership.
+6. Run explicit `legacy | uah | shadow` parity and classify disagreements.
+7. Run same-model standalone versus harness-backed ablations.
+8. Validate fake/sim success, required-effect failure, and best-effort deficit
+   paths.
+9. Run live robot tests only when the operator and robot are available.
 
 ### Stretch after parity: H3 shadow seam, then H3-H5
 
@@ -1367,6 +1502,11 @@ The terminal verifier must compile the exact required effect and artifact
 checks from the task contract. A model saying it is finished is an action
 proposal, not a terminal fact.
 
+Each task declares typed required and best-effort effect obligations before
+execution. Required obligations determine acceptance; best-effort failures are
+retained as explicit deficits. An operation's result is never rewritten merely
+because a later reporting or delivery operation failed.
+
 ### Security and untrusted context
 
 AB scope reduces reach but does not eliminate prompt injection, malicious tool
@@ -1416,14 +1556,20 @@ provenance.
 | Entropy proxy rewards easy observables | No correlation study | Compare proxy delta to terminal acceptance and domain labels |
 | Crystallization hides unsafe detail | No promoted object | Decompress candidate and verify every effect/recovery seam on replay |
 | Frontier worker cannot expose complete trace | Product APIs differ | Define minimum artifact/event contract and classify unavailable fields |
+| Environment restarts mix evidence | No implemented environment-run registry | Replay two identical tasks across distinct attested activations and require isolation |
+| Cross-agent trace projections diverge | No multi-actor ledger implementation | Render environment, task, chatbot, and planner views from one event store and compare event identities |
+| NAO `report_result` semantics drift | Intended registry and `v1.0.0` runtime disagree | Owner-review the DomainContractPack revision and run recorded delegation parity |
+| Task closure overclaims success | No obligation evaluator | Drive required failure and best-effort failure from the same owner evidence set and require distinct judgments |
 | AB5 remains relabeled optimization | No higher-order object | Require held-out population-of-AB4 governance experiment |
 
-The immediate next probe is H0 lifecycle completion around the implemented
-binding loop: serialize one configuration and `TaskSpec`, execute the recorded
-success and a stale-evidence counterexample into append-only lifecycle events,
-replay both without a model, and require identical terminal decisions. This
-tests the semantic center without touching the live NAO stack or committing to
-an external harness.
+The immediate next probe is a narrow H1 synthetic tracer after public-interface
+confirmation: register one attested environment run, classify one ingress into
+a task with one required and one best-effort obligation, execute a recorded
+admitted operation through a fake owner, derive `TaskAcceptance`, produce a
+`VerifiedTraceDigest`, and replay the lifecycle without a model. A second case
+must fail only the best-effort obligation and remain accepted with a recorded
+deficit. This tests the semantic center without touching the live NAO stack or
+committing to an external harness.
 
 ## 20. Primary Sources and Implementation References
 

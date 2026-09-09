@@ -3,6 +3,7 @@
 **Review date:** 2026-08-17<br>
 **Reviewed range:** `5de73a5...71ae872`<br>
 **Commits:** `6708af9` and `71ae872`<br>
+**Seven-day follow-up commit:** `8582ab9` (2026-09-01)<br>
 **UAH branch:** `feat/pre-commit-queue`<br>
 **NAO qualification boundary:** annotated tag `v1.0.0`, peeled commit
 `ebffe93a74be4e013ce0f60fdfc41268dba73fc3` on the
@@ -10,6 +11,7 @@
 **Architecture reconciliation:** 2026-09-03<br>
 **Frame-access reconciliation:** 2026-09-04<br>
 **Agent-handle reconciliation:** 2026-09-06<br>
+**Environment and task-closure reconciliation:** 2026-09-08<br>
 **Review status:** H0 synthetic proof accepted with corrections required; H1 and H2 not qualified
 
 ## 1. Decision
@@ -121,7 +123,8 @@ Those statements are consistent with the source inspected in `71ae872`.
 and `git ls-tree HEAD src/Neural-Wokbench` returns no entry. A fresh clone cannot
 retrieve the companion repository from this commit.
 
-The following statements are therefore factually incorrect:
+The following statements were factually incorrect before this review's
+documentation correction:
 
 - `README.md` calls the companion a commit-pinned submodule;
 - `docs/README.md` calls it a commit-pinned companion repository;
@@ -520,9 +523,13 @@ in the [foundation](../../architecture/universal_agentic_harness_foundation.md).
 | Concrete agent | `agent_id` identifies the immutable embodiment composed from role, model configuration, prompt pack, harness build and adapter revisions. Changing any member creates a new agent. |
 | Stable agent handle | `agent_handle_id` resolves through an immutable revision to one active agent with the same required role configuration, fidelity evidence and rollback lineage. |
 | Activation | `agent_run_id` identifies one bounded activation of an unchanged agent. |
+| Environment activation | `environment_run_id` identifies one owner-attested native activation. It groups ingress, attached agent runs, tasks, traces, and native evidence. |
+| Environment ingress | `EnvironmentIngress` is immutable input; deterministic `TaskIngressPolicy` assigns state-update, start, resume, notify, or reject semantics before any model call. |
 | Domain work | `task_id` is a domain-owned work instance with explicit domain type and native lineage. It is not a domain name or a model turn. |
-| Causal trace | `trace_id` identifies one causally connected workflow and may contain several operations. It is not a chat session alias. |
-| Operation | `operation_id` identifies one frame-relative AB-object lifecycle. Decomposition creates parent and child operation identities rather than assigning several levels to one operation. |
+| Causal trace | `trace_id` identifies one causally connected workflow and may contain operations from several actor agent runs. Environment, task, and actor traces are read-only projections over one ledger. |
+| Operation | `operation_id` identifies one frame-relative AB-object lifecycle. Same-frame refinement uses `decomposes_to`; cross-frame work uses `delegates_to`. |
+| Task closure | `EffectObligation` marks effects required or best-effort. `TaskAcceptance` is derived from owner evidence and preserves best-effort deficits without erasing successful operations. |
+| Trace memory | `VerifiedTraceDigest` is a deterministic, model-free projection for Observatory and future Workbench retrieval. |
 | Model surface | `InteractionModuleCompiler` creates a closed task projection. `PromptCompiler` presents that same projection with the UAH kernel, role contract, minimal domain policy, task state and typed output schemas. |
 | Execution authority | UAH semantic admission creates an immutable `AdmittedOperation`; domain lifecycle admission may issue an `ExecutionLease`; only the environment owner executes and issues effect evidence. |
 | Observatory | Mandatory kernel events preserve raw output, proposal, admission, lease, result and evidence as separate artifacts. Agent-visible trace inspection is a distinct read-only frame projection. |
@@ -606,19 +613,211 @@ review every disagreement before any UAH authority is enabled.
 
 No implementation test should be written until these public seams are accepted:
 
-1. `TypedProposal` to `AdmittedOperation` to domain lease and owner execution;
-2. runtime execution to lifecycle ledger and model-free replay;
-3. binding construction and configuration-manifest loading;
-4. pure NAO contract normalization at a frozen revision;
-5. explicit authority-mode parity evaluation;
-6. provider-neutral model request/result and boot preflight.
+1. `TaskAcceptanceEvaluator.evaluate(effect_obligations, evidence_set)` to an
+   immutable `TaskAcceptance`;
+2. owner-attested environment registration and deterministic ingress
+   classification;
+3. `TypedProposal` to `AdmittedOperation` to domain lease and owner execution;
+4. runtime execution to lifecycle ledger, deterministic digest, and model-free
+   replay;
+5. binding construction and configuration-manifest loading;
+6. pure NAO contract normalization at a frozen revision, including explicit
+   `report_result` delegation;
+7. explicit authority-mode parity evaluation;
+8. provider-neutral model request/result and boot preflight.
 
-The recommended first seam is **`TypedProposal` to `AdmittedOperation` to
-domain lease and owner execution**. It repairs an execution-authority defect in
-the current synthetic path and creates the values that lifecycle replay, NAO
-parity, and Ollama serving all need.
+The refined recommendation for the first seam is the pure
+`TaskAcceptanceEvaluator`. It is smaller than the complete execution path,
+forces the newly accepted required-versus-best-effort semantics into an
+observable public contract, and has no provider, storage, ROS, or scheduler
+dependency. The next tracer should register a synthetic environment run and
+classify one ingress before reconnecting the existing proposal and fake-owner
+path. This order still requires owner confirmation before the first test is
+written.
 
-## 11. Release Recommendation
+## 11. Seven-day Follow-up: Commit `8582ab9`
+
+### 11.1 Scope and release effect
+
+Commit `8582ab9` adds the deslop-refactor skill, the review document and its
+generated HTML, glossary refinements, and renderer registration for this
+review. It changes no `src/ab_harness` runtime file and adds no runtime test.
+Its correct release effect is therefore documentation and development-workflow
+hardening. It does not advance an H0, H1, or H2 implementation gate.
+
+The commit is internally reproducible: the review Markdown is registered in
+`DOCS`, its HTML companion is generated by the shared renderer, and the skill
+uses progressive references rather than placing the full upstream material in
+`SKILL.md`.
+
+### 11.2 Deslop skill review
+
+The skill interface is appropriately narrow. It asks for scope before edits,
+distinguishes first-party from generated and vendored code, prioritizes
+behavior-preserving changes, and requires focused validation. Its stop
+conditions guard against cosmetic churn and speculative abstractions. These
+rules agree with the H0-H2 requirement to preserve domain ownership and tested
+behavior.
+
+One provenance defect remains. The files
+`references/upstream-deslop.md` and
+`references/upstream-addtodeslop.md` are described as vendored from
+`Theta-Tech-AI/llm-public-utils`, but the committed artifacts record no source
+URL, exact upstream revision, retrieval date, or license. The larger reference
+is more than three thousand lines, so repository-level provenance is required
+before redistribution can be treated as resolved. This does not affect UAH
+runtime behavior, but it is a release hygiene and reproducibility risk.
+
+Required correction: add a small provenance record containing the upstream
+repository URL, immutable revision, original paths, retrieval date, local
+adaptation status, and applicable license. If redistribution terms cannot be
+verified, retain the condensed original operating manual and replace the
+vendored copies with source pointers.
+
+### 11.3 Domain-language changes
+
+The added glossary terms correctly separate reusable role configuration,
+concrete agent embodiment, bounded activation, task, trace, and operation. The
+later architecture grill further separated stable handle identity and hardware
+allocation. Those later refinements do not invalidate the commit, but they mean
+the glossary in `8582ab9` should not be read independently of the current
+`CONTEXT.md`.
+
+The strongest semantic correction is that a model change creates a new
+`agent_id`, while an approved stable `agent_handle_id` may later resolve to that
+new embodiment through a versioned revision. Model allocation selects runtime
+capacity for an already resolved agent and cannot redefine the role or agent.
+
+### 11.4 Standards axis
+
+Hard finding:
+
+1. Vendored upstream reference material lacks immutable provenance and license
+   evidence.
+
+Judgement findings:
+
+1. The commit contains three separable concerns (workflow skill import, domain
+   glossary changes, and review publication). This is a possible divergent
+   change at commit granularity. Future commits should keep workflow imports
+   separate from architecture decisions so rollback and review remain narrow.
+2. The `feat:` subject overstates runtime effect. A `docs:` or `chore:` subject
+   would better describe a commit with no harness implementation change.
+
+No source-code smell is reported because the commit does not change runtime
+source. Generated HTML is reviewed only for synchronization and rendering, not
+as an independent semantic implementation.
+
+### 11.5 Specification axis
+
+Implemented as requested:
+
+1. The NAO deslop workflow was brought into this repository as a reusable
+   Codex skill with a condensed operating manual.
+2. A detailed commit and operational-readiness review was published in both
+   canonical Markdown and generated HTML.
+3. Domain language for role, agent, run, trace, and operation was recorded.
+
+Partial or missing:
+
+1. The commit did not restore the declared NeuralWorkbench gitlink.
+2. It did not implement the typed proposal-to-admitted-operation seam selected
+   by the review.
+3. It did not close lifecycle replay, provider preflight, or NAO parity.
+4. The imported upstream material lacks the provenance required for a stable
+   repository dependency.
+
+The commit is accepted as documentation and workflow scaffolding after the
+provenance correction. It must not be counted as H2 progress.
+
+## 12. Current Pre-commit Queue Review on 2026-09-08
+
+The current queue modifies domain language, the foundation, adaptive Workbench
+theory, the Observatory contract, the canonical masterplan and development log,
+their generated HTML companions, this review, and one renderer regression test.
+It changes no runtime source.
+
+### 12.1 File-group disposition
+
+| File group | Disposition | Review basis |
+| --- | --- | --- |
+| `CONTEXT.md` | Accept | Registration, startup, Workbench search, typed action memory, and crystallization now have distinct owners and release boundaries. |
+| Foundation and masterplan | Accept | The original H0-H6 product spine remains canonical; identity and model allocation are staged inside it rather than replacing it. |
+| Adaptive Workbench document | Accept | The pinned code is identified as a deterministic symbolic bootstrap, while the target portfolio includes generated and retrieved/adapted candidates. Training is not claimed as an H3 prerequisite. |
+| Observatory contract | Accept | Registration, handle, run, lease, preflight, invocation, operation, and evidence events remain separate and reconstructable. |
+| Development log | Accept | The existing recorded NAO path is correctly labeled an H0 contract slice; H0-H2 prerequisites and exit evidence are explicit. |
+| Legacy documentation paths | Accept | `docs/agentic_harness/*.html` remains redirect-only; canonical Markdown exists only under `docs/plans` and `docs/architecture`. |
+| Generated HTML | Accept | Regenerated from canonical Markdown and receives no independent semantic edits. |
+| Renderer regression test | Accept | It checks that every legacy page resolves to its declared canonical target and that no competing legacy Markdown exists. |
+
+### 12.2 Standards axis
+
+No new repository-standard violation remains in the queue. Added prose contains
+no em dash, marketing claim, global AB-level claim, or H3 implementation claim.
+Core dependency boundaries are unaffected because `src/ab_harness` is
+unchanged. The generated documents are synchronized and whitespace checks pass.
+
+The open provenance finding for the already committed deslop references remains
+outside this queue. It is recorded rather than hidden.
+
+### 12.3 Specification axis
+
+The queue records the decisions reached during the architecture grill:
+
+1. role configuration, immutable agent embodiment, stable handle, run, task,
+   trace, operation, provider pool, instance, lease, and invocation remain
+   separate identities;
+2. registration is declarative, while startup is the first capacity-reserving
+   and model-probing transition;
+3. H2 remains the first cooperative NAO demonstration against the immutable
+   `v1.0.0` planner baseline and chatbot revision `a2ecca796`;
+4. NeuralWorkbench is the H3 candidate-and-memory engine rather than an
+   abstraction frame or execution authority;
+5. H4 retains crystallization quarantine and reviewed promotion;
+6. the development log has one canonical source and legacy redirects only.
+7. environment profile/run, ingress, attached agent run, task, trace, operation,
+   lease, and invocation have separate lifetimes;
+8. task closure uses required and best-effort effect obligations;
+9. one multi-actor trace records explicit cross-frame delegation and yields a
+   deterministic `VerifiedTraceDigest`.
+
+The queue intentionally does not implement the H0-H2 runtime contracts while
+the design grill remains active. It is ready to stage as an architecture and
+review checkpoint, not as an H2 implementation milestone.
+
+### 12.4 Verification
+
+`python scripts/render_agentic_harness_docs.py`, `git diff --check`, and
+`PYTHONPATH=src python -m pytest -q` pass. The current source-aware suite reports
+45 passed tests. The revised Workbench SVG was rendered separately and checked
+for readable nodes, non-overlapping labels, and visible separation between
+context output and shadow proposal output.
+
+## 13. NAO Source-resolution Addendum on 2026-09-08
+
+The latest grill requested that UAH recover behavior from the existing NAO
+chatbot, planner, and orchestrator rather than reproduce their policy from the
+documentation alone. The following read-only checks were therefore performed:
+
+| Source seam | Observed behavior | UAH implication |
+| --- | --- | --- |
+| Chatbot `DialogueTurnEngine.execute_turn` | Injected history, cancellation, staged routing, prompt/model query, immutable result and trace hooks | Preserve as domain behavior behind `EnvironmentIngress` and prompt/model adapters; do not place routing policy in core. |
+| Chatbot planner request adapter | Maps grounded turn output and history to request kind, goal, parent and supersession lineage | Normalize through a NAO adapter while preserving native IDs. |
+| Planner supervisor | Goal-keyed state, cancellation, supersession, clarification, replanning, stale plan/version checks | Retain as the NAO lifecycle owner below UAH semantic admission. |
+| Orchestrator planner gate | Deterministic readiness, admission and ownership checks | Retain as domain lifecycle admission; do not duplicate it in UAH. |
+| Orchestrator `report_result` | Collects execution results, invokes a bounded chatbot system turn, validates text, then dispatches communication | Represent one AB1 planner operation with a typed cross-frame chatbot delegation and native communication evidence. |
+
+The focused baselines passed 112 chatbot turn-engine tests and 41 planner
+supervisor/gate tests. These are NAO source-preservation checks, not UAH H2
+qualification.
+
+The intended NeuralWorkbench revision `e76ba7e` currently describes
+`report_result` through an older same-frame decomposition. The NAO `v1.0.0`
+runtime remains authoritative. H2 must publish a reviewed DomainContractPack
+revision that pins the NAO runtime, chatbot source, semantic registry, adapter,
+and conformance report. Live mutable registry synchronization is rejected.
+
+## 14. Release Recommendation
 
 Retain both commits on the pre-commit review branch after applying documentation
 corrections. Do not merge them to `main` as an H2 release in their current form.

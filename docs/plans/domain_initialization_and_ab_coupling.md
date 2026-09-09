@@ -1,7 +1,7 @@
 # Domain Initialization and AB Coupling
 
 **Status:** Contract design active; assisted authoring remains H3+
-**Date:** 2026-09-07
+**Date:** 2026-09-08
 **Reference domains:** NAO, iTrader, Watson/Hermes
 
 ## 1. Product Goal
@@ -25,11 +25,14 @@ Manual and LLM-assisted initialization emit the same typed candidate package:
 ```text
 DomainContractPackCandidate
   domain profile
+  environment profile and stable agent-handle roster
   primary and auxiliary abstraction frames with atomicity rules
   AB registry objects and decompositions
   capability packs and role allowlists
   implementation binding candidates
   input/output/effect/evidence contracts
+  operation-edge grammar and task-ingress policy
+  required and best-effort effect-obligation templates
   permissions and approval requirements
   evidence adapters and freshness rules
   minimal domain prompt policy
@@ -44,6 +47,8 @@ a bounded coupling workflow. Neither frontend can approve its own output.
 An approved `DomainContractPack` is the runtime source. A domain-specific
 developer skill may explain how to inspect and validate it, but the
 `PromptCompiler` never consumes developer-skill prose as domain authority.
+Each environment run pins one approved pack revision. Registry changes produce
+a new reviewed revision; they are never synchronized live into an active run.
 
 ## 3. Coupling Pipeline
 
@@ -104,6 +109,9 @@ propose_ab_frame
 propose_registry_objects
 propose_bindings
 define_evidence_adapters
+define_environment_profile
+define_task_ingress_policy
+define_effect_obligations
 generate_counterexamples
 validate_graph
 run_coupling_evals
@@ -229,8 +237,10 @@ agent_handle_id
   -> active agent_id
 
 Activation and work
-active agent_id
-  -> agent_run_id
+environment_profile_id
+  -> environment_run_id
+  -> active agent_id -> agent_run_id
+  -> environment_ingress_id
   -> task_id -> trace_id -> operation_id
 
 Runtime allocation
@@ -241,8 +251,8 @@ agent_run_id + trace_id + model_lease_id
   -> model_invocation_id
 ```
 
-The chains join at `model_invocation_id`, which records `agent_run_id`,
-`trace_id`, and the actual `model_lease_id`. Reallocation among compatible
+The chains join at `model_invocation_id`, which records `environment_run_id`,
+`agent_run_id`, `trace_id`, and the actual `model_lease_id`. Reallocation among compatible
 instances of the same model configuration does not change the agent identity.
 A different model configuration produces a different `agent_id`. A stable
 `agent_handle_id` may move to that agent only through a new immutable revision
@@ -257,6 +267,19 @@ nao.chatbot.primary
 nao.planner.primary
 itrader.proposer.primary
 ```
+
+The environment owner attests one native activation after readiness checks.
+UAH validates that attestation, resolves the profile's roster, and attaches
+agent runs. Approved bindings normalize native stimuli into
+`EnvironmentIngress`; deterministic task-ingress policy assigns state-update,
+start, resume, notify, or reject semantics before any model call.
+
+Every operation receives one coordinate in one abstraction frame. Same-frame
+structure uses `decomposes_to`; cross-frame work uses an explicit
+`delegates_to` edge. Domain onboarding must include the target role or handle,
+typed input and output artifacts, and authority boundary for every delegation.
+Task templates declare required and best-effort effect obligations so terminal
+acceptance can be derived from owner evidence without model-authored criteria.
 
 `primary` names a deployment role, not an unqualified default. It leaves room
 for explicit owner-defined slots without changing the role configuration or

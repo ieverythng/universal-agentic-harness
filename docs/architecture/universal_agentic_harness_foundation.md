@@ -1,15 +1,15 @@
 # Universal Agentic Harness: AB-Aware Foundation and Implementation Plan
 
 **Status:** Architecture baseline; H0 synthetic proof implemented; H1-H2 incomplete
-**Date:** 2026-09-07
-**Branch baseline:** `feat/pre-commit-queue` at `8582ab9`
+**Date:** 2026-09-08
+**Branch baseline:** `feat/pre-commit-queue` at `5c3db78`
 **Seed artifact:** `Universal Agentic Harness Blueprint.html` (user-provided,
 2026-07-12)
 **Primary reference subsystem:** NAO ROS4HRI + Neural Workbench
-**Canonical delivery status:** `../plans/universal_agentic_harness_masterplan.md` (2026-09-07)
+**Canonical delivery status:** `../plans/universal_agentic_harness_masterplan.md` (2026-09-08)
 
 The phase tables in this foundation preserve the original extraction plan. Use
-the canonical masterplan for current H0-H5 implementation status, acceptance
+the canonical masterplan for current H0-H6 implementation status, acceptance
 gates, and the AB4/AB5 boundary.
 
 ## 1. Project Claim
@@ -148,7 +148,7 @@ This separates four things that many harnesses merge:
 ### Identity and activation spine
 
 ```mermaid
-%% uah-render: Figure 1. Immutable role, agent, and activation identities
+%% uah-render: Figure 1. Immutable role, agent, environment, and activation identities
 flowchart TB
     Role["AgentRoleConfiguration<br/>primary frame + packs + authority"]:::semantic
     Model["ModelConfiguration<br/>artifact + runtime + decoding"]:::model
@@ -158,7 +158,9 @@ flowchart TB
     Agent["agent_id<br/>immutable embodiment"]:::identity
     Handle["agent_handle_id<br/>stable routed identity"]:::semantic
     HandleRevision["AgentHandleRevision<br/>active agent + fidelity evidence"]:::gate
-    Run["agent_run_id<br/>one bounded activation"]:::identity
+    EnvironmentProfile["EnvironmentProfile<br/>deployment + roster + supported frames"]:::domain
+    EnvironmentRun["environment_run_id<br/>one attested activation"]:::identity
+    Run["agent_run_id<br/>one environment-bound activation"]:::identity
     Role --> Manifest
     Model --> Manifest
     Prompt --> Manifest
@@ -166,7 +168,9 @@ flowchart TB
     Manifest --> Agent
     Handle --> HandleRevision
     Agent --> HandleRevision
+    EnvironmentProfile --> EnvironmentRun
     HandleRevision --> Run
+    EnvironmentRun --> Run
 ```
 
 `AgentRoleConfiguration` is model-independent. Changing the role, model,
@@ -178,7 +182,9 @@ agent while preserving every prior immutable handle revision.
 Canonical handles use `<domain>.<role>.<slot>`, for example
 `watson.system.primary`, `nao.chatbot.primary`, `nao.planner.primary`, and
 `itrader.proposer.primary`. The `agent_id` is the handle's immutable embodiment
-for one revision; `agent_run_id` is an activation of that embodiment.
+for one revision. An `agent_run_id` is an activation of that embodiment bound
+to exactly one `environment_run_id`. Agent and handle registration remain
+reusable across environment activations.
 
 ### Hardware-aware model allocation spine
 
@@ -244,6 +250,92 @@ instance without changing `agent_id`. Routing the role to a different
 `model_configuration_id` creates a different agent identity. Provider-held
 conversation state is not authoritative agent state and cannot cross a model
 lease without an explicit isolation contract.
+
+### Registration is not activation
+
+```mermaid
+%% uah-render: Figure 1C. Registration validates; startup acquires model capacity
+flowchart TB
+    Manifest["AgentManifest<br/>immutable embodiment candidate"]:::identity
+    Registration["RegistrationPreflight<br/>schema + role + policy + capacity snapshot"]:::gate
+    Registered["RegisteredAgent<br/>no run, lease, or invocation"]:::semantic
+    Handle["AgentHandleRevision<br/>stable routed identity"]:::identity
+    Start["AgentRunStartRequest<br/>explicit startup intent"]:::proposal
+    Resolve["Handle Resolution<br/>pin revision + agent"]:::gate
+    Run["AgentRun<br/>initializing"]:::identity
+    Lease["ModelLease<br/>reserved compatible instance"]:::execution
+    Startup["StartupPreflight<br/>identity + liveness + bounded probes"]:::gate
+    Ready["AgentRun Ready<br/>task ingress exposed"]:::evidence
+    Failed["Startup Failed<br/>no task ingress"]:::domain
+    Manifest --> Registration
+    Registration --> Registered
+    Registered --> Handle
+    Handle --> Resolve
+    Start --> Resolve
+    Resolve --> Run
+    Run --> Lease
+    Lease --> Startup
+    Startup -->|passed| Ready
+    Startup -->|failed| Failed
+```
+
+Registration performs no model load or invocation. It validates immutable
+contracts and a current, explicitly non-reserving capacity snapshot. An
+operator, user, or admitted agent action later requests startup. Only that path
+creates an agent run, obtains a model lease, performs live readiness probes, and
+exposes task ingress after the required policy passes.
+
+### Environment activation, ingress, and agent standby
+
+An environment run is the operational envelope for continuous interaction. The
+environment owner creates and attests its identity after native startup or
+attachment checks pass. UAH validates and registers the attestation before it
+accepts environment ingress or starts environment-bound agent runs.
+
+```mermaid
+%% uah-render: Figure 1D. Environment activation owns ingress and attached agent runs
+flowchart TB
+    Start["EnvironmentRunStartRequest<br/>operator or admitted control action"]:::proposal
+    Native["Environment Owner Preflight<br/>native lifecycle + interfaces + evidence"]:::domain
+    Attestation["EnvironmentRunAttestation<br/>profile + runtime IDs + initial evidence"]:::evidence
+    Active["environment_run_id<br/>active ingress envelope"]:::identity
+    Roster["Environment Agent Roster<br/>required handles + startup policy"]:::semantic
+    Chatbot["chatbot agent_run_id<br/>standby or invoking"]:::identity
+    Planner["planner agent_run_id<br/>standby or invoking"]:::identity
+    Ingress["EnvironmentIngress<br/>observation + request + feedback"]:::trace
+    Policy["TaskIngressPolicy<br/>state update + start + resume + reject"]:::gate
+    Task["TaskSpec + trace_id<br/>typed obligations + causal workflow"]:::semantic
+    Start --> Native
+    Native --> Attestation
+    Attestation --> Active
+    Roster --> Chatbot
+    Roster --> Planner
+    Active --> Chatbot
+    Active --> Planner
+    Active --> Ingress
+    Ingress --> Policy
+    Policy --> Task
+    Chatbot --> Task
+    Planner --> Task
+```
+
+The environment profile may request stable handles such as
+`nao.chatbot.primary` and `nao.planner.primary`. Each resolved handle revision
+creates a separate agent run for the environment activation. A normal turn
+creates a model invocation, not a new agent run. Restarting an agent process
+creates a new agent run under the same environment run; restarting the
+container or native environment creates a new environment run.
+
+An active agent run may release its model lease and enter `standby`. Standby
+retains activation-scoped state and environment attachment but holds no model
+capacity. A later invocation reacquires a compatible lease and performs any
+freshness checks required by deployment policy. This supports continuous
+agents on hardware that cannot keep every configured model loaded.
+
+`TaskIngressPolicy` is deterministic and environment-scoped. It classifies a
+normalized ingress item as a state update, new task, resumed task, notification
+to existing tasks, or rejection. A model may interpret admitted content after
+this association, but it cannot rewrite task or trace lineage.
 
 ### Frame projection and prompt compilation
 
@@ -339,25 +431,32 @@ later implement this interface, but MCP is a transport adapter rather than the
 semantic contract.
 
 ```mermaid
-%% uah-render: Figure 4. Bounded Workbench search before a call and observation after a run
+%% uah-render: Figure 4. H3 Workbench muscle-memory loop within UAH authority
 flowchart TB
     Module["InteractionModuleSpec<br/>closed task projection"]:::projection
     Request["WorkbenchRequest<br/>frame + objects + constraints + budget"]:::compiler
-    Search["NeuralWorkbench Search<br/>support + counterexamples + candidates"]:::model
+    Memory["Typed Action Memory<br/>support + counterexamples + outcomes"]:::trace
+    Sources["Candidate Portfolio<br/>templates + generated + retrieved/adapted"]:::model
+    Verify["Verify + Score + Select<br/>candidate ranking only"]:::gate
     Candidate["WorkbenchCandidateBatch<br/>candidate authority only"]:::proposal
     Filter["UAH Candidate Filter<br/>scope + provenance + policy"]:::gate
-    Prompt["PromptCompiler<br/>accepted context artifacts only"]:::compiler
+    Prompt["PromptCompiler<br/>accepted read-only context"]:::compiler
+    Shadow["Shadow TypedProposal<br/>normal admission path"]:::proposal
     Ledger["Terminal Lifecycle Ledger<br/>events + result + evidence"]:::trace
     Observation["WorkbenchObservation<br/>immutable completed trace"]:::evidence
-    Learning["NeuralWorkbench Update<br/>future search state only"]:::model
+    Update["Memory and Capability Update<br/>future search state only"]:::model
     Module --> Request
-    Request --> Search
-    Search --> Candidate
+    Request --> Sources
+    Memory --> Sources
+    Sources --> Verify
+    Verify --> Candidate
     Candidate --> Filter
     Module --> Filter
     Filter --> Prompt
+    Filter --> Shadow
     Ledger --> Observation
-    Observation --> Learning
+    Observation --> Update
+    Update --> Memory
 ```
 
 H3 may invoke bounded candidate retrieval before each configured model call and
@@ -368,6 +467,14 @@ kernel must operate without it. The engine cannot widen the interaction module,
 admit an operation, issue a lease, mutate a trusted registry, or promote its own
 candidate.
 
+The pinned NeuralWorkbench revision `e76ba7e` implements the deterministic
+template, symbolic verification, hand-tuned energy, selection, JSONL trace, and
+offline macro-proposal substrate. Its target architecture also includes
+model-generated and retrieved-and-adapted candidates. Training is not an H3
+prerequisite. Learned retrieval or scoring components may be added later behind
+the same candidate-only interface and evaluated against deterministic and
+no-memory baselines. H4 owns crystallization quarantine and reviewed promotion.
+
 ### Identity, task, trace, and operation lineage
 
 ```mermaid
@@ -375,29 +482,44 @@ candidate.
 flowchart TB
     Role["role_configuration_id<br/>immutable semantic role"]:::identity
     Agent["agent_id<br/>role + model + prompt + harness"]:::identity
-    Run["agent_run_id<br/>activation lifetime"]:::identity
+    Profile["environment_profile_id<br/>domain runtime contract + agent roster"]:::identity
+    Environment["environment_run_id<br/>one attested native activation"]:::identity
+    ChatRun["chatbot agent_run_id<br/>one attached actor activation"]:::identity
+    PlannerRun["planner agent_run_id<br/>one attached actor activation"]:::identity
     Trace["trace_id<br/>causally connected workflow"]:::trace
     Task["DomainTaskReference<br/>domain + type + task + native lineage"]:::semantic
     Root["operation_id<br/>one frame-relative AB object"]:::proposal
-    ChildA["child operation_id<br/>decomposed AB object"]:::proposal
-    ChildB["child operation_id<br/>decomposed AB object"]:::proposal
+    ChildA["child operation_id<br/>same-frame decomposition"]:::proposal
+    ChildB["delegated operation_id<br/>explicit cross-frame edge"]:::proposal
     Artifacts["proposal + admission + lease<br/>result + evidence identities"]:::evidence
     Role --> Agent
-    Agent --> Run
-    Run --> Trace
-    Trace --> Task
+    Profile --> Environment
+    Agent --> ChatRun
+    Agent --> PlannerRun
+    Environment --> ChatRun
+    Environment --> PlannerRun
+    Environment --> Task
+    Task --> Trace
+    ChatRun -->|actor on events| Trace
+    PlannerRun -->|actor on events| Trace
     Trace --> Root
-    Root --> ChildA
-    Root --> ChildB
+    Root -->|decomposes_to| ChildA
+    Root -->|delegates_to| ChildB
     ChildA --> Artifacts
     ChildB --> Artifacts
 ```
 
 `task_id` is a domain-owned work instance, not a domain name or a model turn.
-`trace_id` identifies the causal whole and may contain several operations.
-`operation_id` identifies one AB-object lifecycle. Domain lineage such as NAO
-`goal_id`, `request_id`, `plan_id`, `plan_version`, and `step_id` crosses the
-flow unchanged and is never reconstructed from timestamps or payload guesses.
+`environment_run_id` identifies one attested activation of a native environment
+and groups its agent runs, tasks, traces, and native runtime evidence. Each
+`agent_run_id` is bound to exactly one environment run but may process many
+tasks, model leases, and model invocations. `trace_id` identifies one causal
+workflow and may include events from several agent runs. Actor-filtered and
+environment-filtered traces are read-only projections over that authoritative
+trace, not separate histories. `operation_id` identifies one AB-object
+lifecycle. Domain lineage such as NAO `goal_id`, `request_id`, `plan_id`,
+`plan_version`, and `step_id` crosses the flow unchanged and is never
+reconstructed from timestamps or payload guesses.
 
 ### Frame-relative operation decomposition
 
@@ -418,11 +540,51 @@ flowchart TB
 ```
 
 Every operation is anchored to exactly one object coordinate in one frame.
-Higher-order operations own child operation identities. The Observatory may
-derive the highest and lowest visited levels or level homogeneity from the
-tree, but those summaries never replace the source coordinates. A replan keeps
-the root semantic operation when the desired effect is unchanged; new
-`plan_id` or `plan_version` values remain domain lineage beneath that operation.
+Higher-order operations own child operation identities. Same-frame refinement
+uses `decomposes_to`. Movement into another frame uses an explicit
+`delegates_to` edge with its source operation, target frame, target role or
+handle, input artifact, expected output artifact, and authority boundary. The
+Observatory may derive the highest and lowest visited levels or level
+homogeneity from the operation graph, but those summaries never replace the
+source coordinates. A replan keeps the root semantic operation when the
+desired effect is unchanged; new `plan_id` or `plan_version` values remain
+domain lineage beneath that operation.
+
+### NAO `report_result` reference delegation
+
+The NAO `report_result` contract is frozen as an AB1 object in the planner's
+runtime frame. Its AB coordinate follows planner-visible semantic atomicity,
+not the amount of implementation work below the object. Producing the grounded
+dialogue artifact requires another logical agent, so the trace contains an
+explicit cross-frame delegation rather than promoting `report_result` to AB2.
+
+```mermaid
+%% uah-render: Figure 6A. NAO report_result remains AB1 and delegates dialogue composition
+flowchart TB
+    Report["op_report_result<br/>nao_runtime.report_result at AB1<br/>planner agent run"]:::semantic
+    Verify["op_verify_execution_evidence<br/>same-frame deterministic owner"]:::gate
+    Compose["op_compose_grounded_report<br/>nao_dialogue frame<br/>chatbot agent run"]:::proposal
+    Invocation["model_invocation_id<br/>bounded report prompt"]:::model
+    Artifact["GroundedReportArtifact<br/>typed text + source evidence refs"]:::evidence
+    Deliver["op_deliver_report<br/>configured speech/runtime owner"]:::execution
+    SpeechEvidence["speech effect evidence<br/>required or best-effort obligation"]:::evidence
+    Report -->|decomposes_to| Verify
+    Report -->|delegates_to| Compose
+    Compose --> Invocation
+    Invocation --> Artifact
+    Report -->|continues_with| Deliver
+    Artifact --> Deliver
+    Deliver --> SpeechEvidence
+```
+
+The NAO owner remains responsible for collecting execution evidence, creating
+the bounded dialogue request, validating the returned artifact, dispatching
+speech, and issuing native evidence. UAH resolves the chatbot run, compiles its
+prompt, leases a provider, records the model invocation, and returns the typed
+artifact. UAH must not reimplement the NAO orchestration policy. The current
+pinned NeuralWorkbench registry describes `report_result` with an older local
+decomposition; onboarding must replace that candidate description with an
+owner-reviewed, content-addressed DomainContractPack revision before H2 parity.
 
 ### Node and seam responsibilities
 
@@ -432,6 +594,8 @@ the root semantic operation when the desired effect is unchanged; new
 | `AgentManifest` | Content-addressed composition | Role, model configuration, prompt pack, harness and adapter revisions | Mutable run state |
 | Agent registry | `register(agent_manifest)` and `get(agent_id)` | Immutable agent embodiments and content-addressed lookup | Handle continuity, hardware placement, or runtime state |
 | Agent handle registry | `resolve(agent_handle_id)` and `promote(candidate_agent_id, fidelity_report)` | Immutable handle revisions, one active agent, role invariance and rollback lineage | Hardware placement or silent model fallback |
+| Environment run registry | `register(environment_run_attestation)` and `close(environment_run_id)` | Attested native activation, profile revision, roster, lifecycle state, and evidence anchors | Starting native infrastructure or inventing readiness evidence |
+| Task ingress policy | `classify(environment_run, environment_ingress)` | Deterministic state-update, start, resume, notify, or reject decision and lineage assignment | Model invocation or domain-side execution policy |
 | `InteractionModuleCompiler` | `compile(role, task, domain, state)` | Minimal closed AB graph, permissions, evidence closure | Prompt wording or execution |
 | `PromptCompiler` | `compile_prompt(agent, module, task_context)` | Stable kernel prefix, role/domain presentation, schemas, artifact hash | Admission or binding resolution |
 | Model allocator | `lease(agent_run, resource_request)` | Compatible instance selection, measured capacity, lease lifetime, isolation and release | Changing the agent's model configuration or semantic authority |
@@ -439,6 +603,7 @@ the root semantic operation when the desired effect is unchanged; new
 | UAH semantic admission | `admit(proposal, module)` | Typed normalization, role/frame reach, binding and evidence obligations | Native lifecycle readiness or effects |
 | Domain lifecycle admission | `request_execution(admitted_operation)` | Readiness, dedupe, concurrency, cancellation, supersession, version fencing | Reinterpreting model text or UAH semantics |
 | Environment owner | `execute(execution_lease)` | Native effect and owner-issued result/evidence | Planner policy or Observatory rendering |
+| Task acceptance evaluator | `evaluate(effect_obligations, evidence_set)` | Required and best-effort obligation status, accepted/rejected/suspended decision, and deficit record | Inventing evidence or changing domain success criteria after execution |
 | Lifecycle ledger | Append-only events and artifact references | Exact causal record and replay inputs | Policy, evidence issuance, or history rewriting |
 | Observatory | `render_observatory(...)` | Read-only configuration, graph, event, evidence, failure, and comparison views | Execution, admission, registry mutation, or evidence issuance |
 
@@ -456,6 +621,42 @@ the root semantic operation when the desired effect is unchanged; new
 | Trace/eval | Events, lineage, artifacts, scores, regression gates | Storage and evaluator |
 
 ## 5. Proposed Contract Grammar
+
+### EnvironmentProfile, EnvironmentRun, and EnvironmentIngress
+
+```yaml
+environment_profile_id: environment-profile:nao_ros4hri:v1
+domain_contract_pack_id: domain-pack:nao:v1
+native_runtime_requirement: nao-ros4hri-bridge@v1.0.0
+agent_roster:
+  - handle_id: handle:nao.chatbot.primary
+    startup_policy: attached_standby
+  - handle_id: handle:nao.planner.primary
+    startup_policy: attached_standby
+required_interfaces: [planner_request, execution_feedback, dialogue_interaction]
+
+environment_run_id: environment-run:01J...
+environment_profile_id: environment-profile:nao_ros4hri:v1
+domain_contract_pack_revision: sha256:...
+native_runtime_revision: git:ebffe93...
+status: active
+attestation_id: environment-attestation:sha256:...
+started_at: 2026-09-08T12:00:00Z
+
+environment_ingress_id: environment-ingress:01J...
+environment_run_id: environment-run:01J...
+binding_id: binding:nao.planner_request:v1
+ingress_type: user_request
+payload_artifact_id: artifact:sha256:...
+native_lineage: {goal_id: goal_123, request_id: request_123}
+observed_at: 2026-09-08T12:00:01Z
+```
+
+An environment profile is a reusable contract. An environment run is a single
+attested native activation. The environment owner mints the attestation after
+native preflight and UAH verifies it against the pinned profile and
+DomainContractPack. An ingress item is immutable input to deterministic task
+association. It is not automatically a task, prompt, or model invocation.
 
 ### AgentRoleConfiguration
 
@@ -515,8 +716,9 @@ rollback_revision_id: handle-revision:sha256:...
 agent_run_id: run:01J...
 started_from_agent_id: agent:nao_planner:qwen:v1
 resolved_handle_revision_id: handle-revision:sha256:...
-environment_id: nao_recorded_v1
+environment_run_id: environment-run:01J...
 authority_mode: shadow
+status: standby
 ```
 
 The agent manifest is immutable. A role, model, prompt, harness, or adapter
@@ -532,11 +734,13 @@ deployment policy may narrow eligible providers, placements, and resource
 budgets. Neither policy permits the hardware allocator to substitute another
 model configuration silently.
 
-An agent run pins the resolved handle revision. Every task, trace, model
-invocation, and operation beneath that run records or resolves the same
+An agent run pins the resolved handle revision and exactly one environment run.
+Every task, trace, model invocation, and operation beneath that run records or
+resolves the same
 `agent_handle_id`, `agent_handle_revision_id`, and `agent_id`. A later handle
 revision cannot rewrite which embodiment performed earlier work or silently
-alter an in-flight task.
+alter an in-flight task. Releasing a model lease moves the run to `standby`; it
+does not terminate the actor or discard activation-scoped state.
 
 ### ProviderPool, ModelLease, and ModelInvocation
 
@@ -612,13 +816,21 @@ native_lineage:
   goal_id: goal_123
   request_id: request_123
 requested_effects: [target_observed, grounded_report_available]
+effect_obligations:
+  - obligation_id: observe_target
+    effect_id: target_observed
+    requirement: required
+    evidence_contract_id: evidence:fresh_target_entity:v1
+  - obligation_id: deliver_spoken_report
+    effect_id: report_spoken
+    requirement: best_effort
+    evidence_contract_id: evidence:speech_action_result:v1
 constraints:
   primary_frame_id: nao_runtime
   allowed_side_effects: [robot_motion, perception_refresh]
   denied_side_effects: [direct_kb_write, direct_speech]
-acceptance:
-  required_evidence: [fresh_scene_summary, target_entity_id]
-  failure_paths: [target_absent, backend_unavailable, unsafe_motion]
+acceptance_policy_id: acceptance:all-required:v1
+failure_paths: [target_absent, backend_unavailable, unsafe_motion]
 budgets:
   wall_time_sec: 90
   model_calls: 3
@@ -645,7 +857,7 @@ exposed_actions: [scan, find_object]
 exposed_resources: [scene_summary, target_reference, recent_relevant_traces]
 required_validators: [registry_validation, evidence_payload_validation]
 approval_points: [robot_motion]
-completion_evidence: [fresh_scene_summary, target_entity_id]
+effect_obligation_ids: [observe_target, deliver_spoken_report]
 projection_hash: sha256:...
 ```
 
@@ -674,9 +886,12 @@ routing:
 
 ```json
 {
+  "environment_run_id": "environment-run:01J...",
+  "environment_ingress_id": "environment-ingress:01J...",
   "trace_id": "trace_123",
   "operation_id": "operation_find_123",
   "parent_operation_id": "operation_goal_123",
+  "operation_relation": "decomposes_to",
   "role_configuration_id": "role:nao_planner:v1",
   "agent_id": "agent:nao_planner:qwen:v1",
   "agent_run_id": "run:01J...",
@@ -701,6 +916,13 @@ routing:
   "timing": {"started_ms": 0, "finished_ms": 1840}
 }
 ```
+
+Every event identifies the actor through `agent_run_id`. A cross-agent causal
+workflow keeps one `trace_id`; actor-specific and environment-specific views
+are projections over the ledger. `operation_relation` records
+`decomposes_to`, `delegates_to`, `continues_with`, or another governed edge
+type. Terminal task judgment is a separate event derived from the declared
+effect obligations and owner-issued evidence.
 
 ## 6. Current Stack: Reusable Harness Mechanisms Already Implemented
 
@@ -948,11 +1170,10 @@ but it does not excuse verbose output or unbounded context.
 ## 11. Control Loop
 
 ```text
-compile(task, subsystem):
-    role = load_role_configuration(subsystem)
-    agent = load_immutable_agent_manifest(role)
-    run = start_agent_run(agent)
-    task_spec = normalize_domain_task(task, role)
+handle_ingress(environment_run, ingress):
+    ingress_decision = task_ingress_policy.classify(environment_run, ingress)
+    task_spec = ingress_decision.task_spec
+    run = resolve_attached_agent_run(environment_run, ingress_decision.handle)
     state = context_adapter.snapshot(task_spec, run)
 
     interaction = interaction_compiler.compile(
@@ -970,19 +1191,29 @@ compile(task, subsystem):
     admitted = semantic_admission.admit(proposal, interaction)
     lease = domain_runtime.request_execution(admitted)
     result = environment_owner.execute(lease, admitted)
-    evidence = terminal_verifier.check(result, task_spec.acceptance)
+    evidence = terminal_verifier.extract_owner_evidence(result)
+    acceptance = task_acceptance_evaluator.evaluate(
+        task_spec.effect_obligations,
+        evidence,
+    )
 
     lifecycle_ledger.append_all(
-        run, task_spec, interaction, prompt, raw_output, proposal,
-        admitted, lease, result, evidence,
+        environment_run, ingress, ingress_decision, run, task_spec,
+        interaction, prompt, raw_output, proposal, admitted, lease,
+        result, evidence, acceptance,
     )
-    return terminal_judgment(evidence)
+    return acceptance
 ```
 
 The model never receives direct execution authority. The domain runtime accepts
 only immutable `AdmittedOperation` values and returns a distinct
 `ExecutionLease` or rejection. The exact admitted value reaches the owner;
 raw model output remains trace evidence and is never dispatchable.
+An owner result is not task completion by itself. The acceptance evaluator
+compares immutable effect obligations with owner-issued evidence. It returns
+`accepted` when every required obligation is satisfied, `accepted_with_deficit`
+when only best-effort obligations fail, `suspended` while a required effect can
+still be obtained, or `rejected` when a required effect has failed terminally.
 
 ## 12. Evaluation and Ablation Protocol
 
@@ -1030,41 +1261,51 @@ the same task set and preserve trace schema.
 | P6 | Cross-domain proof | iTrader and Gamma subsystem profiles | Same kernel, different AB registry/profile, measured uplift |
 | P7 | Learning loop | Trace-derived priors and human-reviewed AB2 proposals | Holdout improves; no automatic runtime promotion |
 
-Implementation follows the simpler release ladder defined by the adaptive
-extension:
+The canonical masterplan now governs the release ladder. The earlier adaptive
+bundle names are retained only as research provenance:
 
 ```text
-H0 AB-grounded role and output gate + complete trace
-H1 candidate and recovery Workbench
-H2 trace-adaptive capability profiles and reviewed heuristics
-H3 counterfactual crystallization and promotion quarantine
-H4 non-NAO AB4 system proof and learned deltas
+H0 AB contract spine and deterministic gate
+H1 executable runtime kernel and complete lifecycle
+H2 cooperative NAO adapter and parity ablation
+H3 trace-adaptive NeuralWorkbench and dynamic model allocation
+H4 crystallization and reviewed AB promotion
+H5 cross-runtime federation and conformance
+H6 optional AB5 policy-foundry research
 ```
 
-H0 is the first engineering target. It wraps the current good chatbot/planner
-behavior and constrains the AB3 model-agent inside the NAO AB4 system without
-adding another reasoning layer.
+The implemented H0 slice remains a contract proof. H1 is the next engineering
+target, and H2 remains the first cooperative real-environment demonstration.
+H3 adaptation, H4 crystallization, H5 federation, and H6 policy research cannot
+be used to relabel incomplete H0-H2 work.
 
 ## 14. Immediate Work Queue
 
-1. Review and name the five core schemas.
-2. Add `ABRegistry.task_projection(...)` or a separate compiler prototype with
+1. Freeze and review the environment, identity, task-ingress, operation-edge,
+   effect-obligation, and task-acceptance schemas.
+2. Confirm the first TDD public seam before writing tests. The current design
+   recommendation is the pure `TaskAcceptanceEvaluator.evaluate(...)` boundary,
+   followed by environment registration and ingress classification.
+3. Add `ABRegistry.task_projection(...)` or a separate compiler prototype with
    no runtime behavior change.
-3. Build golden projection cases for dialogue, knowledge query, scan/find,
+4. Build golden projection cases for dialogue, knowledge query, scan/find,
    navigation failure, and grouped delivery.
-4. Define the shared provider capability record from the union of current
+5. Define the shared provider capability record from the union of current
    chatbot and planner transport behavior.
-5. Extract a generic prompt-pack loader behind compatibility wrappers.
-6. Define one append-only trace event schema and adapters from
+6. Extract a generic prompt-pack loader behind compatibility wrappers.
+7. Define one append-only trace event schema and adapters from
    `chatbot_turn_trace`, planner decisions, orchestrator feedback, and Workbench
    traces.
-7. Run current chatbot/planner tests as the behavior baseline.
-8. Add same-model generic-versus-AB-projected harness ablations.
-9. Run standalone-versus-cooperative ablations for each migrated chatbot and
+8. Correct the NAO `report_result` registry projection through an
+   owner-reviewed DomainContractPack revision, then record its cross-frame
+   delegation as one causal trace.
+9. Run current chatbot/planner tests as the behavior baseline.
+10. Add same-model generic-versus-AB-projected harness ablations.
+11. Run standalone-versus-cooperative ablations for each migrated chatbot and
    planner mechanism; reject slices that change domain behavior.
-10. Prototype Pi RPC and OpenHands sandbox adapters only after the kernel schemas
+12. Prototype Pi RPC and OpenHands sandbox adapters only after the kernel schemas
    stabilize.
-11. Decide whether `ab_harness` remains a package in Neural Workbench or becomes
+13. Decide whether `ab_harness` remains a package in Neural Workbench or becomes
     a standalone repository after the first non-NAO adapter succeeds.
 
 ## 15. Adversarial Audit
@@ -1078,6 +1319,10 @@ adding another reasoning layer.
 - [x] Provider fallback requires capability and schema compatibility.
 - [x] Current node-specific tests are retained as parity gates.
 - [x] Learned composites remain proposal-only until reviewed.
+- [x] Environment activations, agent runs, tasks, traces, and operations have
+  distinct identities and ownership.
+- [x] Cross-frame work uses explicit delegation edges.
+- [x] Task closure is compiled from required and best-effort effect obligations.
 - [~] Core H0 frame, band, role, projection, gate, and trace schemas are
   implemented and tested; the full task/provider/environment/lifecycle grammar
   remains open.

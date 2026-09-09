@@ -1,7 +1,7 @@
 # Universal Agentic Harness: Development Log
 
 **Purpose:** Practical implementation ledger linked to the semantic masterplan  
-**Updated:** 2026-09-07
+**Updated:** 2026-09-08
 **Target:** UAH H2 NAO planner qualification after ordered evidence gates pass
 **Current release boundary:** H0 contract spine, one H1 synthetic vertical
 slice, smoke CLI, quarantined Workbench retrieval, and frozen Workbench adapter
@@ -14,12 +14,14 @@ protocol; H1 lifecycle and H2 planner parity remain incomplete
 | Portable semantic kernel | Green | Frame-relative AB views, projection, role gate, JSONL trace |
 | Semantic implementation bindings | Green | Candidate quarantine, approved resolution, runtime-mode selection |
 | ROS-free environment owner | Green | Approved AB1 dispatch and owner-issued effect evidence |
-| Recorded NAO qualification | Green | Chatbot handoff to planner proposal to gate to fake owner to evidence closure |
+| Recorded NAO contract slice | Green | One H0 fixture replays chatbot handoff to planner proposal to gate to fake owner to evidence closure; this is not H2 planner parity |
 | Latest NAO AB0 seam map | Declared candidates | Seven revision-pinned pointers across six canonical AB0 objects |
 | H2 planner coupling | Active target | NAO `v1.0.0` planner ingress/egress projection, two-stage admission, fake owner, evidence and parity suite required |
 | Chatbot coupling | Deferred after planner parity | Existing node retained as compatibility/reference implementation |
 | Watson/Bonsai model matrix | Not started | Frozen cases and configuration identity still required |
-| Configuration identity | Partial | Monolithic model-harness-environment tuple is content-addressed; role, agent, run, trace and operation identities are specified but not implemented |
+| Configuration identity | Partial | Monolithic model-harness-environment tuple is content-addressed; environment profile/run, ingress, role, agent, run, trace, operation, edge and invocation identities are specified but not implemented |
+| Environment lifecycle | Specified, not implemented | Owner-attested environment run, deterministic ingress classification, attached agent runs, and standby semantics are frozen |
+| Task closure | Specified, not implemented | Required and best-effort effect obligations compile into deterministic accepted, accepted-with-deficit, suspended, or rejected judgments |
 | Launch smoke CLI | Green | Accepted path, rejected canary, and Workbench retrieval run via `python -m ab_harness smoke` |
 | Neural Workbench retrieval | Green candidate slice | Failure-aware bounded retrieval emits provenance-bearing candidates only |
 | Neural Workbench promotion/adaptation | Quarantined design only | No trusted runtime mutation or registry promotion implemented |
@@ -28,6 +30,31 @@ protocol; H1 lifecycle and H2 planner parity remain incomplete
 | Prompt compiler | Specified, not implemented | Layered UAH kernel, role, domain, AB projection and task context contract is documented |
 | Two-stage admission | Specified, not implemented | Typed proposal to immutable admitted operation to domain execution lease |
 | Observatory | O1 identity/event contract frozen | Static renderer implementation required for H1/H2 review; O2 deferred |
+
+### H0-H2 launch preparation
+
+The development target is the H2 cooperative NAO planner demonstration. H0 and
+H1 are its qualification prerequisites rather than separate documentation
+tracks.
+
+| Release | Already proved | Required next | Exit evidence |
+| --- | --- | --- | --- |
+| H0 contract spine | Frame-relative AB views, candidate binding quarantine, deterministic role/projection gate, fake owner evidence, recorded success and rejection | Split identities; environment run and ingress; `TypedProposal`, `AdmittedOperation`, `ExecutionLease`, operation edges, effect obligations, task acceptance, and lifecycle-event schemas | Serializable round trips and one environment-ingress-to-terminal replay covering success plus required counterexamples |
+| H1 runtime kernel | Narrow in-process vertical slice and smoke CLI | Environment and agent lifecycle state machines, registries, fixed-instance lease, preflights, standby, prompt compiler, model port, budgets, cancellation, recovery, acceptance evaluator, append-only event store and deterministic digest | Frozen synthetic suite reconstructs every terminal decision and `VerifiedTraceDigest` without the model |
+| H2 cooperative NAO | Revision-pinned source map, one recorded contract fixture, startup/preflight audit | Package-owned golden fixtures, content-addressed DomainContractPack, AB0/AB1 projections, environment/trace bridge, planner ingress/egress gate, fixed NAO handles, `report_result` delegation, fake/sim execution, `legacy | shadow | uah` parity | Reviewed multi-actor parity report with lineage, admission, lease, result, obligations, failure attribution, and no duplicate activation or speech |
+
+H3 Workbench retrieval and dynamic allocation remain specified companion work.
+They may supply interfaces or shadow fixtures needed to avoid later redesign,
+but they cannot displace an H0-H2 exit criterion.
+
+### Documentation topology
+
+`docs/plans/universal_agentic_harness_development_log.md` is the only canonical
+development-log source. Its HTML companion is generated. The legacy
+`docs/agentic_harness/universal_agentic_harness_development_log.html` file is a
+redirect maintained for old links. The masterplan follows the same rule. No
+second Markdown source or independently editable HTML copy exists in the legacy
+directory.
 
 ## Frozen architectural invariant
 
@@ -310,16 +337,112 @@ candidate models against that profile plus deployment-specific provider and
 hardware constraints. The allocator still receives one resolved model
 configuration and cannot choose a merely similar model on its own.
 
+The NAO source audit confirmed the reusable startup behavior. Chatbot revision
+`a2ecca796` performs tiny and optional realistic probes during lifecycle
+configuration, fails configuration when required readiness is absent, exposes
+dialogue services only on activation, and may run a bounded keepalive. NAO
+`v1.0.0` performs planner tiny and optional planner-shaped probes before the
+planner node reports ready, while launch sequencing holds `dialogue_manager`
+configuration until `chatbot_llm` becomes active.
+
+UAH separates those behaviors into non-reserving `RegistrationPreflight`,
+post-lease `StartupPreflight`, and the final agent-run readiness transition.
+Registration cannot load or invoke a model. A startup request acquires the
+first model lease, runs bounded readiness probes, and exposes task ingress only
+after the required policy passes.
+
+The documentation coherence pass also removed conflicting H labels from the
+foundation and adaptive extension. The masterplan is the only canonical H0-H6
+spine: H2 remains cooperative NAO, H3 remains trace-adaptive Workbench plus its
+supporting dynamic allocator, H4 remains crystallization, H5 remains federation,
+and H6 remains optional AB5 policy research.
+
+### 2026-09-07: NeuralWorkbench muscle-memory audit
+
+The intended companion revision `e76ba7e` was inspected at source resolution.
+Its current client is a deterministic symbolic bootstrap: template pulse
+generation, registry verification, hand-tuned energy scoring, lowest-energy
+valid selection, append-only JSONL traces, and offline macro proposals. Trace
+records are not yet retrieved or adapted by the proposal client.
+
+The companion specification defines a broader search system containing
+deterministic templates, host-model candidates, retrieved-and-adapted traces,
+and hybrid candidates. The architecture diagrams now expose that portfolio,
+its verifier/scorer/selector, typed action memory, the UAH candidate filter, and
+the distinct outputs for read-only prompt context and shadow typed proposals.
+The trace observation path updates future search state only.
+
+No training dependency was added to H3. The initial muscle-memory loop can be
+built from typed trace indexing, retrieval, adaptation, symbolic checks, and
+shadow evaluation. Learned embeddings or scorers remain optional versioned
+adapters. Crystallization stays in the H4 quarantine and cannot follow directly
+from retrieval frequency or a successful trace count.
+
+### 2026-09-08: Environment-run, ingress, and task-closure checkpoint
+
+The continuing architecture grill resolved the runtime envelope that was
+missing between domain startup and operation admission:
+
+- `EnvironmentProfile` is a reusable domain runtime contract with a pinned
+  DomainContractPack and stable agent roster. `EnvironmentRun` is one
+  owner-attested native activation.
+- The environment owner mints readiness evidence after native preflight; UAH
+  validates and registers the attestation. Registering an agent or environment
+  does not invoke a model.
+- Each `AgentRun` is attached to exactly one environment run. It may process
+  many stimuli and tasks while moving between standby, acquiring a compatible
+  model lease, and invoking. Releasing the model does not terminate the actor.
+- `EnvironmentIngress` records immutable native stimuli. Deterministic
+  `TaskIngressPolicy` classifies each item as a state update, task start, task
+  resume, notification, or rejection before prompt compilation.
+- One causal trace may include several actor agent runs. Environment, task,
+  chatbot, planner, handle, and operation views are filters over one lifecycle
+  ledger rather than separately authored traces.
+- Operation graphs distinguish same-frame `decomposes_to`, cross-frame
+  `delegates_to`, and ordered `continues_with` edges. Every operation retains
+  exactly one frame-relative AB coordinate.
+- `EffectObligation` distinguishes `required` from `best_effort` effects.
+  `TaskAcceptance` is derived deterministically from owner-issued evidence.
+  Best-effort failure records a deficit without erasing a successful required
+  operation.
+- `VerifiedTraceDigest` is the model-free, replayable memory projection used by
+  Observatory and future Workbench retrieval. Model-authored reflection is not
+  admitted into this trusted digest.
+
+The source-resolution audit revisited NAO tag `v1.0.0`, chatbot revision
+`a2ecca796...`, and the intended NeuralWorkbench revision `e76ba7e`. The
+chatbot `DialogueTurnEngine`, planner request adapter, supervisor goal/version
+state machine, planner gate, and orchestrator `report_result` callback already
+contain domain behavior that should be preserved behind adapters. Focused
+read-only checks passed for 112 chatbot turn-engine cases and 41 planner
+supervisor/gate cases.
+
+`report_result` is frozen as AB1 in the planner runtime frame. Its source-proven
+implementation verifies planner execution evidence, delegates grounded text
+composition to the chatbot actor, then returns to the native communication
+owner. The intended NeuralWorkbench registry models an older same-frame
+decomposition. H2 must correct that drift through an owner-reviewed,
+content-addressed DomainContractPack revision rather than live registry sync.
+
+This checkpoint changes the contract and implementation order, not the current
+release claim. No environment registry, ingress classifier, task acceptance
+evaluator, multi-actor ledger, or `report_result` adapter is implemented in UAH
+yet. H2 remains the first NAO demonstration and H3 remains the first Workbench
+implementation stage.
+
 ## Verification dashboard
 
 | Command | Result |
 | --- | --- |
+| `PYTHONPATH=src python -m pytest -q` on 2026-09-07 | 45 passed after documentation topology regression coverage |
 | `.venv\Scripts\python.exe -m pytest -q -p no:cacheprovider --basetemp .test-tmp\full-suite` | 42 passed |
 | Focused `tests/test_workbench_protocol.py` red-green pass | 9 passed after strict identity, capability, duplicate-ID, and JSON checks |
 | `.venv\Scripts\python.exe -m ab_harness smoke` | Passed all four canaries |
 | NeuralWorkbench `python -m pytest -q -p no:cacheprovider` | 29 passed |
 | NAO planner/common/gate/supervisor/trace-viewer seam suite | 177 passed; 60 expected warnings for unavailable optional `interaction_skills` manifest |
 | Chatbot planner-handoff/grounding/request-adapter seam suite | 72 passed with `planner_common` and `kb_skills` on `PYTHONPATH` |
+| Chatbot `DialogueTurnEngine` focused read-only baseline | 112 passed against revision `a2ecca796...` |
+| NAO planner supervisor and orchestrator gate focused read-only baseline | 41 passed against the `v1.0.0` source boundary |
 | Offline wheel build, install into fresh venv, then `python -m ab_harness smoke` | Passed; wheel SHA-256 recorded by build output |
 | Core forbidden-import audit | Passed; only stdlib and `ab_harness` imports |
 | `python scripts/render_agentic_harness_docs.py` | Passed after canonical edits |
@@ -415,14 +538,20 @@ concurrency, latency, and quality envelopes differ.
 - [x] Mount one deterministic owner without ROS.
 - [x] Replay success, gate rejection, and failed evidence.
 - [x] Add content-addressed configuration identity.
-- [ ] Split immutable role, model, agent, run, trace, task, and operation
-  identities behind compatibility exports.
-- [ ] Add serialized `TaskSpec` and complete environment policy.
+- [ ] Split immutable environment profile/run, ingress, role, model, agent,
+  actor run, trace, task, operation, edge, and invocation identities behind
+  compatibility exports.
+- [ ] Add serialized `TaskSpec`, `EnvironmentProfile`, `EnvironmentRun`,
+  `EnvironmentIngress`, and deterministic `TaskIngressDecision`.
 - [ ] Add `TypedProposal`, `AdmittedOperation`, and `ExecutionLease` contracts.
+- [ ] Add `EffectObligation`, `TaskAcceptance`, and pure task-acceptance
+  evaluation after the public seam is confirmed.
 - [ ] Add deterministic `PromptCompiler` output and artifact hashing from the
   same `InteractionModuleSpec` consumed by semantic admission.
 - [ ] Append lifecycle events for compile, proposal, gate, dispatch, evidence,
   and terminal decision.
+- [ ] Derive a deterministic `VerifiedTraceDigest` from replayed lifecycle and
+  obligation events.
 - [ ] Add stale evidence, timeout, cancellation, retry exhaustion, and
   false-completion cases.
 
@@ -442,6 +571,8 @@ concurrency, latency, and quality envelopes differ.
 - [ ] Capture package-owned chatbot and planner golden fixtures from NAO tag
   `v1.0.0` and chatbot revision `a2ecca796...`.
 - [ ] Validate candidate AB0 bindings against their exact source revisions.
+- [ ] Freeze the NAO environment profile, named chatbot/planner roster, and
+  content-addressed DomainContractPack revision.
 - [ ] Implement full planner projection, proposal gate, fake-owner dispatch,
   evidence closure, and replay.
 - [ ] Run explicit `legacy | uah | shadow` planner parity.
@@ -450,6 +581,8 @@ concurrency, latency, and quality envelopes differ.
 - [ ] Keep chatbot assimilation behind planner parity.
 - [ ] Preserve native `goal_id`, `request_id`, `plan_id`, `plan_version`, and
   `step_id` beneath UAH task, trace and operation identities.
+- [ ] Preserve `report_result` as AB1 while tracing its explicit delegation to
+  the chatbot run and return to native communication ownership.
 
 ### P3: Neural Workbench coupling
 
@@ -468,18 +601,18 @@ concurrency, latency, and quality envelopes differ.
 
 H2 is qualified only when the core rows and planner parity rows are green:
 
-| Gate | State on 2026-09-04 | Required before qualification |
+| Gate | State on 2026-09-08 | Required before qualification |
 | --- | --- | --- |
 | Installable portable package | Green | Clean install smoke in a fresh venv |
 | Deterministic boot command | Green | Preserve machine-readable output and nonzero failure exit |
 | Accepted and rejected AB canaries | Green | Retain owner evidence and no-dispatch rejection proof |
 | Workbench form | Green, bounded retrieval and protocol | H3 remains optional and shadow-only |
-| Complete configuration identity | Partial | Split role, model, agent, run, trace and operation identities while preserving the current content hash as a compatibility snapshot |
-| Lifecycle replay | Partial | Append compile-to-terminal events and replay without the model |
+| Complete configuration identity | Partial | Split environment profile/run, ingress, role, model, agent, actor run, trace, operation and invocation identities while preserving the current content hash as a compatibility snapshot |
+| Lifecycle replay | Partial | Append environment-start-to-terminal obligation events and replay without the model |
 | Failure suite | Partial | Add stale evidence, timeout, cancellation, and false completion |
 | Documentation | Architecture checkpoint active | Keep Markdown/HTML diagrams, plans, contracts, artifacts and implementation status synchronized |
 | Watson/Bonsai runner | Not started | Freeze provider-neutral protocol; one reproducible paired dry run |
-| NAO planner parity | Not started | Recorded/fake full path under explicit authority mode; reviewed disagreement report |
+| NAO planner parity | Not started | Recorded/fake full path under explicit authority mode, multi-actor trace, `report_result` delegation, and reviewed disagreement report |
 | Live NAO/ROS authority | Explicitly excluded | Not required for H2; remains NAO-owner gated after fake/sim parity |
 
 ## Open issues
@@ -498,10 +631,17 @@ H2 is qualified only when the core rows and planner parity rows are green:
 | UAH-D10 | Workbench protocol uses legacy `configuration_id` | Per-agent and per-run candidate provenance cannot be reconstructed under the new identity model | Version the protocol after identity contracts define exact request and model-call correlation |
 | UAH-D11 | No hardware-aware model allocator | Local RAM, VRAM, context and concurrency constraints cannot govern model reuse or eviction | Implement an H1 fixed-instance lease interface, then add dynamic scheduling at H3 |
 | UAH-D12 | No agent-handle registry or fidelity evaluator | A named deployment cannot change model configuration without losing continuity or hiding an identity change | Add immutable handle-revision resolution and held-out fidelity evidence after core identity contracts |
+| UAH-D13 | No environment-run registry or ingress classifier | Native restarts, stimuli, tasks, and attached agents cannot be isolated deterministically | Register two attested synthetic runs and prove task/trace isolation across identical ingress |
+| UAH-D14 | NAO `report_result` registry drift | Intended NeuralWorkbench decomposition does not match the `v1.0.0` orchestrator callback | Owner-review a DomainContractPack revision and replay planner-to-chatbot delegation |
+| UAH-D15 | No obligation-based task acceptance | Execution feedback or model text can be mistaken for terminal success | Evaluate required failure and best-effort failure from the same evidence grammar |
+| UAH-D16 | No deterministic trace digest | Observatory and Workbench have no trusted compact memory unit | Derive and replay `VerifiedTraceDigest` without reflection or model output authority |
 
 ## Next discriminating probe
 
-Serialize one configuration and task, execute the recorded success and a stale
-evidence counterexample into append-only lifecycle events, replay both without a
-model, and require the same terminal decisions. This completes the semantic
-center before a Watson or Bonsai provider is allowed into the loop.
+After the public TDD seam is confirmed, register one attested synthetic
+environment run, classify one ingress into a task with one required and one
+best-effort obligation, execute a recorded admitted operation through the fake
+owner, derive task acceptance and a `VerifiedTraceDigest`, then replay without
+a model. A paired case must fail only the best-effort obligation and remain
+accepted with a visible deficit. This completes the semantic center before a
+Watson or Bonsai provider is allowed into the loop.

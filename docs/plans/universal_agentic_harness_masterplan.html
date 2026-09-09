@@ -196,7 +196,7 @@
   <main class="doc">
 
 <h1>Universal Agentic Harness: Implementation Masterplan</h1>
-<p><strong>Status:</strong> Canonical implementation plan; H2 qualification gates active <strong>Date:</strong> 2026-09-07 <strong>Scope:</strong> Model-agnostic and task-agnostic harness kernel with domain-specific AB frames and adapters <strong>Extends:</strong> <code>../architecture/universal_agentic_harness_foundation.md</code> and <code>../architecture/neural_workbench_adaptive_ab_harness.md</code> <strong>Decision owner:</strong> UAH H0-H2 core; NeuralWorkbench H3+ companion track; NAO remains the first reference environment</p>
+<p><strong>Status:</strong> Canonical implementation plan; H2 qualification gates active <strong>Date:</strong> 2026-09-08 <strong>Scope:</strong> Model-agnostic and task-agnostic harness kernel with domain-specific AB frames and adapters <strong>Extends:</strong> <code>../architecture/universal_agentic_harness_foundation.md</code> and <code>../architecture/neural_workbench_adaptive_ab_harness.md</code> <strong>Decision owner:</strong> UAH H0-H2 core; NeuralWorkbench H3+ companion track; NAO remains the first reference environment</p>
 <h2>1. Executive Decision</h2>
 <p>The project should build a Universal Agentic Harness, but not by replacing the model loop, tool runtime, sandbox, session store, or provider layer of every existing agent.</p>
 <p>The defensible architecture is a hybrid:</p>
@@ -499,6 +499,18 @@ H6  AB5 policy-foundry hypothesis                         RESEARCH ONLY, NOT COM
 <li>UAH semantic admission and domain lifecycle admission are separate. Only a domain-issued <code>ExecutionLease</code> permits the exact immutable <code>AdmittedOperation</code> to reach its owner.</li>
 <li>Every role names one primary abstraction frame. Auxiliary frames are explicit versioned projections with <code>inspect_only</code>, <code>direct_proposal</code>, or <code>delegate_only</code> access. Task compilation may narrow but cannot widen the role-level declaration. Cross-frame equivalence remains unresolved unless a reviewed mapping proves it.</li>
 </ul>
+<h3>Environment, ingress, and task-closure correction checked on 2026-09-08</h3>
+<ul>
+<li><code>environment_profile_id</code> identifies a reusable domain runtime contract and agent roster. <code>environment_run_id</code> identifies one owner-attested native activation and groups its agent runs, tasks, traces, ingress, and evidence.</li>
+<li>One <code>agent_run_id</code> is attached to exactly one environment run and may span many tasks, model leases, and model invocations. Releasing a lease moves the actor to standby; it does not terminate the run.</li>
+<li>Every native stimulus enters as immutable <code>EnvironmentIngress</code>. <code>TaskIngressPolicy</code> deterministically classifies it as a state update, new task, resumed task, notification, or rejection before any model call.</li>
+<li>One <code>trace_id</code> may contain several actor agent runs. Environment, task, and actor traces are read-only projections over the same append-only ledger.</li>
+<li>Each operation has one frame-relative coordinate. Same-frame refinement uses <code>decomposes_to</code>; cross-frame work uses a typed <code>delegates_to</code> edge.</li>
+<li>Task closure is compiled from typed required and best-effort <code>EffectObligation</code> values. Owner-issued evidence, not model text or an event named <code>execution_feedback</code>, determines acceptance.</li>
+<li><code>VerifiedTraceDigest</code> is a deterministic, model-free memory projection for O1/O2 and H3 retrieval. It does not contain model-authored reflection.</li>
+<li>The NAO <code>report_result</code> skill remains AB1 in the planner runtime frame. It verifies runtime evidence, delegates grounded response composition to the chatbot agent run, and returns to the native communication owner within the original task and trace.</li>
+<li>The intended NeuralWorkbench registry revision contains an older <code>report_result</code> decomposition. H2 must reconcile it with NAO <code>v1.0.0</code> and the pinned chatbot source through an owner-reviewed DomainContractPack revision.</li>
+</ul>
 <h3>What H0 actually implements</h3>
 <p>The parent-only <code>src/ab_harness</code> package is a real portable contract proof. It contains no ROS or NAO imports in the core and currently proves:</p>
 <table><thead><tr>
@@ -640,13 +652,13 @@ AB5 candidate: designs/governs a population of AB4 policies or Workbenches,
 <p>Until those conditions are met, the honest description is an increasingly capable, adaptive, and efficient AB4 system.</p>
 <h2>5. Canonical System Architecture</h2>
 <div class="diagram uah-flow-diagram">
-  <svg viewBox="0 0 1040 1588" role="img" aria-label="Canonical UAH delivery architecture">
+  <svg viewBox="0 0 1040 1864" role="img" aria-label="Canonical UAH delivery architecture">
     <defs>
       <marker id="uah-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
         <path d="M 0 0 L 10 5 L 0 10 z" fill="#9aa8bd"></path>
       </marker>
     </defs>
-    <g font-family="Inter, Liberation Sans, Arial, sans-serif"><path d="M 260.0 106.0 C 260.0 137.0, 520.0 137.0, 520.0 168.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><path d="M 520.0 106.0 C 520.0 137.0, 520.0 137.0, 520.0 168.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><path d="M 780.0 106.0 C 780.0 137.0, 520.0 137.0, 520.0 168.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><path d="M 520.0 244.0 C 520.0 275.0, 520.0 275.0, 520.0 306.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><path d="M 520.0 382.0 C 520.0 413.0, 520.0 413.0, 520.0 444.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><path d="M 520.0 520.0 C 520.0 551.0, 520.0 551.0, 520.0 582.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><path d="M 520.0 658.0 C 520.0 689.0, 520.0 689.0, 520.0 720.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><path d="M 520.0 382.0 C 520.0 551.0, 520.0 551.0, 520.0 720.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><path d="M 520.0 796.0 C 520.0 827.0, 520.0 827.0, 520.0 858.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><path d="M 520.0 934.0 C 520.0 965.0, 520.0 965.0, 520.0 996.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><path d="M 520.0 1072.0 C 520.0 1103.0, 520.0 1103.0, 520.0 1134.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><path d="M 520.0 1210.0 C 520.0 1241.0, 520.0 1241.0, 520.0 1272.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><path d="M 520.0 1348.0 C 520.0 1379.0, 346.7 1379.0, 346.7 1410.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><path d="M 520.0 1348.0 C 520.0 1379.0, 693.3 1379.0, 693.3 1410.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><rect x="148.0" y="30.0" width="224" height="76" rx="15" fill="#e8edff" stroke="#5268d8" stroke-width="2" /><text x="260.0" y="68.0" text-anchor="middle" font-size="12" fill="#172033"><tspan x="260.0" y="59.0" font-weight="700">Identity Plane</tspan><tspan x="260.0" y="79.0" font-weight="500">role + handle + agent + model + run</tspan></text><rect x="408.0" y="30.0" width="224" height="76" rx="15" fill="#e5f5f2" stroke="#168778" stroke-width="2" /><text x="520.0" y="68.0" text-anchor="middle" font-size="12" fill="#172033"><tspan x="520.0" y="59.0" font-weight="700">Semantic Plane</tspan><tspan x="520.0" y="79.0" font-weight="500">DomainContractPack + frames + AB graph</tspan></text><rect x="668.0" y="30.0" width="224" height="76" rx="15" fill="#e5f5f2" stroke="#168778" stroke-width="2" /><text x="780.0" y="68.0" text-anchor="middle" font-size="12" fill="#172033"><tspan x="780.0" y="59.0" font-weight="700">Task Plane</tspan><tspan x="780.0" y="79.0" font-weight="500">domain task + effects + acceptance</tspan></text><rect x="408.0" y="168.0" width="224" height="76" rx="15" fill="#e9f6e7" stroke="#3d8b4e" stroke-width="2" /><text x="520.0" y="206.0" text-anchor="middle" font-size="12" fill="#172033"><tspan x="520.0" y="197.0" font-weight="700">InteractionModuleCompiler</tspan><tspan x="520.0" y="217.0" font-weight="500">closed frame-relative projection</tspan></text><rect x="408.0" y="306.0" width="224" height="76" rx="15" fill="#e8f2ff" stroke="#2879c7" stroke-width="2" /><text x="520.0" y="344.0" text-anchor="middle" font-size="12" fill="#172033"><tspan x="520.0" y="335.0" font-weight="700">InteractionModuleSpec</tspan><tspan x="520.0" y="355.0" font-weight="500">capabilities + policy + evidence closure</tspan></text><rect x="408.0" y="444.0" width="224" height="76" rx="15" fill="#f0eaff" stroke="#7657b8" stroke-width="2" /><text x="520.0" y="482.0" text-anchor="middle" font-size="12" fill="#172033"><tspan x="520.0" y="473.0" font-weight="700">PromptCompiler + ModelAdapter</tspan><tspan x="520.0" y="493.0" font-weight="500">bounded context + typed schemas</tspan></text><rect x="408.0" y="582.0" width="224" height="76" rx="15" fill="#f5ecff" stroke="#8b5bb7" stroke-width="2" /><text x="520.0" y="620.0" text-anchor="middle" font-size="15" fill="#172033"><tspan x="520.0" y="611.0" font-weight="700">TypedProposal</tspan><tspan x="520.0" y="631.0" font-weight="500">model claim only</tspan></text><rect x="408.0" y="720.0" width="224" height="76" rx="15" fill="#efe6ff" stroke="#6c4ca5" stroke-width="2" /><text x="520.0" y="758.0" text-anchor="middle" font-size="15" fill="#172033"><tspan x="520.0" y="749.0" font-weight="700">UAH Semantic Admission</tspan><tspan x="520.0" y="769.0" font-weight="500">typed AdmittedOperation</tspan></text><rect x="408.0" y="858.0" width="224" height="76" rx="15" fill="#fff0e2" stroke="#cb6d26" stroke-width="2" /><text x="520.0" y="896.0" text-anchor="middle" font-size="13" fill="#172033"><tspan x="520.0" y="887.0" font-weight="700">Domain Lifecycle Admission</tspan><tspan x="520.0" y="907.0" font-weight="500">ExecutionLease or rejection</tspan></text><rect x="408.0" y="996.0" width="224" height="76" rx="15" fill="#ffe7e5" stroke="#bf5048" stroke-width="2" /><text x="520.0" y="1034.0" text-anchor="middle" font-size="13" fill="#172033"><tspan x="520.0" y="1025.0" font-weight="700">Environment Owner</tspan><tspan x="520.0" y="1045.0" font-weight="500">exact operation execution</tspan></text><rect x="408.0" y="1134.0" width="224" height="76" rx="15" fill="#fff6cf" stroke="#b18416" stroke-width="2" /><text x="520.0" y="1172.0" text-anchor="middle" font-size="15" fill="#172033"><tspan x="520.0" y="1163.0" font-weight="700">Result + EffectEvidence</tspan><tspan x="520.0" y="1183.0" font-weight="500">terminal judgment</tspan></text><rect x="408.0" y="1272.0" width="224" height="76" rx="15" fill="#e5f4f4" stroke="#247e83" stroke-width="2" /><text x="520.0" y="1310.0" text-anchor="middle" font-size="12" fill="#172033"><tspan x="520.0" y="1301.0" font-weight="700">Lifecycle Ledger + Observatory</tspan><tspan x="520.0" y="1321.0" font-weight="500">append-only replayable record</tspan></text><rect x="234.7" y="1410.0" width="224" height="76" rx="15" fill="#e8edf2" stroke="#536475" stroke-width="2" /><text x="346.7" y="1448.0" text-anchor="middle" font-size="12" fill="#172033"><tspan x="346.7" y="1439.0" font-weight="700">Evaluation</tspan><tspan x="346.7" y="1459.0" font-weight="500">qualification + failure attribution</tspan></text><rect x="581.3" y="1410.0" width="224" height="76" rx="15" fill="#e9f6e7" stroke="#3d8b4e" stroke-width="2" /><text x="693.3" y="1448.0" text-anchor="middle" font-size="15" fill="#172033"><tspan x="693.3" y="1439.0" font-weight="700">NeuralWorkbench H3+</tspan><tspan x="693.3" y="1459.0" font-weight="500">quarantined candidates</tspan></text></g>
+    <g font-family="Inter, Liberation Sans, Arial, sans-serif"><path d="M 260.0 106.0 C 260.0 206.0, 520.0 206.0, 520.0 306.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><path d="M 520.0 106.0 C 520.0 137.0, 520.0 137.0, 520.0 168.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><path d="M 780.0 106.0 C 780.0 206.0, 520.0 206.0, 520.0 306.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><path d="M 520.0 244.0 C 520.0 275.0, 520.0 275.0, 520.0 306.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><path d="M 520.0 382.0 C 520.0 413.0, 520.0 413.0, 520.0 444.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><path d="M 520.0 520.0 C 520.0 551.0, 520.0 551.0, 520.0 582.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><path d="M 520.0 658.0 C 520.0 689.0, 520.0 689.0, 520.0 720.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><path d="M 520.0 796.0 C 520.0 827.0, 520.0 827.0, 520.0 858.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><path d="M 520.0 520.0 C 520.0 689.0, 520.0 689.0, 520.0 858.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><path d="M 520.0 934.0 C 520.0 965.0, 520.0 965.0, 520.0 996.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><path d="M 520.0 1072.0 C 520.0 1103.0, 520.0 1103.0, 520.0 1134.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><path d="M 520.0 1210.0 C 520.0 1241.0, 520.0 1241.0, 520.0 1272.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><path d="M 520.0 1348.0 C 520.0 1379.0, 520.0 1379.0, 520.0 1410.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><path d="M 520.0 244.0 C 520.0 827.0, 520.0 827.0, 520.0 1410.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><path d="M 520.0 1486.0 C 520.0 1517.0, 520.0 1517.0, 520.0 1548.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><path d="M 520.0 1624.0 C 520.0 1655.0, 346.7 1655.0, 346.7 1686.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><path d="M 520.0 1624.0 C 520.0 1655.0, 693.3 1655.0, 693.3 1686.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><rect x="148.0" y="30.0" width="224" height="76" rx="15" fill="#e8edff" stroke="#5268d8" stroke-width="2" /><text x="260.0" y="68.0" text-anchor="middle" font-size="12" fill="#172033"><tspan x="260.0" y="59.0" font-weight="700">Identity Plane</tspan><tspan x="260.0" y="79.0" font-weight="500">role + handle + agent + model + run</tspan></text><rect x="408.0" y="30.0" width="224" height="76" rx="15" fill="#fff0e2" stroke="#cb6d26" stroke-width="2" /><text x="520.0" y="68.0" text-anchor="middle" font-size="12" fill="#172033"><tspan x="520.0" y="59.0" font-weight="700">Environment Plane</tspan><tspan x="520.0" y="79.0" font-weight="500">profile + attested run + ingress</tspan></text><rect x="668.0" y="30.0" width="224" height="76" rx="15" fill="#e5f5f2" stroke="#168778" stroke-width="2" /><text x="780.0" y="68.0" text-anchor="middle" font-size="12" fill="#172033"><tspan x="780.0" y="59.0" font-weight="700">Semantic Plane</tspan><tspan x="780.0" y="79.0" font-weight="500">DomainContractPack + frames + AB graph</tspan></text><rect x="408.0" y="168.0" width="224" height="76" rx="15" fill="#e5f5f2" stroke="#168778" stroke-width="2" /><text x="520.0" y="206.0" text-anchor="middle" font-size="12" fill="#172033"><tspan x="520.0" y="197.0" font-weight="700">Task Plane</tspan><tspan x="520.0" y="217.0" font-weight="500">deterministic ingress + effect obligations</tspan></text><rect x="408.0" y="306.0" width="224" height="76" rx="15" fill="#e9f6e7" stroke="#3d8b4e" stroke-width="2" /><text x="520.0" y="344.0" text-anchor="middle" font-size="12" fill="#172033"><tspan x="520.0" y="335.0" font-weight="700">InteractionModuleCompiler</tspan><tspan x="520.0" y="355.0" font-weight="500">closed frame-relative projection</tspan></text><rect x="408.0" y="444.0" width="224" height="76" rx="15" fill="#e8f2ff" stroke="#2879c7" stroke-width="2" /><text x="520.0" y="482.0" text-anchor="middle" font-size="12" fill="#172033"><tspan x="520.0" y="473.0" font-weight="700">InteractionModuleSpec</tspan><tspan x="520.0" y="493.0" font-weight="500">capabilities + policy + evidence closure</tspan></text><rect x="408.0" y="582.0" width="224" height="76" rx="15" fill="#f0eaff" stroke="#7657b8" stroke-width="2" /><text x="520.0" y="620.0" text-anchor="middle" font-size="12" fill="#172033"><tspan x="520.0" y="611.0" font-weight="700">PromptCompiler + ModelAdapter</tspan><tspan x="520.0" y="631.0" font-weight="500">bounded context + typed schemas</tspan></text><rect x="408.0" y="720.0" width="224" height="76" rx="15" fill="#f5ecff" stroke="#8b5bb7" stroke-width="2" /><text x="520.0" y="758.0" text-anchor="middle" font-size="15" fill="#172033"><tspan x="520.0" y="749.0" font-weight="700">TypedProposal</tspan><tspan x="520.0" y="769.0" font-weight="500">model claim only</tspan></text><rect x="408.0" y="858.0" width="224" height="76" rx="15" fill="#efe6ff" stroke="#6c4ca5" stroke-width="2" /><text x="520.0" y="896.0" text-anchor="middle" font-size="15" fill="#172033"><tspan x="520.0" y="887.0" font-weight="700">UAH Semantic Admission</tspan><tspan x="520.0" y="907.0" font-weight="500">typed AdmittedOperation</tspan></text><rect x="408.0" y="996.0" width="224" height="76" rx="15" fill="#fff0e2" stroke="#cb6d26" stroke-width="2" /><text x="520.0" y="1034.0" text-anchor="middle" font-size="13" fill="#172033"><tspan x="520.0" y="1025.0" font-weight="700">Domain Lifecycle Admission</tspan><tspan x="520.0" y="1045.0" font-weight="500">ExecutionLease or rejection</tspan></text><rect x="408.0" y="1134.0" width="224" height="76" rx="15" fill="#ffe7e5" stroke="#bf5048" stroke-width="2" /><text x="520.0" y="1172.0" text-anchor="middle" font-size="13" fill="#172033"><tspan x="520.0" y="1163.0" font-weight="700">Environment Owner</tspan><tspan x="520.0" y="1183.0" font-weight="500">exact operation execution</tspan></text><rect x="408.0" y="1272.0" width="224" height="76" rx="15" fill="#fff6cf" stroke="#b18416" stroke-width="2" /><text x="520.0" y="1310.0" text-anchor="middle" font-size="15" fill="#172033"><tspan x="520.0" y="1301.0" font-weight="700">Result + EffectEvidence</tspan><tspan x="520.0" y="1321.0" font-weight="500">owner-issued facts</tspan></text><rect x="408.0" y="1410.0" width="224" height="76" rx="15" fill="#efe6ff" stroke="#6c4ca5" stroke-width="2" /><text x="520.0" y="1448.0" text-anchor="middle" font-size="12" fill="#172033"><tspan x="520.0" y="1439.0" font-weight="700">TaskAcceptanceEvaluator</tspan><tspan x="520.0" y="1459.0" font-weight="500">required + best-effort closure</tspan></text><rect x="408.0" y="1548.0" width="224" height="76" rx="15" fill="#e5f4f4" stroke="#247e83" stroke-width="2" /><text x="520.0" y="1586.0" text-anchor="middle" font-size="12" fill="#172033"><tspan x="520.0" y="1577.0" font-weight="700">Lifecycle Ledger + Observatory</tspan><tspan x="520.0" y="1597.0" font-weight="500">append-only replayable record</tspan></text><rect x="234.7" y="1686.0" width="224" height="76" rx="15" fill="#e8edf2" stroke="#536475" stroke-width="2" /><text x="346.7" y="1724.0" text-anchor="middle" font-size="12" fill="#172033"><tspan x="346.7" y="1715.0" font-weight="700">Evaluation</tspan><tspan x="346.7" y="1735.0" font-weight="500">qualification + failure attribution</tspan></text><rect x="581.3" y="1686.0" width="224" height="76" rx="15" fill="#e9f6e7" stroke="#3d8b4e" stroke-width="2" /><text x="693.3" y="1724.0" text-anchor="middle" font-size="15" fill="#172033"><tspan x="693.3" y="1715.0" font-weight="700">NeuralWorkbench H3+</tspan><tspan x="693.3" y="1735.0" font-weight="500">quarantined candidates</tspan></text></g>
   </svg>
   <div class="caption">Canonical UAH delivery architecture</div>
 </div>
@@ -719,12 +731,32 @@ AB5 candidate: designs/governs a population of AB4 policies or Workbenches,
 <td>Stable handle to active agent mapping, required role, fidelity evidence and rollback lineage</td>
 </tr>
 <tr>
+<td><code>EnvironmentProfile</code></td>
+<td>Reusable domain runtime, interface, resource, security, freshness, and agent-roster contract</td>
+</tr>
+<tr>
+<td><code>EnvironmentRunAttestation</code></td>
+<td>Owner-issued native readiness evidence used to register one environment activation</td>
+</tr>
+<tr>
+<td><code>EnvironmentRun</code></td>
+<td>One attested activation grouping ingress, agent runs, tasks, traces, and native evidence</td>
+</tr>
+<tr>
+<td><code>EnvironmentIngress</code></td>
+<td>Immutable normalized native stimulus before task association</td>
+</tr>
+<tr>
+<td><code>TaskIngressDecision</code></td>
+<td>Deterministic state-update, start, resume, notify, or reject result with lineage</td>
+</tr>
+<tr>
 <td><code>AgentRun</code></td>
-<td>One bounded activation identified by <code>agent_run_id</code></td>
+<td>One bounded actor activation attached to exactly one environment run and able to enter standby</td>
 </tr>
 <tr>
 <td><code>TaskSpec</code></td>
-<td>Goal, role, frame, required effects, prohibited effects, budgets, terminal checks</td>
+<td>Goal, role, frame, effect obligations, prohibited effects, budgets, and acceptance policy</td>
 </tr>
 <tr>
 <td><code>DomainContractPack</code></td>
@@ -759,10 +791,6 @@ AB5 candidate: designs/governs a population of AB4 policies or Workbenches,
 <td>Measured provider protocol, schema/tool capabilities, context, latency, trust tier</td>
 </tr>
 <tr>
-<td><code>EnvironmentProfile</code></td>
-<td>Runtime identity, adapters, resources, security and freshness policy</td>
-</tr>
-<tr>
 <td><code>TypedProposal</code></td>
 <td>Model-proposed typed operation without effect truth or authority</td>
 </tr>
@@ -775,12 +803,28 @@ AB5 candidate: designs/governs a population of AB4 policies or Workbenches,
 <td>Domain-owner lifecycle authority or rejection linked to one admitted operation</td>
 </tr>
 <tr>
+<td><code>OperationEdge</code></td>
+<td>Typed relationship such as same-frame decomposition, cross-frame delegation, or workflow continuation</td>
+</tr>
+<tr>
 <td><code>GateDecision</code></td>
 <td>Deterministic acceptance/rejection with machine-readable reasons</td>
 </tr>
 <tr>
+<td><code>EffectObligation</code></td>
+<td>Required or best-effort effect plus its evidence contract and terminal policy</td>
+</tr>
+<tr>
 <td><code>EffectEvidence</code></td>
-<td>Owner-issued observation satisfying a declared effect obligation</td>
+<td>Owner-issued observation satisfying or refuting a declared effect obligation</td>
+</tr>
+<tr>
+<td><code>TaskAcceptance</code></td>
+<td>Deterministic accepted, accepted-with-deficit, suspended, or rejected judgment</td>
+</tr>
+<tr>
+<td><code>VerifiedTraceDigest</code></td>
+<td>Model-free memory projection derived from immutable lifecycle and obligation events</td>
 </tr>
 <tr>
 <td><code>TraceEvent</code></td>
@@ -804,15 +848,15 @@ AB5 candidate: designs/governs a population of AB4 policies or Workbenches,
 </tr></thead><tbody>
 <tr>
 <td>H0</td>
-<td>Freeze serializable role, model, agent, handle, run, task, trace, operation, and invocation identities. No dynamic scheduler.</td>
+<td>Freeze serializable environment profile/run, ingress, role, model, agent, handle, run, task, trace, operation, edge, obligation, acceptance, and invocation identities. No dynamic scheduler.</td>
 </tr>
 <tr>
 <td>H1</td>
-<td>Implement immutable agent manifests, handle resolution, run pinning, and a deterministic allocator interface with a fake or single fixed instance.</td>
+<td>Implement immutable agent manifests, handle resolution, environment registration, task ingress, run pinning and standby, obligation evaluation, and a deterministic allocator interface with a fake or single fixed instance.</td>
 </tr>
 <tr>
 <td>H2</td>
-<td>Configure named NAO handles such as <code>nao.chatbot.primary</code> and <code>nao.planner.primary</code>; run provider/resource preflight and fixed leases. Multiple named agents are allowed, but hot model rebinding is not required.</td>
+<td>Configure the NAO environment profile and named handles such as <code>nao.chatbot.primary</code> and <code>nao.planner.primary</code>; run provider/resource preflight and fixed leases; preserve multi-actor traces and <code>report_result</code> delegation. Hot model rebinding is not required.</td>
 </tr>
 <tr>
 <td>H3</td>
@@ -826,6 +870,10 @@ AB5 candidate: designs/governs a population of AB4 policies or Workbenches,
 <td>H5</td>
 <td>Federate local and remote provider pools and require allocation, isolation, trace, and handle-fidelity conformance across runtimes.</td>
 </tr>
+<tr>
+<td>H6</td>
+<td>Evaluate higher-order policy governance over AB4 harness and allocation configurations. H6 remains optional research and grants no automatic authority.</td>
+</tr>
 </tbody></table>
 <p>The hardware module is called <code>ModelAllocator</code>, not <code>AgentAllocator</code>. <code>AgentRegistry</code> creates and resolves immutable agent embodiments and handle revisions. <code>ModelAllocator</code> only selects compatible runtime capacity for an already resolved agent run. A later high-level <code>AgentRuntime</code> may coordinate both interfaces without merging their ownership.</p>
 <h3>H0: AB contract spine</h3>
@@ -833,12 +881,13 @@ AB5 candidate: designs/governs a population of AB4 policies or Workbenches,
 <p><strong>Current state:</strong> The parent package proves the smallest core, but not the full lifecycle.</p>
 <p><strong>Complete H0 deliverables:</strong></p>
 <ul>
-<li>serialize and version <code>HarnessSpec</code>, <code>TaskSpec</code>, <code>ModelProfile</code>, and <code>EnvironmentProfile</code>;</li>
+<li>serialize and version <code>HarnessSpec</code>, <code>TaskSpec</code>, <code>ModelProfile</code>, and <code>EnvironmentProfile</code>, plus environment-run and ingress envelopes;</li>
 <li>expand <code>ABObjectView</code> with input/output, effect, evidence, freshness, side effect, permission, and owner fields;</li>
 <li>compile projection from required task effects and role policy, not only a caller-provided list of object IDs;</li>
 <li>distinguish <code>inspect</code>, <code>propose</code>, <code>direct</code>, <code>execute</code>, and <code>claim_effect</code> authority;</li>
 <li>add payload-schema and canonical-alias validation;</li>
 <li>define complete lifecycle event types and trace identity;</li>
+<li>define operation-edge grammar and required/best-effort effect obligations;</li>
 <li>create golden fixtures for dialogue, KB query, execution handoff, rejected reach, cancellation, and failed evidence closure.</li>
 </ul>
 <p><strong>Acceptance gate:</strong></p>
@@ -854,6 +903,9 @@ AB5 candidate: designs/governs a population of AB4 policies or Workbenches,
 <ul>
 <li>deterministic lifecycle state machine: compile, observe, propose, gate, dispatch, receive, verify, recover, terminate;</li>
 <li>provider interface for local and OpenAI-compatible API calls;</li>
+<li>immutable agent registration and handle resolution with no model invocation;</li>
+<li>owner-attested environment registration, deterministic task ingress, attached agent-run standby, and task acceptance evaluation;</li>
+<li>non-reserving registration preflight plus a fixed-instance model lease and post-lease startup preflight;</li>
 <li>structured-output adapter with explicit parse/repair provenance;</li>
 <li>runtime adapter protocol for shell/API/simulator/MCP/worker calls;</li>
 <li>cancellation, time, token, tool, retry, and cost budgets;</li>
@@ -874,6 +926,7 @@ AB5 candidate: designs/governs a population of AB4 policies or Workbenches,
 <li>explicit NAO <code>legacy | uah | shadow</code> routing and parity report;</li>
 <li>provider capability normalization behind current callers;</li>
 <li>failure, cancellation, supersede, replan, and duplicate-speech validation;</li>
+<li>owner-reviewed <code>report_result</code> registry reconciliation and cross-frame chatbot delegation parity;</li>
 <li>chatbot compatibility projection after planner parity;</li>
 <li>live robot validation only after fake/sim parity.</li>
 </ol>
@@ -891,6 +944,24 @@ AB5 candidate: designs/governs a population of AB4 policies or Workbenches,
   -&gt; /planner/execution_feedback
   -&gt; planner_llm supervision or /planner/dialogue_act</code></pre>
 <p><code>goal_id</code>, <code>request_id</code>, <code>plan_id</code>, <code>plan_version</code>, and stable <code>step_id</code> values cross this flow unchanged except for explicitly recorded supersede/replan transitions. UAH may wrap it with its own trace/configuration identity but may not replace or infer missing NAO lineage.</p>
+<h4>NAO startup and preflight lessons</h4>
+<p>The immutable NAO baselines already prove the activation pattern that UAH should preserve as behavior:</p>
+<ul>
+<li>chatbot revision <code>a2ecca796</code> builds configuration, transport, prompt/skill projection, and diagnostics during its lifecycle <code>on_configure</code>; it runs tiny and optional role-shaped model probes before <code>on_activate</code> exposes dialogue services;</li>
+<li>a required chatbot preflight failure returns lifecycle failure, while a successful configuration may start a bounded keepalive timer;</li>
+<li>NAO <code>v1.0.0</code> planner configuration runs a tiny structured JSON probe and an optional planner-shaped probe before subscriptions and publishers are considered ready; required failure aborts node startup;</li>
+<li>the launch graph configures <code>dialogue_manager</code> only after <code>chatbot_llm</code> reaches its active lifecycle state.</li>
+</ul>
+<p>UAH generalizes this into three distinct gates:</p>
+<pre><code class="language-text">agent registration
+  -&gt; RegistrationPreflight: schemas + role + provider policy + capacity snapshot
+     no model load, lease, or invocation
+  -&gt; AgentRun startup request
+  -&gt; ModelLease acquisition
+  -&gt; StartupPreflight: endpoint + model identity + tiny structured probe
+     + optional role-shaped probe
+  -&gt; agent_run ready and task ingress exposed</code></pre>
+<p>The NAO probes are real model calls and therefore correspond to <code>StartupPreflight</code>, not registration. UAH should reuse their configurable timeouts, bounded attempts, required/advisory policy, role-shaped canary, visible failure logs, and activation ordering. It must not import ROS lifecycle code or copy the launch shell loops into the portable core. Keepalive belongs to model lease policy and cannot extend a lease or an agent run implicitly.</p>
 <p><strong>Required task set:</strong></p>
 <table><thead><tr>
 <th>Family</th>
@@ -934,6 +1005,8 @@ AB5 candidate: designs/governs a population of AB4 policies or Workbenches,
 <p><strong>Package boundary:</strong> NeuralWorkbench is the sole H3+ engine for pulse creation, candidate verification/scoring, adaptive trace products, entropy experiments, and later crystallization. UAH supplies the model port, task/frame projection, registry snapshot, mandatory execution ledger, deterministic gate, and owner evidence. The first adapter is in-process but its payloads are transport-neutral. Protocol mismatch fails closed; a development override is observation-only. NeuralWorkbench is not an abstraction frame. <code>WorkbenchRequest</code> supplies the named frame and closed object projection within which it searches. An MCP transport may be added as another adapter to <code>WorkbenchEnginePort</code>, but cannot replace or widen that semantic interface.</p>
 <p>The H3 interaction hook has two directions. Before a configured model call, UAH may request bounded candidates and filter them before any context artifact reaches <code>PromptCompiler</code> or any replacement enters shadow evaluation. After a run reaches terminal trace closure, UAH submits an immutable <code>WorkbenchObservation</code>. The Workbench may update future search state but cannot alter the active interaction module, admission decision, lease, registry, or promotion state.</p>
 <p><strong>Current pre-H3 slice:</strong> <code>WorkbenchMemory</code> retrieves a bounded set of relevant supporting and failed <code>TraceExperience</code> records and emits a deterministic, provenance-bearing <code>WorkbenchContextCandidate</code>. Missing support or counterevidence is explicit and the status remains <code>candidate</code>. This is an early H3-compatible seam delivered before H3; it is not a capability posterior, persistent trace memory, prompt optimizer, crystallizer, or H3 completion.</p>
+<p><strong>Pinned companion audit:</strong> NeuralWorkbench revision <code>e76ba7e</code> supplies a deterministic template generator, registry verifier, hand-tuned energy scorer, lowest-energy valid selector, append-only JSONL trace store, and offline macro-candidate proposer. The proposal client does not yet retrieve and adapt stored traces. Its specification nevertheless defines the H3 target as a mechanism-diverse portfolio of deterministic, model-generated, retrieved-and-adapted, and hybrid candidates. UAH therefore treats the pinned code as the symbolic bootstrap rather than equating Workbench search with deterministic lookup.</p>
+<p>H3 does not require online model training. It first closes the loop through typed trace ingestion, bounded retrieval, candidate adaptation, symbolic verification, and shadow comparison. Learned embeddings or scorers are later versioned adapters whose candidates must pass the same provenance, replay, and UAH admission boundaries. H4 remains the first release that may evaluate crystallization proposals for reviewed promotion.</p>
 <p><strong>Deliverables:</strong></p>
 <ul>
 <li>normalized complete traces indexed by task, AB object, mechanism, environment version, model-harness configuration, and failure class;</li>
@@ -945,7 +1018,9 @@ AB5 candidate: designs/governs a population of AB4 policies or Workbenches,
 <li>Pareto vector for success, risk, latency, cost, evidence, and uncertainty;</li>
 <li>symbolic entropy proxy only for declared observable variables;</li>
 <li>reviewed pulse heuristics with provenance and expiry;</li>
-<li>exploration floor so early trace errors cannot permanently collapse search.</li>
+<li>exploration floor so early trace errors cannot permanently collapse search;</li>
+<li>hardware-aware provider-pool snapshots and model-lease arbitration supporting serialized or concurrent agent runs without changing semantic identity;</li>
+<li>fidelity-gated handle promotion for qualified replacement embodiments, with immutable prior revisions and rollback.</li>
 </ul>
 <p><strong>Running uncertainty:</strong></p>
 <pre><code class="language-text">H_proxy(task, t) =
@@ -958,9 +1033,10 @@ AB5 candidate: designs/governs a population of AB4 policies or Workbenches,
 
 delta_H_proxy = H_proxy_before - H_proxy_after</code></pre>
 <p>This is a measured proxy, not Shannon entropy unless a calibrated probability distribution exists. Every term must name its observable and owner.</p>
-<p><strong>Acceptance gate:</strong> On held-out tasks, success-plus-failure retrieval and shadow replacement must beat no-memory and success-only baselines without degrading calibration, scope, evidence completeness, or latency beyond budget.</p>
+<p><strong>Acceptance gate:</strong> On held-out tasks, success-plus-failure retrieval and shadow replacement must beat no-memory and success-only baselines without degrading calibration, scope, evidence completeness, or latency beyond budget. Allocation tests must also reject impossible RAM, VRAM, context, and concurrency combinations, release leases deterministically, and reassign compatible instances without changing the resolved agent or trace identity.</p>
 <h3>H4: Crystallization and reviewed AB promotion</h3>
 <p><strong>Purpose:</strong> Convert repeated, causally supported interaction structures into maintained higher-level AB proposals.</p>
+<p>H4 crystallization may produce several candidate artifact types: a higher-order AB object, capability or prompt pack revision, agent embodiment, or handle revision. These remain distinct artifacts with their own evaluators. Repeated model allocation or successful handle use is supporting evidence only and cannot promote any candidate by frequency.</p>
 <p><strong>Candidate lifecycle:</strong></p>
 <pre><code class="language-text">observed fragment
   -&gt; normalized candidate
@@ -1116,6 +1192,11 @@ delta_H_proxy = H_proxy_before - H_proxy_after</code></pre>
 <td>H0-H1</td>
 </tr>
 <tr>
+<td><code>ab_harness.agent_registry</code></td>
+<td>Immutable agent manifests, handle revisions, run pinning and fidelity evidence lookup</td>
+<td>H1, dynamic promotion H3</td>
+</tr>
+<tr>
 <td><code>ab_harness.registry</code></td>
 <td>Read-only snapshots, frame maps, object resolution</td>
 <td>H0</td>
@@ -1164,6 +1245,11 @@ delta_H_proxy = H_proxy_before - H_proxy_after</code></pre>
 <td><code>ab_harness.providers</code></td>
 <td>Direct local/API model capability normalization</td>
 <td>H1</td>
+</tr>
+<tr>
+<td><code>ab_harness.model_allocator</code></td>
+<td>Fixed-instance lease interface and startup preflight in H1-H2; provider-pool scheduling and arbitration in H3</td>
+<td>H1-H3</td>
 </tr>
 <tr>
 <td><code>ab_harness.configuration</code></td>
@@ -1779,14 +1865,16 @@ evidence_closure | evaluator | resource_budget</code></pre>
 <li>[ ] No AB5 candidate has passed the structural boundary test.</li>
 </ul>
 <h2>15. Decision</h2>
-<p><strong>Accept</strong> the hybrid semantic-kernel architecture and H0-H5 release spine.</p>
+<p><strong>Accept</strong> the hybrid semantic-kernel architecture, H0-H6 delivery spine, with H6 retained as an optional research boundary.</p>
 <p><strong>Reject</strong> a wholesale fork of a broad agent product as the default core, MCP-first semantics, online self-publication, and AB-level inflation from performance alone.</p>
 <p><strong>Bounded handoff:</strong> Complete the remaining H0 contract/lifecycle schemas, H1 runtime, and recorded/fake H2 planner parity before granting any live ROS or H3 replacement authority. Chatbot assimilation follows planner parity through a compatibility adapter. External-worker spikes remain deferred until their protocol is frozen and conformance-tested.</p>
 <h2>16. Ordered Implementation Queue</h2>
 <h3>Now: close H0-H1 for the H2 launch candidate</h3>
 <ol>
 <li>Freeze schema versioning and serialization conventions.</li>
-<li>Add <code>HarnessSpec</code>, <code>TaskSpec</code>, <code>ModelProfile</code>, and <code>EnvironmentProfile</code>.</li>
+<li>Add <code>HarnessSpec</code>, <code>TaskSpec</code>, <code>ModelProfile</code>, <code>EnvironmentProfile</code>, <code>EnvironmentRun</code>, <code>EnvironmentIngress</code>, and <code>TaskIngressDecision</code>.</li>
+<li>Freeze <code>OperationEdge</code>, <code>EffectObligation</code>, <code>TaskAcceptance</code>, and <code>VerifiedTraceDigest</code> before adding runtime policy.</li>
+<li>Confirm the first public TDD seam. The current recommendation is the pure obligation evaluator, then environment registration and task ingress.</li>
 <li>Preserve the implemented semantic-object/implementation-binding split.</li>
 <li>Expand AB object effect/evidence/permission fields through a read-only adapter over the canonical registry.</li>
 <li>Compile one synthetic task from required effects to a closed object graph.</li>
@@ -1797,21 +1885,24 @@ evidence_closure | evaluator | resource_budget</code></pre>
 </ol>
 <h3>In parallel: H1 executable kernel</h3>
 <ol>
-<li>Implement the minimal lifecycle state machine.</li>
+<li>Implement environment-run registration, ingress classification, attached agent-run lifecycle, and standby transitions.</li>
+<li>Implement the minimal operation lifecycle state machine.</li>
 <li>Add direct local/API model and synthetic runtime adapters.</li>
-<li>Add budget, approval, cancellation, and terminal-evidence controls.</li>
+<li>Add budget, approval, cancellation, and obligation-based acceptance.</li>
 <li>Implement milestones and minefields.</li>
-<li>Run the frozen synthetic conformance suite.</li>
+<li>Run the frozen synthetic conformance suite and produce deterministic trace digests.</li>
 <li>Deslop only after behavior is covered; avoid framework-building beyond tested needs.</li>
 </ol>
 <h3>H2 target: cooperative NAO planner proof</h3>
 <ol>
-<li>Record frozen chatbot/planner fixtures and current test results.</li>
-<li>Add read-only AB1/AB0 projection and trace bridge.</li>
+<li>Record frozen chatbot/planner fixtures and current test results against NAO tag <code>v1.0.0</code> and chatbot revision <code>a2ecca796...</code>.</li>
+<li>Freeze a content-addressed NAO DomainContractPack and correct the <code>report_result</code> projection with owner review.</li>
+<li>Add environment-run registration, deterministic ingress, named attached chatbot/planner runs, and the read-only AB1/AB0 trace bridge.</li>
 <li>Implement planner ingress/egress through projection, gate, fake owner, and evidence closure.</li>
+<li>Reproduce <code>report_result</code> as an AB1 planner operation with explicit chatbot delegation and native speech ownership.</li>
 <li>Run explicit <code>legacy | uah | shadow</code> parity and classify disagreements.</li>
 <li>Run same-model standalone versus harness-backed ablations.</li>
-<li>Validate fake/sim success and failure paths.</li>
+<li>Validate fake/sim success, required-effect failure, and best-effort deficit paths.</li>
 <li>Run live robot tests only when the operator and robot are available.</li>
 </ol>
 <h3>Stretch after parity: H3 shadow seam, then H3-H5</h3>
@@ -1888,6 +1979,7 @@ evidence_closure | evaluator | resource_budget</code></pre>
 <p>H3 should first adapt the interface around frozen models. Later work may compare harness-aware post-training against generic post-training under tool and task shift. Weight changes remain versioned deltas and never erase harness evidence.</p>
 <h3>Completion judgment</h3>
 <p>The terminal verifier must compile the exact required effect and artifact checks from the task contract. A model saying it is finished is an action proposal, not a terminal fact.</p>
+<p>Each task declares typed required and best-effort effect obligations before execution. Required obligations determine acceptance; best-effort failures are retained as explicit deficits. An operation&#x27;s result is never rewritten merely because a later reporting or delivery operation failed.</p>
 <h3>Security and untrusted context</h3>
 <p>AB scope reduces reach but does not eliminate prompt injection, malicious tool descriptions, credential leakage, or poisoned memories. Security must follow the lifecycle: input provenance, causal/action checks, privilege separation, artifact scanning, rollback, and degradation.</p>
 <h3>Multi-agent and AB4 composition</h3>
@@ -1943,12 +2035,32 @@ evidence_closure | evaluator | resource_budget</code></pre>
 <td>Define minimum artifact/event contract and classify unavailable fields</td>
 </tr>
 <tr>
+<td>Environment restarts mix evidence</td>
+<td>No implemented environment-run registry</td>
+<td>Replay two identical tasks across distinct attested activations and require isolation</td>
+</tr>
+<tr>
+<td>Cross-agent trace projections diverge</td>
+<td>No multi-actor ledger implementation</td>
+<td>Render environment, task, chatbot, and planner views from one event store and compare event identities</td>
+</tr>
+<tr>
+<td>NAO <code>report_result</code> semantics drift</td>
+<td>Intended registry and <code>v1.0.0</code> runtime disagree</td>
+<td>Owner-review the DomainContractPack revision and run recorded delegation parity</td>
+</tr>
+<tr>
+<td>Task closure overclaims success</td>
+<td>No obligation evaluator</td>
+<td>Drive required failure and best-effort failure from the same owner evidence set and require distinct judgments</td>
+</tr>
+<tr>
 <td>AB5 remains relabeled optimization</td>
 <td>No higher-order object</td>
 <td>Require held-out population-of-AB4 governance experiment</td>
 </tr>
 </tbody></table>
-<p>The immediate next probe is H0 lifecycle completion around the implemented binding loop: serialize one configuration and <code>TaskSpec</code>, execute the recorded success and a stale-evidence counterexample into append-only lifecycle events, replay both without a model, and require identical terminal decisions. This tests the semantic center without touching the live NAO stack or committing to an external harness.</p>
+<p>The immediate next probe is a narrow H1 synthetic tracer after public-interface confirmation: register one attested environment run, classify one ingress into a task with one required and one best-effort obligation, execute a recorded admitted operation through a fake owner, derive <code>TaskAcceptance</code>, produce a <code>VerifiedTraceDigest</code>, and replay the lifecycle without a model. A second case must fail only the best-effort obligation and remain accepted with a recorded deficit. This tests the semantic center without touching the live NAO stack or committing to an external harness.</p>
 <h2>20. Primary Sources and Implementation References</h2>
 <h3>Research</h3>
 <ul>

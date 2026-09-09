@@ -1,14 +1,14 @@
 # Adaptive AB Harness: Neural Workbench Search, Memory, and Crystallization
 
 **Status:** Research extension; H0 parent-repo proof implemented
-**Date:** 2026-09-04
+**Date:** 2026-09-08
 **Extends:** `universal_agentic_harness_foundation.md`
 **Primary theory source:** Neural Workbench documentation and current source on `feat/base-implementation`
-**Canonical delivery status:** `../plans/universal_agentic_harness_masterplan.md` (2026-09-04)
+**Canonical delivery status:** `../plans/universal_agentic_harness_masterplan.md` (2026-09-08)
 
 This document remains the canonical adaptive theory extension. The masterplan
-owns current H0-H5 release status and extends the ladder with H5 cross-runtime
-federation plus a separately gated AB5 research hypothesis.
+owns current H0-H6 release status. H5 is cross-runtime federation and H6 is the
+separately gated AB5 policy-foundry hypothesis.
 
 ## 1. Extension Claim
 
@@ -290,6 +290,30 @@ the same interface, but transport discovery cannot widen the request, activate
 a candidate, or redefine the frame. UAH owns when the hook runs and filters all
 candidate artifacts before prompt compilation or shadow evaluation.
 
+### Pinned implementation versus target engine
+
+The intended companion revision is
+`e76ba7eafbd90f9ed239a65f741d2598ecd033cb`. Its executable Workbench is a
+deterministic symbolic prototype. `CandidateGenerator` emits template pulse
+programs, `ProgramVerifier` checks them against the skill registry,
+`EnergyScorer` applies inspectable hand-tuned terms, and `ProgramSelector`
+chooses the lowest-energy valid candidate. `JsonlTraceMemory` stores completed
+attempts, but the client does not yet retrieve and adapt them during proposal.
+`MacroCrystallizer` emits offline proposal objects and cannot register them.
+
+That implementation is the bootstrap, not the complete search model. The
+pinned specification defines a candidate portfolio containing deterministic
+templates, model-generated candidates, retrieved candidates adapted from trace
+memory, and hybrids of those mechanisms. H3 should preserve those mechanisms
+as separately attributed candidate sources so the Observatory can compare
+their support, failures, costs, and selection outcomes.
+
+The first H3 activation does not require training a model. Typed trace
+indexing, bounded retrieval, deterministic verification, and symbolic scoring
+can establish the memory loop. Learned embeddings, scorers, or policies may be
+introduced later as versioned candidate-producing adapters. Their output
+remains subject to the same UAH filter, replay, and evaluation boundaries.
+
 The intended H3 cadence is:
 
 ```text
@@ -307,26 +331,51 @@ without making the H2 kernel depend on Workbench availability. Workbench
 timeout and failure behavior must be explicit in deployment policy.
 
 ```mermaid
-%% uah-render: Figure 1. Bounded Workbench search before a call and observation after a run
+%% uah-render: Figure 1. H3 Workbench muscle-memory loop within UAH authority
 flowchart TB
     Module["InteractionModuleSpec<br/>closed task projection"]:::projection
     Request["WorkbenchRequest<br/>frame + objects + constraints + budget"]:::compiler
-    Search["NeuralWorkbench Search<br/>support + counterexamples + candidates"]:::model
+    Memory["Typed Action Memory<br/>support + counterexamples + outcomes"]:::trace
+    Templates["Deterministic Templates<br/>bootstrap candidates"]:::model
+    Generated["Model-generated Candidates<br/>host-supplied inference"]:::model
+    Retrieved["Retrieved + Adapted Traces<br/>experience candidates"]:::model
+    Hybrid["Hybrid Composer<br/>mechanism-diverse portfolio"]:::model
+    Verify["Workbench Verifier<br/>types + registry + hard constraints"]:::gate
+    Score["Score Vector<br/>energy + uncertainty + evidence"]:::model
+    Select["Workbench Selector<br/>candidate ranking only"]:::model
     Candidate["WorkbenchCandidateBatch<br/>candidate authority only"]:::proposal
     Filter["UAH Candidate Filter<br/>scope + provenance + policy"]:::gate
-    Prompt["PromptCompiler<br/>accepted context artifacts only"]:::compiler
+    Prompt["PromptCompiler<br/>accepted read-only context"]:::compiler
+    Shadow["Shadow TypedProposal<br/>normal UAH admission path"]:::proposal
     Ledger["Terminal Lifecycle Ledger<br/>events + result + evidence"]:::trace
     Observation["WorkbenchObservation<br/>immutable completed trace"]:::evidence
-    Learning["NeuralWorkbench Update<br/>future search state only"]:::model
+    Update["Memory and Capability Update<br/>future search state only"]:::model
     Module --> Request
-    Request --> Search
-    Search --> Candidate
+    Request --> Templates
+    Request --> Generated
+    Request --> Retrieved
+    Memory --> Retrieved
+    Templates --> Hybrid
+    Generated --> Hybrid
+    Retrieved --> Hybrid
+    Hybrid --> Verify
+    Verify --> Score
+    Score --> Select
+    Select --> Candidate
     Candidate --> Filter
     Module --> Filter
     Filter --> Prompt
+    Filter --> Shadow
     Ledger --> Observation
-    Observation --> Learning
+    Observation --> Update
+    Update --> Memory
 ```
+
+The two filtered outputs have different meanings. A context artifact can inform
+the next model call but cannot execute. A shadow `TypedProposal` enters the
+ordinary semantic and environment admission path with no special Workbench
+privilege. H4 crystallization is a separate quarantine and promotion process;
+it is not an automatic edge from memory update into the trusted registry.
 
 ```mermaid
 flowchart TB
@@ -567,6 +616,7 @@ The trace must preserve the full causal claim chain:
 
 ```text
 task contract
+  -> environment activation, ingress, and deterministic task association
   -> AB frame and control band
   -> registry and model versions
   -> candidate set and provenance
@@ -574,7 +624,8 @@ task contract
   -> selected graph and score vector
   -> approvals and runtime calls
   -> observations, failures, and evidence
-  -> terminal task judgment
+  -> required and best-effort obligation judgment
+  -> VerifiedTraceDigest
   -> capability updates
   -> heuristic and crystallization proposals
 ```
@@ -583,6 +634,8 @@ Proposed trace envelope:
 
 ```yaml
 trace_id: trace_2026_00042
+environment_run_id: environment-run:01J...
+environment_ingress_ids: [environment-ingress:01J...]
 task_spec_id: task_find_cup
 frame_id: nao_runtime
 control_band:
@@ -597,9 +650,17 @@ candidates: []
 selected_candidate_id: cand_017
 execution_events: []
 evidence_events: []
+actors:
+  - agent_run_id: run:nao_planner:01J...
+    operation_ids: [op_find, op_report]
+  - agent_run_id: run:nao_chatbot:01J...
+    operation_ids: [op_compose_grounded_report]
 outcome:
-  status: success
-  acceptance_checks: []
+  status: accepted_with_deficit
+  effect_obligations:
+    - {obligation_id: target_observed, requirement: required, status: satisfied}
+    - {obligation_id: report_spoken, requirement: best_effort, status: failed}
+verified_trace_digest_id: verified-trace-digest:sha256:...
 uncertainty:
   before: {}
   after: {}
@@ -612,6 +673,13 @@ proposal_ids: []
 Trace records are append-only evidence. Derived profiles and indexes may be
 rebuilt, but historical observations must not be rewritten to make a policy
 look better.
+
+`VerifiedTraceDigest` is a deterministic projection of immutable task,
+operation, admission, execution, evidence, and obligation events. It contains
+no model-authored reflection. Workbench retrieval may index it by domain,
+environment profile, frame, role, task family, object, outcome, and approved
+handle lineage. The canonical ledger remains the source of truth, and a memory
+policy controls which digests a given agent may inspect.
 
 ## 11. Adaptation Loop
 
@@ -863,6 +931,17 @@ Adaptation: trace priors and macro proposals only
 The harness improves candidate selection and trace reuse. It does not make the
 robot controller adaptive or allow the planner to dispatch ROS primitives.
 
+`report_result` remains an AB1 planner-visible object in `nao_runtime`. Its
+implementation verifies execution evidence, delegates grounded language
+composition to the chatbot agent run in `nao_dialogue`, and continues through
+the native communication owner. The cross-frame step is a typed
+`delegates_to` edge within the original task and trace, not an ordinary
+decomposition edge and not evidence that `report_result` is AB2. The
+NeuralWorkbench registry at intended revision `e76ba7e` contains an older local
+decomposition. H2 onboarding must reconcile it against the NAO `v1.0.0`
+runtime and pinned chatbot revision through an owner-reviewed,
+content-addressed DomainContractPack update.
+
 ### iTrader
 
 ```text
@@ -904,6 +983,16 @@ ABControlBand
 ABObjectSpec
 ABDeltaSpec
 ABGraphSpec
+EnvironmentProfile
+EnvironmentRunAttestation
+EnvironmentRun
+EnvironmentIngress
+TaskIngressDecision
+AgentRun
+OperationEdge
+EffectObligation
+TaskAcceptance
+VerifiedTraceDigest
 PulseHeuristic
 InteractionSkill
 CapabilitySlice
@@ -921,8 +1010,9 @@ skill_common
   owns canonical AB object and delta schemas, registry versions, graph validity
 
 ab_harness
-  owns task frames, control bands, interaction projection, provider/runtime
-  interfaces, candidate provenance, trace event envelope
+  owns environment and agent identities, deterministic task ingress, task
+  frames, control bands, interaction projection, obligation evaluation,
+  provider/runtime interfaces, candidate provenance, trace event envelope
 
 neural_workbench
   owns graph generation, energy/entropy scoring, retrieval, capability updates,
@@ -943,7 +1033,7 @@ The harness and Workbench must not duplicate the canonical registry.
 | ordered `PulseProgram` | typed branching/recovery graph | `ABGraphSpec` and graph verifier |
 | deterministic templates | mechanism-diverse candidate portfolio | generator provenance and diversity checks |
 | hand-tuned scalar energy | constrained multi-objective score plus posterior terms | score vector and policy-specific scalarizer |
-| JSONL `TraceRecord` | versioned causal trace envelope | event schema and adapters from live systems |
+| JSONL `TraceRecord` | versioned multi-actor causal trace plus deterministic digest | event schema, operation edges, obligation evaluator, and adapters from live systems |
 | recent trace loading | indexed task/mechanism/failure retrieval | trace index and capability slices |
 | sequence frequency macro proposal | counterfactual, holdout, entropy, safety gate | crystallization evaluator and quarantine |
 | static registry metadata | empirical capability posterior | profile store keyed by object/task/environment |
@@ -953,10 +1043,10 @@ The harness and Workbench must not duplicate the canonical registry.
 
 | Phase | Deliverable | Acceptance gate |
 | --- | --- | --- |
-| A0 | Freeze frames, coordinates, bands, graphs, traces, and promotion schemas | NAO, iTrader, and Watson examples serialize without domain fields in core |
+| A0 | Freeze environment, identity, ingress, frames, coordinates, operation edges, obligations, traces, and promotion schemas | NAO, iTrader, and Watson examples serialize without runtime-product fields in core |
 | A1 | Replace scalar AB preference with frame-aware band scoring in a compatibility layer | Existing Workbench tests remain unchanged through adapter |
 | A2 | Add typed pulse graph and deterministic graph verifier | Sequential candidates round-trip; invalid/upward/owner-breaking graphs fail |
-| A3 | Add trace envelope and adapters from current Workbench, chatbot, planner, and orchestrator traces | One task is reconstructable end to end from versioned events |
+| A3 | Add multi-actor trace envelope, deterministic `VerifiedTraceDigest`, and adapters from current Workbench, chatbot, planner, and orchestrator traces | One environment task is reconstructable end to end from ingress through obligation judgment |
 | A4 | Add capability posterior store and symbolic entropy updates | Unknown evidence remains unknown; success/failure calibration is testable |
 | A5 | Add retrieval and reviewed pulse heuristic registry | Holdout candidate quality improves without route or execution regression |
 | A6 | Add crystallization quarantine and replay evaluator | Frequency alone cannot promote; counterexamples block promotion |
@@ -964,13 +1054,21 @@ The harness and Workbench must not duplicate the canonical registry.
 | A8 | Run one non-NAO AB4 adapter | Same kernel controls iTrader or Watson graph without NAO/ROS imports |
 | A9 | Evaluate learned delta operators offline | Versioned model/policy delta outperforms baseline on holdout and verifier gates |
 
-### Complexity ladder and release gates
+### Complexity ladder and legacy adaptive bundles
 
-The phases above are the full research route. Implementation should ship in
-four bounded releases so the useful harness arrives before the speculative
-Workbench layers.
+The phases above are the full research route. An earlier draft grouped them
+into five internal bundles also named H0-H4. Those labels are renamed L0-L4 so
+they cannot conflict with the canonical H0-H6 product spine:
 
-#### Release H0: AB-grounded harness MVP
+| Legacy bundle | Canonical product phase |
+| --- | --- |
+| L0: AB-grounded harness MVP | H0 contract spine and H1 executable lifecycle |
+| L1: Candidate and recovery Workbench | H3 trace-adaptive NeuralWorkbench |
+| L2: Trace-adaptive harness | H3 trace-adaptive NeuralWorkbench |
+| L3: Crystallizing Neural Workbench | H4 crystallization and reviewed promotion |
+| L4: Cross-domain AB4 and learned deltas | H4 research feeding H5 federation and conformance |
+
+#### Legacy bundle L0: AB-grounded harness MVP
 
 Goal: make one model-agent safe, scoped, and traceable inside one subsystem.
 
@@ -1018,7 +1116,7 @@ existing standalone behavior parity
 + no moved ROS4HRI ownership
 ```
 
-H0 implementation checkpoint (2026-07-13):
+Parent H0 implementation checkpoint (2026-07-13):
 
 - `src/ab_harness/ab_harness/contracts.py` implements frames, bands, roles,
   interaction modules, outputs, gate decisions, and traces;
@@ -1034,9 +1132,9 @@ H0 implementation checkpoint (2026-07-13):
 This is a contract proof, not a live node integration. Existing node validators
 and runtime ownership remain authoritative until a later cooperative ablation.
 
-#### Release H1: Candidate and recovery Workbench
+#### Legacy bundle L1: Candidate and recovery Workbench
 
-Goal: use the current symbolic Workbench behind the H0 contracts.
+Goal: use the current symbolic Workbench behind the parent H0 contracts.
 
 - add deterministic and model-generated candidate portfolios;
 - verify typed sequential/recovery graphs;
@@ -1047,7 +1145,7 @@ Goal: use the current symbolic Workbench behind the H0 contracts.
 Acceptance: same-model candidate search improves validity or recovery on a
 frozen task set without worsening latency beyond the declared budget.
 
-#### Release H2: Trace-adaptive harness
+#### Legacy bundle L2: Trace-adaptive harness
 
 Goal: let prior evidence affect future search conservatively.
 
@@ -1060,7 +1158,7 @@ Goal: let prior evidence affect future search conservatively.
 Acceptance: holdout uplift, calibrated uncertainty, and no regression in scope,
 safety, or evidence completeness.
 
-#### Release H3: Crystallizing Neural Workbench
+#### Legacy bundle L3: Crystallizing Neural Workbench
 
 Goal: propose and evaluate reusable higher-level AB objects.
 
@@ -1073,7 +1171,7 @@ Goal: propose and evaluate reusable higher-level AB objects.
 Acceptance: a reviewed AB2+ object compresses a repeated solution family while
 preserving effect evidence, recovery visibility, and task performance.
 
-#### Release H4: Cross-domain AB4 design and learned deltas
+#### Legacy bundle L4: Cross-domain AB4 design and learned deltas
 
 Goal: prove the object calculus beyond NAO.
 

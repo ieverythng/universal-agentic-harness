@@ -25,8 +25,14 @@ and must be regenerated after canonical edits.
 
 ## Artifacts
 
-- `artifacts/decisions/`: dated design and grill outcomes.
+- `artifacts/decisions/2026-08-04_uah_h2_neural_workbench_grill.md`: initial
+  H2 and Workbench ownership decisions.
+- `artifacts/decisions/2026-09-08_uah_identity_environment_and_memory_grill.md`:
+  identity, environment, ingress, multi-actor trace, task-closure, and memory
+  decisions from the extended architecture grill.
 - `artifacts/reviews/`: dated implementation and release-gate audits.
+- `artifacts/design-reports/uah_environment_ingress_task_closure_design_report.docx`:
+  retained-template review of the 2026-09-08 architecture checkpoint.
 - `artifacts/system-design/`: system-design document, retained template, and
   architecture figure.
 - `artifacts/provenance.md`: source and extraction provenance.
@@ -43,11 +49,14 @@ and must be regenerated after canonical edits.
 projection, bindings, gates, environment-owner evidence, configuration identity,
 and the mandatory execution ledger.
 
-`src/Neural-Wokbench` is a commit-pinned companion repository. NeuralWorkbench
-remains independently usable and begins its authoritative role at H3 through a
-versioned adapter. It owns pulse search, adaptive trace products, scoring,
-entropy experiments, and quarantined crystallization, not UAH execution
-authority or environment registry content.
+NeuralWorkbench remains an independently usable companion repository and begins
+its authoritative role at H3 through a versioned adapter. The intended revision
+is `e76ba7e`, but the current UAH tree does not contain the declared
+`src/Neural-Wokbench` gitlink. Documentation and qualification must treat that
+revision as an intended pin until the gitlink is restored and verified. The
+companion owns pulse search, adaptive trace products, scoring, entropy
+experiments, and quarantined crystallization, not UAH execution authority or
+environment registry content.
 
 NAO is the first reference domain. Existing chatbot, planner, orchestrator,
 dialogue, knowledge, perception, and skill ownership remains in the NAO
