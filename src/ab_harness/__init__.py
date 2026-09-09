@@ -1,3 +1,4 @@
+from ab_harness.acceptance import TaskAcceptanceEvaluator
 from ab_harness.bindings import BindingCatalog
 from ab_harness.configuration import ConfigurationIdentity
 from ab_harness.contracts import ABControlBand
@@ -7,10 +8,12 @@ from ab_harness.contracts import AbstractionFrame
 from ab_harness.contracts import AgentOutput
 from ab_harness.contracts import AgentRoleSpec
 from ab_harness.contracts import EffectEvidence
+from ab_harness.contracts import EffectObligation
 from ab_harness.contracts import GateDecision
 from ab_harness.contracts import HarnessTrace
 from ab_harness.contracts import InteractionModuleSpec
 from ab_harness.contracts import OwnerExecutionResult
+from ab_harness.contracts import TaskAcceptance
 from ab_harness.environment import InProcessEnvironmentOwner
 from ab_harness.gate import OutputGate
 from ab_harness.projection import InteractionProjector
@@ -34,7 +37,8 @@ from ab_harness.workbench_protocol import WorkbenchRequest
 __all__ = [
     'ABControlBand', 'ABImplementationBinding', 'ABObjectView',
     'AbstractionFrame', 'AgentOutput', 'AgentRoleSpec', 'BindingCatalog',
-    'ConfigurationIdentity', 'EffectEvidence', 'GateDecision', 'HarnessTrace',
+    'ConfigurationIdentity', 'EffectEvidence', 'EffectObligation', 'GateDecision',
+    'HarnessTrace',
     'InProcessEnvironmentOwner', 'InteractionModuleSpec',
     'InteractionProjector', 'JsonlHarnessTraceStore', 'OutputGate',
     'OwnerExecutionResult', 'QualificationCase', 'QualificationResult',
@@ -42,6 +46,7 @@ __all__ = [
     'WorkbenchContextCandidate', 'WorkbenchMemory', 'CURRENT_WORKBENCH_PROTOCOL',
     'InProcessWorkbenchAdapter', 'WorkbenchCandidate',
     'WorkbenchCandidateBatch', 'WorkbenchObservation',
-    'WorkbenchProtocolDescriptor', 'WorkbenchProtocolMismatch',
+    'TaskAcceptance', 'TaskAcceptanceEvaluator', 'WorkbenchProtocolDescriptor',
+    'WorkbenchProtocolMismatch',
     'WorkbenchRequest',
 ]

@@ -1,7 +1,7 @@
 # Universal Agentic Harness: Development Log
 
 **Purpose:** Practical implementation ledger linked to the semantic masterplan  
-**Updated:** 2026-09-08
+**Updated:** 2026-09-09
 **Target:** UAH H2 NAO planner qualification after ordered evidence gates pass
 **Current release boundary:** H0 contract spine, one H1 synthetic vertical
 slice, smoke CLI, quarantined Workbench retrieval, and frozen Workbench adapter
@@ -21,7 +21,7 @@ protocol; H1 lifecycle and H2 planner parity remain incomplete
 | Watson/Bonsai model matrix | Not started | Frozen cases and configuration identity still required |
 | Configuration identity | Partial | Monolithic model-harness-environment tuple is content-addressed; environment profile/run, ingress, role, agent, run, trace, operation, edge and invocation identities are specified but not implemented |
 | Environment lifecycle | Specified, not implemented | Owner-attested environment run, deterministic ingress classification, attached agent runs, and standby semantics are frozen |
-| Task closure | Specified, not implemented | Required and best-effort effect obligations compile into deterministic accepted, accepted-with-deficit, suspended, or rejected judgments |
+| Task closure | Green narrow kernel seam | `EffectObligation`, `TaskAcceptance`, and the pure evaluator distinguish accepted, accepted-with-deficit, suspended, and rejected outcomes; TaskSpec compilation and full lifecycle integration remain open |
 | Launch smoke CLI | Green | Accepted path, rejected canary, and Workbench retrieval run via `python -m ab_harness smoke` |
 | Neural Workbench retrieval | Green candidate slice | Failure-aware bounded retrieval emits provenance-bearing candidates only |
 | Neural Workbench promotion/adaptation | Quarantined design only | No trusted runtime mutation or registry promotion implemented |
@@ -430,11 +430,46 @@ evaluator, multi-actor ledger, or `report_result` adapter is implemented in UAH
 yet. H2 remains the first NAO demonstration and H3 remains the first Workbench
 implementation stage.
 
+### 2026-09-09: First task-acceptance TDD seam
+
+The owner confirmed the public interface and closed the architecture grill:
+
+```text
+TaskAcceptanceEvaluator.evaluate(
+    effect_obligations,
+    evidence_set,
+) -> TaskAcceptance
+```
+
+Four vertical red-green behaviors now prove the pure seam:
+
+- required owner evidence closes its declared effect;
+- failure of a best-effort report preserves required-effect acceptance and is
+  recorded as a deficit;
+- terminal failure of a required effect rejects the task;
+- duplicate obligation identities and empty obligation sets fail closed.
+
+The recorded NAO qualification path now accepts explicit effect obligations
+and returns an optional `TaskAcceptance` artifact. Its existing
+`required_observables` field remains available as a compatibility surface.
+This additive path reuses `InProcessEnvironmentOwner` evidence and does not
+move NAO retry, replan, speech, or lifecycle policy into the evaluator.
+
+The NAO source informed the contract without becoming a dependency:
+`observable_success` supplies effect names, the AB object and binding identify
+the evidence owner, and NAO retry or terminal policy must be compiled into the
+obligation before evaluation. The evaluator does not parse planner text,
+interpret `plan_completed`, or decide native retryability.
+
+The next TDD seam is owner-attested synthetic environment registration and
+deterministic ingress classification. TaskSpec obligation compilation follows
+once the environment and task identities are available.
+
 ## Verification dashboard
 
 | Command | Result |
 | --- | --- |
-| `PYTHONPATH=src python -m pytest -q` on 2026-09-07 | 45 passed after documentation topology regression coverage |
+| `PYTHONPATH=src python -m pytest -q` on 2026-09-09 | 50 passed after task-acceptance and recorded-qualification integration coverage |
 | `.venv\Scripts\python.exe -m pytest -q -p no:cacheprovider --basetemp .test-tmp\full-suite` | 42 passed |
 | Focused `tests/test_workbench_protocol.py` red-green pass | 9 passed after strict identity, capability, duplicate-ID, and JSON checks |
 | `.venv\Scripts\python.exe -m ab_harness smoke` | Passed all four canaries |
@@ -544,8 +579,10 @@ concurrency, latency, and quality envelopes differ.
 - [ ] Add serialized `TaskSpec`, `EnvironmentProfile`, `EnvironmentRun`,
   `EnvironmentIngress`, and deterministic `TaskIngressDecision`.
 - [ ] Add `TypedProposal`, `AdmittedOperation`, and `ExecutionLease` contracts.
-- [ ] Add `EffectObligation`, `TaskAcceptance`, and pure task-acceptance
-  evaluation after the public seam is confirmed.
+- [x] Add `EffectObligation`, `TaskAcceptance`, and pure task-acceptance
+  evaluation after public seam confirmation.
+- [ ] Compile obligations deterministically from `TaskSpec`, DomainContractPack
+  evidence rules, and task-ingress lineage.
 - [ ] Add deterministic `PromptCompiler` output and artifact hashing from the
   same `InteractionModuleSpec` consumed by semantic admission.
 - [ ] Append lifecycle events for compile, proposal, gate, dispatch, evidence,
@@ -601,7 +638,7 @@ concurrency, latency, and quality envelopes differ.
 
 H2 is qualified only when the core rows and planner parity rows are green:
 
-| Gate | State on 2026-09-08 | Required before qualification |
+| Gate | State on 2026-09-09 | Required before qualification |
 | --- | --- | --- |
 | Installable portable package | Green | Clean install smoke in a fresh venv |
 | Deterministic boot command | Green | Preserve machine-readable output and nonzero failure exit |
@@ -610,6 +647,7 @@ H2 is qualified only when the core rows and planner parity rows are green:
 | Complete configuration identity | Partial | Split environment profile/run, ingress, role, model, agent, actor run, trace, operation and invocation identities while preserving the current content hash as a compatibility snapshot |
 | Lifecycle replay | Partial | Append environment-start-to-terminal obligation events and replay without the model |
 | Failure suite | Partial | Add stale evidence, timeout, cancellation, and false completion |
+| Task acceptance | Partial green | Pure obligation evaluator and recorded-qualification artifact implemented; TaskSpec compilation and full lifecycle replay remain required |
 | Documentation | Architecture checkpoint active | Keep Markdown/HTML diagrams, plans, contracts, artifacts and implementation status synchronized |
 | Watson/Bonsai runner | Not started | Freeze provider-neutral protocol; one reproducible paired dry run |
 | NAO planner parity | Not started | Recorded/fake full path under explicit authority mode, multi-actor trace, `report_result` delegation, and reviewed disagreement report |

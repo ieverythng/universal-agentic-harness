@@ -1,11 +1,13 @@
-"""Frozen-output qualification loop for the first ROS-free NAO-shaped case."""
+"""Frozen-output qualification loop"""
 
 from __future__ import annotations
 
 from dataclasses import dataclass
 from typing import Any
 
-from ab_harness.contracts import EffectEvidence, GateDecision
+from ab_harness.acceptance import TaskAcceptanceEvaluator
+from ab_harness.contracts import EffectEvidence, EffectObligation, GateDecision
+from ab_harness.contracts import TaskAcceptance
 from ab_harness.environment import InProcessEnvironmentOwner
 from ab_harness.gate import OutputGate
 from ab_harness.nao_h0 import CHATBOT_ROLE, PLANNER_ROLE
@@ -19,7 +21,8 @@ class QualificationCase:
     case_id: str
     task_id: str
     requested_object_ids: tuple[str, ...]
-    required_observables: tuple[str, ...]
+    required_observables: tuple[str, ...] = ()
+    effect_obligations: tuple[EffectObligation, ...] = ()
     prohibited_object_ids: tuple[str, ...] = ()
     expected_chatbot_output_type: str = 'planner_handoff'
 
@@ -35,6 +38,7 @@ class QualificationResult:
     closed_observables: tuple[str, ...] = ()
     missing_observables: tuple[str, ...] = ()
     errors: tuple[str, ...] = ()
+    acceptance: TaskAcceptance | None = None
 
 
 class RecordedNaoQualificationHarness:
@@ -49,6 +53,7 @@ class RecordedNaoQualificationHarness:
         self._environment = environment
         self._projector = InteractionProjector(registry)
         self._gate = OutputGate()
+        self._acceptance = TaskAcceptanceEvaluator()
 
     def run(
         self,
@@ -152,15 +157,26 @@ class RecordedNaoQualificationHarness:
             for observable in case.required_observables
             if observable not in closed
         )
+        acceptance = (
+            self._acceptance.evaluate(case.effect_obligations, evidence)
+            if case.effect_obligations
+            else None
+        )
+        passed = (
+            acceptance.status in {'accepted', 'accepted_with_deficit'}
+            if acceptance is not None
+            else not missing
+        )
         return QualificationResult(
             case_id=case.case_id,
-            passed=not missing,
-            failure_stage='evidence_closure' if missing else None,
+            passed=passed,
+            failure_stage='evidence_closure' if not passed else None,
             chatbot_gate=chatbot_gate,
             planner_gate=planner_gate,
             evidence=tuple(evidence),
             closed_observables=closed,
             missing_observables=missing,
+            acceptance=acceptance,
         )
 
 

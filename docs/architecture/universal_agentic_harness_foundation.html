@@ -1388,7 +1388,7 @@ H6 optional AB5 policy-foundry research</code></pre>
 <h2>14. Immediate Work Queue</h2>
 <ol>
 <li>Freeze and review the environment, identity, task-ingress, operation-edge, effect-obligation, and task-acceptance schemas.</li>
-<li>Confirm the first TDD public seam before writing tests. The current design recommendation is the pure <code>TaskAcceptanceEvaluator.evaluate(...)</code> boundary, followed by environment registration and ingress classification.</li>
+<li>Retain the implemented pure <code>TaskAcceptanceEvaluator.evaluate(...)</code> public seam and next add environment registration and ingress classification.</li>
 <li>Add <code>ABRegistry.task_projection(...)</code> or a separate compiler prototype with no runtime behavior change.</li>
 <li>Build golden projection cases for dialogue, knowledge query, scan/find, navigation failure, and grouped delivery.</li>
 <li>Define the shared provider capability record from the union of current chatbot and planner transport behavior.</li>

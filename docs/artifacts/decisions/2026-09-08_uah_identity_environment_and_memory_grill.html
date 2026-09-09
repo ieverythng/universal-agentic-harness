@@ -196,7 +196,7 @@
   <main class="doc">
 
 <h1>UAH Identity, Environment, and Memory Design Grill</h1>
-<p><strong>Date:</strong> 2026-09-08 <strong>Status:</strong> Architecture decisions accepted; first TDD seam awaiting owner confirmation <strong>Scope:</strong> H0-H2 contracts, with H3-H5 compatibility seams only</p>
+<p><strong>Date:</strong> 2026-09-08 <strong>Status:</strong> Architecture decisions accepted; grill closed; first TDD seam implemented <strong>Scope:</strong> H0-H2 contracts, with H3-H5 compatibility seams only</p>
 <h2>1. Purpose</h2>
 <p>This record captures the decisions made after the H2 commit review. It keeps the original H0-H6 delivery spine intact while resolving agent identity, hardware allocation, environment activation, multi-actor traces, task closure, Observatory, and NeuralWorkbench ownership.</p>
 <h2>2. Role, Agent, and Runtime Identity</h2>
@@ -283,15 +283,16 @@ required effect terminally failed    -&gt; rejected</code></pre>
 <li><strong>H5:</strong> federate local and remote provider pools with conformance tests.</li>
 <li><strong>H6:</strong> retain AB5 policy-foundry research as optional.</li>
 </ul>
-<h2>13. Open Grill Decision Before TDD</h2>
-<p>No new implementation test is authorized until the owner confirms the public seam. The current recommendation is:</p>
+<h2>13. TDD Seam Confirmed on 2026-09-09</h2>
+<p>The owner confirmed the public seam and closed the architecture grill:</p>
 <pre><code class="language-text">TaskAcceptanceEvaluator.evaluate(
     effect_obligations,
     evidence_set,
 ) -&gt; TaskAcceptance</code></pre>
-<p>The first failing cases would distinguish required-effect failure from a best-effort deficit using the same immutable evidence grammar. The next slice would register an attested synthetic environment run and classify one ingress. Only then should the existing proposal, admission, fake-owner, and replay path be connected into a complete tracer.</p>
+<p>The first red-green slices now distinguish required-effect failure from a best-effort deficit using the same immutable evidence grammar. Duplicate obligation identities and empty obligation sets fail closed. The evaluator is also connected additively to the recorded NAO qualification result while the legacy <code>required_observables</code> compatibility field remains available.</p>
+<p>The next seam is owner-attested synthetic environment registration and deterministic ingress classification. It should then connect the existing proposal, admission, fake-owner, acceptance, and replay path into a complete tracer.</p>
 <h2>14. Evidence and Limits</h2>
-<p>The architecture was checked against NAO tag <code>v1.0.0</code>, chatbot revision <code>a2ecca796...</code>, and intended NeuralWorkbench revision <code>e76ba7e</code>. Focused read-only baselines passed 112 chatbot turn-engine tests and 41 planner supervisor/gate tests. These results constrain compatibility but do not qualify UAH H2. No environment registry, task-ingress policy, obligation evaluator, multi-actor ledger, <code>report_result</code> adapter, or Workbench retrieval policy is implemented in UAH at this checkpoint.</p>
+<p>The architecture was checked against NAO tag <code>v1.0.0</code>, chatbot revision <code>a2ecca796...</code>, and intended NeuralWorkbench revision <code>e76ba7e</code>. Focused read-only baselines passed 112 chatbot turn-engine tests and 41 planner supervisor/gate tests. These results constrain compatibility but do not qualify UAH H2. <code>EffectObligation</code>, <code>TaskAcceptance</code>, and the pure acceptance evaluator are now implemented. No TaskSpec obligation compiler, environment registry, task-ingress policy, multi-actor ledger, <code>report_result</code> adapter, or Workbench retrieval policy is implemented at this checkpoint.</p>
   </main>
 </body>
 </html>

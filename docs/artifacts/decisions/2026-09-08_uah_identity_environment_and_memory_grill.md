@@ -1,7 +1,7 @@
 # UAH Identity, Environment, and Memory Design Grill
 
 **Date:** 2026-09-08
-**Status:** Architecture decisions accepted; first TDD seam awaiting owner confirmation
+**Status:** Architecture decisions accepted; grill closed; first TDD seam implemented
 **Scope:** H0-H2 contracts, with H3-H5 compatibility seams only
 
 ## 1. Purpose
@@ -234,10 +234,9 @@ deslop workflows. It cannot approve its own semantic objects or bindings.
 - **H5:** federate local and remote provider pools with conformance tests.
 - **H6:** retain AB5 policy-foundry research as optional.
 
-## 13. Open Grill Decision Before TDD
+## 13. TDD Seam Confirmed on 2026-09-09
 
-No new implementation test is authorized until the owner confirms the public
-seam. The current recommendation is:
+The owner confirmed the public seam and closed the architecture grill:
 
 ```text
 TaskAcceptanceEvaluator.evaluate(
@@ -246,11 +245,16 @@ TaskAcceptanceEvaluator.evaluate(
 ) -> TaskAcceptance
 ```
 
-The first failing cases would distinguish required-effect failure from a
-best-effort deficit using the same immutable evidence grammar. The next slice
-would register an attested synthetic environment run and classify one ingress.
-Only then should the existing proposal, admission, fake-owner, and replay path
-be connected into a complete tracer.
+The first red-green slices now distinguish required-effect failure from a
+best-effort deficit using the same immutable evidence grammar. Duplicate
+obligation identities and empty obligation sets fail closed. The evaluator is
+also connected additively to the recorded NAO qualification result while the
+legacy `required_observables` compatibility field remains available.
+
+The next seam is owner-attested synthetic environment registration and
+deterministic ingress classification. It should then connect the existing
+proposal, admission, fake-owner, acceptance, and replay path into a complete
+tracer.
 
 ## 14. Evidence and Limits
 
@@ -258,6 +262,7 @@ The architecture was checked against NAO tag `v1.0.0`, chatbot revision
 `a2ecca796...`, and intended NeuralWorkbench revision `e76ba7e`. Focused
 read-only baselines passed 112 chatbot turn-engine tests and 41 planner
 supervisor/gate tests. These results constrain compatibility but do not qualify
-UAH H2. No environment registry, task-ingress policy, obligation evaluator,
-multi-actor ledger, `report_result` adapter, or Workbench retrieval policy is
-implemented in UAH at this checkpoint.
+UAH H2. `EffectObligation`, `TaskAcceptance`, and the pure acceptance evaluator
+are now implemented. No TaskSpec obligation compiler, environment registry,
+task-ingress policy, multi-actor ledger, `report_result` adapter, or Workbench
+retrieval policy is implemented at this checkpoint.

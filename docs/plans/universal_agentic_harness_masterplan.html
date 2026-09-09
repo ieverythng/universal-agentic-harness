@@ -511,6 +511,9 @@ H6  AB5 policy-foundry hypothesis                         RESEARCH ONLY, NOT COM
 <li>The NAO <code>report_result</code> skill remains AB1 in the planner runtime frame. It verifies runtime evidence, delegates grounded response composition to the chatbot agent run, and returns to the native communication owner within the original task and trace.</li>
 <li>The intended NeuralWorkbench registry revision contains an older <code>report_result</code> decomposition. H2 must reconcile it with NAO <code>v1.0.0</code> and the pinned chatbot source through an owner-reviewed DomainContractPack revision.</li>
 </ul>
+<h3>First task-acceptance seam implemented on 2026-09-09</h3>
+<p>The architecture grill is closed. The confirmed public seam is <code>TaskAcceptanceEvaluator.evaluate(effect_obligations, evidence_set)</code>, which returns an immutable <code>TaskAcceptance</code>.</p>
+<p>The first red-green slices implement required and best-effort obligations, terminal required-effect rejection, suspended unproven work, duplicate-ID rejection, and rejection of an empty obligation set. The recorded NAO qualification result now carries an optional explicit acceptance artifact while retaining its legacy <code>required_observables</code> compatibility surface. The evaluator consumes normalized owner evidence and contains no prompt, ROS, provider, registry, or domain-lifecycle policy.</p>
 <h3>What H0 actually implements</h3>
 <p>The parent-only <code>src/ab_harness</code> package is a real portable contract proof. It contains no ROS or NAO imports in the core and currently proves:</p>
 <table><thead><tr>
@@ -559,9 +562,14 @@ H6  AB5 policy-foundry hypothesis                         RESEARCH ONLY, NOT COM
 <td>Approved AB1 dispatch, owner enforcement, normalized effect evidence</td>
 </tr>
 <tr>
+<td>Task acceptance</td>
+<td><code>acceptance.py</code></td>
+<td>Required versus best-effort closure, terminal failure, suspension, duplicate and empty obligation rejection</td>
+</tr>
+<tr>
 <td>Recorded NAO qualification</td>
 <td><code>qualification.py</code></td>
-<td>Chatbot gate, planner gate, fake execution, terminal observable closure</td>
+<td>Chatbot gate, planner gate, fake execution, terminal observable closure, optional explicit task acceptance</td>
 </tr>
 <tr>
 <td>Focused fail-closed tests</td>
@@ -573,6 +581,7 @@ H6  AB5 policy-foundry hypothesis                         RESEARCH ONLY, NOT COM
 <p>The current proof is intentionally narrower than the desired H0 contract in the earlier foundation document. These are open seams, not failures:</p>
 <ul>
 <li>no serialized <code>HarnessSpec</code>, <code>TaskSpec</code>, <code>ModelProfile</code>, permission policy, environment identity, or versioned schema envelope;</li>
+<li>no TaskSpec compiler yet constructs effect obligations from a domain pack and task-ingress decision;</li>
 <li>registry object views do not yet carry full input/output schemas, owner authority, side-effect class, freshness, or evidence obligation types;</li>
 <li>projection starts from requested object IDs rather than compiling them from a complete task/effect contract;</li>
 <li>the output gate does not yet validate payload schemas, canonical aliases, preconditions, permissions, budgets, or evidence closure;</li>
@@ -2051,8 +2060,8 @@ evidence_closure | evaluator | resource_budget</code></pre>
 </tr>
 <tr>
 <td>Task closure overclaims success</td>
-<td>No obligation evaluator</td>
-<td>Drive required failure and best-effort failure from the same owner evidence set and require distinct judgments</td>
+<td>Pure evaluator implemented; TaskSpec compiler and lifecycle integration absent</td>
+<td>Compile obligations from a frozen task and replay required failure plus best-effort deficit through the full ledger</td>
 </tr>
 <tr>
 <td>AB5 remains relabeled optimization</td>
@@ -2060,7 +2069,7 @@ evidence_closure | evaluator | resource_budget</code></pre>
 <td>Require held-out population-of-AB4 governance experiment</td>
 </tr>
 </tbody></table>
-<p>The immediate next probe is a narrow H1 synthetic tracer after public-interface confirmation: register one attested environment run, classify one ingress into a task with one required and one best-effort obligation, execute a recorded admitted operation through a fake owner, derive <code>TaskAcceptance</code>, produce a <code>VerifiedTraceDigest</code>, and replay the lifecycle without a model. A second case must fail only the best-effort obligation and remain accepted with a recorded deficit. This tests the semantic center without touching the live NAO stack or committing to an external harness.</p>
+<p>The immediate next probe is a narrow H1 synthetic tracer: register one attested environment run, classify one ingress into a task with one required and one best-effort obligation, execute a recorded admitted operation through a fake owner, derive <code>TaskAcceptance</code>, produce a <code>VerifiedTraceDigest</code>, and replay the lifecycle without a model. A second case must fail only the best-effort obligation and remain accepted with a recorded deficit. This tests the semantic center without touching the live NAO stack or committing to an external harness.</p>
 <h2>20. Primary Sources and Implementation References</h2>
 <h3>Research</h3>
 <ul>

@@ -12,6 +12,7 @@
 **Frame-access reconciliation:** 2026-09-04<br>
 **Agent-handle reconciliation:** 2026-09-06<br>
 **Environment and task-closure reconciliation:** 2026-09-08<br>
+**First TDD seam implemented:** 2026-09-09<br>
 **Review status:** H0 synthetic proof accepted with corrections required; H1 and H2 not qualified
 
 ## 1. Decision
@@ -730,12 +731,12 @@ Partial or missing:
 The commit is accepted as documentation and workflow scaffolding after the
 provenance correction. It must not be counted as H2 progress.
 
-## 12. Current Pre-commit Queue Review on 2026-09-08
+## 12. Current Pre-commit Queue Review on 2026-09-09
 
 The current queue modifies domain language, the foundation, adaptive Workbench
 theory, the Observatory contract, the canonical masterplan and development log,
-their generated HTML companions, this review, and one renderer regression test.
-It changes no runtime source.
+their generated HTML companions, this review, the first task-acceptance runtime
+seam, and focused tests.
 
 ### 12.1 File-group disposition
 
@@ -749,13 +750,16 @@ It changes no runtime source.
 | Legacy documentation paths | Accept | `docs/agentic_harness/*.html` remains redirect-only; canonical Markdown exists only under `docs/plans` and `docs/architecture`. |
 | Generated HTML | Accept | Regenerated from canonical Markdown and receives no independent semantic edits. |
 | Renderer regression test | Accept | It checks that every legacy page resolves to its declared canonical target and that no competing legacy Markdown exists. |
+| `acceptance.py` and public contracts | Accept as a narrow H0-H1 seam | The evaluator compares frozen obligations with normalized owner evidence and imports no domain or provider runtime. |
+| Task-acceptance tests | Accept | Red-green cases cover best-effort deficits, terminal required failure, duplicate identities, empty obligations, and recorded NAO integration through public APIs. |
 
 ### 12.2 Standards axis
 
 No new repository-standard violation remains in the queue. Added prose contains
 no em dash, marketing claim, global AB-level claim, or H3 implementation claim.
-Core dependency boundaries are unaffected because `src/ab_harness` is
-unchanged. The generated documents are synchronized and whitespace checks pass.
+The new core module uses only standard-library and `ab_harness` contracts. It
+contains no ROS, NAO, provider SDK, or runtime-product dependency. The generated
+documents are synchronized and whitespace checks pass.
 
 The open provenance finding for the already committed deslop references remains
 outside this queue. It is recorded rather than hidden.
@@ -781,15 +785,16 @@ The queue records the decisions reached during the architecture grill:
 9. one multi-actor trace records explicit cross-frame delegation and yields a
    deterministic `VerifiedTraceDigest`.
 
-The queue intentionally does not implement the H0-H2 runtime contracts while
-the design grill remains active. It is ready to stage as an architecture and
-review checkpoint, not as an H2 implementation milestone.
+The design grill is closed. The queue now implements the first confirmed public
+runtime seam but remains an architecture and H0-H1 checkpoint, not an H2
+implementation milestone. Environment registration, task ingress, TaskSpec
+obligation compilation, lifecycle replay, and NAO parity remain open.
 
 ### 12.4 Verification
 
 `python scripts/render_agentic_harness_docs.py`, `git diff --check`, and
 `PYTHONPATH=src python -m pytest -q` pass. The current source-aware suite reports
-45 passed tests. The revised Workbench SVG was rendered separately and checked
+50 passed tests. The revised Workbench SVG was rendered separately and checked
 for readable nodes, non-overlapping labels, and visible separation between
 context output and shadow proposal output.
 
@@ -822,5 +827,6 @@ and conformance report. Live mutable registry synchronization is rejected.
 Retain both commits on the pre-commit review branch after applying documentation
 corrections. Do not merge them to `main` as an H2 release in their current form.
 The clean-install smoke result supports preserving the implementation as an H0
-baseline. Source changes should begin only after the first TDD seam and the
-immutable NAO revision are confirmed through the design grill.
+baseline. The architecture grill and first TDD seam are now complete. Continue
+with owner-attested synthetic environment registration and deterministic task
+ingress before expanding provider or live NAO scope.

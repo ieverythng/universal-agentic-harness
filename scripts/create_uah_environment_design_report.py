@@ -248,7 +248,17 @@ def _replace_cover_image(docx_path: Path, cover_path: Path) -> None:
                 payload = payload.replace(
                     b"Report title", b"UAH architecture checkpoint"
                 )
-                payload = payload.replace(b">Date<", b">8 September 2026<")
+                payload = payload.replace(b">Date<", b">9 September 2026<")
+            if item.filename == "word/document.xml":
+                payload = payload.replace(
+                    b">Introduction<", b">Architecture checkpoint<"
+                )
+                payload = payload.replace(
+                    b">Notes<", b">Identity and authority map<"
+                )
+                payload = payload.replace(
+                    b">Source placeholders<", b">Evidence sources<"
+                )
             target.writestr(item, payload)
     temporary.replace(docx_path)
 
@@ -275,7 +285,7 @@ def populate(reference: Path, output_dir: Path) -> Path:
     replacements = {
         2: "Universal Agentic Harness",
         4: "Contents",
-        5: "Executive summary  ·  Architecture checkpoint  ·  Key findings  ·  Implications  ·  Recommendations  ·  Appendix",
+        5: "",
         6: "Executive summary",
         7: "The H0-H2 architecture now has an explicit runtime envelope. An owner-attested EnvironmentRun groups native ingress, persistent agent actors, domain tasks, causal traces, and evidence. Agent identity remains independent of provider placement, while each model invocation records the exact lease and loaded instance that supplied computation.",
         8: "Task closure is no longer inferred from planner status, model text, or an event label. Tasks declare required and best-effort effect obligations before execution. A deterministic evaluator compares those obligations with owner-issued evidence and produces accepted, accepted-with-deficit, suspended, or rejected outcomes.",
@@ -297,22 +307,22 @@ def populate(reference: Path, output_dir: Path) -> Path:
         26: "Observatory and NeuralWorkbench remain separate. Observatory renders immutable facts and projections. Workbench consumes verified trace digests to retrieve experience and compare candidates, but it cannot mutate the ledger or decide when evidence becomes memory or authority. H2 provides only the attachment seams; retrieval and model-assisted search begin in H3.",
         27: "Recommendations",
         28: "Implementation should proceed through small public contracts and preserve the current H0 compatibility surface while the new identity grammar lands.",
-        29: "Confirm the first TDD seam. The recommended starting boundary is TaskAcceptanceEvaluator.evaluate(effect_obligations, evidence_set) -> TaskAcceptance.",
-        30: "Register one synthetic EnvironmentRun, classify one ingress, attach one standby-capable agent run, and connect the existing typed proposal and fake-owner path.",
+        29: "Retain the implemented TaskAcceptanceEvaluator.evaluate(effect_obligations, evidence_set) -> TaskAcceptance boundary and compile obligations only from frozen task and domain contracts.",
+        30: "Register one synthetic EnvironmentRun, classify one ingress, attach one standby-capable agent run, and connect the existing typed proposal, fake-owner, and acceptance path.",
         31: "Produce a replayable VerifiedTraceDigest, then freeze the NAO DomainContractPack and test planner parity, report_result delegation, required-effect failure, and best-effort deficit paths.",
         32: "Conclusion",
-        33: "The architecture is ready to leave the grill once the first public test seam is confirmed. It supports continuous environment-bound agents without permanent model allocation, preserves domain authority, and creates a trace grammar suitable for O1/O2 debugging and later Workbench memory.",
-        34: "No environment-run registry, ingress classifier, obligation evaluator, multi-actor ledger, report_result adapter, or dynamic allocator is implemented at this checkpoint. The current release remains an H0 contract proof with one partial H1 vertical slice.",
+        33: "The architecture grill is closed and the first public task-acceptance seam is implemented. The design supports continuous environment-bound agents without permanent model allocation, preserves domain authority, and creates a trace grammar suitable for O1/O2 debugging and later Workbench memory.",
+        34: "No TaskSpec obligation compiler, environment-run registry, ingress classifier, multi-actor ledger, report_result adapter, or dynamic allocator is implemented at this checkpoint. The current release remains an H0 contract proof with partial H1 vertical slices.",
         35: "Appendix",
         36: "Identity and authority map",
         37: "Semantic chain: DomainContractPack -> AgentRoleConfiguration -> AgentManifest -> agent_id -> AgentHandleRevision -> agent_run_id.",
         38: "Runtime chain: EnvironmentProfile -> environment_run_id -> EnvironmentIngress -> TaskIngressDecision -> task_id -> trace_id -> operation graph -> effect obligations -> TaskAcceptance.",
         39: "Evidence sources",
-        40: "Universal Agentic Harness foundation, canonical Markdown, 8 September 2026.",
-        41: "Universal Agentic Harness masterplan and development log, canonical Markdown, 8 September 2026.",
+        40: "Universal Agentic Harness foundation, canonical Markdown, 9 September 2026.",
+        41: "Universal Agentic Harness masterplan and development log, canonical Markdown, 9 September 2026.",
         42: "NAO ROS4HRI bridge, annotated tag v1.0.0, peeled commit ebffe93a74be4e013ce0f60fdfc41268dba73fc3.",
         43: "Chatbot planner-hook source, revision a2ecca796; NeuralWorkbench intended companion revision e76ba7e.",
-        45: "Report status. Architecture and test seams are specified. Runtime implementation and H2 qualification remain open.",
+        45: "Report status. The architecture grill is closed and the task-acceptance seam is implemented. Environment lifecycle, replay, and H2 qualification remain open.",
     }
     for index, value in replacements.items():
         _replace_paragraph(document, index, value)
@@ -331,7 +341,7 @@ def populate(reference: Path, output_dir: Path) -> Path:
 
     metadata = document.tables[0]
     metadata.cell(0, 0).text = "Environment, ingress, and task closure architecture"
-    metadata.cell(0, 2).text = "Prepared by UAH project\n8 September 2026"
+    metadata.cell(0, 2).text = "Prepared by UAH project\n9 September 2026"
 
     findings = document.tables[1]
     rows = (

@@ -196,7 +196,7 @@
   <main class="doc">
 
 <h1>UAH H2 Commit and Operational Readiness Review</h1>
-<p><strong>Review date:</strong> 2026-08-17&lt;br&gt; <strong>Reviewed range:</strong> <code>5de73a5...71ae872</code>&lt;br&gt; <strong>Commits:</strong> <code>6708af9</code> and <code>71ae872</code>&lt;br&gt; <strong>Seven-day follow-up commit:</strong> <code>8582ab9</code> (2026-09-01)&lt;br&gt; <strong>UAH branch:</strong> <code>feat/pre-commit-queue</code>&lt;br&gt; <strong>NAO qualification boundary:</strong> annotated tag <code>v1.0.0</code>, peeled commit <code>ebffe93a74be4e013ce0f60fdfc41268dba73fc3</code> on the <code>feat/TFM-LLM_planner</code> development line&lt;br&gt; <strong>Architecture reconciliation:</strong> 2026-09-03&lt;br&gt; <strong>Frame-access reconciliation:</strong> 2026-09-04&lt;br&gt; <strong>Agent-handle reconciliation:</strong> 2026-09-06&lt;br&gt; <strong>Environment and task-closure reconciliation:</strong> 2026-09-08&lt;br&gt; <strong>Review status:</strong> H0 synthetic proof accepted with corrections required; H1 and H2 not qualified</p>
+<p><strong>Review date:</strong> 2026-08-17&lt;br&gt; <strong>Reviewed range:</strong> <code>5de73a5...71ae872</code>&lt;br&gt; <strong>Commits:</strong> <code>6708af9</code> and <code>71ae872</code>&lt;br&gt; <strong>Seven-day follow-up commit:</strong> <code>8582ab9</code> (2026-09-01)&lt;br&gt; <strong>UAH branch:</strong> <code>feat/pre-commit-queue</code>&lt;br&gt; <strong>NAO qualification boundary:</strong> annotated tag <code>v1.0.0</code>, peeled commit <code>ebffe93a74be4e013ce0f60fdfc41268dba73fc3</code> on the <code>feat/TFM-LLM_planner</code> development line&lt;br&gt; <strong>Architecture reconciliation:</strong> 2026-09-03&lt;br&gt; <strong>Frame-access reconciliation:</strong> 2026-09-04&lt;br&gt; <strong>Agent-handle reconciliation:</strong> 2026-09-06&lt;br&gt; <strong>Environment and task-closure reconciliation:</strong> 2026-09-08&lt;br&gt; <strong>First TDD seam implemented:</strong> 2026-09-09&lt;br&gt; <strong>Review status:</strong> H0 synthetic proof accepted with corrections required; H1 and H2 not qualified</p>
 <h2>1. Decision</h2>
 <p>The two commits contain a useful portable contract proof. They do not close the then-active dated H2 launch contract. The current package can be installed in a clean Python environment, executes one deterministic recorded success and one out-of-projection rejection, and preserves the basic rule that an environment owner issues effect evidence. The package does not yet implement the complete H1 lifecycle, typed operation admission, model-free lifecycle replay, a provider adapter, or NAO planner parity.</p>
 <p>The current release label should therefore remain <strong>H0 synthetic proof with one partial H1 vertical slice</strong>. It should not be labeled <code>UAH core qualified</code>, <code>UAH H2 NAO planner qualified</code>, or <code>UAH H2 model qualified</code> under the definitions in the <a href="../../plans/universal_agentic_harness_masterplan.md">masterplan</a>.</p>
@@ -856,8 +856,8 @@ raw dictionary -&gt; second parser -&gt; owner arguments</code></pre>
 <li>The imported upstream material lacks the provenance required for a stable repository dependency.</li>
 </ol>
 <p>The commit is accepted as documentation and workflow scaffolding after the provenance correction. It must not be counted as H2 progress.</p>
-<h2>12. Current Pre-commit Queue Review on 2026-09-08</h2>
-<p>The current queue modifies domain language, the foundation, adaptive Workbench theory, the Observatory contract, the canonical masterplan and development log, their generated HTML companions, this review, and one renderer regression test. It changes no runtime source.</p>
+<h2>12. Current Pre-commit Queue Review on 2026-09-09</h2>
+<p>The current queue modifies domain language, the foundation, adaptive Workbench theory, the Observatory contract, the canonical masterplan and development log, their generated HTML companions, this review, the first task-acceptance runtime seam, and focused tests.</p>
 <h3>12.1 File-group disposition</h3>
 <table><thead><tr>
 <th>File group</th>
@@ -904,9 +904,19 @@ raw dictionary -&gt; second parser -&gt; owner arguments</code></pre>
 <td>Accept</td>
 <td>It checks that every legacy page resolves to its declared canonical target and that no competing legacy Markdown exists.</td>
 </tr>
+<tr>
+<td><code>acceptance.py</code> and public contracts</td>
+<td>Accept as a narrow H0-H1 seam</td>
+<td>The evaluator compares frozen obligations with normalized owner evidence and imports no domain or provider runtime.</td>
+</tr>
+<tr>
+<td>Task-acceptance tests</td>
+<td>Accept</td>
+<td>Red-green cases cover best-effort deficits, terminal required failure, duplicate identities, empty obligations, and recorded NAO integration through public APIs.</td>
+</tr>
 </tbody></table>
 <h3>12.2 Standards axis</h3>
-<p>No new repository-standard violation remains in the queue. Added prose contains no em dash, marketing claim, global AB-level claim, or H3 implementation claim. Core dependency boundaries are unaffected because <code>src/ab_harness</code> is unchanged. The generated documents are synchronized and whitespace checks pass.</p>
+<p>No new repository-standard violation remains in the queue. Added prose contains no em dash, marketing claim, global AB-level claim, or H3 implementation claim. The new core module uses only standard-library and <code>ab_harness</code> contracts. It contains no ROS, NAO, provider SDK, or runtime-product dependency. The generated documents are synchronized and whitespace checks pass.</p>
 <p>The open provenance finding for the already committed deslop references remains outside this queue. It is recorded rather than hidden.</p>
 <h3>12.3 Specification axis</h3>
 <p>The queue records the decisions reached during the architecture grill:</p>
@@ -921,9 +931,9 @@ raw dictionary -&gt; second parser -&gt; owner arguments</code></pre>
 <li>task closure uses required and best-effort effect obligations;</li>
 <li>one multi-actor trace records explicit cross-frame delegation and yields a deterministic <code>VerifiedTraceDigest</code>.</li>
 </ol>
-<p>The queue intentionally does not implement the H0-H2 runtime contracts while the design grill remains active. It is ready to stage as an architecture and review checkpoint, not as an H2 implementation milestone.</p>
+<p>The design grill is closed. The queue now implements the first confirmed public runtime seam but remains an architecture and H0-H1 checkpoint, not an H2 implementation milestone. Environment registration, task ingress, TaskSpec obligation compilation, lifecycle replay, and NAO parity remain open.</p>
 <h3>12.4 Verification</h3>
-<p><code>python scripts/render_agentic_harness_docs.py</code>, <code>git diff --check</code>, and <code>PYTHONPATH=src python -m pytest -q</code> pass. The current source-aware suite reports 45 passed tests. The revised Workbench SVG was rendered separately and checked for readable nodes, non-overlapping labels, and visible separation between context output and shadow proposal output.</p>
+<p><code>python scripts/render_agentic_harness_docs.py</code>, <code>git diff --check</code>, and <code>PYTHONPATH=src python -m pytest -q</code> pass. The current source-aware suite reports 50 passed tests. The revised Workbench SVG was rendered separately and checked for readable nodes, non-overlapping labels, and visible separation between context output and shadow proposal output.</p>
 <h2>13. NAO Source-resolution Addendum on 2026-09-08</h2>
 <p>The latest grill requested that UAH recover behavior from the existing NAO chatbot, planner, and orchestrator rather than reproduce their policy from the documentation alone. The following read-only checks were therefore performed:</p>
 <table><thead><tr>
@@ -960,7 +970,7 @@ raw dictionary -&gt; second parser -&gt; owner arguments</code></pre>
 <p>The focused baselines passed 112 chatbot turn-engine tests and 41 planner supervisor/gate tests. These are NAO source-preservation checks, not UAH H2 qualification.</p>
 <p>The intended NeuralWorkbench revision <code>e76ba7e</code> currently describes <code>report_result</code> through an older same-frame decomposition. The NAO <code>v1.0.0</code> runtime remains authoritative. H2 must publish a reviewed DomainContractPack revision that pins the NAO runtime, chatbot source, semantic registry, adapter, and conformance report. Live mutable registry synchronization is rejected.</p>
 <h2>14. Release Recommendation</h2>
-<p>Retain both commits on the pre-commit review branch after applying documentation corrections. Do not merge them to <code>main</code> as an H2 release in their current form. The clean-install smoke result supports preserving the implementation as an H0 baseline. Source changes should begin only after the first TDD seam and the immutable NAO revision are confirmed through the design grill.</p>
+<p>Retain both commits on the pre-commit review branch after applying documentation corrections. Do not merge them to <code>main</code> as an H2 release in their current form. The clean-install smoke result supports preserving the implementation as an H0 baseline. The architecture grill and first TDD seam are now complete. Continue with owner-attested synthetic environment registration and deterministic task ingress before expanding provider or live NAO scope.</p>
   </main>
 </body>
 </html>

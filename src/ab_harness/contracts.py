@@ -149,6 +149,49 @@ class EffectEvidence:
 
 
 @dataclass(frozen=True)
+class EffectObligation:
+    """One task effect that must be judged from owner-issued evidence."""
+
+    obligation_id: str
+    effect_id: str
+    object_id: str
+    evidence_owner: str
+    requirement: str
+    failure_policy: str
+
+    def __post_init__(self) -> None:
+        required = {
+            'obligation_id': self.obligation_id,
+            'effect_id': self.effect_id,
+            'object_id': self.object_id,
+            'evidence_owner': self.evidence_owner,
+        }
+        missing = tuple(name for name, value in required.items() if not value.strip())
+        if missing:
+            raise ValueError(
+                'effect obligation fields must not be empty: %s' % ', '.join(missing)
+            )
+        if self.requirement not in {'required', 'best_effort'}:
+            raise ValueError('invalid effect obligation requirement: %s' % self.requirement)
+        if self.failure_policy not in {'terminal', 'retryable'}:
+            raise ValueError(
+                'invalid effect obligation failure policy: %s' % self.failure_policy
+            )
+
+
+@dataclass(frozen=True)
+class TaskAcceptance:
+    """Deterministic task judgment over a frozen obligation set."""
+
+    status: str
+    satisfied_obligation_ids: tuple[str, ...] = ()
+    deficit_obligation_ids: tuple[str, ...] = ()
+    pending_obligation_ids: tuple[str, ...] = ()
+    failed_obligation_ids: tuple[str, ...] = ()
+    evidence_refs: tuple[str, ...] = ()
+
+
+@dataclass(frozen=True)
 class HarnessTrace:
     trace_id: str
     task_id: str

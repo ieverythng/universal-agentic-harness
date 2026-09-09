@@ -374,6 +374,20 @@ correct scope + correct ownership + valid output + evidence-complete effect
   `report_result` decomposition. H2 must reconcile it with NAO `v1.0.0` and the
   pinned chatbot source through an owner-reviewed DomainContractPack revision.
 
+### First task-acceptance seam implemented on 2026-09-09
+
+The architecture grill is closed. The confirmed public seam is
+`TaskAcceptanceEvaluator.evaluate(effect_obligations, evidence_set)`, which
+returns an immutable `TaskAcceptance`.
+
+The first red-green slices implement required and best-effort obligations,
+terminal required-effect rejection, suspended unproven work, duplicate-ID
+rejection, and rejection of an empty obligation set. The recorded NAO
+qualification result now carries an optional explicit acceptance artifact while
+retaining its legacy `required_observables` compatibility surface. The
+evaluator consumes normalized owner evidence and contains no prompt, ROS,
+provider, registry, or domain-lifecycle policy.
+
 ### What H0 actually implements
 
 The parent-only `src/ab_harness` package is a real portable contract proof. It
@@ -389,7 +403,8 @@ contains no ROS or NAO imports in the core and currently proves:
 | NAO compatibility views | `nao_h0.py` | Chatbot route and planner-step mapping without nested package imports |
 | Semantic implementation bindings | `bindings.py` | Stable AB objects, candidate quarantine, revisioned locators, runtime-mode resolution |
 | Portable environment owner | `environment.py` | Approved AB1 dispatch, owner enforcement, normalized effect evidence |
-| Recorded NAO qualification | `qualification.py` | Chatbot gate, planner gate, fake execution, terminal observable closure |
+| Task acceptance | `acceptance.py` | Required versus best-effort closure, terminal failure, suspension, duplicate and empty obligation rejection |
+| Recorded NAO qualification | `qualification.py` | Chatbot gate, planner gate, fake execution, terminal observable closure, optional explicit task acceptance |
 | Focused fail-closed tests | `test_h0_nao_harness.py` | Accepted paths, unknown object, inspection-only AB0, effect claim, trace replay |
 
 ### What H0 does not yet implement
@@ -399,6 +414,8 @@ earlier foundation document. These are open seams, not failures:
 
 - no serialized `HarnessSpec`, `TaskSpec`, `ModelProfile`, permission policy,
   environment identity, or versioned schema envelope;
+- no TaskSpec compiler yet constructs effect obligations from a domain pack and
+  task-ingress decision;
 - registry object views do not yet carry full input/output schemas, owner
   authority, side-effect class, freshness, or evidence obligation types;
 - projection starts from requested object IDs rather than compiling them from a
@@ -1559,11 +1576,11 @@ provenance.
 | Environment restarts mix evidence | No implemented environment-run registry | Replay two identical tasks across distinct attested activations and require isolation |
 | Cross-agent trace projections diverge | No multi-actor ledger implementation | Render environment, task, chatbot, and planner views from one event store and compare event identities |
 | NAO `report_result` semantics drift | Intended registry and `v1.0.0` runtime disagree | Owner-review the DomainContractPack revision and run recorded delegation parity |
-| Task closure overclaims success | No obligation evaluator | Drive required failure and best-effort failure from the same owner evidence set and require distinct judgments |
+| Task closure overclaims success | Pure evaluator implemented; TaskSpec compiler and lifecycle integration absent | Compile obligations from a frozen task and replay required failure plus best-effort deficit through the full ledger |
 | AB5 remains relabeled optimization | No higher-order object | Require held-out population-of-AB4 governance experiment |
 
-The immediate next probe is a narrow H1 synthetic tracer after public-interface
-confirmation: register one attested environment run, classify one ingress into
+The immediate next probe is a narrow H1 synthetic tracer: register one attested
+environment run, classify one ingress into
 a task with one required and one best-effort obligation, execute a recorded
 admitted operation through a fake owner, derive `TaskAcceptance`, produce a
 `VerifiedTraceDigest`, and replay the lifecycle without a model. A second case

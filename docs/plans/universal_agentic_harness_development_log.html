@@ -196,7 +196,7 @@
   <main class="doc">
 
 <h1>Universal Agentic Harness: Development Log</h1>
-<p><strong>Purpose:</strong> Practical implementation ledger linked to the semantic masterplan <strong>Updated:</strong> 2026-09-08 <strong>Target:</strong> UAH H2 NAO planner qualification after ordered evidence gates pass <strong>Current release boundary:</strong> H0 contract spine, one H1 synthetic vertical slice, smoke CLI, quarantined Workbench retrieval, and frozen Workbench adapter protocol; H1 lifecycle and H2 planner parity remain incomplete</p>
+<p><strong>Purpose:</strong> Practical implementation ledger linked to the semantic masterplan <strong>Updated:</strong> 2026-09-09 <strong>Target:</strong> UAH H2 NAO planner qualification after ordered evidence gates pass <strong>Current release boundary:</strong> H0 contract spine, one H1 synthetic vertical slice, smoke CLI, quarantined Workbench retrieval, and frozen Workbench adapter protocol; H1 lifecycle and H2 planner parity remain incomplete</p>
 <h2>Current state</h2>
 <table><thead><tr>
 <th>Area</th>
@@ -255,8 +255,8 @@
 </tr>
 <tr>
 <td>Task closure</td>
-<td>Specified, not implemented</td>
-<td>Required and best-effort effect obligations compile into deterministic accepted, accepted-with-deficit, suspended, or rejected judgments</td>
+<td>Green narrow kernel seam</td>
+<td><code>EffectObligation</code>, <code>TaskAcceptance</code>, and the pure evaluator distinguish accepted, accepted-with-deficit, suspended, and rejected outcomes; TaskSpec compilation and full lifecycle integration remain open</td>
 </tr>
 <tr>
 <td>Launch smoke CLI</td>
@@ -517,14 +517,30 @@
 <p>The source-resolution audit revisited NAO tag <code>v1.0.0</code>, chatbot revision <code>a2ecca796...</code>, and the intended NeuralWorkbench revision <code>e76ba7e</code>. The chatbot <code>DialogueTurnEngine</code>, planner request adapter, supervisor goal/version state machine, planner gate, and orchestrator <code>report_result</code> callback already contain domain behavior that should be preserved behind adapters. Focused read-only checks passed for 112 chatbot turn-engine cases and 41 planner supervisor/gate cases.</p>
 <p><code>report_result</code> is frozen as AB1 in the planner runtime frame. Its source-proven implementation verifies planner execution evidence, delegates grounded text composition to the chatbot actor, then returns to the native communication owner. The intended NeuralWorkbench registry models an older same-frame decomposition. H2 must correct that drift through an owner-reviewed, content-addressed DomainContractPack revision rather than live registry sync.</p>
 <p>This checkpoint changes the contract and implementation order, not the current release claim. No environment registry, ingress classifier, task acceptance evaluator, multi-actor ledger, or <code>report_result</code> adapter is implemented in UAH yet. H2 remains the first NAO demonstration and H3 remains the first Workbench implementation stage.</p>
+<h3>2026-09-09: First task-acceptance TDD seam</h3>
+<p>The owner confirmed the public interface and closed the architecture grill:</p>
+<pre><code class="language-text">TaskAcceptanceEvaluator.evaluate(
+    effect_obligations,
+    evidence_set,
+) -&gt; TaskAcceptance</code></pre>
+<p>Four vertical red-green behaviors now prove the pure seam:</p>
+<ul>
+<li>required owner evidence closes its declared effect;</li>
+<li>failure of a best-effort report preserves required-effect acceptance and is recorded as a deficit;</li>
+<li>terminal failure of a required effect rejects the task;</li>
+<li>duplicate obligation identities and empty obligation sets fail closed.</li>
+</ul>
+<p>The recorded NAO qualification path now accepts explicit effect obligations and returns an optional <code>TaskAcceptance</code> artifact. Its existing <code>required_observables</code> field remains available as a compatibility surface. This additive path reuses <code>InProcessEnvironmentOwner</code> evidence and does not move NAO retry, replan, speech, or lifecycle policy into the evaluator.</p>
+<p>The NAO source informed the contract without becoming a dependency: <code>observable_success</code> supplies effect names, the AB object and binding identify the evidence owner, and NAO retry or terminal policy must be compiled into the obligation before evaluation. The evaluator does not parse planner text, interpret <code>plan_completed</code>, or decide native retryability.</p>
+<p>The next TDD seam is owner-attested synthetic environment registration and deterministic ingress classification. TaskSpec obligation compilation follows once the environment and task identities are available.</p>
 <h2>Verification dashboard</h2>
 <table><thead><tr>
 <th>Command</th>
 <th>Result</th>
 </tr></thead><tbody>
 <tr>
-<td><code>PYTHONPATH=src python -m pytest -q</code> on 2026-09-07</td>
-<td>45 passed after documentation topology regression coverage</td>
+<td><code>PYTHONPATH=src python -m pytest -q</code> on 2026-09-09</td>
+<td>50 passed after task-acceptance and recorded-qualification integration coverage</td>
 </tr>
 <tr>
 <td><code>.venv\Scripts\python.exe -m pytest -q -p no:cacheprovider --basetemp .test-tmp\full-suite</code></td>
@@ -709,7 +725,8 @@
 <li>[ ] Split immutable environment profile/run, ingress, role, model, agent, actor run, trace, task, operation, edge, and invocation identities behind compatibility exports.</li>
 <li>[ ] Add serialized <code>TaskSpec</code>, <code>EnvironmentProfile</code>, <code>EnvironmentRun</code>, <code>EnvironmentIngress</code>, and deterministic <code>TaskIngressDecision</code>.</li>
 <li>[ ] Add <code>TypedProposal</code>, <code>AdmittedOperation</code>, and <code>ExecutionLease</code> contracts.</li>
-<li>[ ] Add <code>EffectObligation</code>, <code>TaskAcceptance</code>, and pure task-acceptance evaluation after the public seam is confirmed.</li>
+<li>[x] Add <code>EffectObligation</code>, <code>TaskAcceptance</code>, and pure task-acceptance evaluation after public seam confirmation.</li>
+<li>[ ] Compile obligations deterministically from <code>TaskSpec</code>, DomainContractPack evidence rules, and task-ingress lineage.</li>
 <li>[ ] Add deterministic <code>PromptCompiler</code> output and artifact hashing from the same <code>InteractionModuleSpec</code> consumed by semantic admission.</li>
 <li>[ ] Append lifecycle events for compile, proposal, gate, dispatch, evidence, and terminal decision.</li>
 <li>[ ] Derive a deterministic <code>VerifiedTraceDigest</code> from replayed lifecycle and obligation events.</li>
@@ -752,7 +769,7 @@
 <p>H2 is qualified only when the core rows and planner parity rows are green:</p>
 <table><thead><tr>
 <th>Gate</th>
-<th>State on 2026-09-08</th>
+<th>State on 2026-09-09</th>
 <th>Required before qualification</th>
 </tr></thead><tbody>
 <tr>
@@ -789,6 +806,11 @@
 <td>Failure suite</td>
 <td>Partial</td>
 <td>Add stale evidence, timeout, cancellation, and false completion</td>
+</tr>
+<tr>
+<td>Task acceptance</td>
+<td>Partial green</td>
+<td>Pure obligation evaluator and recorded-qualification artifact implemented; TaskSpec compilation and full lifecycle replay remain required</td>
 </tr>
 <tr>
 <td>Documentation</td>

@@ -2,6 +2,7 @@ from pathlib import Path
 
 from ab_harness import ABImplementationBinding
 from ab_harness import BindingCatalog
+from ab_harness import EffectObligation
 from ab_harness import InProcessEnvironmentOwner
 from ab_harness import OwnerExecutionResult
 from ab_harness import RegistrySnapshot
@@ -149,3 +150,40 @@ def test_failed_owner_result_does_not_close_terminal_observable():
     assert result.missing_observables == (
         "fresh detector-backed result returned",
     )
+
+
+def test_recorded_owner_evidence_produces_explicit_task_acceptance():
+    def find_object(_arguments):
+        return OwnerExecutionResult(
+            evidence_ref="fake-nao://evidence/detection-acceptance-001",
+            succeeded=True,
+            observed_effects=("fresh detector-backed result returned",),
+        )
+
+    registry, environment = _environment(find_object)
+    harness = RecordedNaoQualificationHarness(registry, environment)
+    case = QualificationCase(
+        case_id="nao-find-cup-acceptance-001",
+        task_id="find_the_cup",
+        requested_object_ids=("find_object",),
+        effect_obligations=(
+            EffectObligation(
+                obligation_id="target_observed",
+                effect_id="fresh detector-backed result returned",
+                object_id="find_object",
+                evidence_owner="object_finder",
+                requirement="required",
+                failure_policy="terminal",
+            ),
+        ),
+    )
+
+    result = harness.run(
+        case=case,
+        chatbot_payload=CHATBOT_HANDOFF,
+        planner_payload=PLANNER_FIND,
+        runtime_mode="fake",
+    )
+
+    assert result.acceptance is not None
+    assert result.acceptance.status == "accepted"

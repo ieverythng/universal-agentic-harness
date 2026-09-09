@@ -1283,9 +1283,8 @@ be used to relabel incomplete H0-H2 work.
 
 1. Freeze and review the environment, identity, task-ingress, operation-edge,
    effect-obligation, and task-acceptance schemas.
-2. Confirm the first TDD public seam before writing tests. The current design
-   recommendation is the pure `TaskAcceptanceEvaluator.evaluate(...)` boundary,
-   followed by environment registration and ingress classification.
+2. Retain the implemented pure `TaskAcceptanceEvaluator.evaluate(...)` public
+   seam and next add environment registration and ingress classification.
 3. Add `ABRegistry.task_projection(...)` or a separate compiler prototype with
    no runtime behavior change.
 4. Build golden projection cases for dialogue, knowledge query, scan/find,
