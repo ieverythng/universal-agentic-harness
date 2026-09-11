@@ -309,7 +309,7 @@ correct scope + correct ownership + valid output + evidence-complete effect
   a workspace-local pytest temp root.
 - The implemented H1 slice consumes recorded role outputs. It does not invoke a
   model provider, ROS node, container, or live robot.
-- `python -m ab_harness smoke` now runs accepted and rejected boot canaries,
+- `python -m ab_harness_nao` now runs accepted and rejected NAO adapter canaries,
   emits a content-addressed configuration identity, and retrieves a quarantined
   Workbench context with supporting and counterexample traces.
 - `ab_harness.workbench_protocol` now freezes JSON-compatible request,
@@ -400,11 +400,13 @@ contains no ROS or NAO imports in the core and currently proves:
 | Task projection and decomposition closure | `projection.py` | Requested objects plus inspectable lower decomposition |
 | Deterministic role/output gate | `gate.py` | Output ownership, reachability, direct AB level, effect-claim rejection |
 | Append-only trace proof | `trace.py` | JSONL append and round-trip reconstruction |
-| NAO compatibility views | `nao_h0.py` | Chatbot route and planner-step mapping without nested package imports |
 | Semantic implementation bindings | `bindings.py` | Stable AB objects, candidate quarantine, revisioned locators, runtime-mode resolution |
 | Portable environment owner | `environment.py` | Approved AB1 dispatch, owner enforcement, normalized effect evidence |
+| Environment profile registry | `environment_profiles.py` | Frozen domain pack, runtime, owner, interface, and handle-roster authority with duplicate and incomplete-profile rejection |
+| Environment activation registry | `environment_runs.py` | Readiness evidence, exact profile/pack/runtime/owner matching, unique run and attestation identities, active registration and lookup |
 | Task acceptance | `acceptance.py` | Required versus best-effort closure, terminal failure, suspension, duplicate and empty obligation rejection |
-| Recorded NAO qualification | `qualification.py` | Chatbot gate, planner gate, fake execution, terminal observable closure, optional explicit task acceptance |
+| NAO compatibility package | `ab_harness_nao/contracts.py` | Chatbot route, planner-step mapping, and binding candidates without importing the native NAO stack |
+| Recorded NAO qualification | `ab_harness_nao/qualification.py` | Chatbot gate, planner gate, fake execution, terminal observable closure, optional explicit task acceptance |
 | Focused fail-closed tests | `test_h0_nao_harness.py` | Accepted paths, unknown object, inspection-only AB0, effect claim, trace replay |
 
 ### What H0 does not yet implement
@@ -413,7 +415,8 @@ The current proof is intentionally narrower than the desired H0 contract in the
 earlier foundation document. These are open seams, not failures:
 
 - no serialized `HarnessSpec`, `TaskSpec`, `ModelProfile`, permission policy,
-  environment identity, or versioned schema envelope;
+  or versioned schema envelope; environment profiles and runs currently use
+  immutable in-memory contracts without persistence or signature verification;
 - no TaskSpec compiler yet constructs effect obligations from a domain pack and
   task-ingress decision;
 - registry object views do not yet carry full input/output schemas, owner
@@ -1067,8 +1070,9 @@ the H3+ search/adaptation engine.
 | `ab_harness.configuration` | Content-addressed model-harness-environment identity | H0-H1 |
 | `ab_harness.workbench` | Bounded success/counterexample retrieval and quarantined context candidates | v0 seam toward H3 |
 | `ab_harness.workbench_protocol` | Transport-neutral request, candidate-batch, observation, handshake, and in-process adapter contracts | H2-H3 seam |
-| `ab_harness.smoke` / `cli` | Deterministic accepted, rejected, and retrieval boot canaries | v0-H1 |
-| `ab_harness.adapters.nao` | Temporary cooperative chatbot/planner/ROS views | H2 |
+| `ab_harness.environment_runs` | Owner-attested activation registration and lifecycle state | H0-H1 |
+| `ab_harness_nao.smoke` / `cli` | Deterministic accepted, rejected, and retrieval reference canaries | v0-H2 |
+| `ab_harness_nao` | Cooperative chatbot/planner contract views and recorded parity adapter; no native ROS imports | H0 seam toward H2 |
 | `ab_harness.adapters.workers` | Pi, OpenHands, Hermes, OpenClaw, Codex, Claude | H5 |
 | `ab_harness.adapters.mcp` | Protocol discovery and transport mapping | H5 |
 | `neural_workbench.search` | Candidate families, graph verifier, scoring | H3 |
@@ -1353,7 +1357,7 @@ point, not agentic parity.
 | Replace a fake binding locator under the same object | Semantic projection and object identity remain unchanged | Accept explicit object-to-implementation binding seam |
 | Replay valid and out-of-projection recorded NAO proposals | Valid AB1 reaches the fake owner; invalid proposal never dispatches | Continue ROS-free shadow-first qualification |
 | Return failed owner evidence | Terminal observable remains open | Preserve owner-issued evidence as the completion boundary |
-| Run `python -m ab_harness smoke` | Accepted and rejected canaries pass under one content-addressed configuration | Adopt as the v0 boot qualification surface |
+| Run `python -m ab_harness_nao` | Accepted and rejected adapter canaries pass under one content-addressed configuration | Adopt as the v0 NAO reference qualification surface |
 | Retrieve the smoke success and rejection | Workbench candidate contains both supporting and counterexample provenance | Accept bounded retrieval seam; keep promotion and mutation absent |
 
 ## 14. Adversarial Audit
@@ -1573,7 +1577,7 @@ provenance.
 | Entropy proxy rewards easy observables | No correlation study | Compare proxy delta to terminal acceptance and domain labels |
 | Crystallization hides unsafe detail | No promoted object | Decompress candidate and verify every effect/recovery seam on replay |
 | Frontier worker cannot expose complete trace | Product APIs differ | Define minimum artifact/event contract and classify unavailable fields |
-| Environment restarts mix evidence | No implemented environment-run registry | Replay two identical tasks across distinct attested activations and require isolation |
+| Environment restarts mix evidence | Profile-verified environment-run registration exists, but lifecycle events and replay isolation do not | Replay two identical tasks across distinct attested activations and require isolation |
 | Cross-agent trace projections diverge | No multi-actor ledger implementation | Render environment, task, chatbot, and planner views from one event store and compare event identities |
 | NAO `report_result` semantics drift | Intended registry and `v1.0.0` runtime disagree | Owner-review the DomainContractPack revision and run recorded delegation parity |
 | Task closure overclaims success | Pure evaluator implemented; TaskSpec compiler and lifecycle integration absent | Compile obligations from a frozen task and replay required failure plus best-effort deficit through the full ledger |

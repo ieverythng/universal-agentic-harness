@@ -11,7 +11,7 @@ import zipfile
 
 from docx import Document
 from docx.enum.text import WD_ALIGN_PARAGRAPH
-from docx.shared import Inches
+from docx.shared import Inches, Pt
 from PIL import Image, ImageDraw, ImageFont
 
 
@@ -290,14 +290,14 @@ def populate(reference: Path, output_dir: Path) -> Path:
         7: "The H0-H2 architecture now has an explicit runtime envelope. An owner-attested EnvironmentRun groups native ingress, persistent agent actors, domain tasks, causal traces, and evidence. Agent identity remains independent of provider placement, while each model invocation records the exact lease and loaded instance that supplied computation.",
         8: "Task closure is no longer inferred from planner status, model text, or an event label. Tasks declare required and best-effort effect obligations before execution. A deterministic evaluator compares those obligations with owner-issued evidence and produces accepted, accepted-with-deficit, suspended, or rejected outcomes.",
         9: "At a glance",
-        10: "H0 freezes identity, environment, ingress, operation-edge, obligation, acceptance, and trace contracts. It does not introduce a scheduler.",
-        11: "H1 implements registries, deterministic ingress, attached agent-run standby, fixed-instance leases, PromptCompiler, admission, replay, O1, and VerifiedTraceDigest.",
-        12: "H2 remains the first NAO demonstration. It uses fixed chatbot and planner handles, preserves NAO lifecycle owners, and validates report_result as an AB1 operation with explicit chatbot delegation.",
+        10: "H0 freezes identity, environment, operation, acceptance, and trace contracts. It adds no scheduler.",
+        11: "H1 adds lifecycle registries, ingress, standby, fixed leases, PromptCompiler, admission, replay, O1, and VerifiedTraceDigest.",
+        12: "H2 is the first NAO demonstration: fixed chatbot and planner handles, native lifecycle ownership, and report_result as AB1 with explicit chatbot delegation.",
         13: "Architecture checkpoint",
         14: "The identity hierarchy distinguishes reusable role configuration, immutable agent embodiment, stable handle revision, bounded agent activation, provider capacity, and individual model invocation. Registering an agent does not load or call a model. An active agent run may release its lease and remain in standby inside one environment activation.",
         15: "EnvironmentIngress separates native stimuli from task semantics. Deterministic TaskIngressPolicy decides whether an item updates environment state, starts work, resumes work, notifies an existing task, or is rejected. A model can interpret admitted content but cannot rewrite task or trace lineage.",
         16: "Key findings",
-        17: "The accepted design preserves the portable-kernel boundary. Core contracts contain no ROS, NAO, provider-SDK, or runtime-product imports. DomainContractPack carries frame-relative objects, role projections, bindings, environment profiles, evidence rules, prompt policy, and qualification cases. Custom adapters are limited to irreducible native normalization.",
+        17: "The accepted design preserves the portable-kernel boundary. Core contracts contain no ROS, NAO, provider-SDK, or runtime-product imports. NAO compatibility and recorded qualification now reside in the separate ab_harness_nao package, with a regression test enforcing dependency direction. DomainContractPack carries frame-relative objects, role projections, bindings, environment profiles, evidence rules, prompt policy, and qualification cases. Custom adapters are limited to irreducible native normalization.",
         18: "Context and conditions",
         19: "The source-resolution audit used NAO tag v1.0.0 at ebffe93, chatbot revision a2ecca796, and intended NeuralWorkbench revision e76ba7e. Focused read-only checks passed 112 chatbot turn-engine cases and 41 planner supervisor/gate cases. These baselines constrain compatibility but do not qualify UAH H2.",
         20: "Patterns in the evidence",
@@ -308,11 +308,11 @@ def populate(reference: Path, output_dir: Path) -> Path:
         27: "Recommendations",
         28: "Implementation should proceed through small public contracts and preserve the current H0 compatibility surface while the new identity grammar lands.",
         29: "Retain the implemented TaskAcceptanceEvaluator.evaluate(effect_obligations, evidence_set) -> TaskAcceptance boundary and compile obligations only from frozen task and domain contracts.",
-        30: "Register one synthetic EnvironmentRun, classify one ingress, attach one standby-capable agent run, and connect the existing typed proposal, fake-owner, and acceptance path.",
+        30: "Retain profile-verified EnvironmentRun registration, then classify one immutable ingress, attach one standby-capable agent run, and connect the existing typed proposal, fake-owner, and acceptance path.",
         31: "Produce a replayable VerifiedTraceDigest, then freeze the NAO DomainContractPack and test planner parity, report_result delegation, required-effect failure, and best-effort deficit paths.",
         32: "Conclusion",
-        33: "The architecture grill is closed and the first public task-acceptance seam is implemented. The design supports continuous environment-bound agents without permanent model allocation, preserves domain authority, and creates a trace grammar suitable for O1/O2 debugging and later Workbench memory.",
-        34: "No TaskSpec obligation compiler, environment-run registry, ingress classifier, multi-actor ledger, report_result adapter, or dynamic allocator is implemented at this checkpoint. The current release remains an H0 contract proof with partial H1 vertical slices.",
+        33: "The architecture grill is closed. The public task-acceptance and profile-verified EnvironmentRun registration seams are implemented. The design supports continuous environment-bound agents without permanent model allocation, preserves domain authority, and creates a trace grammar suitable for O1/O2 debugging and later Workbench memory.",
+        34: "Environment profiles and run attestations are immutable in-memory contracts without persistence or signature verification. No TaskSpec obligation compiler, ingress classifier, multi-actor ledger, report_result adapter, or dynamic allocator is implemented at this checkpoint. The current release remains an H0 contract proof with partial H1 vertical slices.",
         35: "Appendix",
         36: "Identity and authority map",
         37: "Semantic chain: DomainContractPack -> AgentRoleConfiguration -> AgentManifest -> agent_id -> AgentHandleRevision -> agent_run_id.",
@@ -322,10 +322,14 @@ def populate(reference: Path, output_dir: Path) -> Path:
         41: "Universal Agentic Harness masterplan and development log, canonical Markdown, 9 September 2026.",
         42: "NAO ROS4HRI bridge, annotated tag v1.0.0, peeled commit ebffe93a74be4e013ce0f60fdfc41268dba73fc3.",
         43: "Chatbot planner-hook source, revision a2ecca796; NeuralWorkbench intended companion revision e76ba7e.",
-        45: "Report status. The architecture grill is closed and the task-acceptance seam is implemented. Environment lifecycle, replay, and H2 qualification remain open.",
+        45: "Report status. The architecture grill is closed. Task acceptance and profile-verified environment registration are implemented. Ingress, lifecycle replay, and H2 qualification remain open.",
     }
     for index, value in replacements.items():
         _replace_paragraph(document, index, value)
+
+    checkpoint_heading = document.paragraphs[13].paragraph_format
+    checkpoint_heading.space_before = Pt(18)
+    checkpoint_heading.keep_with_next = True
 
     picture = document.paragraphs[24]
     picture.clear()

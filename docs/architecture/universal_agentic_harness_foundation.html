@@ -1388,7 +1388,7 @@ H6 optional AB5 policy-foundry research</code></pre>
 <h2>14. Immediate Work Queue</h2>
 <ol>
 <li>Freeze and review the environment, identity, task-ingress, operation-edge, effect-obligation, and task-acceptance schemas.</li>
-<li>Retain the implemented pure <code>TaskAcceptanceEvaluator.evaluate(...)</code> public seam and next add environment registration and ingress classification.</li>
+<li>Retain the implemented pure <code>TaskAcceptanceEvaluator.evaluate(...)</code> and profile-verified <code>EnvironmentRunRegistry.register(...)</code> seams. Next add immutable environment ingress and deterministic classification.</li>
 <li>Add <code>ABRegistry.task_projection(...)</code> or a separate compiler prototype with no runtime behavior change.</li>
 <li>Build golden projection cases for dialogue, knowledge query, scan/find, navigation failure, and grouped delivery.</li>
 <li>Define the shared provider capability record from the union of current chatbot and planner transport behavior.</li>
@@ -1414,7 +1414,7 @@ H6 optional AB5 policy-foundry research</code></pre>
 <li>[x] Environment activations, agent runs, tasks, traces, and operations have distinct identities and ownership.</li>
 <li>[x] Cross-frame work uses explicit delegation edges.</li>
 <li>[x] Task closure is compiled from required and best-effort effect obligations.</li>
-<li>[~] Core H0 frame, band, role, projection, gate, and trace schemas are implemented and tested; the full task/provider/environment/lifecycle grammar remains open.</li>
+<li>[~] Core H0 frame, band, role, projection, gate, trace, task-acceptance, and profile-verified environment-run registration schemas are implemented and tested; the full task/provider/environment/lifecycle grammar remains open.</li>
 <li>[ ] No same-model harness ablation has yet measured uplift.</li>
 <li>[ ] No external Pi/OpenHands adapter has yet been prototyped.</li>
 <li>[ ] Live ROS and robot behavior remain outside this documentation-only pass.</li>

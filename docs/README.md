@@ -47,7 +47,9 @@ and must be regenerated after canonical edits.
 
 `src/ab_harness` is the portable UAH core. It owns H0-H2 contracts, domain
 projection, bindings, gates, environment-owner evidence, configuration identity,
-and the mandatory execution ledger.
+and the mandatory execution ledger. `src/ab_harness_nao` is the explicit
+ROS-free NAO compatibility and recorded qualification adapter. The kernel has a
+test-enforced dependency boundary against importing that adapter.
 
 NeuralWorkbench remains an independently usable companion repository and begins
 its authoritative role at H3 through a versioned adapter. The intended revision

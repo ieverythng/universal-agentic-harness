@@ -440,6 +440,13 @@ Design-smell findings:
   and Workbench protocol modules;
 - authority-bearing states use unrestricted strings across several modules.
 
+The 2026-09-09 deslop pass resolved the package-boundary part of the first
+finding. Those historically reviewed files now live as
+`ab_harness_nao/contracts.py` and `ab_harness_nao/qualification.py`; the
+portable `ab_harness` package has a regression test prohibiting imports from
+the NAO adapter. The duplicated parsing itself remains an H2 adapter cleanup
+item and is not moved into the kernel.
+
 ### 6.2 Specification findings
 
 Missing or partial requirements:

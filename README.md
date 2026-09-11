@@ -21,13 +21,14 @@ H0 proves:
 - deterministic output-type, object-reachability, AB-level, and effect-claim
   gates;
 - append-only JSONL trace round trips;
-- thin NAO chatbot/planner payload adapters;
+- a separate `ab_harness_nao` package for thin chatbot/planner payload adapters;
 - semantic implementation bindings with candidate quarantine;
 - an in-process environment-owner adapter that issues effect evidence;
 - one recorded, ROS-free chatbot-to-planner-to-fake-owner qualification path;
 - content-addressed model-harness-environment configuration identity;
 - bounded Neural Workbench retrieval of supporting and counterexample traces;
-- a machine-readable v0 smoke command.
+- profile-verified registration of owner-attested environment activations;
+- a machine-readable NAO reference canary.
 
 It does **not** yet provide a complete live agent loop. Provider adapters, full
 task/environment schemas, lifecycle events, stale-evidence handling, model
@@ -56,13 +57,13 @@ Python 3.10 or newer is required.
 python -m venv .venv
 python -m pip install -e ".[test]"
 python -m pytest
-python -m ab_harness smoke
+python -m ab_harness_nao
 ```
 
-The smoke command is a deterministic boot qualification over recorded
-proposals and a fake environment. It proves the portable control seam and
-Workbench quarantine; it does not claim live-model, ROS, or general agentic
-capability.
+The adapter canary is a deterministic boot qualification over recorded NAO
+proposals and a fake environment. It exercises the portable control seam and
+Workbench quarantine through the explicit `ab_harness_nao` boundary. It does
+not claim live-model, ROS, or general agentic capability.
 
 Minimal use:
 
@@ -92,8 +93,10 @@ module = InteractionProjector(registry).compile(
 
 ## Repository map
 
-- `src/ab_harness/` — portable H0 contracts, registry adapter, projector, gate,
-  trace store, and NAO compatibility views.
+- `src/ab_harness/` contains portable contracts, registries, projection, gates,
+  evidence evaluation, and trace storage.
+- `src/ab_harness_nao/` contains the explicit ROS-free NAO compatibility and
+  recorded qualification adapter.
 - `src/Neural-Wokbench/` is the declared companion-engine submodule path. The
   intended revision is `e76ba7e`, but the current UAH tree has no gitlink. It
   remains optional before H3 and attaches through a versioned adapter protocol.

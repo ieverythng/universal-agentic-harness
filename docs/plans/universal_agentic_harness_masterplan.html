@@ -485,7 +485,7 @@ H6  AB5 policy-foundry hypothesis                         RESEARCH ONLY, NOT COM
 <li>The portable NAO AB fixture models the distinct gate ingress <code>/nao_orchestrator/planner_request</code>, admitted ingress <code>/planner/request</code>, planner egress <code>/intents</code>, execution feedback, dialogue act, and scene summary as non-callable AB0 objects.</li>
 <li>Forty-two portable tests pass using the repository virtual environment and a workspace-local pytest temp root.</li>
 <li>The implemented H1 slice consumes recorded role outputs. It does not invoke a model provider, ROS node, container, or live robot.</li>
-<li><code>python -m ab_harness smoke</code> now runs accepted and rejected boot canaries, emits a content-addressed configuration identity, and retrieves a quarantined Workbench context with supporting and counterexample traces.</li>
+<li><code>python -m ab_harness_nao</code> now runs accepted and rejected NAO adapter canaries, emits a content-addressed configuration identity, and retrieves a quarantined Workbench context with supporting and counterexample traces.</li>
 <li><code>ab_harness.workbench_protocol</code> now freezes JSON-compatible request, candidate-batch, observation, protocol handshake, and fail-closed in-process adapter contracts. A mismatch override is visibly observation-only.</li>
 </ul>
 <h3>Architecture and baseline correction checked on 2026-09-03</h3>
@@ -547,11 +547,6 @@ H6  AB5 policy-foundry hypothesis                         RESEARCH ONLY, NOT COM
 <td>JSONL append and round-trip reconstruction</td>
 </tr>
 <tr>
-<td>NAO compatibility views</td>
-<td><code>nao_h0.py</code></td>
-<td>Chatbot route and planner-step mapping without nested package imports</td>
-</tr>
-<tr>
 <td>Semantic implementation bindings</td>
 <td><code>bindings.py</code></td>
 <td>Stable AB objects, candidate quarantine, revisioned locators, runtime-mode resolution</td>
@@ -562,13 +557,28 @@ H6  AB5 policy-foundry hypothesis                         RESEARCH ONLY, NOT COM
 <td>Approved AB1 dispatch, owner enforcement, normalized effect evidence</td>
 </tr>
 <tr>
+<td>Environment profile registry</td>
+<td><code>environment_profiles.py</code></td>
+<td>Frozen domain pack, runtime, owner, interface, and handle-roster authority with duplicate and incomplete-profile rejection</td>
+</tr>
+<tr>
+<td>Environment activation registry</td>
+<td><code>environment_runs.py</code></td>
+<td>Readiness evidence, exact profile/pack/runtime/owner matching, unique run and attestation identities, active registration and lookup</td>
+</tr>
+<tr>
 <td>Task acceptance</td>
 <td><code>acceptance.py</code></td>
 <td>Required versus best-effort closure, terminal failure, suspension, duplicate and empty obligation rejection</td>
 </tr>
 <tr>
+<td>NAO compatibility package</td>
+<td><code>ab_harness_nao/contracts.py</code></td>
+<td>Chatbot route, planner-step mapping, and binding candidates without importing the native NAO stack</td>
+</tr>
+<tr>
 <td>Recorded NAO qualification</td>
-<td><code>qualification.py</code></td>
+<td><code>ab_harness_nao/qualification.py</code></td>
 <td>Chatbot gate, planner gate, fake execution, terminal observable closure, optional explicit task acceptance</td>
 </tr>
 <tr>
@@ -580,7 +590,7 @@ H6  AB5 policy-foundry hypothesis                         RESEARCH ONLY, NOT COM
 <h3>What H0 does not yet implement</h3>
 <p>The current proof is intentionally narrower than the desired H0 contract in the earlier foundation document. These are open seams, not failures:</p>
 <ul>
-<li>no serialized <code>HarnessSpec</code>, <code>TaskSpec</code>, <code>ModelProfile</code>, permission policy, environment identity, or versioned schema envelope;</li>
+<li>no serialized <code>HarnessSpec</code>, <code>TaskSpec</code>, <code>ModelProfile</code>, permission policy, or versioned schema envelope; environment profiles and runs currently use immutable in-memory contracts without persistence or signature verification;</li>
 <li>no TaskSpec compiler yet constructs effect obligations from a domain pack and task-ingress decision;</li>
 <li>registry object views do not yet carry full input/output schemas, owner authority, side-effect class, freshness, or evidence obligation types;</li>
 <li>projection starts from requested object IDs rather than compiling them from a complete task/effect contract;</li>
@@ -1276,14 +1286,19 @@ delta_H_proxy = H_proxy_before - H_proxy_after</code></pre>
 <td>H2-H3 seam</td>
 </tr>
 <tr>
-<td><code>ab_harness.smoke</code> / <code>cli</code></td>
-<td>Deterministic accepted, rejected, and retrieval boot canaries</td>
-<td>v0-H1</td>
+<td><code>ab_harness.environment_runs</code></td>
+<td>Owner-attested activation registration and lifecycle state</td>
+<td>H0-H1</td>
 </tr>
 <tr>
-<td><code>ab_harness.adapters.nao</code></td>
-<td>Temporary cooperative chatbot/planner/ROS views</td>
-<td>H2</td>
+<td><code>ab_harness_nao.smoke</code> / <code>cli</code></td>
+<td>Deterministic accepted, rejected, and retrieval reference canaries</td>
+<td>v0-H2</td>
+</tr>
+<tr>
+<td><code>ab_harness_nao</code></td>
+<td>Cooperative chatbot/planner contract views and recorded parity adapter; no native ROS imports</td>
+<td>H0 seam toward H2</td>
 </tr>
 <tr>
 <td><code>ab_harness.adapters.workers</code></td>
@@ -1831,9 +1846,9 @@ evidence_closure | evaluator | resource_budget</code></pre>
 <td>Preserve owner-issued evidence as the completion boundary</td>
 </tr>
 <tr>
-<td>Run <code>python -m ab_harness smoke</code></td>
-<td>Accepted and rejected canaries pass under one content-addressed configuration</td>
-<td>Adopt as the v0 boot qualification surface</td>
+<td>Run <code>python -m ab_harness_nao</code></td>
+<td>Accepted and rejected adapter canaries pass under one content-addressed configuration</td>
+<td>Adopt as the v0 NAO reference qualification surface</td>
 </tr>
 <tr>
 <td>Retrieve the smoke success and rejection</td>
@@ -2045,7 +2060,7 @@ evidence_closure | evaluator | resource_budget</code></pre>
 </tr>
 <tr>
 <td>Environment restarts mix evidence</td>
-<td>No implemented environment-run registry</td>
+<td>Profile-verified environment-run registration exists, but lifecycle events and replay isolation do not</td>
 <td>Replay two identical tasks across distinct attested activations and require isolation</td>
 </tr>
 <tr>

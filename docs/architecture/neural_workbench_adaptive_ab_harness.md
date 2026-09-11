@@ -1125,7 +1125,8 @@ Parent H0 implementation checkpoint (2026-07-13):
 - `gate.py` rejects role-owned output violations, out-of-projection objects,
   direct AB0 use, and model-claimed execution effects;
 - `trace.py` round-trips append-only H0 JSONL evidence;
-- `nao_h0.py` maps current chatbot and planner payload shapes without importing
+- `ab_harness_nao/contracts.py` maps current chatbot and planner payload shapes
+  without importing
   or modifying either nested package;
 - focused tests cover accepted planner/chatbot paths and fail-closed cases.
 

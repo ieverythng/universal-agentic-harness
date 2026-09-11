@@ -17,9 +17,9 @@ contracts contain no ROS or NAO imports.
 ## Boundary
 
 `chatbot_llm`, `planner_llm`, Neural Workbench, and runtime packages are not
-modified or imported. `nao_h0.py` describes compatibility only. It does not
-publish ROS messages, call skills, change prompts, or replace existing
-validation.
+modified or imported. `ab_harness_nao/contracts.py` describes compatibility
+only. It does not publish ROS messages, call skills, change prompts, or replace
+existing validation.
 
 ## Test
 

@@ -196,7 +196,7 @@
   <main class="doc">
 
 <h1>Universal Agentic Harness: Development Log</h1>
-<p><strong>Purpose:</strong> Practical implementation ledger linked to the semantic masterplan <strong>Updated:</strong> 2026-09-09 <strong>Target:</strong> UAH H2 NAO planner qualification after ordered evidence gates pass <strong>Current release boundary:</strong> H0 contract spine, one H1 synthetic vertical slice, smoke CLI, quarantined Workbench retrieval, and frozen Workbench adapter protocol; H1 lifecycle and H2 planner parity remain incomplete</p>
+<p><strong>Purpose:</strong> Practical implementation ledger linked to the semantic masterplan <strong>Updated:</strong> 2026-09-09 <strong>Target:</strong> UAH H2 NAO planner qualification after ordered evidence gates pass <strong>Current release boundary:</strong> H0 contract spine, one H1 synthetic vertical slice, explicit NAO adapter canary, quarantined Workbench retrieval, and frozen Workbench adapter protocol; H1 lifecycle and H2 planner parity remain incomplete</p>
 <h2>Current state</h2>
 <table><thead><tr>
 <th>Area</th>
@@ -246,12 +246,12 @@
 <tr>
 <td>Configuration identity</td>
 <td>Partial</td>
-<td>Monolithic model-harness-environment tuple is content-addressed; environment profile/run, ingress, role, agent, run, trace, operation, edge and invocation identities are specified but not implemented</td>
+<td>Monolithic model-harness-environment tuple is content-addressed; environment profile and run identities are now explicit, while ingress, role, agent, trace, operation, edge and invocation identities remain incomplete</td>
 </tr>
 <tr>
 <td>Environment lifecycle</td>
-<td>Specified, not implemented</td>
-<td>Owner-attested environment run, deterministic ingress classification, attached agent runs, and standby semantics are frozen</td>
+<td>Partial green</td>
+<td>Frozen profiles and attestation registration enforce owner, runtime, DomainContractPack revision, readiness evidence, and unique IDs; close, ingress, attached agent runs, persistence, and standby remain open</td>
 </tr>
 <tr>
 <td>Task closure</td>
@@ -259,9 +259,9 @@
 <td><code>EffectObligation</code>, <code>TaskAcceptance</code>, and the pure evaluator distinguish accepted, accepted-with-deficit, suspended, and rejected outcomes; TaskSpec compilation and full lifecycle integration remain open</td>
 </tr>
 <tr>
-<td>Launch smoke CLI</td>
+<td>NAO adapter canary</td>
 <td>Green</td>
-<td>Accepted path, rejected canary, and Workbench retrieval run via <code>python -m ab_harness smoke</code></td>
+<td>Accepted path, rejected canary, and Workbench retrieval run via <code>python -m ab_harness_nao</code></td>
 </tr>
 <tr>
 <td>Neural Workbench retrieval</td>
@@ -391,8 +391,8 @@
 <h3>2026-07-30: Recorded NAO qualification slice</h3>
 <p>Added:</p>
 <ul>
-<li><code>QualificationCase</code></li>
-<li><code>QualificationResult</code></li>
+<li><code>NaoQualificationCase</code></li>
+<li><code>NaoQualificationResult</code></li>
 <li><code>RecordedNaoQualificationHarness</code></li>
 </ul>
 <p>The initial case is intentionally narrow:</p>
@@ -419,7 +419,7 @@
 <p>Added <code>TraceExperience</code>, <code>WorkbenchMemory</code>, and <code>WorkbenchContextCandidate</code>. Retrieval is deterministic, query-scoped, and bounded separately for supporting traces and counterexamples. Missing support or counterevidence is surfaced as an explicit gap. The output status is always <code>candidate</code>; the module has no promotion or registry-write path.</p>
 <p>This is a concrete Neural Workbench coupling seam, not an H3 completion claim. It prepares structured context for a later model adapter while keeping prompt policy, trusted code, permissions, evaluator rules, and canonical AB objects outside online mutation.</p>
 <h3>2026-08-04: Content-addressed v0 smoke launch surface</h3>
-<p>Added <code>ConfigurationIdentity</code> and <code>python -m ab_harness smoke</code>. The smoke run:</p>
+<p>Added <code>ConfigurationIdentity</code> and the canary now exposed by <code>python -m ab_harness_nao</code>. The recorded run:</p>
 <ol>
 <li>identifies the complete recorded model, runtime, harness, adapter, registry, environment, suite, and evaluator configuration;</li>
 <li>runs one admitted chatbot/planner/fake-owner path;</li>
@@ -516,7 +516,7 @@
 </ul>
 <p>The source-resolution audit revisited NAO tag <code>v1.0.0</code>, chatbot revision <code>a2ecca796...</code>, and the intended NeuralWorkbench revision <code>e76ba7e</code>. The chatbot <code>DialogueTurnEngine</code>, planner request adapter, supervisor goal/version state machine, planner gate, and orchestrator <code>report_result</code> callback already contain domain behavior that should be preserved behind adapters. Focused read-only checks passed for 112 chatbot turn-engine cases and 41 planner supervisor/gate cases.</p>
 <p><code>report_result</code> is frozen as AB1 in the planner runtime frame. Its source-proven implementation verifies planner execution evidence, delegates grounded text composition to the chatbot actor, then returns to the native communication owner. The intended NeuralWorkbench registry models an older same-frame decomposition. H2 must correct that drift through an owner-reviewed, content-addressed DomainContractPack revision rather than live registry sync.</p>
-<p>This checkpoint changes the contract and implementation order, not the current release claim. No environment registry, ingress classifier, task acceptance evaluator, multi-actor ledger, or <code>report_result</code> adapter is implemented in UAH yet. H2 remains the first NAO demonstration and H3 remains the first Workbench implementation stage.</p>
+<p>This checkpoint changed the contract and implementation order, not the release claim. The environment registry and task-acceptance evaluator were implemented in the following 2026-09-09 TDD slices. Ingress classification, a multi-actor ledger, and the <code>report_result</code> adapter remain open. H2 remains the first NAO demonstration and H3 remains the first Workbench implementation stage.</p>
 <h3>2026-09-09: First task-acceptance TDD seam</h3>
 <p>The owner confirmed the public interface and closed the architecture grill:</p>
 <pre><code class="language-text">TaskAcceptanceEvaluator.evaluate(
@@ -532,7 +532,11 @@
 </ul>
 <p>The recorded NAO qualification path now accepts explicit effect obligations and returns an optional <code>TaskAcceptance</code> artifact. Its existing <code>required_observables</code> field remains available as a compatibility surface. This additive path reuses <code>InProcessEnvironmentOwner</code> evidence and does not move NAO retry, replan, speech, or lifecycle policy into the evaluator.</p>
 <p>The NAO source informed the contract without becoming a dependency: <code>observable_success</code> supplies effect names, the AB object and binding identify the evidence owner, and NAO retry or terminal policy must be compiled into the obligation before evaluation. The evaluator does not parse planner text, interpret <code>plan_completed</code>, or decide native retryability.</p>
-<p>The next TDD seam is owner-attested synthetic environment registration and deterministic ingress classification. TaskSpec obligation compilation follows once the environment and task identities are available.</p>
+<h3>2026-09-09: Environment registration and NAO package boundary</h3>
+<p><code>EnvironmentRunRegistry.register(attestation)</code> now admits one complete owner attestation and returns an immutable active <code>EnvironmentRun</code>. Registration requires a frozen <code>EnvironmentProfile</code>, at least one non-empty readiness evidence reference, and exact agreement on the environment owner, native runtime revision, and DomainContractPack revision. Unknown profiles, mismatches, and reused run or attestation identities fail before state is written. Registration does not start native infrastructure, attach an agent, reserve hardware, or invoke a model.</p>
+<p><code>EnvironmentProfileRegistry</code> rejects duplicate identities and incomplete authority lineage. The contracts are currently in-memory and do not yet provide serialization, durable persistence, attestation signature validation, or environment close semantics.</p>
+<p>The deslop boundary audit also moved all NAO-specific projection, qualification, and canary code into the explicit <code>ab_harness_nao</code> package. The <code>ab_harness</code> kernel has a regression test that rejects imports from this adapter. Future domains should normally supply declarative DomainContractPack content. A Python package is warranted only for irreducible native normalization or parity behavior.</p>
+<p>The next TDD seam is immutable <code>EnvironmentIngress</code> plus deterministic classification against an active environment run. Agent attachment and model leases remain later lifecycle seams.</p>
 <h2>Verification dashboard</h2>
 <table><thead><tr>
 <th>Command</th>
@@ -540,7 +544,7 @@
 </tr></thead><tbody>
 <tr>
 <td><code>PYTHONPATH=src python -m pytest -q</code> on 2026-09-09</td>
-<td>50 passed after task-acceptance and recorded-qualification integration coverage</td>
+<td>73 passed after task acceptance, profile-verified environment registration, adapter isolation, and recorded qualification coverage</td>
 </tr>
 <tr>
 <td><code>.venv\Scripts\python.exe -m pytest -q -p no:cacheprovider --basetemp .test-tmp\full-suite</code></td>
@@ -575,8 +579,8 @@
 <td>41 passed against the <code>v1.0.0</code> source boundary</td>
 </tr>
 <tr>
-<td>Offline wheel build, install into fresh venv, then <code>python -m ab_harness smoke</code></td>
-<td>Passed; wheel SHA-256 recorded by build output</td>
+<td>Offline wheel build, install into fresh venv, then <code>python -m ab_harness_nao</code></td>
+<td>Passed after package split; wheel SHA-256 <code>745bc6f7897e57a89f9619b83cd984b09079d19dc7470d7295c4384565a6e34a</code></td>
 </tr>
 <tr>
 <td>Core forbidden-import audit</td>
@@ -724,6 +728,7 @@
 <li>[x] Add content-addressed configuration identity.</li>
 <li>[ ] Split immutable environment profile/run, ingress, role, model, agent, actor run, trace, task, operation, edge, and invocation identities behind compatibility exports.</li>
 <li>[ ] Add serialized <code>TaskSpec</code>, <code>EnvironmentProfile</code>, <code>EnvironmentRun</code>, <code>EnvironmentIngress</code>, and deterministic <code>TaskIngressDecision</code>.</li>
+<li>[x] Add frozen in-memory <code>EnvironmentProfile</code>, exact attestation authority checks, readiness-evidence presence, unique activation identities, and lookup.</li>
 <li>[ ] Add <code>TypedProposal</code>, <code>AdmittedOperation</code>, and <code>ExecutionLease</code> contracts.</li>
 <li>[x] Add <code>EffectObligation</code>, <code>TaskAcceptance</code>, and pure task-acceptance evaluation after public seam confirmation.</li>
 <li>[ ] Compile obligations deterministically from <code>TaskSpec</code>, DomainContractPack evidence rules, and task-ingress lineage.</li>
@@ -795,7 +800,7 @@
 <tr>
 <td>Complete configuration identity</td>
 <td>Partial</td>
-<td>Split environment profile/run, ingress, role, model, agent, actor run, trace, operation and invocation identities while preserving the current content hash as a compatibility snapshot</td>
+<td>Persist the implemented profile/run contracts, then split ingress, role, model, agent, actor run, trace, operation and invocation identities while preserving the current content hash as a compatibility snapshot</td>
 </tr>
 <tr>
 <td>Lifecycle replay</td>
@@ -866,9 +871,9 @@
 </tr>
 <tr>
 <td>UAH-D05</td>
-<td>Identity layers specified but not implemented</td>
-<td>Agent, activation, trace and operation state remain conflated in current contracts</td>
-<td>Add immutable identity contracts behind compatibility exports</td>
+<td>Identity layers only partly implemented</td>
+<td>Environment profiles and activations are distinct, but agent, trace and operation state remain conflated in current contracts</td>
+<td>Add immutable ingress, agent, trace and operation contracts behind compatibility exports</td>
 </tr>
 <tr>
 <td>UAH-D06</td>

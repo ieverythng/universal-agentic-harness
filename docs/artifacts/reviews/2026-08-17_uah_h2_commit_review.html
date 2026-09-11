@@ -616,6 +616,7 @@ raw dictionary -&gt; second parser -&gt; owner arguments</code></pre>
 <li>content-address construction repeats across configuration, Workbench memory, and Workbench protocol modules;</li>
 <li>authority-bearing states use unrestricted strings across several modules.</li>
 </ul>
+<p>The 2026-09-09 deslop pass resolved the package-boundary part of the first finding. Those historically reviewed files now live as <code>ab_harness_nao/contracts.py</code> and <code>ab_harness_nao/qualification.py</code>; the portable <code>ab_harness</code> package has a regression test prohibiting imports from the NAO adapter. The duplicated parsing itself remains an H2 adapter cleanup item and is not moved into the kernel.</p>
 <h3>6.2 Specification findings</h3>
 <p>Missing or partial requirements:</p>
 <ol>

@@ -251,10 +251,12 @@ obligation identities and empty obligation sets fail closed. The evaluator is
 also connected additively to the recorded NAO qualification result while the
 legacy `required_observables` compatibility field remains available.
 
-The next seam is owner-attested synthetic environment registration and
-deterministic ingress classification. It should then connect the existing
-proposal, admission, fake-owner, acceptance, and replay path into a complete
-tracer.
+The owner-attested synthetic environment registration seam is now implemented.
+It requires a registered frozen `EnvironmentProfile`, exact owner, native
+runtime, and DomainContractPack revisions, plus readiness evidence. Reused run
+or attestation identities fail before state is written. Registration performs
+no native startup or model action. Immutable environment ingress and
+deterministic classification are next.
 
 ## 14. Evidence and Limits
 
@@ -262,7 +264,10 @@ The architecture was checked against NAO tag `v1.0.0`, chatbot revision
 `a2ecca796...`, and intended NeuralWorkbench revision `e76ba7e`. Focused
 read-only baselines passed 112 chatbot turn-engine tests and 41 planner
 supervisor/gate tests. These results constrain compatibility but do not qualify
-UAH H2. `EffectObligation`, `TaskAcceptance`, and the pure acceptance evaluator
-are now implemented. No TaskSpec obligation compiler, environment registry,
-task-ingress policy, multi-actor ledger, `report_result` adapter, or Workbench
-retrieval policy is implemented at this checkpoint.
+UAH H2. `EffectObligation`, `TaskAcceptance`, the pure acceptance evaluator,
+and profile-verified environment-run registration are now implemented. The NAO
+projection and recorded qualification live in the separate `ab_harness_nao`
+adapter package. No TaskSpec obligation compiler, environment-profile
+serialization or signature verification, task-ingress policy, multi-actor
+ledger, `report_result` adapter, or Workbench retrieval policy is implemented
+at this checkpoint.
