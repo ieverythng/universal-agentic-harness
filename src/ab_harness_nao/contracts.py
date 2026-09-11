@@ -1,4 +1,4 @@
-"""Read-only NAO H0 role contracts and output adapters."""
+"""Read-only NAO role contracts and output adapters."""
 
 from __future__ import annotations
 

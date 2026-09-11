@@ -15,11 +15,13 @@ from ab_harness.contracts import InteractionModuleSpec
 from ab_harness.contracts import OwnerExecutionResult
 from ab_harness.contracts import TaskAcceptance
 from ab_harness.environment import InProcessEnvironmentOwner
+from ab_harness.environment_profiles import EnvironmentProfile
+from ab_harness.environment_profiles import EnvironmentProfileRegistry
+from ab_harness.environment_runs import EnvironmentRun
+from ab_harness.environment_runs import EnvironmentRunAttestation
+from ab_harness.environment_runs import EnvironmentRunRegistry
 from ab_harness.gate import OutputGate
 from ab_harness.projection import InteractionProjector
-from ab_harness.qualification import QualificationCase
-from ab_harness.qualification import QualificationResult
-from ab_harness.qualification import RecordedNaoQualificationHarness
 from ab_harness.registry import RegistrySnapshot
 from ab_harness.trace import JsonlHarnessTraceStore
 from ab_harness.workbench import TraceExperience
@@ -39,10 +41,11 @@ __all__ = [
     'AbstractionFrame', 'AgentOutput', 'AgentRoleSpec', 'BindingCatalog',
     'ConfigurationIdentity', 'EffectEvidence', 'EffectObligation', 'GateDecision',
     'HarnessTrace',
+    'EnvironmentProfile', 'EnvironmentProfileRegistry', 'EnvironmentRun',
+    'EnvironmentRunAttestation', 'EnvironmentRunRegistry',
     'InProcessEnvironmentOwner', 'InteractionModuleSpec',
     'InteractionProjector', 'JsonlHarnessTraceStore', 'OutputGate',
-    'OwnerExecutionResult', 'QualificationCase', 'QualificationResult',
-    'RecordedNaoQualificationHarness', 'RegistrySnapshot', 'TraceExperience',
+    'OwnerExecutionResult', 'RegistrySnapshot', 'TraceExperience',
     'WorkbenchContextCandidate', 'WorkbenchMemory', 'CURRENT_WORKBENCH_PROTOCOL',
     'InProcessWorkbenchAdapter', 'WorkbenchCandidate',
     'WorkbenchCandidateBatch', 'WorkbenchObservation',

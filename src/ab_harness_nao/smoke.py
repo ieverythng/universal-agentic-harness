@@ -1,4 +1,4 @@
-"""Deterministic UAH v0 smoke qualification with no live model or ROS runtime."""
+"""Deterministic NAO adapter canary with no live model or ROS runtime."""
 
 from __future__ import annotations
 
@@ -10,10 +10,10 @@ from ab_harness.configuration import ConfigurationIdentity
 from ab_harness.contracts import ABImplementationBinding, ABObjectView
 from ab_harness.contracts import OwnerExecutionResult
 from ab_harness.environment import InProcessEnvironmentOwner
-from ab_harness.qualification import QualificationCase
-from ab_harness.qualification import RecordedNaoQualificationHarness
 from ab_harness.registry import RegistrySnapshot
 from ab_harness.workbench import TraceExperience, WorkbenchMemory
+from ab_harness_nao.qualification import NaoQualificationCase
+from ab_harness_nao.qualification import RecordedNaoQualificationHarness
 
 
 CHATBOT_HANDOFF = {
@@ -50,11 +50,11 @@ def run_smoke() -> dict[str, object]:
         environment_id='nao_fake',
         implementation_owner='object_finder',
         interface_kind='python_method',
-        locator='ab_harness.smoke:find_object',
+        locator='ab_harness_nao.smoke:find_object',
         source_revision='uah-smoke-v1',
         input_schema_ref='schema://find_object/input/v1',
         output_schema_ref='schema://find_object/result/v1',
-        evidence_adapter='ab_harness.smoke:fresh_detection',
+        evidence_adapter='ab_harness_nao.smoke:fresh_detection',
         runtime_modes=('smoke',),
         status='approved',
     )
@@ -64,7 +64,7 @@ def run_smoke() -> dict[str, object]:
         handlers={binding.locator: _find_object},
     )
     harness = RecordedNaoQualificationHarness(registry, owner)
-    case = QualificationCase(
+    case = NaoQualificationCase(
         case_id='uah-smoke-find-cup',
         task_id='find_the_cup',
         requested_object_ids=('find_object',),
@@ -187,7 +187,7 @@ def _experience(
     *,
     trace_id: str,
     result,
-    case: QualificationCase,
+    case: NaoQualificationCase,
     configuration: ConfigurationIdentity,
     registry: RegistrySnapshot,
 ) -> TraceExperience:

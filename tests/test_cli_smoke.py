@@ -1,7 +1,7 @@
 import json
 
-from ab_harness.cli import main
-from ab_harness.smoke import run_smoke
+from ab_harness_nao.cli import main
+from ab_harness_nao.smoke import run_smoke
 
 
 def test_smoke_runs_accept_reject_and_workbench_canaries():
@@ -23,7 +23,7 @@ def test_smoke_runs_accept_reject_and_workbench_canaries():
 
 
 def test_module_cli_prints_machine_readable_smoke_report(capsys):
-    exit_code = main(["smoke"])
+    exit_code = main()
 
     payload = json.loads(capsys.readouterr().out)
     assert exit_code == 0

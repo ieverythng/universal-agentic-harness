@@ -9,12 +9,12 @@ from ab_harness import InteractionProjector
 from ab_harness import JsonlHarnessTraceStore
 from ab_harness import OutputGate
 from ab_harness import RegistrySnapshot
-from ab_harness.nao_h0 import CHATBOT_ROLE
-from ab_harness.nao_h0 import PLANNER_ROLE
-from ab_harness.nao_h0 import chatbot_output
-from ab_harness.nao_h0 import nao_frame
-from ab_harness.nao_h0 import nao_contract_bindings
-from ab_harness.nao_h0 import planner_output
+from ab_harness_nao.contracts import CHATBOT_ROLE
+from ab_harness_nao.contracts import PLANNER_ROLE
+from ab_harness_nao.contracts import chatbot_output
+from ab_harness_nao.contracts import nao_contract_bindings
+from ab_harness_nao.contracts import nao_frame
+from ab_harness_nao.contracts import planner_output
 
 
 ROOT = Path(__file__).resolve().parents[1]

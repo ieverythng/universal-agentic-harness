@@ -6,8 +6,8 @@ from ab_harness import EffectObligation
 from ab_harness import InProcessEnvironmentOwner
 from ab_harness import OwnerExecutionResult
 from ab_harness import RegistrySnapshot
-from ab_harness.qualification import QualificationCase
-from ab_harness.qualification import RecordedNaoQualificationHarness
+from ab_harness_nao.qualification import NaoQualificationCase
+from ab_harness_nao.qualification import RecordedNaoQualificationHarness
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -38,8 +38,8 @@ def _environment(handler):
     return registry, owner
 
 
-def _case() -> QualificationCase:
-    return QualificationCase(
+def _case() -> NaoQualificationCase:
+    return NaoQualificationCase(
         case_id="nao-find-cup-001",
         task_id="find_the_cup",
         requested_object_ids=("find_object",),
@@ -162,7 +162,7 @@ def test_recorded_owner_evidence_produces_explicit_task_acceptance():
 
     registry, environment = _environment(find_object)
     harness = RecordedNaoQualificationHarness(registry, environment)
-    case = QualificationCase(
+    case = NaoQualificationCase(
         case_id="nao-find-cup-acceptance-001",
         task_id="find_the_cup",
         requested_object_ids=("find_object",),

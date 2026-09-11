@@ -10,14 +10,14 @@ from ab_harness.contracts import EffectEvidence, EffectObligation, GateDecision
 from ab_harness.contracts import TaskAcceptance
 from ab_harness.environment import InProcessEnvironmentOwner
 from ab_harness.gate import OutputGate
-from ab_harness.nao_h0 import CHATBOT_ROLE, PLANNER_ROLE
-from ab_harness.nao_h0 import chatbot_output, nao_frame, planner_output
+from ab_harness_nao.contracts import CHATBOT_ROLE, PLANNER_ROLE
+from ab_harness_nao.contracts import chatbot_output, nao_frame, planner_output
 from ab_harness.projection import InteractionProjector
 from ab_harness.registry import RegistrySnapshot
 
 
 @dataclass(frozen=True)
-class QualificationCase:
+class NaoQualificationCase:
     case_id: str
     task_id: str
     requested_object_ids: tuple[str, ...]
@@ -28,7 +28,7 @@ class QualificationCase:
 
 
 @dataclass(frozen=True)
-class QualificationResult:
+class NaoQualificationResult:
     case_id: str
     passed: bool
     failure_stage: str | None
@@ -58,11 +58,11 @@ class RecordedNaoQualificationHarness:
     def run(
         self,
         *,
-        case: QualificationCase,
+        case: NaoQualificationCase,
         chatbot_payload: dict[str, Any],
         planner_payload: dict[str, Any],
         runtime_mode: str,
-    ) -> QualificationResult:
+    ) -> NaoQualificationResult:
         frame = nao_frame(self._registry)
         chatbot_module = self._projector.compile(
             task_id=case.task_id,
@@ -84,7 +84,7 @@ class RecordedNaoQualificationHarness:
                 ),
             )
         if not chatbot_gate.accepted:
-            return QualificationResult(
+            return NaoQualificationResult(
                 case_id=case.case_id,
                 passed=False,
                 failure_stage='chatbot_gate',
@@ -115,7 +115,7 @@ class RecordedNaoQualificationHarness:
                 + tuple('prohibited object referenced: %s' % item for item in prohibited),
             )
         if not planner_gate.accepted:
-            return QualificationResult(
+            return NaoQualificationResult(
                 case_id=case.case_id,
                 passed=False,
                 failure_stage='planner_gate',
@@ -134,7 +134,7 @@ class RecordedNaoQualificationHarness:
                     )
                 )
         except (LookupError, TypeError, ValueError) as exc:
-            return QualificationResult(
+            return NaoQualificationResult(
                 case_id=case.case_id,
                 passed=False,
                 failure_stage='environment_owner',
@@ -167,7 +167,7 @@ class RecordedNaoQualificationHarness:
             if acceptance is not None
             else not missing
         )
-        return QualificationResult(
+        return NaoQualificationResult(
             case_id=case.case_id,
             passed=passed,
             failure_stage='evidence_closure' if not passed else None,
