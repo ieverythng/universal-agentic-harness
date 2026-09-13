@@ -74,3 +74,23 @@ python scripts/render_agentic_harness_docs.py
 
 The shared theme lives in `docs/assets/`. The old
 `docs/agentic_harness/*.html` paths are redirects only and are not canonical.
+
+## Local validation
+
+Initialize the repository-local Python environment and install the Git hooks
+once:
+
+```bash
+./scripts/setup_dev_tools.sh
+```
+
+Run the complete pre-commit suite before staging a change:
+
+```bash
+./scripts/run_precommit.sh
+```
+
+The wrapper records the repository signature only after every hook passes. The
+pre-push hook rejects missing or stale validation. Provider credentials belong
+in the ignored root `.env`; `.env.example` documents the supported local
+settings without containing secrets.

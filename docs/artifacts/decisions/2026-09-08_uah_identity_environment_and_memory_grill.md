@@ -256,7 +256,12 @@ It requires a registered frozen `EnvironmentProfile`, exact owner, native
 runtime, and DomainContractPack revisions, plus readiness evidence. Reused run
 or attestation identities fail before state is written. Registration performs
 no native startup or model action. Immutable environment ingress and
-deterministic classification are next.
+deterministic state-update classification are now implemented under exact
+profile, DomainContractPack revision, run, binding, and type checks.
+
+Task-bearing actions remain disabled until task and trace identity issuance is
+defined. This prevents `start_task`, `resume_task`, or `notify_task` decisions
+from carrying absent or reconstructed lineage.
 
 ## 14. Evidence and Limits
 
@@ -268,6 +273,8 @@ UAH H2. `EffectObligation`, `TaskAcceptance`, the pure acceptance evaluator,
 and profile-verified environment-run registration are now implemented. The NAO
 projection and recorded qualification live in the separate `ab_harness_nao`
 adapter package. No TaskSpec obligation compiler, environment-profile
-serialization or signature verification, task-ingress policy, multi-actor
-ledger, `report_result` adapter, or Workbench retrieval policy is implemented
-at this checkpoint.
+serialization or signature verification, task and trace lineage issuance,
+ingress persistence and deduplication, multi-actor ledger, `report_result`
+adapter, or Workbench retrieval policy is implemented at this checkpoint. The
+current in-memory registration and ingress contracts do not provide durable
+persistence, attestation signature validation, or environment close semantics.

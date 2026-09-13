@@ -567,6 +567,11 @@ H6  AB5 policy-foundry hypothesis                         RESEARCH ONLY, NOT COM
 <td>Readiness evidence, exact profile/pack/runtime/owner matching, unique run and attestation identities, active registration and lookup</td>
 </tr>
 <tr>
+<td>Environment ingress policy</td>
+<td><code>environment_ingress.py</code></td>
+<td>Immutable normalized ingress, exact profile/revision/run/binding/type checks, state-update classification, and typed rejection</td>
+</tr>
+<tr>
 <td>Task acceptance</td>
 <td><code>acceptance.py</code></td>
 <td>Required versus best-effort closure, terminal failure, suspension, duplicate and empty obligation rejection</td>
@@ -592,6 +597,7 @@ H6  AB5 policy-foundry hypothesis                         RESEARCH ONLY, NOT COM
 <ul>
 <li>no serialized <code>HarnessSpec</code>, <code>TaskSpec</code>, <code>ModelProfile</code>, permission policy, or versioned schema envelope; environment profiles and runs currently use immutable in-memory contracts without persistence or signature verification;</li>
 <li>no TaskSpec compiler yet constructs effect obligations from a domain pack and task-ingress decision;</li>
+<li>task-bearing ingress remains disabled until task and trace identity issuance can return complete lineage; ingress persistence and duplicate delivery detection are also open;</li>
 <li>registry object views do not yet carry full input/output schemas, owner authority, side-effect class, freshness, or evidence obligation types;</li>
 <li>projection starts from requested object IDs rather than compiling them from a complete task/effect contract;</li>
 <li>the output gate does not yet validate payload schemas, canonical aliases, preconditions, permissions, budgets, or evidence closure;</li>
@@ -1876,6 +1882,7 @@ evidence_closure | evaluator | resource_budget</code></pre>
 <li>[x] Candidate bindings cannot resolve for runtime use.</li>
 <li>[x] An executable binding cannot claim another package&#x27;s effect ownership.</li>
 <li>[x] Configuration identity changes when registry or runtime parameters change.</li>
+<li>[x] State-update ingress is immutable and classified under exact environment profile, contract revision, run, binding, and type checks.</li>
 <li>[x] Workbench retrieval is bounded, failure-aware, provenance-bearing, and candidate-only.</li>
 <li>[x] The smoke command has one accepted path and one no-dispatch rejection canary.</li>
 <li>[~] The first transport-neutral, fail-closed Workbench adapter contracts are tested; the declared NeuralWorkbench gitlink remains to be restored at the intended revision.</li>
@@ -1896,9 +1903,9 @@ evidence_closure | evaluator | resource_budget</code></pre>
 <h3>Now: close H0-H1 for the H2 launch candidate</h3>
 <ol>
 <li>Freeze schema versioning and serialization conventions.</li>
-<li>Add <code>HarnessSpec</code>, <code>TaskSpec</code>, <code>ModelProfile</code>, <code>EnvironmentProfile</code>, <code>EnvironmentRun</code>, <code>EnvironmentIngress</code>, and <code>TaskIngressDecision</code>.</li>
+<li>Retain the implemented in-memory <code>EnvironmentProfile</code>, <code>EnvironmentRun</code>, <code>EnvironmentIngress</code>, and state-update <code>TaskIngressDecision</code> contracts. Add serialization and task/trace identity issuance before task-bearing ingress.</li>
 <li>Freeze <code>OperationEdge</code>, <code>EffectObligation</code>, <code>TaskAcceptance</code>, and <code>VerifiedTraceDigest</code> before adding runtime policy.</li>
-<li>Confirm the first public TDD seam. The current recommendation is the pure obligation evaluator, then environment registration and task ingress.</li>
+<li>Preserve the confirmed task-acceptance, environment-registration, and state-update ingress seams. Next define task and trace lineage issuance.</li>
 <li>Preserve the implemented semantic-object/implementation-binding split.</li>
 <li>Expand AB object effect/evidence/permission fields through a read-only adapter over the canonical registry.</li>
 <li>Compile one synthetic task from required effects to a closed object graph.</li>
@@ -1909,7 +1916,7 @@ evidence_closure | evaluator | resource_budget</code></pre>
 </ol>
 <h3>In parallel: H1 executable kernel</h3>
 <ol>
-<li>Implement environment-run registration, ingress classification, attached agent-run lifecycle, and standby transitions.</li>
+<li>Extend implemented environment-run registration and state-update ingress with task-bearing association, attached agent-run lifecycle, and standby.</li>
 <li>Implement the minimal operation lifecycle state machine.</li>
 <li>Add direct local/API model and synthetic runtime adapters.</li>
 <li>Add budget, approval, cancellation, and obligation-based acceptance.</li>

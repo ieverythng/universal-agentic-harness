@@ -404,6 +404,7 @@ contains no ROS or NAO imports in the core and currently proves:
 | Portable environment owner | `environment.py` | Approved AB1 dispatch, owner enforcement, normalized effect evidence |
 | Environment profile registry | `environment_profiles.py` | Frozen domain pack, runtime, owner, interface, and handle-roster authority with duplicate and incomplete-profile rejection |
 | Environment activation registry | `environment_runs.py` | Readiness evidence, exact profile/pack/runtime/owner matching, unique run and attestation identities, active registration and lookup |
+| Environment ingress policy | `environment_ingress.py` | Immutable normalized ingress, exact profile/revision/run/binding/type checks, state-update classification, and typed rejection |
 | Task acceptance | `acceptance.py` | Required versus best-effort closure, terminal failure, suspension, duplicate and empty obligation rejection |
 | NAO compatibility package | `ab_harness_nao/contracts.py` | Chatbot route, planner-step mapping, and binding candidates without importing the native NAO stack |
 | Recorded NAO qualification | `ab_harness_nao/qualification.py` | Chatbot gate, planner gate, fake execution, terminal observable closure, optional explicit task acceptance |
@@ -419,6 +420,9 @@ earlier foundation document. These are open seams, not failures:
   immutable in-memory contracts without persistence or signature verification;
 - no TaskSpec compiler yet constructs effect obligations from a domain pack and
   task-ingress decision;
+- task-bearing ingress remains disabled until task and trace identity issuance
+  can return complete lineage; ingress persistence and duplicate delivery
+  detection are also open;
 - registry object views do not yet carry full input/output schemas, owner
   authority, side-effect class, freshness, or evidence obligation types;
 - projection starts from requested object IDs rather than compiling them from a
@@ -1383,6 +1387,8 @@ point, not agentic parity.
 - [x] Candidate bindings cannot resolve for runtime use.
 - [x] An executable binding cannot claim another package's effect ownership.
 - [x] Configuration identity changes when registry or runtime parameters change.
+- [x] State-update ingress is immutable and classified under exact environment
+  profile, contract revision, run, binding, and type checks.
 - [x] Workbench retrieval is bounded, failure-aware, provenance-bearing, and candidate-only.
 - [x] The smoke command has one accepted path and one no-dispatch rejection canary.
 - [~] The first transport-neutral, fail-closed Workbench adapter contracts are
@@ -1417,12 +1423,13 @@ protocol is frozen and conformance-tested.
 ### Now: close H0-H1 for the H2 launch candidate
 
 1. Freeze schema versioning and serialization conventions.
-2. Add `HarnessSpec`, `TaskSpec`, `ModelProfile`, `EnvironmentProfile`,
-   `EnvironmentRun`, `EnvironmentIngress`, and `TaskIngressDecision`.
+2. Retain the implemented in-memory `EnvironmentProfile`, `EnvironmentRun`,
+   `EnvironmentIngress`, and state-update `TaskIngressDecision` contracts. Add
+   serialization and task/trace identity issuance before task-bearing ingress.
 3. Freeze `OperationEdge`, `EffectObligation`, `TaskAcceptance`, and
    `VerifiedTraceDigest` before adding runtime policy.
-4. Confirm the first public TDD seam. The current recommendation is the pure
-   obligation evaluator, then environment registration and task ingress.
+4. Preserve the confirmed task-acceptance, environment-registration, and
+   state-update ingress seams. Next define task and trace lineage issuance.
 5. Preserve the implemented semantic-object/implementation-binding split.
 6. Expand AB object effect/evidence/permission fields through a read-only
    adapter over the canonical registry.
@@ -1435,8 +1442,8 @@ protocol is frozen and conformance-tested.
 
 ### In parallel: H1 executable kernel
 
-1. Implement environment-run registration, ingress classification, attached
-   agent-run lifecycle, and standby transitions.
+1. Extend implemented environment-run registration and state-update ingress
+   with task-bearing association, attached agent-run lifecycle, and standby.
 2. Implement the minimal operation lifecycle state machine.
 3. Add direct local/API model and synthetic runtime adapters.
 4. Add budget, approval, cancellation, and obligation-based acceptance.

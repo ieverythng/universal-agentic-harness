@@ -342,4 +342,3 @@ Avoid:
 - No primary source reviewed here validates the AB coordinate system,
   Neural Workbench energy/entropy terms, or an AB2 crystallization gate. Those
   remain project-specific hypotheses.
-

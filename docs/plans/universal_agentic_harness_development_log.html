@@ -196,7 +196,7 @@
   <main class="doc">
 
 <h1>Universal Agentic Harness: Development Log</h1>
-<p><strong>Purpose:</strong> Practical implementation ledger linked to the semantic masterplan <strong>Updated:</strong> 2026-09-09 <strong>Target:</strong> UAH H2 NAO planner qualification after ordered evidence gates pass <strong>Current release boundary:</strong> H0 contract spine, one H1 synthetic vertical slice, explicit NAO adapter canary, quarantined Workbench retrieval, and frozen Workbench adapter protocol; H1 lifecycle and H2 planner parity remain incomplete</p>
+<p><strong>Purpose:</strong> Practical implementation ledger linked to the semantic masterplan <strong>Updated:</strong> 2026-09-11 <strong>Target:</strong> UAH H2 NAO planner qualification after ordered evidence gates pass <strong>Current release boundary:</strong> H0 contract spine, one H1 synthetic vertical slice, profile-bound state-update ingress, explicit NAO adapter canary, quarantined Workbench retrieval, and enforced repository hooks; task-bearing ingress, H1 lifecycle, and H2 planner parity remain incomplete</p>
 <h2>Current state</h2>
 <table><thead><tr>
 <th>Area</th>
@@ -246,12 +246,12 @@
 <tr>
 <td>Configuration identity</td>
 <td>Partial</td>
-<td>Monolithic model-harness-environment tuple is content-addressed; environment profile and run identities are now explicit, while ingress, role, agent, trace, operation, edge and invocation identities remain incomplete</td>
+<td>Monolithic model-harness-environment tuple is content-addressed; environment profile, run, and ingress identities are explicit, while role, agent, trace, operation, edge, and invocation identities remain incomplete</td>
 </tr>
 <tr>
 <td>Environment lifecycle</td>
 <td>Partial green</td>
-<td>Frozen profiles and attestation registration enforce owner, runtime, DomainContractPack revision, readiness evidence, and unique IDs; close, ingress, attached agent runs, persistence, and standby remain open</td>
+<td>Frozen profiles and attestation registration enforce owner, runtime, DomainContractPack revision, readiness evidence, and unique IDs; immutable ingress can classify state updates or reject mismatched input; task association, close, persistence, attached agent runs, and standby remain open</td>
 </tr>
 <tr>
 <td>Task closure</td>
@@ -298,6 +298,11 @@
 <td>O1 identity/event contract frozen</td>
 <td>Static renderer implementation required for H1/H2 review; O2 deferred</td>
 </tr>
+<tr>
+<td>Repository guardrails</td>
+<td>Green</td>
+<td>Python-native pre-commit and pre-push hooks enforce hygiene, Ruff, tests, generated-doc synchronization, and a fresh repository-signature cache</td>
+</tr>
 </tbody></table>
 <h3>H0-H2 launch preparation</h3>
 <p>The development target is the H2 cooperative NAO planner demonstration. H0 and H1 are its qualification prerequisites rather than separate documentation tracks.</p>
@@ -309,8 +314,8 @@
 </tr></thead><tbody>
 <tr>
 <td>H0 contract spine</td>
-<td>Frame-relative AB views, candidate binding quarantine, deterministic role/projection gate, fake owner evidence, recorded success and rejection</td>
-<td>Split identities; environment run and ingress; <code>TypedProposal</code>, <code>AdmittedOperation</code>, <code>ExecutionLease</code>, operation edges, effect obligations, task acceptance, and lifecycle-event schemas</td>
+<td>Frame-relative AB views, candidate binding quarantine, deterministic role/projection gate, profile-verified environment runs, state-update ingress, fake owner evidence, recorded success and rejection</td>
+<td>Task/trace identity issuance for task-bearing ingress; <code>TypedProposal</code>, <code>AdmittedOperation</code>, <code>ExecutionLease</code>, operation edges, and lifecycle-event schemas</td>
 <td>Serializable round trips and one environment-ingress-to-terminal replay covering success plus required counterexamples</td>
 </tr>
 <tr>
@@ -536,15 +541,19 @@
 <p><code>EnvironmentRunRegistry.register(attestation)</code> now admits one complete owner attestation and returns an immutable active <code>EnvironmentRun</code>. Registration requires a frozen <code>EnvironmentProfile</code>, at least one non-empty readiness evidence reference, and exact agreement on the environment owner, native runtime revision, and DomainContractPack revision. Unknown profiles, mismatches, and reused run or attestation identities fail before state is written. Registration does not start native infrastructure, attach an agent, reserve hardware, or invoke a model.</p>
 <p><code>EnvironmentProfileRegistry</code> rejects duplicate identities and incomplete authority lineage. The contracts are currently in-memory and do not yet provide serialization, durable persistence, attestation signature validation, or environment close semantics.</p>
 <p>The deslop boundary audit also moved all NAO-specific projection, qualification, and canary code into the explicit <code>ab_harness_nao</code> package. The <code>ab_harness</code> kernel has a regression test that rejects imports from this adapter. Future domains should normally supply declarative DomainContractPack content. A Python package is warranted only for irreducible native normalization or parity behavior.</p>
-<p>The next TDD seam is immutable <code>EnvironmentIngress</code> plus deterministic classification against an active environment run. Agent attachment and model leases remain later lifecycle seams.</p>
+<h3>2026-09-11: Repository guardrails and first EnvironmentIngress slice</h3>
+<p>The repository now uses a Python-native pre-commit pipeline, following the proven NAO and iTrader approach without introducing Node or Husky into a Python package. <code>scripts/setup_dev_tools.sh</code> creates an ignored <code>.venv</code>, installs the editable package and pinned development tools, then installs pre-commit and pre-push hooks. The pre-commit suite checks merge markers, YAML, EOF and whitespace hygiene, Ruff, the full test suite, and generated HTML consistency.</p>
+<p><code>scripts/run_precommit.sh</code> records a repository signature only after every hook passes. Pre-push rejects a missing or stale signature. This corrects a weakness in the inspected NAO pattern, where an ordinary final hook could record a cache entry even after an earlier hook failed. The signature sorts repository paths, so staging an unchanged file cannot invalidate the result merely by changing Git&#x27;s tracked/untracked listing order. <code>.env.example</code>, <code>.editorconfig</code>, and <code>.gitattributes</code> define local-secret, line-ending, and editor boundaries across the Linux and main-PC environments.</p>
+<p>The confirmed <code>TaskIngressPolicy.classify(environment_run, ingress)</code> seam now accepts immutable normalized ingress under an exact environment profile, DomainContractPack revision, environment run, binding, and ingress-type rule. The implemented positive action is <code>state_update</code>. Cross-environment input, unknown bindings, unknown ingress types, and policy provenance mismatches return typed rejection decisions without invoking a model. Duplicate rules and malformed contracts fail closed.</p>
+<p>Task-bearing actions are deliberately rejected at policy construction until a task and trace identity issuer exists. The next TDD seam must define that lineage before enabling <code>start_task</code>, <code>resume_task</code>, or <code>notify_task</code>.</p>
 <h2>Verification dashboard</h2>
 <table><thead><tr>
 <th>Command</th>
 <th>Result</th>
 </tr></thead><tbody>
 <tr>
-<td><code>PYTHONPATH=src python -m pytest -q</code> on 2026-09-09</td>
-<td>73 passed after task acceptance, profile-verified environment registration, adapter isolation, and recorded qualification coverage</td>
+<td><code>PYTHONPATH=src python -m pytest -q</code> on 2026-09-11</td>
+<td>88 passed after task acceptance, profile-verified environment registration, immutable state-update ingress, adapter isolation, and repository-tooling coverage</td>
 </tr>
 <tr>
 <td><code>.venv\Scripts\python.exe -m pytest -q -p no:cacheprovider --basetemp .test-tmp\full-suite</code></td>
@@ -587,8 +596,12 @@
 <td>Passed; only stdlib and <code>ab_harness</code> imports</td>
 </tr>
 <tr>
-<td><code>python scripts/render_agentic_harness_docs.py</code></td>
-<td>Passed after canonical edits</td>
+<td><code>./scripts/run_precommit.sh</code></td>
+<td>Passed all repository hooks and recorded a fresh state signature after the complete suite succeeded</td>
+</tr>
+<tr>
+<td><code>python scripts/render_agentic_harness_docs.py --check</code></td>
+<td>Passed without rewriting generated files</td>
 </tr>
 <tr>
 <td>Markdown/HTML synchronization</td>
@@ -726,9 +739,11 @@
 <li>[x] Mount one deterministic owner without ROS.</li>
 <li>[x] Replay success, gate rejection, and failed evidence.</li>
 <li>[x] Add content-addressed configuration identity.</li>
-<li>[ ] Split immutable environment profile/run, ingress, role, model, agent, actor run, trace, task, operation, edge, and invocation identities behind compatibility exports.</li>
+<li>[ ] Split immutable role, model, agent, actor run, trace, task, operation, edge, and invocation identities behind compatibility exports.</li>
 <li>[ ] Add serialized <code>TaskSpec</code>, <code>EnvironmentProfile</code>, <code>EnvironmentRun</code>, <code>EnvironmentIngress</code>, and deterministic <code>TaskIngressDecision</code>.</li>
 <li>[x] Add frozen in-memory <code>EnvironmentProfile</code>, exact attestation authority checks, readiness-evidence presence, unique activation identities, and lookup.</li>
+<li>[x] Add immutable <code>EnvironmentIngress</code> and profile-, revision-, run-, binding-, and type-bound state-update classification with typed rejection.</li>
+<li>[ ] Issue task and trace lineage before enabling task-bearing ingress actions.</li>
 <li>[ ] Add <code>TypedProposal</code>, <code>AdmittedOperation</code>, and <code>ExecutionLease</code> contracts.</li>
 <li>[x] Add <code>EffectObligation</code>, <code>TaskAcceptance</code>, and pure task-acceptance evaluation after public seam confirmation.</li>
 <li>[ ] Compile obligations deterministically from <code>TaskSpec</code>, DomainContractPack evidence rules, and task-ingress lineage.</li>
@@ -774,7 +789,7 @@
 <p>H2 is qualified only when the core rows and planner parity rows are green:</p>
 <table><thead><tr>
 <th>Gate</th>
-<th>State on 2026-09-09</th>
+<th>State on 2026-09-11</th>
 <th>Required before qualification</th>
 </tr></thead><tbody>
 <tr>
@@ -800,12 +815,12 @@
 <tr>
 <td>Complete configuration identity</td>
 <td>Partial</td>
-<td>Persist the implemented profile/run contracts, then split ingress, role, model, agent, actor run, trace, operation and invocation identities while preserving the current content hash as a compatibility snapshot</td>
+<td>Persist the implemented profile, run, and ingress contracts, then split role, model, agent, actor run, trace, operation, and invocation identities while preserving the current content hash as a compatibility snapshot</td>
 </tr>
 <tr>
 <td>Lifecycle replay</td>
 <td>Partial</td>
-<td>Append environment-start-to-terminal obligation events and replay without the model</td>
+<td>Add task-bearing ingress lineage, then append environment-start-to-terminal obligation events and replay without the model</td>
 </tr>
 <tr>
 <td>Failure suite</td>
@@ -872,8 +887,8 @@
 <tr>
 <td>UAH-D05</td>
 <td>Identity layers only partly implemented</td>
-<td>Environment profiles and activations are distinct, but agent, trace and operation state remain conflated in current contracts</td>
-<td>Add immutable ingress, agent, trace and operation contracts behind compatibility exports</td>
+<td>Environment profiles, activations, and ingress are distinct, but agent, trace, and operation state remain conflated in current contracts</td>
+<td>Add immutable agent, trace, and operation contracts behind compatibility exports</td>
 </tr>
 <tr>
 <td>UAH-D06</td>
@@ -919,9 +934,9 @@
 </tr>
 <tr>
 <td>UAH-D13</td>
-<td>No environment-run registry or ingress classifier</td>
-<td>Native restarts, stimuli, tasks, and attached agents cannot be isolated deterministically</td>
-<td>Register two attested synthetic runs and prove task/trace isolation across identical ingress</td>
+<td>No task-bearing ingress lineage or isolation replay</td>
+<td>State updates are classified, but stimuli cannot yet receive task and trace identities or prove isolation across activations</td>
+<td>Issue lineage, register two attested synthetic runs, and replay identical task-bearing ingress without cross-run evidence</td>
 </tr>
 <tr>
 <td>UAH-D14</td>

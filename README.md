@@ -28,6 +28,7 @@ H0 proves:
 - content-addressed model-harness-environment configuration identity;
 - bounded Neural Workbench retrieval of supporting and counterexample traces;
 - profile-verified registration of owner-attested environment activations;
+- immutable, profile-bound classification of normalized state-update ingress;
 - a machine-readable NAO reference canary.
 
 It does **not** yet provide a complete live agent loop. Provider adapters, full
@@ -64,6 +65,24 @@ The adapter canary is a deterministic boot qualification over recorded NAO
 proposals and a fake environment. It exercises the portable control seam and
 Workbench quarantine through the explicit `ab_harness_nao` boundary. It does
 not claim live-model, ROS, or general agentic capability.
+
+## Development environment
+
+Local secrets and machine-specific paths belong in an ignored `.env`; use
+`.env.example` as the policy template. The kernel does not load `.env` files or
+depend on local credentials.
+
+```bash
+./scripts/setup_dev_tools.sh
+./scripts/run_precommit.sh
+```
+
+The setup script creates the ignored `.venv`, installs the editable package and
+version-bounded development tools, then installs pre-commit and pre-push hooks.
+The pre-commit run checks merge markers, YAML, EOF and whitespace hygiene,
+Ruff, the complete test suite, and generated-document synchronization. A
+successful manual run records the exact repository signature inside `.git`;
+pre-push rejects a missing or stale record.
 
 Minimal use:
 

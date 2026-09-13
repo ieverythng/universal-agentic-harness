@@ -14,6 +14,7 @@ boundaries:
 - Any adaptive or learned structure remains quarantined until replay,
   counterexample, holdout, owner-review, provenance, and rollback gates pass.
 
-Run `python -m pytest` for source changes and
-`python scripts/render_agentic_harness_docs.py` after canonical Markdown edits.
+Run `./scripts/setup_dev_tools.sh` once, then `./scripts/run_precommit.sh` for
+source or documentation changes. The hook suite runs Ruff, source-aware tests,
+repository hygiene, and `python scripts/render_agentic_harness_docs.py --check`.
 Generated HTML and Markdown documents must remain synchronized.

@@ -15,6 +15,10 @@ from ab_harness.contracts import InteractionModuleSpec
 from ab_harness.contracts import OwnerExecutionResult
 from ab_harness.contracts import TaskAcceptance
 from ab_harness.environment import InProcessEnvironmentOwner
+from ab_harness.environment_ingress import EnvironmentIngress
+from ab_harness.environment_ingress import TaskIngressDecision
+from ab_harness.environment_ingress import TaskIngressPolicy
+from ab_harness.environment_ingress import TaskIngressRule
 from ab_harness.environment_profiles import EnvironmentProfile
 from ab_harness.environment_profiles import EnvironmentProfileRegistry
 from ab_harness.environment_runs import EnvironmentRun
@@ -41,7 +45,8 @@ __all__ = [
     'AbstractionFrame', 'AgentOutput', 'AgentRoleSpec', 'BindingCatalog',
     'ConfigurationIdentity', 'EffectEvidence', 'EffectObligation', 'GateDecision',
     'HarnessTrace',
-    'EnvironmentProfile', 'EnvironmentProfileRegistry', 'EnvironmentRun',
+    'EnvironmentIngress', 'EnvironmentProfile', 'EnvironmentProfileRegistry',
+    'EnvironmentRun',
     'EnvironmentRunAttestation', 'EnvironmentRunRegistry',
     'InProcessEnvironmentOwner', 'InteractionModuleSpec',
     'InteractionProjector', 'JsonlHarnessTraceStore', 'OutputGate',
@@ -49,7 +54,8 @@ __all__ = [
     'WorkbenchContextCandidate', 'WorkbenchMemory', 'CURRENT_WORKBENCH_PROTOCOL',
     'InProcessWorkbenchAdapter', 'WorkbenchCandidate',
     'WorkbenchCandidateBatch', 'WorkbenchObservation',
-    'TaskAcceptance', 'TaskAcceptanceEvaluator', 'WorkbenchProtocolDescriptor',
+    'TaskAcceptance', 'TaskAcceptanceEvaluator', 'TaskIngressDecision',
+    'TaskIngressPolicy', 'TaskIngressRule', 'WorkbenchProtocolDescriptor',
     'WorkbenchProtocolMismatch',
     'WorkbenchRequest',
 ]

@@ -3,10 +3,12 @@
 
 from __future__ import annotations
 
-from pathlib import Path
+import argparse
 import os
+from pathlib import Path
 import subprocess
 import sys
+import tempfile
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -46,34 +48,59 @@ def theme_links(html_path: Path) -> str:
     )
 
 
-def render(relative_path: Path) -> None:
+def rendered_html(relative_path: Path) -> str:
     markdown_path = ROOT / "docs" / relative_path.with_suffix(".md")
     html_path = ROOT / "docs" / relative_path.with_suffix(".html")
-    subprocess.run(
-        [sys.executable, str(RENDERER), str(markdown_path), str(html_path)],
-        check=True,
-    )
-    html = html_path.read_text(encoding="utf-8")
-    html_path.write_text(
-        html.replace("</head>", theme_links(html_path) + "</head>"),
-        encoding="utf-8",
-    )
-
-
-def render_legacy_redirects() -> None:
-    legacy_dir = ROOT / "docs" / "agentic_harness"
-    legacy_dir.mkdir(parents=True, exist_ok=True)
-    for name, target in LEGACY_REDIRECTS.items():
-        (legacy_dir / f"{name}.html").write_text(
-            REDIRECT_TEMPLATE.format(target=target),
-            encoding="utf-8",
+    with tempfile.TemporaryDirectory() as temporary_directory:
+        temporary_path = Path(temporary_directory) / "rendered.html"
+        subprocess.run(
+            [sys.executable, str(RENDERER), str(markdown_path), str(temporary_path)],
+            check=True,
         )
+        html = temporary_path.read_text(encoding="utf-8")
+    return html.replace("</head>", theme_links(html_path) + "</head>")
 
 
-def main() -> int:
+def render(relative_path: Path, *, check: bool) -> bool:
+    html_path = ROOT / "docs" / relative_path.with_suffix(".html")
+    expected = rendered_html(relative_path)
+    if check:
+        return html_path.exists() and html_path.read_text(encoding="utf-8") == expected
+    html_path.write_text(expected, encoding="utf-8")
+    return True
+
+
+def render_legacy_redirects(*, check: bool) -> tuple[Path, ...]:
+    legacy_dir = ROOT / "docs" / "agentic_harness"
+    if not check:
+        legacy_dir.mkdir(parents=True, exist_ok=True)
+    drifted: list[Path] = []
+    for name, target in LEGACY_REDIRECTS.items():
+        path = legacy_dir / f"{name}.html"
+        expected = REDIRECT_TEMPLATE.format(target=target)
+        if check:
+            if not path.exists() or path.read_text(encoding="utf-8") != expected:
+                drifted.append(path)
+        else:
+            path.write_text(expected, encoding="utf-8")
+    return tuple(drifted)
+
+
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--check", action="store_true")
+    args = parser.parse_args(argv)
+    drifted: list[Path] = []
     for name in DOCS:
-        render(name)
-    render_legacy_redirects()
+        if not render(name, check=args.check):
+            drifted.append(ROOT / "docs" / name.with_suffix(".html"))
+    drifted.extend(render_legacy_redirects(check=args.check))
+    if drifted:
+        print("Generated documentation is out of sync:", file=sys.stderr)
+        for path in drifted:
+            print(f"  {path.relative_to(ROOT)}", file=sys.stderr)
+        print("Run python scripts/render_agentic_harness_docs.py", file=sys.stderr)
+        return 1
     return 0
 
 

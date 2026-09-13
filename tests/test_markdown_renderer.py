@@ -1,3 +1,6 @@
+from pathlib import Path
+
+from scripts import render_agentic_harness_docs
 from scripts.render_markdown_html import render_markdown
 from scripts.render_agentic_harness_docs import LEGACY_REDIRECTS
 from scripts.render_agentic_harness_docs import ROOT
@@ -51,3 +54,27 @@ def test_legacy_agentic_harness_pages_only_redirect_to_canonical_docs():
         assert f'http-equiv="refresh" content="0; url={target}"' in redirect
         assert f'<link rel="canonical" href="{target}"' in redirect
         assert not (legacy_dir / f"{name}.md").exists()
+
+
+def test_check_mode_reports_drift_without_rewriting_generated_html(
+    monkeypatch, tmp_path, capsys
+):
+    generated = tmp_path / "docs" / "plans" / "sample.html"
+    generated.parent.mkdir(parents=True)
+    generated.write_text("stale", encoding="utf-8")
+    monkeypatch.setattr(render_agentic_harness_docs, "ROOT", tmp_path)
+    monkeypatch.setattr(
+        render_agentic_harness_docs, "DOCS", (Path("plans/sample"),)
+    )
+    monkeypatch.setattr(render_agentic_harness_docs, "LEGACY_REDIRECTS", {})
+    monkeypatch.setattr(
+        render_agentic_harness_docs,
+        "rendered_html",
+        lambda _relative_path: "expected",
+    )
+
+    result = render_agentic_harness_docs.main(["--check"])
+
+    assert result == 1
+    assert generated.read_text(encoding="utf-8") == "stale"
+    assert "docs/plans/sample.html" in capsys.readouterr().err

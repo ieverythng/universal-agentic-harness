@@ -1283,9 +1283,9 @@ be used to relabel incomplete H0-H2 work.
 
 1. Freeze and review the environment, identity, task-ingress, operation-edge,
    effect-obligation, and task-acceptance schemas.
-2. Retain the implemented pure `TaskAcceptanceEvaluator.evaluate(...)` and
-   profile-verified `EnvironmentRunRegistry.register(...)` seams. Next add
-   immutable environment ingress and deterministic classification.
+2. Retain the implemented task-acceptance, profile-verified environment-run,
+   and binding-scoped state-update ingress seams. Next define task and trace
+   identity issuance before enabling task-bearing ingress actions.
 3. Add `ABRegistry.task_projection(...)` or a separate compiler prototype with
    no runtime behavior change.
 4. Build golden projection cases for dialogue, knowledge query, scan/find,
@@ -1323,9 +1323,10 @@ be used to relabel incomplete H0-H2 work.
   distinct identities and ownership.
 - [x] Cross-frame work uses explicit delegation edges.
 - [x] Task closure is compiled from required and best-effort effect obligations.
-- [~] Core H0 frame, band, role, projection, gate, trace, task-acceptance, and
-  profile-verified environment-run registration schemas are implemented and tested;
-  the full task/provider/environment/lifecycle grammar remains open.
+- [~] Core H0 frame, band, role, projection, gate, trace, task-acceptance,
+  profile-verified environment-run registration, and state-update ingress are
+  implemented and tested; task-bearing ingress and the remaining lifecycle
+  grammar remain open.
 - [ ] No same-model harness ablation has yet measured uplift.
 - [ ] No external Pi/OpenHands adapter has yet been prototyped.
 - [ ] Live ROS and robot behavior remain outside this documentation-only pass.
