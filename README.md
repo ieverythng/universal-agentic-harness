@@ -28,7 +28,16 @@ H0 proves:
 - content-addressed model-harness-environment configuration identity;
 - bounded Neural Workbench retrieval of supporting and counterexample traces;
 - profile-verified registration of owner-attested environment activations;
-- immutable, profile-bound classification of normalized state-update ingress;
+- immutable, profile-bound classification of normalized state/new-task
+  ingress with domain task identity and deterministic UAH trace issuance;
+- in-memory environment task registration with duplicate-start protection and
+  same-run resume/notify lineage;
+- strict content-addressed task lifecycle events with canonical local JSONL
+  persistence and model-free terminal-state reload across process restart;
+- deterministic TaskSpec compilation into one content-addressed projection,
+  obligation, prohibition, and budget artifact;
+- content-addressed typed proposals, UAH semantic admission, and domain-owned
+  operation leases with deterministic rejection reasons;
 - a machine-readable NAO reference canary.
 
 It does **not** yet provide a complete live agent loop. Provider adapters, full

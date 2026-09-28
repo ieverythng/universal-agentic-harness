@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>UAH and NeuralWorkbench Technical Diligence</title>
+  <style>
+    @page {
+      size: A4;
+      margin: 2.6cm 2.2cm 2.4cm 2.2cm;
+    }
+    :root {
+      --ink: #111;
+      --muted: #3a3a3a;
+      --line: #1f1f1f;
+      --soft: #f3f3f3;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: #fff;
+      font-family: "Liberation Serif", "Times New Roman", Times, serif;
+      font-size: 11.5pt;
+      line-height: 1.42;
+    }
+    .doc {
+      max-width: 172mm;
+      margin: 0 auto;
+      padding: 0;
+    }
+    .title-page {
+      min-height: 247mm;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      page-break-after: always;
+    }
+    .title-top {
+      text-align: center;
+      margin-top: 18mm;
+    }
+    .title-top h1 {
+      font-size: 20pt;
+      line-height: 1.28;
+      margin: 20mm 0 8mm;
+      font-weight: 700;
+    }
+    .title-top h2 {
+      font-size: 13pt;
+      margin: 0 0 3mm;
+      font-weight: 600;
+      border-bottom: 0;
+    }
+    .title-top p {
+      margin: 2mm 0;
+      color: var(--muted);
+    }
+    .title-meta {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 0 auto 20mm;
+      font-size: 11pt;
+    }
+    .title-meta td {
+      padding: 2.5mm 0;
+      vertical-align: top;
+      border: 0;
+    }
+    .title-meta td:first-child {
+      width: 38mm;
+      font-weight: 700;
+    }
+    .small { font-size: 10.3pt; color: #222; }
+    h1, h2, h3 {
+      margin: 0 0 3mm;
+      line-height: 1.28;
+      font-weight: 700;
+    }
+    h1 { font-size: 16.5pt; margin-top: 0; }
+    h2 {
+      font-size: 13pt;
+      margin-top: 9mm;
+      border-bottom: 0.5pt solid var(--line);
+      padding-bottom: 1.5mm;
+    }
+    h3 {
+      font-size: 11.8pt;
+      margin-top: 6mm;
+    }
+    p { margin: 2.2mm 0; }
+    ul, ol { margin: 2.5mm 0 2.5mm 6mm; padding: 0; }
+    li { margin: 1.4mm 0; }
+    pre {
+      margin: 2.5mm 0 4mm;
+      background: var(--soft);
+      border: 0.6pt solid #666;
+      padding: 2.6mm 2.8mm;
+      overflow-x: auto;
+      white-space: pre;
+      font-family: "Liberation Mono", "Courier New", monospace;
+      font-size: 9.2pt;
+      line-height: 1.3;
+    }
+    code {
+      font-family: "Liberation Mono", "Courier New", monospace;
+      background: #efefef;
+      padding: 0.2mm 1mm;
+      border: 0.4pt solid #d7d7d7;
+      border-radius: 2px;
+      font-size: 10.3pt;
+    }
+    pre code {
+      background: transparent;
+      padding: 0;
+      border: 0;
+      font-size: inherit;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 3mm 0 4mm;
+      font-size: 10.8pt;
+    }
+    th, td {
+      border: 0.6pt solid #333;
+      padding: 2.2mm 2.3mm;
+      vertical-align: top;
+      overflow-wrap: anywhere;
+      hyphens: auto;
+    }
+    th {
+      background: #fafafa;
+      text-align: left;
+      font-weight: 700;
+    }
+    .diagram {
+      margin: 4mm 0 5mm;
+      border: 0.6pt solid #777;
+      padding: 2mm;
+      background: #fff;
+    }
+    .diagram pre {
+      margin: 0;
+      border: 0;
+      background: #fcfcfc;
+      font-size: 10.2pt;
+      white-space: pre-wrap;
+    }
+    .diagram svg {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+    .diagram-labels {
+      font-family: "Liberation Serif", "Times New Roman", Times, serif;
+      font-size: 25px;
+      font-weight: 700;
+      fill: #111;
+    }
+    .lifelines {
+      stroke: #999;
+      stroke-dasharray: 4 4;
+    }
+    .messages {
+      stroke: #111;
+      stroke-width: 1.35;
+      fill: none;
+    }
+    .messages text {
+      stroke: none;
+      fill: #111;
+      font-family: "Liberation Serif", "Times New Roman", Times, serif;
+      font-size: 22px;
+    }
+    .caption {
+      margin-top: 2mm;
+      font-size: 10.5pt;
+      color: #222;
+      font-style: italic;
+      text-align: center;
+    }
+    blockquote {
+      border: 0.6pt solid #333;
+      background: #fcfcfc;
+      margin: 3mm 0;
+      padding: 2.6mm 3mm;
+      color: var(--muted);
+    }
+    a { color: #111; }
+  </style>
+  <link rel="stylesheet" href="../../assets/harness-theme.css" />
+  <script defer src="../../assets/harness-theme.js"></script>
+</head>
+<body>
+  <main class="doc">
+
+<h1>UAH and NeuralWorkbench Technical Diligence</h1>
+<p><strong>Prepared:</strong> 2026-09-28</p>
+<p><strong>Scope:</strong> product architecture, implementation evidence, authority boundaries, NeuralWorkbench design, portability, security posture, and open engineering risk</p>
+<h2>1. Technical thesis</h2>
+<p>The Universal Agentic Harness is a portable semantic and runtime control kernel for turning model output into bounded subsystem behavior. It does not replace the native domain runtime. It compiles what one role may see and propose for one task, validates typed proposals, requests domain admission, and accepts effects only from the owner responsible for producing them.</p>
+<p>NeuralWorkbench is a separate H3+ engine that searches and learns over the interaction structures admitted by UAH. It consumes immutable evidence and returns candidates. UAH retains scope, policy, admission, and execution authority.</p>
+<p>The design addresses a recurring integration failure: application code often mixes model prompting, tool selection, authorization, execution, evidence, and memory in one session abstraction. UAH assigns separate contracts and identities to these concerns so a failure can be attributed and replayed.</p>
+<h2>2. System architecture</h2>
+<div class="diagram"><pre><code class="language-mermaid">flowchart TB
+    subgraph Semantic[&quot;Semantic plane&quot;]
+        Frame[&quot;AbstractionFrame&quot;]
+        Registry[&quot;AB Registry Snapshot&quot;]
+        Domain[&quot;DomainContractPack&quot;]
+        Role[&quot;AgentRoleConfiguration&quot;]
+        Task[&quot;TaskSpec&quot;]
+        Compiler[&quot;TaskSpecCompiler&quot;]
+        Compiled[&quot;CompiledTask&quot;]
+        Frame --&gt; Compiler
+        Registry --&gt; Compiler
+        Domain --&gt; Compiler
+        Role --&gt; Compiler
+        Task --&gt; Compiler
+        Compiler --&gt; Compiled
+    end
+
+    subgraph Model[&quot;Model plane&quot;]
+        Prompt[&quot;PromptCompiler&quot;]
+        Invocation[&quot;Model Invocation&quot;]
+        Raw[&quot;Raw Output Artifact&quot;]
+        Proposal[&quot;TypedProposal&quot;]
+        Compiled --&gt; Prompt
+        Prompt --&gt; Invocation --&gt; Raw --&gt; Proposal
+    end
+
+    subgraph Control[&quot;Control and runtime plane&quot;]
+        UAHGate[&quot;UAH Semantic Admission&quot;]
+        Admitted[&quot;AdmittedOperation&quot;]
+        DomainGate[&quot;Domain Lifecycle Admission&quot;]
+        Lease[&quot;ExecutionLease&quot;]
+        Owner[&quot;Environment Owner&quot;]
+        Evidence[&quot;Effect Evidence&quot;]
+        Acceptance[&quot;TaskAcceptance&quot;]
+        Proposal --&gt; UAHGate --&gt; Admitted --&gt; DomainGate --&gt; Lease --&gt; Owner
+        Owner --&gt; Evidence --&gt; Acceptance
+    end
+
+    subgraph EvidencePlane[&quot;Evidence and adaptation plane&quot;]
+        Ledger[&quot;Lifecycle Ledger&quot;]
+        Observatory[&quot;Observatory&quot;]
+        Workbench[&quot;NeuralWorkbench&quot;]
+        Acceptance --&gt; Ledger
+        Ledger --&gt; Observatory
+        Ledger --&gt; Workbench
+        Workbench -. &quot;candidate only&quot; .-&gt; Prompt
+    end</code></pre></div>
+<p>Solid nodes represent the target architecture. Current implementation status is listed in Section 10. Two-stage admission and operation-scoped lease issuance are implemented as a narrow H0 slice. PromptCompiler, lease-bound owner dispatch, and the full lifecycle ledger are not yet complete.</p>
+<h2>3. Abstraction-boundary model</h2>
+<p>An AB object is a typed operation, observation, composition, strategy, or coupled system defined within an explicit abstraction frame. AB coordinates are frame-relative. AB1 in a robot runtime and AB1 in a software workspace need not represent the same capability or complexity.</p>
+<p>Each frame declares its substrate, atomicity rule, owners, and registry revision. A role receives a control band that separates:</p>
+<ul>
+<li>inspectable objects;</li>
+<li>objects it may propose;</li>
+<li>directly controllable objects;</li>
+<li>effect claims that require owner evidence.</li>
+</ul>
+<p>Higher-level work decomposes into an operation tree. Same-frame structure uses <code>decomposes_to</code>; cross-frame work uses an explicit mapping or <code>delegates_to</code> edge. This prevents an agent from treating a foreign frame as an untyped global tool namespace.</p>
+<p>The product claim is not that AB levels create reasoning. The claim is that an explicit task-relative object graph provides a smaller and more inspectable interaction surface than a flat catalog of unrelated tools.</p>
+<h2>4. Identity and lifecycle model</h2>
+<p>The identity model separates reusable configuration, persistent actors, runtime activation, causal work, and provider resources:</p>
+<pre><code class="language-text">environment_profile_id
+└── environment_run_id
+    ├── agent_handle_id -&gt; agent_id -&gt; agent_run_id
+    │   └── model_lease_id -&gt; model_invocation_id
+    └── task_id
+        └── trace_id
+            └── operation_id
+                ├── proposal_id
+                ├── admission_id
+                └── execution_lease_id</code></pre>
+<ul>
+<li><code>role_configuration_id</code> defines model-independent authority, frames, skills, policy, budgets, and evaluation requirements.</li>
+<li><code>agent_id</code> identifies one frozen role, model, prompt pack, harness, and adapter composition.</li>
+<li><code>agent_handle_id</code> provides a stable operational name such as <code>nao.planner.primary</code>, with versioned revisions and rollback.</li>
+<li><code>agent_run_id</code> is one bounded actor activation attached to exactly one environment run. Releasing a model lease does not terminate the logical actor.</li>
+<li><code>task_id</code> remains domain-owned. <code>trace_id</code> is the UAH causal workflow.</li>
+<li><code>operation_id</code> anchors exactly one frame-relative AB object. Cross-frame delegation creates another operation rather than assigning one operation several incompatible AB coordinates.</li>
+</ul>
+<p>Environment registration never invokes a model or starts native infrastructure. The environment owner attests readiness after native preflight. UAH verifies that attestation against a frozen profile and DomainContractPack revision.</p>
+<h2>5. Task compilation</h2>
+<p>The implemented <code>TaskSpecCompiler</code> closes a major source of semantic drift. Before this seam, callers could independently supply an object projection and effect obligations. The compiler now produces one <code>uah.compiled_task/v1</code> artifact from:</p>
+<ul>
+<li>a successful start-task decision;</li>
+<li>task and trace lineage;</li>
+<li>a versioned TaskSpec;</li>
+<li>role and frame policy;</li>
+<li>a content-addressed registry snapshot;</li>
+<li>reviewed DomainContractPack rules.</li>
+</ul>
+<p>The task selects semantic effects and marks each as required or best-effort. The domain pack determines which AB object owns the effect, which evidence owner may prove it, and which failure policy applies. The compiler produces:</p>
+<ul>
+<li>a closed <code>InteractionModuleSpec</code>, including inspectable decomposition;</li>
+<li>frozen <code>EffectObligation</code> values;</li>
+<li>merged prohibited effects;</li>
+<li>finite wall-time, model-call, and tool-call budgets;</li>
+<li>a content identity that excludes machine-local registry paths.</li>
+</ul>
+<p>Compilation fails on owner drift, undeclared observables, ambiguous rules, duplicate obligation identities, prohibited requested effects, mutable collections, mismatched lineage, mismatched revisions, unsupported roles or task types, and altered content identities. Resume and notification ingress must resolve the original compiled artifact rather than compile another one.</p>
+<h2>6. Two-stage admission</h2>
+<p>The implemented kernel seam preserves two distinct kinds of authority:</p>
+<pre><code class="language-text">raw model output
+  -&gt; TypedProposal
+  -&gt; UAH semantic admission
+  -&gt; AdmittedOperation
+  -&gt; domain lifecycle admission
+  -&gt; ExecutionLease or rejection</code></pre>
+<p>UAH semantic admission verifies role ownership, frame reach, AB object, binding status and ownership, canonical arguments, schema-reference presence, prohibited effects, and evidence obligations. It does not yet evaluate the arguments against the referenced schema or assert that the native environment is ready.</p>
+<p>Domain lifecycle admission owns readiness and operation deduplication. The current slice rechecks the environment run, DomainContractPack revision, binding environment, lifecycle owner, and readiness attestation before issuing an operation-scoped lease. Native concurrency, cancellation, supersession, version fencing, and safety checks remain adapter-owned future work. A semantically valid operation may still be rejected.</p>
+<p>The accepted tracer reaches an <code>ExecutionLease</code> without calling the environment handler. Candidate bindings, foreign binding owners, inspection-only objects, domain-revision drift, duplicate leasing, and tampered authority artifacts fail closed. The immediate next step is to require the fake owner to consume this exact lease and reject direct dispatch.</p>
+<h2>7. Evidence and task acceptance</h2>
+<p>Model text cannot prove an external effect. UAH distinguishes:</p>
+<ol>
+<li>raw owner result;</li>
+<li>normalized effect evidence;</li>
+<li>deterministic obligation evaluation;</li>
+<li>task acceptance.</li>
+</ol>
+<p><code>EffectObligation</code> identifies the semantic effect, AB object, evidence owner, requirement class, and failure policy. <code>TaskAcceptanceEvaluator</code> produces:</p>
+<ul>
+<li><code>accepted</code> when every required obligation is satisfied;</li>
+<li><code>accepted_with_deficit</code> when required obligations succeed and a best-effort obligation does not;</li>
+<li><code>suspended</code> when required evidence is still pending;</li>
+<li><code>rejected</code> when a terminal required obligation fails.</li>
+</ul>
+<p>The environment task registry records suspension or terminal judgment and rejects later ingress for a terminal task. A strict <code>uah.task_lifecycle_event/v1</code> stream persists locally as canonical JSONL and reconstructs registry state after process restart without invoking a model or rerunning acceptance.</p>
+<p>The current store is local and single-writer. It does not yet provide the full ledger sequence, timestamps, parent-event links, cross-process coordination, or owner-authorized cancellation and native failure grammar.</p>
+<h2>8. NeuralWorkbench</h2>
+<h3>8.1 Role in the product</h3>
+<p>NeuralWorkbench is the proposed adaptive memory and search engine. It is not an abstraction frame, model provider, runtime owner, or permission system. UAH supplies the active frame, task projection, constraints, candidate budget, and versioned context.</p>
+<p>The external seam is deliberately small:</p>
+<pre><code class="language-text">describe() -&gt; protocol and capability descriptor
+propose(WorkbenchRequest) -&gt; WorkbenchCandidateBatch
+observe(WorkbenchObservation) -&gt; no authority-bearing result</code></pre>
+<p>The existing UAH adapter implements a transport-neutral handshake and bounded candidate exchange. Candidate output remains quarantined.</p>
+<h3>8.2 Candidate portfolio</h3>
+<p>The target engine compares mechanism-diverse candidates:</p>
+<ul>
+<li>deterministic templates;</li>
+<li>model-generated structures through a host-supplied inference port;</li>
+<li>retrieved prior traces adapted to the current task;</li>
+<li>hybrids of templates, retrieval, and generation.</li>
+</ul>
+<p>Hard constraints and deterministic verification run before scoring. The target score vector preserves validity, expected success, safety, evidence coverage, uncertainty reduction, latency, cost, reversibility, and portability. A scalar energy may rank the remaining candidates, but it is deployment policy rather than truth.</p>
+<h3>8.3 Memory unit</h3>
+<p>NeuralWorkbench learns from completed evidence, not chat history alone. A trace must join task, environment, role, model, candidate provenance, admission, execution, owner evidence, acceptance, costs, and failures. The planned <code>VerifiedTraceDigest</code> is the compact memory unit exposed to retrieval.</p>
+<p>Successes and counterexamples remain first-class. Unknown evidence remains unknown rather than being coerced into success or failure. Capability profiles are keyed by object, task family, environment, and version.</p>
+<h3>8.4 Crystallization</h3>
+<p>Repeated graph structures may be proposed as higher-level AB objects at H4. Frequency is insufficient. Promotion requires replay, removal and substitution counterfactuals, opposing traces, disjoint holdout evaluation, owner review, provenance, versioning, rollback, and continued monitoring.</p>
+<p>NeuralWorkbench cannot publish directly into the trusted registry.</p>
+<h3>8.5 Current implementation boundary</h3>
+<p>The intended companion revision <code>e76ba7e</code> is described as a deterministic symbolic prototype with template candidate generation, registry verification, an inspectable hand-tuned energy score, candidate selection, JSONL trace storage, and offline macro proposals. It does not yet implement the complete retrieval-adaptation loop or learned search model.</p>
+<p>The UAH repository declares the companion relationship, but the expected gitlink is not currently mounted. The revision must be restored and verified before a release may claim a pinned NeuralWorkbench dependency.</p>
+<p>No repository evidence currently proves that NeuralWorkbench improves NAO, iTrader, Watson, or another environment. The required experiment compares fixed projection, retrieval from successes only, and retrieval from successes plus failures on held-out tasks under the same model and acceptance checks.</p>
+<h2>9. Observatory</h2>
+<p>Observatory is a read-only projection over the common lifecycle ledger. It is designed to render:</p>
+<ul>
+<li>environment-run, task, trace, agent-run, and operation views;</li>
+<li>raw model output, TypedProposal, admission, lease, native result, evidence, and terminal judgment as distinct artifacts;</li>
+<li>model and provider comparisons;</li>
+<li>Workbench requests, candidate provenance, scores, selection, counterexamples, and observations;</li>
+<li>replay and failure attribution.</li>
+</ul>
+<p>Observatory does not execute, admit, mutate registries, issue evidence, or decide what becomes memory. NeuralWorkbench may consume the ledger and Observatory may display Workbench artifacts, but neither owns the other&#x27;s responsibility.</p>
+<h2>10. Implementation status</h2>
+<table><thead><tr>
+<th>Capability</th>
+<th>State on 2026-09-28</th>
+<th>Evidence or gap</th>
+</tr></thead><tbody>
+<tr>
+<td>Portable semantic kernel</td>
+<td>Implemented H0 proof</td>
+<td>Core has no ROS, NAO, provider SDK, or runtime-product imports</td>
+</tr>
+<tr>
+<td>Registry projection and output gate</td>
+<td>Implemented</td>
+<td>Closed object projection, AB band checks, role/output reach, effect-claim rejection</td>
+</tr>
+<tr>
+<td>Binding quarantine</td>
+<td>Implemented</td>
+<td>Candidate bindings cannot resolve for runtime use</td>
+</tr>
+<tr>
+<td>Environment activation and ingress</td>
+<td>Implemented narrow seam</td>
+<td>Profile and attestation checks, start/resume/notify lineage; environment close and full persistence remain open</td>
+</tr>
+<tr>
+<td>TaskSpec compilation</td>
+<td>Implemented</td>
+<td>Content-addressed projection, obligations, prohibitions, budgets, and revision provenance</td>
+</tr>
+<tr>
+<td>Task acceptance</td>
+<td>Implemented narrow seam</td>
+<td>Required, best-effort, suspended, and terminal outcomes</td>
+</tr>
+<tr>
+<td>Task lifecycle persistence</td>
+<td>Implemented local seam</td>
+<td>Strict JSONL, restart recovery, corruption rejection; full common ledger absent</td>
+</tr>
+<tr>
+<td>Recorded NAO canary</td>
+<td>Implemented</td>
+<td>Accepted, rejected, support-retrieval, and counterexample-retrieval cases</td>
+</tr>
+<tr>
+<td>PromptCompiler</td>
+<td>Specified</td>
+<td>No executable prompt artifact compiler</td>
+</tr>
+<tr>
+<td>Two-stage admission</td>
+<td>Implemented narrow seam</td>
+<td>Content-addressed proposal, semantic admission, binding and obligation capture, independent domain decision, attestation-bound operation lease, and typed rejections; dispatch and persistence remain open</td>
+</tr>
+<tr>
+<td>Agent identity and handles</td>
+<td>Partially specified</td>
+<td>Environment/task identities exist; role, agent, run, handle, operation, and invocation registries incomplete</td>
+</tr>
+<tr>
+<td>Live model port and allocator</td>
+<td>Not implemented</td>
+<td>No Watson/Bonsai runner; fixed lease and startup preflight remain open</td>
+</tr>
+<tr>
+<td>H2 NAO planner parity</td>
+<td>Not started</td>
+<td>No explicit <code>legacy</code>, <code>shadow</code>, and <code>uah</code> comparison report</td>
+</tr>
+<tr>
+<td>Observatory renderer</td>
+<td>Contract frozen</td>
+<td>Static O1 implementation remains open</td>
+</tr>
+<tr>
+<td>NeuralWorkbench retrieval</td>
+<td>Candidate slice only</td>
+<td>Bounded UAH-side memory and protocol exist; complete companion attachment and uplift test remain open</td>
+</tr>
+<tr>
+<td>Crystallization</td>
+<td>Quarantined design</td>
+<td>No promoted AB2+ object</td>
+</tr>
+</tbody></table>
+<p>The current full suite reports <strong>144 passing tests</strong>. The repository hook suite checks Ruff, source-aware tests, repository hygiene, and generated Markdown/HTML synchronization.</p>
+<h2>11. Security and governance posture</h2>
+<p>The architecture applies least capability at task scope:</p>
+<ul>
+<li>runtime discovery is not authorization;</li>
+<li>candidate bindings do not execute;</li>
+<li>AB0 inspection does not imply AB0 control;</li>
+<li>model output cannot assert effect truth;</li>
+<li>environment owners remain responsible for native execution and evidence;</li>
+<li>cross-frame work requires explicit delegation;</li>
+<li>Workbench candidates cannot promote themselves;</li>
+<li>provider fallback must preserve model admission requirements and role fidelity;</li>
+<li>untrusted retrieved context remains data and cannot expand the compiled task;</li>
+<li>registries, evaluators, permissions, and promotion thresholds stay outside online model mutation.</li>
+</ul>
+<p>The present code is research-stage infrastructure and has not completed a formal security review, threat model, penetration test, or regulated-system certification.</p>
+<h2>12. Portability model</h2>
+<p>Domain onboarding should normally produce declarative content:</p>
+<ul>
+<li>frames and AB objects;</li>
+<li>role projections and control bands;</li>
+<li>implementation bindings;</li>
+<li>evidence and task-ingress rules;</li>
+<li>environment profiles;</li>
+<li>prompt policy and qualification cases.</li>
+</ul>
+<p>Custom Python adapters are reserved for irreducible native normalization or parity behavior. The NAO-specific package is separate from the core. A second domain must demonstrate that the unchanged kernel can compile, admit, trace, and accept a materially different task before universality is claimed.</p>
+<h2>13. Principal technical risks</h2>
+<table><thead><tr>
+<th>Risk</th>
+<th>Why it matters</th>
+<th>Required evidence</th>
+</tr></thead><tbody>
+<tr>
+<td>Contract breadth grows faster than executable depth</td>
+<td>A large type system can appear complete without operating a full task</td>
+<td>One minimal ingress-to-terminal tracer with replay and failure cases</td>
+</tr>
+<tr>
+<td>Domain onboarding remains bespoke</td>
+<td>Integration cost could dominate kernel reuse</td>
+<td>Measured second-domain onboarding with unchanged core and a deletion budget</td>
+</tr>
+<tr>
+<td>AB projection harms model performance</td>
+<td>Narrow context can omit useful affordances</td>
+<td>Same-model flat-tool versus compiled-projection ablation</td>
+</tr>
+<tr>
+<td>Evidence rules are incomplete</td>
+<td>False completion can remain hidden</td>
+<td>Stale, missing, conflicting, delayed, and owner-failure fixtures</td>
+</tr>
+<tr>
+<td>Two admission layers drift</td>
+<td>UAH and domain may disagree without clear ownership</td>
+<td>Typed reasons, immutable operation identity, parity fixtures, and replay</td>
+</tr>
+<tr>
+<td>Local provider constraints block concurrency</td>
+<td>Agent identity may be confused with loaded model capacity</td>
+<td>Fixed lease first, then hardware-aware allocation and serialized multi-agent trials</td>
+</tr>
+<tr>
+<td>Workbench amplifies early errors</td>
+<td>Retrieved traces may bias future failures</td>
+<td>Counterexamples, calibration, holdout, provenance, and rollback</td>
+</tr>
+<tr>
+<td>Observatory becomes a second ledger</td>
+<td>Views could disagree with execution truth</td>
+<td>Projection-only renderer over one append-only store</td>
+</tr>
+<tr>
+<td>NeuralWorkbench dependency is not pinned</td>
+<td>Reproducibility and licensing cannot be verified</td>
+<td>Restore gitlink, verify revision, tests, provenance, and license</td>
+</tr>
+</tbody></table>
+<h2>14. Next technical gates</h2>
+<ol>
+<li>Require the fake owner to execute only the exact <code>ExecutionLease</code> and reject direct dispatch.</li>
+<li>Extend the task store into a common lifecycle event envelope and derive <code>VerifiedTraceDigest</code>.</li>
+<li>Add stale evidence, timeout, owner failure, cancellation, retry exhaustion, supersession, and false-completion cases.</li>
+<li>Implement role, agent, handle, agent-run, operation, edge, lease, and model invocation identities.</li>
+<li>Add PromptCompiler, provider-neutral model port, fixed model lease, and startup preflight.</li>
+<li>Freeze the NAO <code>v1.0.0</code> DomainContractPack and package-owned fixtures.</li>
+<li>Run planner <code>legacy | shadow | uah</code> parity with fake or simulated owners.</li>
+<li>Attach NeuralWorkbench in shadow mode and run the first retrieval ablation.</li>
+<li>Prove one non-NAO adapter with the unchanged kernel.</li>
+</ol>
+<h2>15. Reproduction entry points</h2>
+<p>From a configured repository checkout:</p>
+<pre><code class="language-bash">./scripts/setup_dev_tools.sh
+./scripts/run_precommit.sh
+PYTHONPATH=src .venv/bin/python -m ab_harness_nao</code></pre>
+<p>The smoke command is a deterministic adapter qualification over recorded proposals and a fake environment. It is not a live model, ROS, or production deployment claim.</p>
+  </main>
+</body>
+</html>

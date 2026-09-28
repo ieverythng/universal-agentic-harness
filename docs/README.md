@@ -42,6 +42,9 @@ and must be regenerated after canonical edits.
 
 - `research/`: primary-source reviews and experimental notes. Research claims
   remain separate from implementation status.
+- `research/jev_system_one_uah_research.md`: Jev and RLCD source review,
+  local decision-model alternatives, UAH integration boundaries, hardware and
+  schema-scaling analysis, and the proposed H3 shadow experiment.
 
 ## Repository Relationship
 

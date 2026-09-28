@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>UAH and NeuralWorkbench GTM and Investment Case</title>
+  <style>
+    @page {
+      size: A4;
+      margin: 2.6cm 2.2cm 2.4cm 2.2cm;
+    }
+    :root {
+      --ink: #111;
+      --muted: #3a3a3a;
+      --line: #1f1f1f;
+      --soft: #f3f3f3;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: #fff;
+      font-family: "Liberation Serif", "Times New Roman", Times, serif;
+      font-size: 11.5pt;
+      line-height: 1.42;
+    }
+    .doc {
+      max-width: 172mm;
+      margin: 0 auto;
+      padding: 0;
+    }
+    .title-page {
+      min-height: 247mm;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      page-break-after: always;
+    }
+    .title-top {
+      text-align: center;
+      margin-top: 18mm;
+    }
+    .title-top h1 {
+      font-size: 20pt;
+      line-height: 1.28;
+      margin: 20mm 0 8mm;
+      font-weight: 700;
+    }
+    .title-top h2 {
+      font-size: 13pt;
+      margin: 0 0 3mm;
+      font-weight: 600;
+      border-bottom: 0;
+    }
+    .title-top p {
+      margin: 2mm 0;
+      color: var(--muted);
+    }
+    .title-meta {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 0 auto 20mm;
+      font-size: 11pt;
+    }
+    .title-meta td {
+      padding: 2.5mm 0;
+      vertical-align: top;
+      border: 0;
+    }
+    .title-meta td:first-child {
+      width: 38mm;
+      font-weight: 700;
+    }
+    .small { font-size: 10.3pt; color: #222; }
+    h1, h2, h3 {
+      margin: 0 0 3mm;
+      line-height: 1.28;
+      font-weight: 700;
+    }
+    h1 { font-size: 16.5pt; margin-top: 0; }
+    h2 {
+      font-size: 13pt;
+      margin-top: 9mm;
+      border-bottom: 0.5pt solid var(--line);
+      padding-bottom: 1.5mm;
+    }
+    h3 {
+      font-size: 11.8pt;
+      margin-top: 6mm;
+    }
+    p { margin: 2.2mm 0; }
+    ul, ol { margin: 2.5mm 0 2.5mm 6mm; padding: 0; }
+    li { margin: 1.4mm 0; }
+    pre {
+      margin: 2.5mm 0 4mm;
+      background: var(--soft);
+      border: 0.6pt solid #666;
+      padding: 2.6mm 2.8mm;
+      overflow-x: auto;
+      white-space: pre;
+      font-family: "Liberation Mono", "Courier New", monospace;
+      font-size: 9.2pt;
+      line-height: 1.3;
+    }
+    code {
+      font-family: "Liberation Mono", "Courier New", monospace;
+      background: #efefef;
+      padding: 0.2mm 1mm;
+      border: 0.4pt solid #d7d7d7;
+      border-radius: 2px;
+      font-size: 10.3pt;
+    }
+    pre code {
+      background: transparent;
+      padding: 0;
+      border: 0;
+      font-size: inherit;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 3mm 0 4mm;
+      font-size: 10.8pt;
+    }
+    th, td {
+      border: 0.6pt solid #333;
+      padding: 2.2mm 2.3mm;
+      vertical-align: top;
+      overflow-wrap: anywhere;
+      hyphens: auto;
+    }
+    th {
+      background: #fafafa;
+      text-align: left;
+      font-weight: 700;
+    }
+    .diagram {
+      margin: 4mm 0 5mm;
+      border: 0.6pt solid #777;
+      padding: 2mm;
+      background: #fff;
+    }
+    .diagram pre {
+      margin: 0;
+      border: 0;
+      background: #fcfcfc;
+      font-size: 10.2pt;
+      white-space: pre-wrap;
+    }
+    .diagram svg {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+    .diagram-labels {
+      font-family: "Liberation Serif", "Times New Roman", Times, serif;
+      font-size: 25px;
+      font-weight: 700;
+      fill: #111;
+    }
+    .lifelines {
+      stroke: #999;
+      stroke-dasharray: 4 4;
+    }
+    .messages {
+      stroke: #111;
+      stroke-width: 1.35;
+      fill: none;
+    }
+    .messages text {
+      stroke: none;
+      fill: #111;
+      font-family: "Liberation Serif", "Times New Roman", Times, serif;
+      font-size: 22px;
+    }
+    .caption {
+      margin-top: 2mm;
+      font-size: 10.5pt;
+      color: #222;
+      font-style: italic;
+      text-align: center;
+    }
+    blockquote {
+      border: 0.6pt solid #333;
+      background: #fcfcfc;
+      margin: 3mm 0;
+      padding: 2.6mm 3mm;
+      color: var(--muted);
+    }
+    a { color: #111; }
+  </style>
+  <link rel="stylesheet" href="../../assets/harness-theme.css" />
+  <script defer src="../../assets/harness-theme.js"></script>
+</head>
+<body>
+  <main class="doc">
+
+<h1>UAH and NeuralWorkbench GTM and Investment Case</h1>
+<p><strong>Prepared:</strong> 2026-09-28</p>
+<p><strong>Scope:</strong> commercialization hypotheses, customer sequence, packaging, milestones, metrics, use of capital, and diligence disclosures</p>
+<p><strong>Important:</strong> market size, pricing, demand, and sales-cycle assumptions have not yet been validated in this repository</p>
+<h2>1. Commercial framing</h2>
+<p>UAH is positioned as infrastructure for teams that want to use language models inside an existing operational stack without transferring authority to the model or rebuilding the same harness controls for every role.</p>
+<p>The proposed commercial outcome is a reusable control and evidence layer that helps a customer:</p>
+<ul>
+<li>constrain each agent to a task-relative capability surface;</li>
+<li>retain native ownership of execution, safety, and evidence;</li>
+<li>change models or providers without changing role semantics;</li>
+<li>inspect the chain from raw output to admitted operation and native result;</li>
+<li>replay failures without invoking the model;</li>
+<li>compare models, prompts, policies, and candidate structures under frozen acceptance criteria;</li>
+<li>use NeuralWorkbench to retrieve and compare prior experience without granting online self-modification authority.</li>
+</ul>
+<p>The commercial claim is not established until at least two materially different domains use the unchanged kernel and onboarding effort is measured.</p>
+<h2>2. Beachhead hypothesis</h2>
+<p>The best initial design partner is expected to have four characteristics:</p>
+<ol>
+<li>an existing multi-process or multi-owner system;</li>
+<li>a concrete desire to add or replace an LLM role;</li>
+<li>costly or visible failures that require evidence and replay;</li>
+<li>enough task repetition to justify standardized qualification and memory.</li>
+</ol>
+<p>Likely early segments include robotics and embodied-agent teams, local-first software-agent deployments, research automation platforms, and operational AI teams integrating several model providers. Regulated use may become relevant, but the current project has no compliance certification and should not lead with regulated-production claims.</p>
+<h3>Reference sequence</h3>
+<table><thead><tr>
+<th>Sequence</th>
+<th>Reference environment</th>
+<th>Commercial purpose</th>
+</tr></thead><tbody>
+<tr>
+<td>1</td>
+<td>NAO planner</td>
+<td>Demonstrate preserved native ownership, multi-actor traces, failure attribution, and no duplicate activation</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Watson/software engineering</td>
+<td>Demonstrate named agents, local-model portability, provider swapping, workspace evidence, and repeatable evaluation</td>
+</tr>
+<tr>
+<td>3</td>
+<td>iTrader or bounded market simulator</td>
+<td>Demonstrate proposer/solver/verifier separation, simulator evidence, risk ownership, and held-out evaluation</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Gamma or another research workflow</td>
+<td>Demonstrate domain onboarding and cross-agent composition outside embodied control</td>
+</tr>
+</tbody></table>
+<p>NAO is an engineering qualification environment, not necessarily the largest commercial market. Watson is a practical second proof because the same Linux workstation can exercise software-engineering tasks and local inference without robot hardware.</p>
+<h2>3. Buyer and user hypotheses</h2>
+<table><thead><tr>
+<th>Role</th>
+<th>Problem</th>
+<th>Relevant product surface</th>
+<th>Purchase evidence to obtain</th>
+</tr></thead><tbody>
+<tr>
+<td>AI platform lead</td>
+<td>Each team builds a different agent runtime and trace format</td>
+<td>UAH kernel, model port, identity, conformance suite</td>
+<td>Reduced integration duplication and faster role qualification</td>
+</tr>
+<tr>
+<td>Robotics or automation lead</td>
+<td>Model behavior must coexist with deterministic owners and lifecycle gates</td>
+<td>Domain adapter, two-stage admission, evidence ledger</td>
+<td>Parity, lower failure-diagnosis time, no ownership regression</td>
+</tr>
+<tr>
+<td>Agent product lead</td>
+<td>Model/provider changes make behavior and cost difficult to compare</td>
+<td>Stable handles, frozen cases, Observatory comparisons</td>
+<td>Faster model replacement with maintained acceptance</td>
+</tr>
+<tr>
+<td>Reliability or evaluation lead</td>
+<td>Chat logs do not show what was admitted or what the environment proved</td>
+<td>Observatory, replay, VerifiedTraceDigest</td>
+<td>Higher evidence completeness and reproducible incident review</td>
+</tr>
+<tr>
+<td>Research lead</td>
+<td>Prior trajectories are difficult to reuse safely</td>
+<td>NeuralWorkbench retrieval and candidate evaluation</td>
+<td>Held-out uplift without unsafe-action or evidence regression</td>
+</tr>
+</tbody></table>
+<p>Economic buyer, procurement path, deployment preference, and willingness to pay must be tested through interviews and paid design partnerships.</p>
+<h2>4. Product packaging hypothesis</h2>
+<h3>4.1 UAH Core</h3>
+<p>Portable task compilation, semantic admission, identity, lifecycle, provider ports, domain adapters, evidence normalization, acceptance, and replay.</p>
+<p>Potential packaging:</p>
+<ul>
+<li>source-available or commercial enterprise runtime;</li>
+<li>self-hosted deployment for local and private models;</li>
+<li>conformance suite and signed release artifacts;</li>
+<li>supported adapters for selected runtimes.</li>
+</ul>
+<p>Licensing has not been decided. The current repository license and every reused dependency or companion revision require legal review before commercial packaging.</p>
+<h3>4.2 Domain onboarding and qualification</h3>
+<p>A services-led engagement that produces:</p>
+<ul>
+<li>an approved DomainContractPack;</li>
+<li>environment profile and agent roster;</li>
+<li>bindings and normalization adapters;</li>
+<li>frozen success and failure fixtures;</li>
+<li>evidence and acceptance rules;</li>
+<li>deployment preflight and rollback plan;</li>
+<li>parity and qualification report.</li>
+</ul>
+<p>This is the likely initial revenue motion. The business becomes scalable only if the second and third onboarding efforts show declining custom engineering.</p>
+<h3>4.3 Observatory</h3>
+<p>Read-only operational and evaluation views over the common ledger. Potential buyers may value incident reconstruction, model comparison, policy review, evaluation, and evidence export even before NeuralWorkbench adaptation is enabled.</p>
+<h3>4.4 NeuralWorkbench</h3>
+<p>An H3+ module for retrieval, candidate construction, failure-aware memory, scoring, and shadow evaluation. Commercial activation should follow measured uplift and remain optional. H4 crystallization and reviewed promotion may support maintained interaction-skill libraries, but automatic self-publishing is outside the product boundary.</p>
+<h3>4.5 Support and conformance</h3>
+<p>Potential recurring services include release qualification, domain-pack version review, provider/model conformance, incident replay, security updates, and migration support.</p>
+<h2>5. Founder-led GTM sequence</h2>
+<h3>Stage A: technical design partners</h3>
+<p>Select one or two partners with an existing system and a bounded high-value agent role. Sell a qualification outcome rather than broad autonomy.</p>
+<p>Deliverables:</p>
+<ul>
+<li>current-system seam and ownership audit;</li>
+<li>one frozen task and failure suite;</li>
+<li>one DomainContractPack and adapter;</li>
+<li>one explicit shadow or authority mode;</li>
+<li>one evidence and parity report;</li>
+<li>measured onboarding time and unresolved gaps.</li>
+</ul>
+<p>Exit condition: a partner agrees that the evidence artifact is useful enough to continue, pay, or provide a reference under defined terms.</p>
+<h3>Stage B: reference deployment</h3>
+<p>Complete H2 NAO parity and one Watson/software-engineering deployment. Publish a technical case study that reports failures and limitations alongside successes.</p>
+<p>Exit condition: the unchanged kernel qualifies two frames, with measured reuse and no domain-specific imports in core.</p>
+<h3>Stage C: repeatable onboarding</h3>
+<p>Turn repeated work into an onboarding workflow, templates, validators, and conformance tests. Keep generated domain content quarantined until owner review.</p>
+<p>Exit condition: a third environment reaches shadow qualification with less custom kernel work than the second.</p>
+<h3>Stage D: adaptive module</h3>
+<p>Offer NeuralWorkbench to customers with repeated tasks and sufficient trace volume. Begin with inspect-only retrieval and shadow candidate comparison.</p>
+<p>Exit condition: held-out task results improve against a no-memory baseline without worsening unsafe-action rate, evidence completeness, or rollback.</p>
+<h3>Stage E: platform motion</h3>
+<p>Package supported runtimes, domain packs, Observatory views, conformance, and Workbench policies into a repeatable enterprise deployment.</p>
+<p>Exit condition: recurring product revenue and partner-led onboarding contribute materially relative to bespoke engineering services.</p>
+<h2>6. Sales narrative by audience</h2>
+<h3>Engineering leadership</h3>
+<p>&quot;Keep your orchestrator, lifecycle, safety, and native APIs. Add a portable model control layer that compiles task scope and records what was proposed, admitted, executed, and proven.&quot;</p>
+<h3>Reliability and governance</h3>
+<p>&quot;Replace session-only logs with replayable evidence that distinguishes model claims from environment-owner proof and terminal acceptance.&quot;</p>
+<h3>Model and infrastructure teams</h3>
+<p>&quot;Treat the model as a leased compute resource beneath a stable agent identity, then compare local and remote providers under the same role and task suite.&quot;</p>
+<h3>Research teams</h3>
+<p>&quot;Use completed traces, failures, and counterexamples to search interaction structures in shadow mode before proposing a reviewed replacement.&quot;</p>
+<p>These are positioning statements for discovery, not verified customer quotes.</p>
+<h2>7. Defensibility hypothesis</h2>
+<p>Potential defensibility comes from accumulated, interoperable operational assets rather than a single model:</p>
+<ul>
+<li>the AB frame and object grammar;</li>
+<li>reviewed DomainContractPacks and adapters;</li>
+<li>frozen task and failure suites;</li>
+<li>multi-actor identity and evidence lineage;</li>
+<li>cross-provider and cross-runtime conformance data;</li>
+<li>supporting and counterexample trace corpora;</li>
+<li>Workbench retrieval, candidate, and crystallization evaluation;</li>
+<li>onboarding workflow and owner-review discipline.</li>
+</ul>
+<p>These assets may produce switching costs and data advantage if they remain portable and evidence-rich. They do not yet constitute a demonstrated moat. Patentability, trade-secret policy, open-source strategy, and freedom to operate require separate legal analysis.</p>
+<h2>8. Milestone-gated investment plan</h2>
+<p>Capital should be released against evidence-producing milestones rather than feature count.</p>
+<table><thead><tr>
+<th>Gate</th>
+<th>Deliverable</th>
+<th>Value created</th>
+<th>Go or no-go evidence</th>
+</tr></thead><tbody>
+<tr>
+<td>G1: executable semantic center</td>
+<td>Lease-bound owner dispatch, common ledger, full synthetic replay</td>
+<td>Extends implemented two-stage admission into an end-to-end authority path</td>
+<td>Success and failure replay identically without the model</td>
+</tr>
+<tr>
+<td>G2: H1 agent runtime</td>
+<td>Agent identity, handles, PromptCompiler, provider port, fixed lease, startup preflight</td>
+<td>Enables local and remote model trials under stable roles</td>
+<td>Frozen suite runs through recorded and live provider modes</td>
+</tr>
+<tr>
+<td>G3: H2 NAO parity</td>
+<td>Domain pack, planner adapter, report-result delegation, `legacy</td>
+<td>shadow</td>
+<td>uah` report</td>
+<td>Demonstrates integration with a real multi-owner system</td>
+<td>Reviewed parity and failure attribution, no duplicate action or speech</td>
+</tr>
+<tr>
+<td>G4: second-domain proof</td>
+<td>Watson/software-engineering adapter using unchanged core</td>
+<td>Tests portability and onboarding leverage</td>
+<td>Measured reuse and same-model comparison</td>
+</tr>
+<tr>
+<td>G5: H3 Workbench shadow</td>
+<td>Verified trace digest, retrieval, candidate provenance, counterexample-aware memory</td>
+<td>Tests adaptive advantage without authority risk</td>
+<td>Held-out uplift or recovery improvement with safety/evidence parity</td>
+</tr>
+<tr>
+<td>G6: repeatable commercialization</td>
+<td>Paid partner, deployment package, support and conformance process</td>
+<td>Tests willingness to pay and repeatability</td>
+<td>Paid continuation, reduced onboarding effort, referenceable outcome</td>
+</tr>
+</tbody></table>
+<p>Failure at a gate should narrow the product claim. Later model performance cannot compensate for failed ownership, evidence, replay, or parity gates.</p>
+<h2>9. Use of capital</h2>
+<p>Suggested categories, without assigning amounts before financing scope is known:</p>
+<ol>
+<li><strong>Kernel and runtime engineering:</strong> lease-bound dispatch, ledger, replay, identities, provider ports, allocator, and security hardening.</li>
+<li><strong>Reference integrations:</strong> NAO parity, Watson/software engineering, and one non-NAO qualification.</li>
+<li><strong>Evaluation infrastructure:</strong> frozen suites, failure injection, model/provider matrix, Workbench ablations, and regression reporting.</li>
+<li><strong>Observatory product:</strong> evidence views, comparison workflows, export, and operator experience.</li>
+<li><strong>Domain onboarding:</strong> tooling, validators, templates, documentation, and design-partner delivery.</li>
+<li><strong>Commercial readiness:</strong> licensing review, security review, deployment packaging, customer discovery, and support process.</li>
+</ol>
+<p>Hiring should follow the gates. Early priorities are systems/runtime engineering, evaluation and reliability, and domain integration. Sales hiring before repeatable onboarding would be premature.</p>
+<h2>10. Metrics</h2>
+<h3>Technical qualification</h3>
+<ul>
+<li>accepted-task rate on frozen cases;</li>
+<li>unsafe or out-of-scope dispatch rate;</li>
+<li>evidence-complete terminal judgment rate;</li>
+<li>replay determinism;</li>
+<li>stale-evidence and false-completion detection;</li>
+<li>parity disagreement rate and classified causes;</li>
+<li>latency, token, tool-call, memory, and model-lease cost;</li>
+<li>provider/model substitution success under fixed role requirements;</li>
+<li>Workbench holdout uplift and counterexample recovery.</li>
+</ul>
+<h3>Product and onboarding</h3>
+<ul>
+<li>time to first shadow trace;</li>
+<li>time to approved DomainContractPack;</li>
+<li>percentage of reused kernel and onboarding artifacts;</li>
+<li>custom adapter code per environment;</li>
+<li>qualification-case coverage;</li>
+<li>incident diagnosis time;</li>
+<li>operator acceptance and evidence-review completion.</li>
+</ul>
+<h3>Commercial</h3>
+<ul>
+<li>design-partner conversion to paid continuation;</li>
+<li>deployment and support revenue mix;</li>
+<li>onboarding gross effort and trend by customer;</li>
+<li>time from discovery to shadow qualification;</li>
+<li>number of qualified roles and environments;</li>
+<li>recurring renewal or expansion;</li>
+<li>referenceability and partner-led introductions.</li>
+</ul>
+<p>No baseline values are claimed yet. Each metric needs a definition and data collection plan before it is used externally.</p>
+<h2>11. Competitive framing</h2>
+<p>UAH should not compete on having the largest tool catalog or claiming the most autonomy. Its intended differentiation is the combination of:</p>
+<ul>
+<li>frame-relative semantic task compilation;</li>
+<li>two distinct admission layers;</li>
+<li>environment-owner effect evidence;</li>
+<li>stable agent identity separated from provider capacity;</li>
+<li>multi-actor replay and observability;</li>
+<li>quarantined adaptive memory and candidate search.</li>
+</ul>
+<p>Adjacent products may provide workflow orchestration, agent frameworks, sandboxes, model gateways, observability, or memory. UAH can integrate with these as runtimes or adapters if they preserve the contracts. A formal competitive matrix requires current product research and should be created as a separate sourced deliverable.</p>
+<h2>12. Diligence disclosures</h2>
+<ul>
+<li>H0 is a tested contract proof, not a production release.</li>
+<li>H1 agent lifecycle and live provider operation are incomplete.</li>
+<li>H2 NAO planner parity and model qualification are not complete.</li>
+<li>NeuralWorkbench improvement is unproven and remains an H3 experiment.</li>
+<li>The intended NeuralWorkbench revision is documented, but its gitlink is absent from the current UAH tree.</li>
+<li>Observatory has a frozen contract but no complete product renderer.</li>
+<li>Cross-domain universality is not established.</li>
+<li>There are no customer, revenue, pricing, market-size, compliance, security certification, or production-scale claims in the repository.</li>
+<li>Licensing and intellectual-property strategy require review before external distribution or commercial packaging.</li>
+</ul>
+<h2>13. Immediate external workstream</h2>
+<ol>
+<li>Run ten to fifteen buyer and operator interviews using the beachhead criteria.</li>
+<li>Select one paid or tightly scoped design partner.</li>
+<li>Freeze the G1 technical demonstration and produce a short replay artifact.</li>
+<li>Prepare a sourced market and competitive landscape separately from this architecture-grounded package.</li>
+<li>Build a simple financial model only after pricing and onboarding effort have interview evidence.</li>
+<li>Convert the executive brief into a concise deck once the audience and raise objective are defined.</li>
+</ol>
+  </main>
+</body>
+</html>

@@ -259,9 +259,9 @@ no native startup or model action. Immutable environment ingress and
 deterministic state-update classification are now implemented under exact
 profile, DomainContractPack revision, run, binding, and type checks.
 
-Task-bearing actions remain disabled until task and trace identity issuance is
-defined. This prevents `start_task`, `resume_task`, or `notify_task` decisions
-from carrying absent or reconstructed lineage.
+Task-bearing actions remained disabled at this checkpoint until task and trace
+identity issuance was defined. This prevented `start_task`, `resume_task`, or
+`notify_task` decisions from carrying absent or reconstructed lineage.
 
 ## 14. Evidence and Limits
 
@@ -273,8 +273,155 @@ UAH H2. `EffectObligation`, `TaskAcceptance`, the pure acceptance evaluator,
 and profile-verified environment-run registration are now implemented. The NAO
 projection and recorded qualification live in the separate `ab_harness_nao`
 adapter package. No TaskSpec obligation compiler, environment-profile
-serialization or signature verification, task and trace lineage issuance,
-ingress persistence and deduplication, multi-actor ledger, `report_result`
-adapter, or Workbench retrieval policy is implemented at this checkpoint. The
-current in-memory registration and ingress contracts do not provide durable
-persistence, attestation signature validation, or environment close semantics.
+serialization or signature verification, task registry, ingress persistence
+and deduplication, multi-actor ledger, `report_result` adapter, or Workbench
+retrieval policy is implemented at this checkpoint. The current in-memory
+registration and ingress contracts do not provide durable persistence,
+attestation signature validation, or environment close semantics.
+
+## 15. TDD Continuation on 2026-09-13
+
+This implementation checkpoint applies Decision 5 without reopening the
+architecture grill. A reviewed `start_task` rule now selects the domain-owned
+task identifier from a named immutable native-lineage field. UAH preserves
+that identifier and derives the initial causal `trace_id` with the versioned
+`uah-trace-v1` scheme over the environment run and task identity.
+
+Missing task lineage produces typed rejection. Mutable lineage containers,
+duplicate keys, and empty lineage fields fail contract construction. Resume
+and notify remain disabled until an environment-bound task registry can prove
+that the referenced task exists in the same activation. No model may author,
+replace, or infer these identities.
+
+## 16. Environment Task Registry TDD Continuation on 2026-09-13
+
+The next implementation round applies the same Decision 5 boundary.
+`EnvironmentTaskRegistry` records immutable task and trace lineage under the
+exact environment activation. Replayed task-bearing ingress is rejected. A
+different ingress cannot start a domain task that is already registered in the
+same environment run. Both decisions retain the existing task and trace
+identifiers for inspection without authorizing another activation.
+
+Registered `resume_task` and `notify_task` ingress reuse the original trace.
+Unknown task identifiers and references to a task registered under another
+environment run fail closed. This registry is an in-memory H0 contract proof.
+It does not supply durable recovery, terminal task transitions, concurrent
+transaction guarantees, or native effect evidence.
+
+## 17. Acceptance and Task Replay TDD Continuation on 2026-09-19
+
+This round connects the existing pure `TaskAcceptance` judgment to the
+environment task registry. `accepted`, `accepted_with_deficit`, and `rejected`
+become terminal registry states and reject later resume or notify ingress.
+`suspended` remains nonterminal because required evidence is still pending.
+A terminal judgment cannot be replaced, and no acceptance may close a task
+registered under another environment activation.
+
+Task start, resume, notification, suspension, and terminal acceptance emit
+content-addressed `TaskLifecycleEvent` values using the Observatory event
+vocabulary. Ordered replay reconstructs lineage, terminal state, and
+duplicate-ingress protection without a model or a second acceptance-evaluator
+pass. Modified event content, duplicate event identity, and acceptance before
+task start fail closed.
+
+The event stream remains an in-memory H0 proof. Durable storage, global event
+sequence, timestamps, and process-restart recovery remain open. Cancellation
+and native failure are not represented as generic terminal calls because their
+environment-owner authority contract has not yet been implemented.
+
+## 18. Task Lifecycle Persistence TDD Continuation on 2026-09-23
+
+This round applies Decision 5 to restart recovery without expanding the event
+authority model. `TaskLifecycleEvent` now serializes through the exact
+`uah.task_lifecycle_event/v1` envelope. Missing or additional fields,
+unsupported versions, empty or non-string values, incompatible event/status
+pairs, and content-address mismatches fail validation.
+
+`JsonlTaskLifecycleStore` provides a canonical, append-only local stream. Each
+append is flushed through `fsync`. Reload validates the complete UTF-8 stream
+before replaying it into a fresh `EnvironmentTaskRegistry`, so malformed JSON,
+blank records, invalid events, duplicates, invalid ordering, and an
+unterminated final record cannot publish partial registry state. A missing
+store reconstructs an empty registry. A valid stream reconstructs task and
+trace lineage, ingress replay protection, suspension, and terminal acceptance
+after process restart without a model or evaluator call.
+
+The accepted scope is a single-writer, task-event subset. It does not claim
+cross-process locking, a global event sequence, timestamps, parent-event
+links, compaction, or a filesystem-wide power-loss transaction. Integration
+with the common lifecycle ledger remains required. Cancellation and native
+failure remain excluded until an environment-owner authority contract defines
+who may assert those transitions and which evidence must accompany them.
+
+## 19. TaskSpec Compiler TDD Continuation on 2026-09-23
+
+The next H0 seam compiles one accepted task start into a single immutable
+source of truth. `TaskSpecCompiler.compile(...)` consumes the admitted
+`TaskIngressDecision`, `uah.task_spec/v1`, role, frame, registry, and reviewed
+DomainContractPack. It emits a content-addressed `uah.compiled_task/v1` with
+task and trace lineage, one closed `InteractionModuleSpec`, compiled effect
+obligations, merged prohibited effects, finite budgets, and exact domain-pack
+provenance.
+
+The task author selects semantic effects and whether each is required or
+best-effort. The DomainContractPack owns the mapping from each effect to one AB
+object, evidence owner, and failure policy. The compiler verifies that the
+owner matches the AB object and that the effect is a declared normalized
+observable. This prevents task text or future model output from selecting its
+own evidence authority.
+
+Compilation occurs once after successful `start_task` ingress. Resume and
+notify ingress resolve the existing compiled artifact. Recompilation is
+rejected so a task cannot change projection, obligations, prohibitions, or
+budgets while retaining the same task and trace identities. Domain-rule
+ambiguity, duplicate obligation identities, prohibited requested effects,
+lineage or revision mismatches, mutable collections, and altered content
+identities fail closed.
+
+This round does not implement prompt wording, proposal normalization, semantic
+admission, domain lifecycle admission, execution leases, or ledger events for
+compilation. The next seam must make `CompiledTask` the sole authority input to
+`TypedProposal -> AdmittedOperation -> ExecutionLease`.
+
+## 20. Typed Proposal and Two-Stage Admission TDD Continuation on 2026-09-28
+
+This round implements the authority path selected during the grill without
+granting execution authority to model output or to UAH semantic admission.
+`ProposalNormalizer` converts one raw typed model-output artifact into one
+content-addressed `uah.typed_proposal/v1`. The proposal preserves the exact
+compiled task, environment run, task, trace, operation, output type, AB object,
+and canonical finite-JSON arguments. It rejects model-authored effect claims,
+ambiguous payload shapes, missing artifact lineage, and disagreement between
+the requested object and the model's object references.
+
+`SemanticAdmission` is the domain-agnostic UAH gate. It rechecks the compiled
+task identity and causal lineage, role output policy, task projection, direct
+control band, runtime callability, prohibited effects, effect obligations, and
+the selected approved binding. The binding must match the environment and
+runtime mode, retain the semantic owner's implementation boundary, and provide
+input, output, and evidence adapter references. Acceptance produces one
+content-addressed `uah.admitted_operation/v1`. That artifact records a semantic
+decision and still cannot authorize native execution.
+
+`DomainLifecycleAdmission` is a separate environment-owned gate. It rechecks
+the active environment activation, environment identity, DomainContractPack
+revision, and duplicate-operation state before issuing an operation-scoped,
+attestation-bound `uah.execution_lease/v1`. The accepted tracer therefore has
+the following authority order:
+
+```text
+CompiledTask + raw typed model output
+  -> TypedProposal
+  -> UAH semantic admission
+  -> AdmittedOperation
+  -> domain lifecycle admission
+  -> ExecutionLease or typed rejection
+```
+
+All three artifacts reject content tampering. The implemented slice does not
+yet validate arguments against the binding's input schema, decrement task
+budgets, dispatch to an environment owner, persist proposal and admission
+events in the common ledger, or implement cancellation, concurrency, expiry,
+and fencing. The next authority seam requires a fake environment owner to
+consume the exact lease, reject direct or altered calls, return a native result,
+and emit owner-issued effect evidence for task acceptance and replay.

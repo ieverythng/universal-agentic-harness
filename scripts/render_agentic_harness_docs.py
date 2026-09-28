@@ -23,6 +23,10 @@ DOCS = (
     Path("artifacts/decisions/2026-08-04_uah_h2_neural_workbench_grill"),
     Path("artifacts/decisions/2026-09-08_uah_identity_environment_and_memory_grill"),
     Path("artifacts/reviews/2026-08-17_uah_h2_commit_review"),
+    Path("gtm/investor_handoff/README"),
+    Path("gtm/investor_handoff/executive_brief"),
+    Path("gtm/investor_handoff/technical_diligence"),
+    Path("gtm/investor_handoff/gtm_and_investment_case"),
 )
 LEGACY_REDIRECTS = {
     "universal_agentic_harness_masterplan": "../plans/universal_agentic_harness_masterplan.html",

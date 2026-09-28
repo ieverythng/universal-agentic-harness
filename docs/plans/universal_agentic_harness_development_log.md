@@ -1,12 +1,14 @@
 # Universal Agentic Harness: Development Log
 
 **Purpose:** Practical implementation ledger linked to the semantic masterplan  
-**Updated:** 2026-09-11
+**Updated:** 2026-09-28
 **Target:** UAH H2 NAO planner qualification after ordered evidence gates pass
 **Current release boundary:** H0 contract spine, one H1 synthetic vertical
-slice, profile-bound state-update ingress, explicit NAO adapter canary,
-quarantined Workbench retrieval, and enforced repository hooks; task-bearing
-ingress, H1 lifecycle, and H2 planner parity remain incomplete
+slice, profile-bound state-update and new-task ingress, explicit NAO adapter
+canary, quarantined Workbench retrieval, and enforced repository hooks;
+task lifecycle events persist in a strict local JSONL stream and reload across
+process restart, while the common lifecycle ledger, H1 agent lifecycle, and H2
+planner parity remain incomplete
 
 ## Current state
 
@@ -17,19 +19,19 @@ ingress, H1 lifecycle, and H2 planner parity remain incomplete
 | ROS-free environment owner | Green | Approved AB1 dispatch and owner-issued effect evidence |
 | Recorded NAO contract slice | Green | One H0 fixture replays chatbot handoff to planner proposal to gate to fake owner to evidence closure; this is not H2 planner parity |
 | Latest NAO AB0 seam map | Declared candidates | Seven revision-pinned pointers across six canonical AB0 objects |
-| H2 planner coupling | Active target | NAO `v1.0.0` planner ingress/egress projection, two-stage admission, fake owner, evidence and parity suite required |
+| H2 planner coupling | Active target | NAO `v1.0.0` planner ingress/egress must be normalized through the implemented admission contracts, then connected to lease-bound fake-owner execution, evidence, and parity fixtures |
 | Chatbot coupling | Deferred after planner parity | Existing node retained as compatibility/reference implementation |
 | Watson/Bonsai model matrix | Not started | Frozen cases and configuration identity still required |
-| Configuration identity | Partial | Monolithic model-harness-environment tuple is content-addressed; environment profile, run, and ingress identities are explicit, while role, agent, trace, operation, edge, and invocation identities remain incomplete |
-| Environment lifecycle | Partial green | Frozen profiles and attestation registration enforce owner, runtime, DomainContractPack revision, readiness evidence, and unique IDs; immutable ingress can classify state updates or reject mismatched input; task association, close, persistence, attached agent runs, and standby remain open |
-| Task closure | Green narrow kernel seam | `EffectObligation`, `TaskAcceptance`, and the pure evaluator distinguish accepted, accepted-with-deficit, suspended, and rejected outcomes; TaskSpec compilation and full lifecycle integration remain open |
+| Configuration identity | Partial | Monolithic model-harness-environment tuple is content-addressed; environment profile, run, ingress, and registered task/trace lineage are explicit, while role, agent, operation, edge, and invocation identities and the general trace lifecycle remain incomplete |
+| Environment lifecycle | Partial green | Frozen profiles and attestation registration enforce owner, runtime, DomainContractPack revision, readiness evidence, and unique IDs; immutable ingress can start, resume, or notify an environment-registered task without changing its trace; acceptance-derived terminal state blocks later ingress; strict task events persist locally and reconstruct the registry after restart; common-ledger integration, cross-process writer coordination, owner-authored cancellation/failure, attached agent runs, and standby remain open |
+| Task compilation and closure | Green narrow kernel seam | `TaskSpecCompiler` binds accepted start ingress, role, frame, registry, and DomainContractPack rules into one content-addressed `CompiledTask`; its projection, obligations, prohibitions, and budgets feed semantic admission and the pure acceptance seam; lease-bound execution and full-ledger integration remain open |
 | NAO adapter canary | Green | Accepted path, rejected canary, and Workbench retrieval run via `python -m ab_harness_nao` |
 | Neural Workbench retrieval | Green candidate slice | Failure-aware bounded retrieval emits provenance-bearing candidates only |
 | Neural Workbench promotion/adaptation | Quarantined design only | No trusted runtime mutation or registry promotion implemented |
 | NeuralWorkbench repository | Boundary defined, gitlink missing | Intended companion revision is `e76ba7e`; `.gitmodules` exists but the UAH tree does not currently mount the gitlink |
 | Workbench adapter protocol | Green contract slice | Focused tests cover serialization, handshake, mismatch, and observation-only override |
 | Prompt compiler | Specified, not implemented | Layered UAH kernel, role, domain, AB projection and task context contract is documented |
-| Two-stage admission | Specified, not implemented | Typed proposal to immutable admitted operation to domain execution lease |
+| Two-stage admission | Green narrow kernel seam | One-operation `TypedProposal` normalization, compiled-task semantic admission, approved binding and evidence-obligation capture, and independent domain `ExecutionLease` issuance or typed rejection are executable; payload-schema validation, persistence, cancellation, concurrency, and owner dispatch remain open |
 | Observatory | O1 identity/event contract frozen | Static renderer implementation required for H1/H2 review; O2 deferred |
 | Repository guardrails | Green | Python-native pre-commit and pre-push hooks enforce hygiene, Ruff, tests, generated-doc synchronization, and a fresh repository-signature cache |
 
@@ -41,7 +43,7 @@ tracks.
 
 | Release | Already proved | Required next | Exit evidence |
 | --- | --- | --- | --- |
-| H0 contract spine | Frame-relative AB views, candidate binding quarantine, deterministic role/projection gate, profile-verified environment runs, state-update ingress, fake owner evidence, recorded success and rejection | Task/trace identity issuance for task-bearing ingress; `TypedProposal`, `AdmittedOperation`, `ExecutionLease`, operation edges, and lifecycle-event schemas | Serializable round trips and one environment-ingress-to-terminal replay covering success plus required counterexamples |
+| H0 contract spine | Frame-relative AB views, candidate binding quarantine, deterministic role/projection gate, profile-verified environment runs, environment-bound task registration/ingress, content-addressed task compilation, two-stage operation admission, acceptance-derived terminal state, strict task-event persistence and model-free restart replay, fake owner evidence, recorded success and rejection | Lease-bound owner dispatch, common lifecycle ledger, operation edges, payload-schema validation, and remaining event schemas | Serializable round trips and one environment-ingress-to-terminal replay covering success plus required counterexamples |
 | H1 runtime kernel | Narrow in-process vertical slice and smoke CLI | Environment and agent lifecycle state machines, registries, fixed-instance lease, preflights, standby, prompt compiler, model port, budgets, cancellation, recovery, acceptance evaluator, append-only event store and deterministic digest | Frozen synthetic suite reconstructs every terminal decision and `VerifiedTraceDigest` without the model |
 | H2 cooperative NAO | Revision-pinned source map, one recorded contract fixture, startup/preflight audit | Package-owned golden fixtures, content-addressed DomainContractPack, AB0/AB1 projections, environment/trace bridge, planner ingress/egress gate, fixed NAO handles, `report_result` delegation, fake/sim execution, `legacy | shadow | uah` parity | Reviewed multi-actor parity report with lineage, admission, lease, result, obligations, failure attribution, and no duplicate activation or speech |
 
@@ -513,18 +515,156 @@ unknown bindings, unknown ingress types, and policy provenance mismatches return
 typed rejection decisions without invoking a model. Duplicate rules and
 malformed contracts fail closed.
 
-Task-bearing actions are deliberately rejected at policy construction until a
-task and trace identity issuer exists. The next TDD seam must define that
-lineage before enabling `start_task`, `resume_task`, or `notify_task`.
+At this checkpoint, task-bearing actions were deliberately rejected at policy
+construction until a task and trace identity issuer existed. The next TDD seam
+was required to define that lineage before enabling `start_task`,
+`resume_task`, or `notify_task`.
+
+### 2026-09-13: Domain task identity and initial UAH trace issuance
+
+This checkpoint implements the next seam confirmed by the closed identity,
+environment, and memory grill. A `start_task` rule names the immutable native
+lineage field that owns the domain task identifier. Classification preserves
+that value as `task_id` and derives `trace_id` with the versioned
+`uah-trace-v1` scheme over `environment_run_id` and `task_id`. A repeated task
+identity within a different environment activation therefore receives a
+different trace namespace.
+
+Missing task identity returns `missing_task_identity` without constructing
+partial lineage. Mutable lineage containers, duplicate lineage keys, empty
+keys, and empty values fail at contract construction. `resume_task` and
+`notify_task` remain disabled because the current stateless policy cannot prove
+that a referenced task is registered and active in the same environment run.
+The next lifecycle seam is an environment-bound task registry with duplicate
+start protection and lookup for existing-task ingress.
+
+### 2026-09-13: Environment-bound task registry and existing-task ingress
+
+`EnvironmentTaskRegistry` now records immutable `TaskLineage` beneath the exact
+`environment_run_id`. Replaying the same task-bearing ingress returns
+`duplicate_environment_ingress`. A different ingress that attempts to start
+the same environment-scoped domain task returns `task_already_registered`.
+Both rejections preserve the registered task and trace identifiers for
+diagnosis without granting another start action. Incomplete lineage identities
+fail contract construction.
+
+`resume_task` and `notify_task` rules now require an injected task registry and
+a configured native task-identity field. A registered same-environment task
+reuses its original `trace_id`; unknown tasks and cross-environment references
+return `unknown_task_identity`. The registry records task-bearing ingress only.
+State-update deduplication, durable persistence, terminal task transitions,
+and concurrent transaction control remain open lifecycle work.
+
+### 2026-09-19: Acceptance-derived terminal state and task replay
+
+`EnvironmentTaskRegistry.record_acceptance(...)` now records the deterministic
+judgment produced by `TaskAcceptanceEvaluator`. `accepted`,
+`accepted_with_deficit`, and `rejected` are terminal and prevent later resume
+or notify ingress with reason `task_terminal`. `suspended` remains nonterminal
+and permits further task work. Terminal judgments cannot be replaced, and an
+acceptance from another environment activation cannot close the task.
+
+Task start, resume, notification, suspension, and terminal acceptance now emit
+immutable `TaskLifecycleEvent` values using the Observatory event vocabulary.
+Each event identity is a SHA-256 digest of its exact content. Duplicate event
+identity, modified content, acceptance-before-start ordering, trace mismatch,
+and duplicate task-bearing ingress fail closed. A fresh
+`EnvironmentTaskRegistry.replay(events)` reconstructs task lineage, terminal
+state, and duplicate-ingress protection without model invocation or evaluator
+execution.
+
+The lifecycle stream at this checkpoint remained in memory. The following
+round adds its bounded persistence contract. Cancellation and native failure
+are not accepted as generic terminal calls because their environment-owner
+authority contract is not yet implemented.
+
+### 2026-09-23: Versioned task-event persistence and restart reload
+
+`TaskLifecycleEvent` now has an exact
+`uah.task_lifecycle_event/v1` serialization envelope. Missing or additional
+fields, unsupported versions, non-string values, empty values, incompatible
+event/status pairs, and event identifiers that do not match the serialized
+content fail validation.
+
+`JsonlTaskLifecycleStore` appends canonical JSON records and flushes each
+accepted append through `fsync`. Reload first parses the complete stream, then
+replays it into a fresh `EnvironmentTaskRegistry`; no partially reconstructed
+registry is published. Missing stores produce an empty registry. Blank
+records, non-UTF-8 data, malformed JSON, invalid events, duplicate events,
+invalid event order, and an unterminated final record fail closed. A process
+restart can therefore reconstruct task lineage, ingress replay protection, and
+terminal acceptance without invoking a model or rerunning the evaluator.
+
+This is a local, single-writer task stream rather than the full lifecycle
+ledger. Cross-process locking, global sequence, timestamps, parent-event
+links, compaction, and a directory-level power-loss transaction are not
+claimed. Owner-authorized cancellation and native failure also remain open.
+
+### 2026-09-23: TaskSpec compilation into one admission source of truth
+
+`TaskSpecCompiler.compile(...)` now accepts one successful `start_task`
+decision, a frozen `uah.task_spec/v1`, role, frame, registry, and reviewed
+DomainContractPack. It emits one immutable `uah.compiled_task/v1` artifact.
+The artifact contains the closed `InteractionModuleSpec`, compiled
+`EffectObligation` values, merged prohibited effects, finite budgets, task and
+trace lineage, environment lineage, and exact domain-pack revision.
+
+Effect requests no longer carry object or evidence-owner authority. The
+DomainContractPack maps each requested effect to one AB object, evidence owner,
+and failure policy. Compilation fails if the rule is ambiguous, the owner does
+not own the object, the effect is not a declared owner observable, the object
+is outside the role's inspectable control band, the effect is prohibited, or
+the ingress, task, frame, registry, role, task type, or pack revisions differ.
+Mutable contract collections and altered compiled-task identities also fail
+closed.
+
+Only accepted task-start ingress may compile. Resume and notify ingress must
+resolve the existing compiled artifact so a task cannot silently change its
+projection, acceptance obligations, or budgets. The artifact excludes the
+machine-local registry path from its content identity. The following round now
+consumes this artifact through two-stage admission; compiled-task and admission
+lifecycle events remain open.
+
+### 2026-09-28: Typed proposal and two-stage admission TDD seam
+
+`ProposalNormalizer.normalize(...)` now converts one raw typed model output
+into one content-addressed `uah.typed_proposal/v1`. The normalizer requires a
+UAH-issued operation identity and raw-output artifact reference, canonicalizes
+finite JSON arguments, requires exact object-reference agreement, and rejects
+model-authored effect claims. Expected malformed output returns deterministic
+reason codes rather than raising from later admission code.
+
+`SemanticAdmission.admit(...)` evaluates that proposal only against its exact
+`CompiledTask`. It checks task and trace lineage, role-owned output type,
+projection reach, direct-control band, runtime callability, prohibited effects,
+effect obligations, approved binding availability, binding ownership, runtime
+mode, environment, schemas, and evidence adapter. Success emits an immutable
+`uah.admitted_operation/v1` containing the exact proposal, binding revision,
+schema references, runtime mode, and obligation identities. It grants no native
+execution authority.
+
+`DomainLifecycleAdmission.request_execution(...)` independently rechecks the
+active environment run, binding environment, DomainContractPack revision,
+operation deduplication, lifecycle owner, and readiness attestation. Success
+emits an operation-scoped `uah.execution_lease/v1`; rejection returns domain
+reason codes. The accepted tracer reaches a lease without invoking an
+environment handler. Candidate bindings, foreign owners, inspection-only AB0
+objects, incomplete binding contracts, changed domain revisions, duplicate
+lease requests, and tampered proposal, admission, or lease content fail closed.
+
+This is the first executable two-stage authority slice. It does not yet validate
+arguments against referenced input schemas, persist admission or lease events,
+model operation trees, express cancellation/concurrency/version fencing, or
+dispatch the fake owner through the lease.
 
 ## Verification dashboard
 
 | Command | Result |
 | --- | --- |
-| `PYTHONPATH=src python -m pytest -q` on 2026-09-11 | 88 passed after task acceptance, profile-verified environment registration, immutable state-update ingress, adapter isolation, and repository-tooling coverage |
+| `PYTHONPATH=src python -m pytest -q` on 2026-09-28 | 144 passed after typed-proposal normalization, two-stage admission and lease rejection cases, content-addressed TaskSpec compilation, strict task-event persistence/reload, task acceptance, adapter isolation, and repository-tooling coverage |
 | `.venv\Scripts\python.exe -m pytest -q -p no:cacheprovider --basetemp .test-tmp\full-suite` | 42 passed |
 | Focused `tests/test_workbench_protocol.py` red-green pass | 9 passed after strict identity, capability, duplicate-ID, and JSON checks |
-| `.venv\Scripts\python.exe -m ab_harness smoke` | Passed all four canaries |
+| `PYTHONPATH=src .venv/bin/python -m ab_harness_nao` | Passed accepted, rejected, supporting-trace, and counterexample canaries through the explicit NAO adapter package |
 | NeuralWorkbench `python -m pytest -q -p no:cacheprovider` | 29 passed |
 | NAO planner/common/gate/supervisor/trace-viewer seam suite | 177 passed; 60 expected warnings for unavailable optional `interaction_skills` manifest |
 | Chatbot planner-handoff/grounding/request-adapter seam suite | 72 passed with `planner_common` and `kb_skills` on `PYTHONPATH` |
@@ -629,22 +769,36 @@ concurrency, latency, and quality envelopes differ.
 - [ ] Split immutable role, model, agent,
   actor run, trace, task, operation, edge, and invocation identities behind
   compatibility exports.
-- [ ] Add serialized `TaskSpec`, `EnvironmentProfile`, `EnvironmentRun`,
-  `EnvironmentIngress`, and deterministic `TaskIngressDecision`.
+- [~] Add serialized contracts: versioned `TaskSpec` and a serializable
+  content-addressed `CompiledTask` are implemented; strict standalone
+  TaskSpec round-trip plus `EnvironmentProfile`, `EnvironmentRun`,
+  `EnvironmentIngress`, and `TaskIngressDecision` envelopes remain open.
 - [x] Add frozen in-memory `EnvironmentProfile`, exact attestation authority
   checks, readiness-evidence presence, unique activation identities, and lookup.
 - [x] Add immutable `EnvironmentIngress` and profile-, revision-, run-, binding-,
   and type-bound state-update classification with typed rejection.
-- [ ] Issue task and trace lineage before enabling task-bearing ingress actions.
-- [ ] Add `TypedProposal`, `AdmittedOperation`, and `ExecutionLease` contracts.
+- [x] Preserve a configured domain task identity and issue a deterministic,
+  environment-scoped UAH trace for `start_task` ingress.
+- [x] Add an in-memory environment-bound task registry, duplicate-start
+  rejection, and same-run `resume_task`/`notify_task` lineage lookup.
+- [x] Add acceptance-derived terminal task state, content-addressed task events,
+  ordered replay, and rejection of later existing-task ingress.
+- [x] Add strict versioned task-event serialization, canonical fsynced JSONL
+  persistence, and process-restart registry reconstruction.
+- [ ] Add the common-ledger envelope, global sequence/timestamps,
+  cross-process writer coordination, and owner-authorized cancellation/failure
+  transitions.
+- [x] Add content-addressed `TypedProposal`, `AdmittedOperation`, and
+  `ExecutionLease` contracts with separate semantic and domain decisions.
 - [x] Add `EffectObligation`, `TaskAcceptance`, and pure task-acceptance
   evaluation after public seam confirmation.
-- [ ] Compile obligations deterministically from `TaskSpec`, DomainContractPack
-  evidence rules, and task-ingress lineage.
+- [x] Compile one closed projection, obligation set, prohibited-effect set, and
+  budgets deterministically from accepted task ingress, `TaskSpec`, role,
+  frame, registry, and DomainContractPack rules.
 - [ ] Add deterministic `PromptCompiler` output and artifact hashing from the
   same `InteractionModuleSpec` consumed by semantic admission.
-- [ ] Append lifecycle events for compile, proposal, gate, dispatch, evidence,
-  and terminal decision.
+- [~] Append content-addressed task start/resume/notify/suspension/terminal
+  events; compile, proposal, gate, dispatch, and evidence events remain open.
 - [ ] Derive a deterministic `VerifiedTraceDigest` from replayed lifecycle and
   obligation events.
 - [ ] Add stale evidence, timeout, cancellation, retry exhaustion, and
@@ -696,16 +850,16 @@ concurrency, latency, and quality envelopes differ.
 
 H2 is qualified only when the core rows and planner parity rows are green:
 
-| Gate | State on 2026-09-11 | Required before qualification |
+| Gate | State on 2026-09-23 | Required before qualification |
 | --- | --- | --- |
 | Installable portable package | Green | Clean install smoke in a fresh venv |
 | Deterministic boot command | Green | Preserve machine-readable output and nonzero failure exit |
 | Accepted and rejected AB canaries | Green | Retain owner evidence and no-dispatch rejection proof |
 | Workbench form | Green, bounded retrieval and protocol | H3 remains optional and shadow-only |
 | Complete configuration identity | Partial | Persist the implemented profile, run, and ingress contracts, then split role, model, agent, actor run, trace, operation, and invocation identities while preserving the current content hash as a compatibility snapshot |
-| Lifecycle replay | Partial | Add task-bearing ingress lineage, then append environment-start-to-terminal obligation events and replay without the model |
+| Lifecycle replay | Partial green | Task registration, task-bearing ingress, and acceptance-derived terminal state reload across process restart without a model; integrate the stream into the common ledger and add the remaining environment/operation/evidence events |
 | Failure suite | Partial | Add stale evidence, timeout, cancellation, and false completion |
-| Task acceptance | Partial green | Pure obligation evaluator and recorded-qualification artifact implemented; TaskSpec compilation and full lifecycle replay remain required |
+| Task acceptance | Partial green | TaskSpec compilation, two-stage operation admission, pure obligation evaluation, and recorded qualification are implemented; lease-bound dispatch and full lifecycle replay remain required |
 | Documentation | Architecture checkpoint active | Keep Markdown/HTML diagrams, plans, contracts, artifacts and implementation status synchronized |
 | Watson/Bonsai runner | Not started | Freeze provider-neutral protocol; one reproducible paired dry run |
 | NAO planner parity | Not started | Recorded/fake full path under explicit authority mode, multi-actor trace, `report_result` delegation, and reviewed disagreement report |
@@ -715,29 +869,28 @@ H2 is qualified only when the core rows and planner parity rows are green:
 
 | ID | Issue | Blocking condition | Next proof |
 | --- | --- | --- | --- |
-| UAH-D01 | No complete lifecycle event grammar | Cannot reconstruct every runtime transition | Add event types and replay test |
+| UAH-D01 | Lifecycle event grammar is incomplete | Task start/resume/notify and acceptance replay, but compile, proposal, admission, execution, evidence, allocation, and agent/environment transitions remain absent | Extend the same content-addressed replay grammar through one admitted operation |
 | UAH-D02 | Candidate NAO bindings are unvalidated | No source-schema parity artifact | Compile fixtures from package-owned tests |
 | UAH-D03 | No live model adapter | Watson/Bonsai matrix cannot run | Freeze provider-neutral request/result protocol |
 | UAH-D04 | No stale/freshness contract in `ABObjectView` | Evidence closure is incomplete | Add clock/freshness fixture and counterexample |
 | UAH-D05 | Identity layers only partly implemented | Environment profiles, activations, and ingress are distinct, but agent, trace, and operation state remain conflated in current contracts | Add immutable agent, trace, and operation contracts behind compatibility exports |
 | UAH-D06 | No Workbench trace bridge | Adaptation remains a paper design | Implement terminal-ledger to `WorkbenchObservation` adaptation without direct mutation |
 | UAH-D07 | No PromptCompiler | Prompt, projection and deterministic admission can drift | Compile a prompt artifact and gate from the same immutable interaction module |
-| UAH-D08 | No two-stage admission contracts | Domain lifecycle cannot grant or deny authority independently | Add `TypedProposal`, `AdmittedOperation` and `ExecutionLease` vertical slice |
+| UAH-D08 | Admission is not yet connected to execution or replay | Semantic and domain decisions are separate and executable, but the fake owner still accepts object arguments directly and no admission or lease event is persisted | Dispatch one exact `ExecutionLease` through the fake owner, append proposal/admission/lease/result events, and reject bypass calls |
 | UAH-D09 | NeuralWorkbench gitlink absent | Intended companion revision is documented but not mounted | Restore and verify gitlink at `e76ba7e` without changing core dependency rules |
 | UAH-D10 | Workbench protocol uses legacy `configuration_id` | Per-agent and per-run candidate provenance cannot be reconstructed under the new identity model | Version the protocol after identity contracts define exact request and model-call correlation |
 | UAH-D11 | No hardware-aware model allocator | Local RAM, VRAM, context and concurrency constraints cannot govern model reuse or eviction | Implement an H1 fixed-instance lease interface, then add dynamic scheduling at H3 |
 | UAH-D12 | No agent-handle registry or fidelity evaluator | A named deployment cannot change model configuration without losing continuity or hiding an identity change | Add immutable handle-revision resolution and held-out fidelity evidence after core identity contracts |
-| UAH-D13 | No task-bearing ingress lineage or isolation replay | State updates are classified, but stimuli cannot yet receive task and trace identities or prove isolation across activations | Issue lineage, register two attested synthetic runs, and replay identical task-bearing ingress without cross-run evidence |
+| UAH-D13 | Task store is single-writer and task-scoped | Restart reload works, but cross-process locking, global sequence, timestamps, and common-ledger transactions are absent | Integrate two environment-scoped task streams into the lifecycle ledger and verify deterministic ordering plus concurrent-writer rejection |
 | UAH-D14 | NAO `report_result` registry drift | Intended NeuralWorkbench decomposition does not match the `v1.0.0` orchestrator callback | Owner-review a DomainContractPack revision and replay planner-to-chatbot delegation |
-| UAH-D15 | No obligation-based task acceptance | Execution feedback or model text can be mistaken for terminal success | Evaluate required failure and best-effort failure from the same evidence grammar |
+| UAH-D15 | CompiledTask is not yet the admission and ledger input | Task compilation is deterministic, but the recorded qualification still accepts legacy caller-supplied projection and obligation fields | Admit one typed proposal only against `CompiledTask`, then replay its required failure and best-effort deficit through the common ledger |
 | UAH-D16 | No deterministic trace digest | Observatory and Workbench have no trusted compact memory unit | Derive and replay `VerifiedTraceDigest` without reflection or model output authority |
 
 ## Next discriminating probe
 
-After the public TDD seam is confirmed, register one attested synthetic
-environment run, classify one ingress into a task with one required and one
-best-effort obligation, execute a recorded admitted operation through the fake
-owner, derive task acceptance and a `VerifiedTraceDigest`, then replay without
-a model. A paired case must fail only the best-effort obligation and remain
-accepted with a visible deficit. This completes the semantic center before a
-Watson or Bonsai provider is allowed into the loop.
+Dispatch one exact `ExecutionLease` through the fake owner, record proposal,
+semantic decision, domain decision, execution result, evidence, and acceptance
+in the common ledger, then derive a `VerifiedTraceDigest` and replay without a
+model. A paired case must fail only the best-effort obligation and remain
+accepted with a visible deficit. This completes the synthetic semantic center
+before a Watson or Bonsai provider is allowed into the loop.

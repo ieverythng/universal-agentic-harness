@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>UAH and NeuralWorkbench Investor Handoff</title>
+  <style>
+    @page {
+      size: A4;
+      margin: 2.6cm 2.2cm 2.4cm 2.2cm;
+    }
+    :root {
+      --ink: #111;
+      --muted: #3a3a3a;
+      --line: #1f1f1f;
+      --soft: #f3f3f3;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: #fff;
+      font-family: "Liberation Serif", "Times New Roman", Times, serif;
+      font-size: 11.5pt;
+      line-height: 1.42;
+    }
+    .doc {
+      max-width: 172mm;
+      margin: 0 auto;
+      padding: 0;
+    }
+    .title-page {
+      min-height: 247mm;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      page-break-after: always;
+    }
+    .title-top {
+      text-align: center;
+      margin-top: 18mm;
+    }
+    .title-top h1 {
+      font-size: 20pt;
+      line-height: 1.28;
+      margin: 20mm 0 8mm;
+      font-weight: 700;
+    }
+    .title-top h2 {
+      font-size: 13pt;
+      margin: 0 0 3mm;
+      font-weight: 600;
+      border-bottom: 0;
+    }
+    .title-top p {
+      margin: 2mm 0;
+      color: var(--muted);
+    }
+    .title-meta {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 0 auto 20mm;
+      font-size: 11pt;
+    }
+    .title-meta td {
+      padding: 2.5mm 0;
+      vertical-align: top;
+      border: 0;
+    }
+    .title-meta td:first-child {
+      width: 38mm;
+      font-weight: 700;
+    }
+    .small { font-size: 10.3pt; color: #222; }
+    h1, h2, h3 {
+      margin: 0 0 3mm;
+      line-height: 1.28;
+      font-weight: 700;
+    }
+    h1 { font-size: 16.5pt; margin-top: 0; }
+    h2 {
+      font-size: 13pt;
+      margin-top: 9mm;
+      border-bottom: 0.5pt solid var(--line);
+      padding-bottom: 1.5mm;
+    }
+    h3 {
+      font-size: 11.8pt;
+      margin-top: 6mm;
+    }
+    p { margin: 2.2mm 0; }
+    ul, ol { margin: 2.5mm 0 2.5mm 6mm; padding: 0; }
+    li { margin: 1.4mm 0; }
+    pre {
+      margin: 2.5mm 0 4mm;
+      background: var(--soft);
+      border: 0.6pt solid #666;
+      padding: 2.6mm 2.8mm;
+      overflow-x: auto;
+      white-space: pre;
+      font-family: "Liberation Mono", "Courier New", monospace;
+      font-size: 9.2pt;
+      line-height: 1.3;
+    }
+    code {
+      font-family: "Liberation Mono", "Courier New", monospace;
+      background: #efefef;
+      padding: 0.2mm 1mm;
+      border: 0.4pt solid #d7d7d7;
+      border-radius: 2px;
+      font-size: 10.3pt;
+    }
+    pre code {
+      background: transparent;
+      padding: 0;
+      border: 0;
+      font-size: inherit;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 3mm 0 4mm;
+      font-size: 10.8pt;
+    }
+    th, td {
+      border: 0.6pt solid #333;
+      padding: 2.2mm 2.3mm;
+      vertical-align: top;
+      overflow-wrap: anywhere;
+      hyphens: auto;
+    }
+    th {
+      background: #fafafa;
+      text-align: left;
+      font-weight: 700;
+    }
+    .diagram {
+      margin: 4mm 0 5mm;
+      border: 0.6pt solid #777;
+      padding: 2mm;
+      background: #fff;
+    }
+    .diagram pre {
+      margin: 0;
+      border: 0;
+      background: #fcfcfc;
+      font-size: 10.2pt;
+      white-space: pre-wrap;
+    }
+    .diagram svg {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+    .diagram-labels {
+      font-family: "Liberation Serif", "Times New Roman", Times, serif;
+      font-size: 25px;
+      font-weight: 700;
+      fill: #111;
+    }
+    .lifelines {
+      stroke: #999;
+      stroke-dasharray: 4 4;
+    }
+    .messages {
+      stroke: #111;
+      stroke-width: 1.35;
+      fill: none;
+    }
+    .messages text {
+      stroke: none;
+      fill: #111;
+      font-family: "Liberation Serif", "Times New Roman", Times, serif;
+      font-size: 22px;
+    }
+    .caption {
+      margin-top: 2mm;
+      font-size: 10.5pt;
+      color: #222;
+      font-style: italic;
+      text-align: center;
+    }
+    blockquote {
+      border: 0.6pt solid #333;
+      background: #fcfcfc;
+      margin: 3mm 0;
+      padding: 2.6mm 3mm;
+      color: var(--muted);
+    }
+    a { color: #111; }
+  </style>
+  <link rel="stylesheet" href="../../assets/harness-theme.css" />
+  <script defer src="../../assets/harness-theme.js"></script>
+</head>
+<body>
+  <main class="doc">
+
+<h1>UAH and NeuralWorkbench Investor Handoff</h1>
+<p><strong>Prepared:</strong> 2026-09-28</p>
+<p><strong>Audience:</strong> prospective investors, design partners, strategic operators, and technical diligence teams</p>
+<p><strong>Status:</strong> external diligence draft, not an offering memorandum</p>
+<p><strong>Evidence boundary:</strong> implementation claims refer to the repository state and validation ledger current on the preparation date</p>
+<h2>Package purpose</h2>
+<p>This package explains the Universal Agentic Harness (UAH) and NeuralWorkbench as one product thesis with separate authority boundaries:</p>
+<ul>
+<li><strong>UAH</strong> is the portable control kernel. It compiles task scope, constrains model proposals, preserves domain ownership, and records evidence.</li>
+<li><strong>NeuralWorkbench</strong> is the H3+ adaptive engine. It retrieves prior experience, constructs and compares candidate interaction structures, and proposes reusable structures without receiving execution authority.</li>
+<li><strong>Observatory</strong> is the read-only evidence surface. It renders model output, admission, execution, evidence, acceptance, and Workbench provenance without becoming another source of truth.</li>
+</ul>
+<p>The package separates implemented behavior from the roadmap. Commercial and market statements are hypotheses for validation unless identified as repository evidence.</p>
+<h2>Reading order</h2>
+<ol>
+<li><a href="executive_brief.html">Executive brief</a> (<a href="executive_brief.md">Markdown</a>)</li>
+</ol>
+<p>Product thesis, current proof, target users, differentiation, and financing narrative in a short form.</p>
+<ol>
+<li><a href="technical_diligence.html">Technical diligence</a> (<a href="technical_diligence.md">Markdown</a>)</li>
+</ol>
+<p>Architecture, identity, task compilation, two-stage admission, NeuralWorkbench, Observatory, security boundaries, implementation status, and open risks.</p>
+<ol>
+<li><a href="gtm_and_investment_case.html">GTM and investment case</a> (<a href="gtm_and_investment_case.md">Markdown</a>)</li>
+</ol>
+<p>Beachhead, buyer hypotheses, packaging, commercialization sequence, milestone gates, metrics, capital use, and diligence disclosures.</p>
+<p>HTML companions are generated from these Markdown sources and use the shared UAH documentation theme:</p>
+<ul>
+<li><code>README.html</code></li>
+<li><code>executive_brief.html</code></li>
+<li><code>technical_diligence.html</code></li>
+<li><code>gtm_and_investment_case.html</code></li>
+</ul>
+<h2>Evidence packet</h2>
+<p>The following canonical documents support the package. They should accompany the handoff when the recipient requests technical depth:</p>
+<table><thead><tr>
+<th>Document</th>
+<th>Diligence purpose</th>
+</tr></thead><tbody>
+<tr>
+<td><a href="../../plans/universal_agentic_harness_masterplan.md">Implementation masterplan</a></td>
+<td>H0-H6 delivery spine, hard gates, ownership, and acceptance criteria</td>
+</tr>
+<tr>
+<td><a href="../../plans/universal_agentic_harness_development_log.md">Development log</a></td>
+<td>Implemented seams, test evidence, open issues, and current release boundary</td>
+</tr>
+<tr>
+<td><a href="../../architecture/universal_agentic_harness_foundation.md">UAH foundation</a></td>
+<td>System model, identities, frames, task lifecycle, agent embodiment, and runtime architecture</td>
+</tr>
+<tr>
+<td><a href="../../architecture/neural_workbench_adaptive_ab_harness.md">NeuralWorkbench architecture</a></td>
+<td>Search, trace memory, uncertainty, candidate scoring, crystallization, and H3/H4 boundaries</td>
+</tr>
+<tr>
+<td><a href="../../architecture/observatory_contract.md">Observatory contract</a></td>
+<td>Immutable evidence views, lifecycle event families, and read-only authority</td>
+</tr>
+<tr>
+<td><a href="../../plans/domain_initialization_and_ab_coupling.md">Domain onboarding</a></td>
+<td>DomainContractPack production, validation, activation, and portability model</td>
+</tr>
+<tr>
+<td><a href="../../artifacts/decisions/2026-09-08_uah_identity_environment_and_memory_grill.md">Identity and memory decisions</a></td>
+<td>Frozen decisions for roles, agents, runs, environments, tasks, traces, operations, memory, and allocation</td>
+</tr>
+<tr>
+<td><a href="../../artifacts/decisions/2026-08-04_uah_h2_neural_workbench_grill.md">H2 and Workbench decisions</a></td>
+<td>UAH versus NeuralWorkbench ownership and H2/H3 staging</td>
+</tr>
+</tbody></table>
+<h2>Current evidence in one page</h2>
+<p>As of 2026-09-28:</p>
+<ul>
+<li>the portable kernel and NAO compatibility package pass <strong>144 tests</strong>;</li>
+<li>repository pre-commit checks, Ruff, source-aware tests, and generated-document synchronization pass;</li>
+<li>H0 implements task projection, deterministic gates, binding quarantine, environment registration, task and trace lineage, TaskSpec compilation, two-stage operation admission, task acceptance, and local lifecycle restart replay;</li>
+<li>the deterministic NAO adapter canary covers accepted and rejected paths plus supporting and counterexample trace retrieval;</li>
+<li>H1 does not yet provide a complete live model and agent lifecycle;</li>
+<li>H2 NAO planner parity has not yet been demonstrated;</li>
+<li>the Watson/Bonsai model comparison has not started;</li>
+<li>NeuralWorkbench is an optional H3 companion, and its intended repository revision is documented but the gitlink is not currently mounted in this repository;</li>
+<li>no production customer, revenue, live robot qualification, market-simulator result, or measured NeuralWorkbench uplift is claimed by this package.</li>
+</ul>
+<h2>Recommended external use</h2>
+<p>Send the executive brief first. Provide the GTM and investment case for a commercial discussion, then the technical diligence document and canonical evidence packet for architecture review. Any slide deck, financial model, pricing proposal, or market-size estimate should remain a separate artifact until it has its own sources and assumptions.</p>
+  </main>
+</body>
+</html>

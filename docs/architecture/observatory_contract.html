@@ -339,7 +339,7 @@ agent_registered
 agent_handle_revision_promoted | agent_handle_revision_rolled_back | agent_handle_resolved
 environment_run_start_requested | environment_run_attested | environment_run_ready | environment_run_failed
 environment_ingress_recorded | environment_ingress_classified | environment_ingress_rejected
-task_started | task_resumed | task_notified | environment_state_updated
+task_started | task_compiled | task_resumed | task_notified | environment_state_updated
 agent_run_start_requested | agent_run_initializing | agent_run_attached
 model_lease_requested | model_lease_acquired | model_lease_rejected
 startup_preflight_started | startup_preflight_passed | startup_preflight_failed
@@ -354,10 +354,13 @@ execution_started | execution_feedback
 execution_completed | execution_failed | execution_cancelled
 evidence_issued | evidence_rejected
 effect_obligation_satisfied | effect_obligation_failed | effect_obligation_pending
-terminal_task_accepted | terminal_task_accepted_with_deficit | terminal_task_rejected | terminal_task_suspended
+task_suspended | terminal_task_accepted | terminal_task_accepted_with_deficit | terminal_task_rejected
 model_lease_released
 agent_run_detached | agent_run_terminated
 environment_run_closing | environment_run_closed</code></pre>
+<p>The current H0 <code>TaskLifecycleEvent</code> implements the task subset: <code>task_started</code>, <code>task_resumed</code>, <code>task_notified</code>, <code>task_suspended</code>, <code>terminal_task_accepted</code>, <code>terminal_task_accepted_with_deficit</code>, and <code>terminal_task_rejected</code>. Its event ID is content-addressed, and ordered replay reconstructs registry state without a model. The exact <code>uah.task_lifecycle_event/v1</code> envelope is persisted in canonical local JSONL and can rebuild the registry after process restart. It does not yet supply a global sequence, parent-event links, timestamps, cross-process writer coordination, or the full common-ledger transaction. O1 must consume this subset through the common ledger envelope rather than treat the task store as a second authoritative trace ledger.</p>
+<p>The H0 <code>CompiledTask</code> is now a content-addressed artifact binding start-task ingress, task and trace lineage, role, frame, registry, DomainContractPack, closed interaction projection, effect obligations, prohibited effects, and budgets. Its compiler does not yet emit <code>task_compiled</code> into the lifecycle ledger. O1 must render the artifact and its future event separately from the prompt, proposal, admission, lease, evidence, and terminal judgment.</p>
+<p>The current H0 authority slice also emits content-addressed <code>uah.typed_proposal/v1</code>, <code>uah.admitted_operation/v1</code>, and <code>uah.execution_lease/v1</code> artifacts with typed rejection reasons. These values are not yet appended as <code>proposal_normalized</code>, semantic-admission, or domain-admission events. O1 must preserve their distinct identities and must not infer a lease from an admitted operation or an admission from a proposal.</p>
 <p>This is the common startup-to-task order, not a rule that every lease ends with one task. A lease may be invocation-, task-, or run-scoped; its declared scope determines the release edge.</p>
 <p>The raw model output, normalized proposal, <code>AdmittedOperation</code>, execution lease, native owner result, normalized evidence, and terminal judgment remain distinct artifacts. Observatory may place them beside each other but may not collapse them into one generated summary.</p>
 <p><code>execution_feedback</code> is evidence-bearing input, not terminal proof by name. A task closes only after the task acceptance evaluator compares its immutable required and best-effort obligations with owner-issued evidence. A failed best-effort report may therefore produce <code>accepted_with_deficit</code> while a failed required manipulation effect produces rejection or suspension. The operation that succeeded remains succeeded even when a later reporting operation fails.</p>

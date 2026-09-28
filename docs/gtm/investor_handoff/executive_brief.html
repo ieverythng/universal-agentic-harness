@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Universal Agentic Harness and NeuralWorkbench</title>
+  <style>
+    @page {
+      size: A4;
+      margin: 2.6cm 2.2cm 2.4cm 2.2cm;
+    }
+    :root {
+      --ink: #111;
+      --muted: #3a3a3a;
+      --line: #1f1f1f;
+      --soft: #f3f3f3;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: #fff;
+      font-family: "Liberation Serif", "Times New Roman", Times, serif;
+      font-size: 11.5pt;
+      line-height: 1.42;
+    }
+    .doc {
+      max-width: 172mm;
+      margin: 0 auto;
+      padding: 0;
+    }
+    .title-page {
+      min-height: 247mm;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      page-break-after: always;
+    }
+    .title-top {
+      text-align: center;
+      margin-top: 18mm;
+    }
+    .title-top h1 {
+      font-size: 20pt;
+      line-height: 1.28;
+      margin: 20mm 0 8mm;
+      font-weight: 700;
+    }
+    .title-top h2 {
+      font-size: 13pt;
+      margin: 0 0 3mm;
+      font-weight: 600;
+      border-bottom: 0;
+    }
+    .title-top p {
+      margin: 2mm 0;
+      color: var(--muted);
+    }
+    .title-meta {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 0 auto 20mm;
+      font-size: 11pt;
+    }
+    .title-meta td {
+      padding: 2.5mm 0;
+      vertical-align: top;
+      border: 0;
+    }
+    .title-meta td:first-child {
+      width: 38mm;
+      font-weight: 700;
+    }
+    .small { font-size: 10.3pt; color: #222; }
+    h1, h2, h3 {
+      margin: 0 0 3mm;
+      line-height: 1.28;
+      font-weight: 700;
+    }
+    h1 { font-size: 16.5pt; margin-top: 0; }
+    h2 {
+      font-size: 13pt;
+      margin-top: 9mm;
+      border-bottom: 0.5pt solid var(--line);
+      padding-bottom: 1.5mm;
+    }
+    h3 {
+      font-size: 11.8pt;
+      margin-top: 6mm;
+    }
+    p { margin: 2.2mm 0; }
+    ul, ol { margin: 2.5mm 0 2.5mm 6mm; padding: 0; }
+    li { margin: 1.4mm 0; }
+    pre {
+      margin: 2.5mm 0 4mm;
+      background: var(--soft);
+      border: 0.6pt solid #666;
+      padding: 2.6mm 2.8mm;
+      overflow-x: auto;
+      white-space: pre;
+      font-family: "Liberation Mono", "Courier New", monospace;
+      font-size: 9.2pt;
+      line-height: 1.3;
+    }
+    code {
+      font-family: "Liberation Mono", "Courier New", monospace;
+      background: #efefef;
+      padding: 0.2mm 1mm;
+      border: 0.4pt solid #d7d7d7;
+      border-radius: 2px;
+      font-size: 10.3pt;
+    }
+    pre code {
+      background: transparent;
+      padding: 0;
+      border: 0;
+      font-size: inherit;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 3mm 0 4mm;
+      font-size: 10.8pt;
+    }
+    th, td {
+      border: 0.6pt solid #333;
+      padding: 2.2mm 2.3mm;
+      vertical-align: top;
+      overflow-wrap: anywhere;
+      hyphens: auto;
+    }
+    th {
+      background: #fafafa;
+      text-align: left;
+      font-weight: 700;
+    }
+    .diagram {
+      margin: 4mm 0 5mm;
+      border: 0.6pt solid #777;
+      padding: 2mm;
+      background: #fff;
+    }
+    .diagram pre {
+      margin: 0;
+      border: 0;
+      background: #fcfcfc;
+      font-size: 10.2pt;
+      white-space: pre-wrap;
+    }
+    .diagram svg {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+    .diagram-labels {
+      font-family: "Liberation Serif", "Times New Roman", Times, serif;
+      font-size: 25px;
+      font-weight: 700;
+      fill: #111;
+    }
+    .lifelines {
+      stroke: #999;
+      stroke-dasharray: 4 4;
+    }
+    .messages {
+      stroke: #111;
+      stroke-width: 1.35;
+      fill: none;
+    }
+    .messages text {
+      stroke: none;
+      fill: #111;
+      font-family: "Liberation Serif", "Times New Roman", Times, serif;
+      font-size: 22px;
+    }
+    .caption {
+      margin-top: 2mm;
+      font-size: 10.5pt;
+      color: #222;
+      font-style: italic;
+      text-align: center;
+    }
+    blockquote {
+      border: 0.6pt solid #333;
+      background: #fcfcfc;
+      margin: 3mm 0;
+      padding: 2.6mm 3mm;
+      color: var(--muted);
+    }
+    a { color: #111; }
+  </style>
+  <link rel="stylesheet" href="../../assets/harness-theme.css" />
+  <script defer src="../../assets/harness-theme.js"></script>
+</head>
+<body>
+  <main class="doc">
+
+<h1>Universal Agentic Harness and NeuralWorkbench</h1>
+<h2>Executive brief</h2>
+<p><strong>Prepared:</strong> 2026-09-28</p>
+<p><strong>Positioning:</strong> evidence-governed infrastructure for deploying language models inside operational systems</p>
+<p><strong>Current maturity:</strong> tested H0 contract proof, partial H1 runtime, H2 NAO qualification in preparation, H3 NeuralWorkbench research seam defined</p>
+<h2>The problem</h2>
+<p>Putting a capable model behind an application interface does not make it a reliable subsystem agent. Each deployment must answer the same operational questions:</p>
+<ul>
+<li>Which actions may this role inspect, propose, or execute for this task?</li>
+<li>Which system owns admission and execution?</li>
+<li>What proves that an effect occurred?</li>
+<li>How are model output, admitted operation, native result, and task acceptance kept distinct?</li>
+<li>How can the same model or role move between local and remote providers without losing identity, policy, or traceability?</li>
+<li>How does prior experience improve future operation without allowing online self-modification of trusted runtime code?</li>
+</ul>
+<p>Most domain integrations solve these questions locally. The result is repeated harness code, inconsistent traces, broad tool exposure, and failure modes that are difficult to attribute across model, policy, runtime, or environment owners.</p>
+<h2>The product thesis</h2>
+<p>UAH treats an agent as a governed embodiment rather than a model process. A task is compiled against a role, an abstraction frame, a versioned domain contract, and a graph of typed abstraction-boundary (AB) objects. The model receives the smallest valid task interaction surface. It proposes typed work; deterministic UAH admission and the native domain lifecycle decide whether that work may execute. Environment-owner evidence, not model text, determines task closure.</p>
+<div class="diagram"><pre><code class="language-mermaid">flowchart LR
+    Domain[&quot;DomainContractPack&lt;br/&gt;objects + evidence rules&quot;] --&gt; Compile[&quot;TaskSpec Compiler&lt;br/&gt;closed interaction module&quot;]
+    Task[&quot;Accepted Task Ingress&lt;br/&gt;task + trace lineage&quot;] --&gt; Compile
+    Compile --&gt; Prompt[&quot;Prompt and Typed Proposal&quot;]
+    Prompt --&gt; UAH[&quot;UAH Semantic Admission&quot;]
+    UAH --&gt; DomainGate[&quot;Domain Lifecycle Admission&quot;]
+    DomainGate --&gt; Owner[&quot;Environment Owner&quot;]
+    Owner --&gt; Evidence[&quot;Owner-issued Evidence&quot;]
+    Evidence --&gt; Acceptance[&quot;Task Acceptance&quot;]
+    Acceptance --&gt; Ledger[&quot;Lifecycle Ledger + Observatory&quot;]
+    Ledger --&gt; Workbench[&quot;NeuralWorkbench&lt;br/&gt;H3 candidate learning&quot;]
+    Workbench -. &quot;candidate context only&quot; .-&gt; Prompt</code></pre></div>
+<p>The architecture creates three products that can be developed and packaged independently while sharing one evidence model:</p>
+<ol>
+<li><strong>UAH Kernel:</strong> task compilation, semantic admission, identity, lifecycle, provider-neutral agent operation, and domain adapters.</li>
+<li><strong>Observatory:</strong> immutable operational evidence and comparison views for developers, evaluators, operators, and governance teams.</li>
+<li><strong>NeuralWorkbench:</strong> frame-relative retrieval, candidate search, failure-aware memory, and reviewed crystallization of repeated interaction structures.</li>
+</ol>
+<h2>Why NeuralWorkbench matters</h2>
+<p>Static harnesses repeatedly expose the same tools and prompt instructions. NeuralWorkbench is designed to make the interaction structure itself an evidence-driven search object. Given a bounded task projection, it can compare deterministic templates, retrieved prior attempts, model-generated candidates, and hybrids. It preserves supporting traces, counterexamples, costs, verifier coverage, and uncertainty.</p>
+<p>Its authority is deliberately limited. NeuralWorkbench cannot execute domain actions, edit the trusted registry, change permissions, or declare an effect. It returns candidate context or a shadow proposal that must pass the normal UAH and domain admission path. Repeated successful structures may become H4 crystallization candidates only after replay, counterexample, holdout, owner review, provenance, and rollback gates.</p>
+<p>The intended commercial advantage is a system that can accumulate operational memory and improve task-specific interaction design while retaining auditable control. That advantage remains an H3 hypothesis until holdout experiments show improvement over fixed projections and no-memory baselines.</p>
+<h2>Initial wedge and expansion path</h2>
+<p>The first reference environment is the NAO robotics stack. It contains distinct chatbot, planner, orchestrator, perception, skill, and speech owners, making it a demanding test of multi-actor lineage and effect evidence. H2 is designed to qualify the planner path through recorded and fake or simulated contracts before any live robot authority is considered.</p>
+<p>The expansion thesis is based on reusing the same kernel while changing the DomainContractPack and adapters:</p>
+<table><thead><tr>
+<th>Environment</th>
+<th>Initial value proposition</th>
+<th>Proof required</th>
+</tr></thead><tbody>
+<tr>
+<td>NAO robotics</td>
+<td>Preserve planner and orchestrator ownership while adding bounded model use and complete traces</td>
+<td>Recorded or simulated planner parity, failure attribution, no duplicate activation or speech</td>
+</tr>
+<tr>
+<td>Watson and software engineering</td>
+<td>Run local or remote models as stable named agents with scoped workspace operations and replayable evidence</td>
+<td>Frozen task suite, provider-neutral model port, same-model harness ablation</td>
+</tr>
+<tr>
+<td>iTrader</td>
+<td>Separate proposer, solver, verifier, simulator, risk, and execution authority</td>
+<td>Held-out replay, risk-engine evidence, no model-owned execution truth</td>
+</tr>
+<tr>
+<td>Gamma and research systems</td>
+<td>Compose bounded research or analysis agents without a global tool bag</td>
+<td>Domain pack conformance and evidence-complete task acceptance</td>
+</tr>
+</tbody></table>
+<p>NAO and Watson are the priority reference paths. iTrader and Gamma are expansion candidates, not current implementation claims.</p>
+<h2>Current proof</h2>
+<p>The repository currently demonstrates:</p>
+<ul>
+<li>a portable Python kernel with no ROS, NAO, or provider SDK dependency;</li>
+<li>frame-relative AB control bands and closed task projections;</li>
+<li>semantic object versus implementation-binding separation;</li>
+<li>candidate-binding quarantine and deterministic role/output gating;</li>
+<li>owner-attested environment activation and deterministic task ingress;</li>
+<li>distinct environment-run, task, trace, and lifecycle-event identities;</li>
+<li>content-addressed TaskSpec compilation into one projection, obligation, prohibition, and budget artifact;</li>
+<li>content-addressed TypedProposal normalization, UAH semantic admission, and independent domain execution-lease issuance or typed rejection;</li>
+<li>required versus best-effort task acceptance from owner-issued evidence;</li>
+<li>append-only local task lifecycle persistence and model-free restart replay;</li>
+<li>a ROS-free NAO canary with accepted, rejected, supporting-trace, and counterexample behavior;</li>
+<li><strong>144 passing tests</strong> and enforced repository validation.</li>
+</ul>
+<p>The proof does not yet include a complete live agent loop, lease-bound owner dispatch, a full common ledger, model allocation, H2 NAO planner parity, a Watson/Bonsai comparison, production deployment, or measured Workbench uplift.</p>
+<h2>Commercial hypothesis</h2>
+<p>The likely early buyer is a technical team integrating LLMs into an existing system where actions have operational consequences and several owners must remain intact. The initial sale is expected to be a design-partner engagement that produces a qualified DomainContractPack, adapter, frozen task suite, Observatory evidence, and deployment profile.</p>
+<p>If repeated onboarding demonstrates reuse, the offer can progress toward:</p>
+<ul>
+<li>an enterprise UAH runtime and policy license;</li>
+<li>paid domain onboarding and qualification;</li>
+<li>Observatory evaluation and governance deployments;</li>
+<li>NeuralWorkbench adaptive-memory modules after H3 validation;</li>
+<li>support, conformance, and regulated-environment deployment services.</li>
+</ul>
+<p>Pricing, market size, procurement cycle, and buyer willingness remain open discovery questions. They should not be inferred from technical completion.</p>
+<h2>Investment case</h2>
+<p>The investment case rests on four propositions that can be tested in sequence:</p>
+<ol>
+<li><strong>Control reuse:</strong> one kernel can replace repeated harness logic across domains without taking over native execution ownership.</li>
+<li><strong>Evidence quality:</strong> typed lineage and owner-issued evidence improve failure attribution, reproducibility, and operator confidence.</li>
+<li><strong>Onboarding leverage:</strong> a reviewed DomainContractPack plus thin adapters can qualify a new environment faster than writing another bespoke harness.</li>
+<li><strong>Adaptive advantage:</strong> NeuralWorkbench can improve candidate quality or recovery on held-out tasks without increasing unsafe actions or hiding uncertainty.</li>
+</ol>
+<p>The next value-inflection gates are lease-bound owner dispatch, a complete synthetic lifecycle replay, H2 NAO planner parity, and one non-NAO adapter using the unchanged kernel. These gates convert the project from a coherent contract proof into a repeatable product claim.</p>
+<h2>Diligence position</h2>
+<p>The architecture is intentionally conservative about claims. UAH does not assert that AB levels measure intelligence, that model output proves effects, or that frequent trajectories justify automatic skill promotion. It separates proposal, admission, execution, evidence, acceptance, observation, and adaptation so each claim can be inspected and challenged.</p>
+<p>The principal investment risks are incomplete runtime integration, unproven cross-domain reuse, uncertain Workbench uplift, integration cost, and an unvalidated commercial motion. The roadmap turns each risk into a specific qualification gate rather than treating system breadth as evidence of product readiness.</p>
+  </main>
+</body>
+</html>

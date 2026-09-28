@@ -402,6 +402,19 @@ duplicate suppression, concurrency, cancellation, supersession, and stale
 version checks before granting an `ExecutionLease`. The owner executes the
 immutable admitted value, not a reparsed copy of raw model output.
 
+The implemented H0 slice now covers one-operation proposal normalization and
+both decisions. `ProposalNormalizer` binds canonical finite-JSON arguments to
+the raw-output artifact, compiled task, environment run, task, trace, and
+operation. `SemanticAdmission` checks role output ownership, projection reach,
+direct-control band, runtime callability, prohibited effects, approved binding,
+binding owner/environment/runtime, schema-reference presence, and obligation
+lineage before emitting a content-addressed `AdmittedOperation`.
+`DomainLifecycleAdmission` independently rechecks activation, domain revision,
+binding environment, readiness attestation, and duplicate operation before
+issuing a content-addressed, operation-scoped `ExecutionLease`. Native
+concurrency, cancellation, supersession, version fencing, payload-schema
+evaluation, ledger persistence, and owner dispatch remain open.
+
 ### Prompt compilation seam
 
 The `PromptCompiler` renders one model-facing view from the same immutable
@@ -658,6 +671,22 @@ native preflight and UAH verifies it against the pinned profile and
 DomainContractPack. An ingress item is immutable input to deterministic task
 association. It is not automatically a task, prompt, or model invocation.
 
+For a reviewed `start_task` rule, `task_id_lineage_key` identifies the native
+lineage field that owns the domain task identity. UAH preserves that value and
+derives the initial trace as
+`sha256("uah-trace-v1" NUL environment_run_id NUL task_id)`. This makes trace
+issuance deterministic and environment-scoped without replacing native goal or
+request identities. Resume and notification require a registered task lookup
+and reuse the original trace only within the same environment run. The current
+registry rejects duplicate starts and replayed task-bearing ingress.
+Acceptance-derived terminal judgments reject later ingress, while suspended
+judgments remain resumable. Content-addressed task events reconstruct these
+decisions through ordered model-free replay. The strict
+`uah.task_lifecycle_event/v1` subset is appended to canonical local JSONL and
+reconstructs the registry after process restart. This store is single-writer
+and task-scoped; it does not yet provide the global sequence, timestamps,
+parent links, or writer coordination of the common lifecycle ledger.
+
 ### AgentRoleConfiguration
 
 ```yaml
@@ -836,6 +865,17 @@ budgets:
   model_calls: 3
   tool_calls: 12
 ```
+
+The implemented H0 compiler uses the narrower `uah.task_spec/v1` subset needed
+for the first executable proof. A successful start-task decision, task and
+trace lineage, role, frame, registry, budgets, and DomainContractPack revision
+produce one content-addressed `uah.compiled_task/v1` artifact. Effect requests
+carry requirement only; the reviewed domain pack supplies the AB object,
+evidence owner, and failure policy. The compiler rejects owner or observable
+drift, prohibited effects, revision mismatches, mutable collections, and
+resume-time recompilation. Prompt compilation and two-stage admission must
+consume this artifact rather than independently recreating projection or
+acceptance inputs.
 
 ### InteractionModuleSpec
 
@@ -1284,10 +1324,12 @@ be used to relabel incomplete H0-H2 work.
 1. Freeze and review the environment, identity, task-ingress, operation-edge,
    effect-obligation, and task-acceptance schemas.
 2. Retain the implemented task-acceptance, profile-verified environment-run,
-   and binding-scoped state-update ingress seams. Next define task and trace
-   identity issuance before enabling task-bearing ingress actions.
-3. Add `ABRegistry.task_projection(...)` or a separate compiler prototype with
-   no runtime behavior change.
+   environment-bound ingress, and strict local task-event persistence seams.
+   Next integrate those records into the common lifecycle ledger and add
+   owner-authorized cancellation/failure transitions.
+3. Retain the implemented `CompiledTask -> TypedProposal -> AdmittedOperation
+   -> ExecutionLease` slice. Require fake and native owners to consume the exact
+   lease and reject direct or reparsed dispatch.
 4. Build golden projection cases for dialogue, knowledge query, scan/find,
    navigation failure, and grouped delivery.
 5. Define the shared provider capability record from the union of current
@@ -1323,10 +1365,14 @@ be used to relabel incomplete H0-H2 work.
   distinct identities and ownership.
 - [x] Cross-frame work uses explicit delegation edges.
 - [x] Task closure is compiled from required and best-effort effect obligations.
+- [x] One accepted task start compiles role, frame, registry, domain evidence
+  rules, prohibitions, and budgets into a content-addressed source of truth.
 - [~] Core H0 frame, band, role, projection, gate, trace, task-acceptance,
-  profile-verified environment-run registration, and state-update ingress are
-  implemented and tested; task-bearing ingress and the remaining lifecycle
-  grammar remain open.
+  profile-verified environment-run registration, and environment-bound task
+  ingress/replay are implemented and tested; the strict task subset now reloads
+  from a local, single-writer JSONL store, while common-ledger integration,
+  cross-process coordination, state-update duplicate handling, and the
+  remaining lifecycle grammar remain open.
 - [ ] No same-model harness ablation has yet measured uplift.
 - [ ] No external Pi/OpenHands adapter has yet been prototyped.
 - [ ] Live ROS and robot behavior remain outside this documentation-only pass.

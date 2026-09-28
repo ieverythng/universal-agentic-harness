@@ -76,6 +76,21 @@ owner is the semantic effect owner.
 The minimal, task- and role-scoped projection of inspectable and directly
 controllable AB objects presented to a model or worker.
 
+### Task spec
+
+A frozen `uah.task_spec/v1` intent created for one accepted task start. It pins
+task and trace lineage, task type, role, frame, DomainContractPack revision,
+requested effects, prohibited effects, and finite budgets. Resume and notify
+ingress reuse the compiled task rather than compiling a replacement.
+
+### Compiled task
+
+The content-addressed `uah.compiled_task/v1` artifact produced once from an
+accepted start-task decision, TaskSpec, role, frame, registry, and
+DomainContractPack. It is the shared source of the interaction module, effect
+obligations, prohibited effects, and budgets for prompt compilation, semantic
+admission, task acceptance, and replay.
+
 ### Agent role configuration
 
 An immutable, reusable definition that fixes an agent role, domain, abstraction
@@ -188,6 +203,34 @@ ingress with state updates, new tasks, resumed tasks, notifications, or
 rejection. A model may interpret admitted content but cannot rewrite its task
 or trace lineage.
 
+A new task preserves the domain-owned task identifier selected from a named
+native-lineage field in the reviewed ingress rule. The task identity is scoped
+by `environment_run_id`. UAH derives the initial `trace_id` from the trace
+scheme version, environment run, and domain task identity. Resume and notify
+classification resolve registered lineage and cannot infer it from model
+output or an unregistered ingress item.
+
+### Environment task registry
+
+The environment-scoped registry of immutable task and trace lineage. It
+rejects replayed task-bearing ingress and a second start for the same domain
+task within one environment run. Resume and notify ingress may reuse a lineage
+only when the task is registered under that exact environment activation.
+Acceptance-derived terminal states reject later ingress. A suspended
+acceptance remains resumable. Registration does not prove native effects.
+
+### Task lifecycle event
+
+A content-addressed, immutable registry event for task start, resume,
+notification, suspension, or acceptance-derived terminal judgment. Ordered
+replay reconstructs task lineage, duplicate-ingress protection, and terminal
+state without invoking a model or rerunning acceptance evaluation. The strict
+`uah.task_lifecycle_event/v1` envelope can be appended to a canonical local
+JSONL store and reloaded across process restart. These H0 events remain a
+bounded, single-writer subset of the lifecycle ledger. They do not yet provide
+a global sequence, cross-process writer coordination, or environment-owner
+cancellation/failure.
+
 ### Prompt compiler
 
 A deterministic assembler of the universal UAH protocol, role contract,
@@ -215,25 +258,33 @@ an agent role configuration, but it does not create cross-frame equivalence.
 ### Domain contract pack
 
 An environment-owned, content-addressed package of abstraction frames, AB
-objects, binding policy, evidence rules, minimal domain prompt policy, and
-qualification cases. Assisted onboarding may propose one but cannot approve it.
+objects, binding policy, role and task-type rules, evidence ownership, failure
+policy, prohibited effects, minimal domain prompt policy, and qualification
+cases. It is semantic configuration rather than executable domain code.
+Assisted onboarding may propose one but cannot approve it.
 
 ### Proposal
 
-A typed model output that requests an operation. It is not execution and cannot
-prove an effect.
+A content-addressed `uah.typed_proposal/v1` normalized from one raw model-output
+artifact. It requests exactly one operation under a compiled task and carries
+task, trace, operation, object, output-type, and canonical argument lineage. It
+is not execution and cannot prove an effect. Model-authored effect claims are
+rejected during normalization.
 
 ### Admitted operation
 
-An immutable UAH-issued value proving that a typed proposal passed semantic
-admission for one role, frame, object, binding, argument set, and evidence
-obligation. It still has no domain execution authority.
+An immutable, content-addressed `uah.admitted_operation/v1` proving that a typed
+proposal passed UAH semantic admission for one compiled task, role, frame, AB
+object, approved binding revision, argument set, runtime mode, and evidence
+obligation set. It still has no domain execution authority.
 
 ### Execution lease
 
-A domain-owner decision authorizing one admitted operation after native
-lifecycle checks. The lease is distinct from semantic admission and cannot
-change the admitted operation.
+A content-addressed `uah.execution_lease/v1` issued by the domain lifecycle
+owner after rechecking the environment activation, binding environment,
+DomainContractPack revision, operation deduplication, and readiness attestation.
+The lease authorizes exactly one admitted operation, is distinct from semantic
+admission, and cannot change the admitted value.
 
 ### UAH trace
 
@@ -279,7 +330,8 @@ operation result may satisfy one obligation without deciding the task outcome.
 The deterministic terminal judgment compiled from a task's effect obligations.
 All required obligations must be satisfied; an unsatisfied best-effort
 obligation is retained as a deficit without invalidating otherwise complete
-work.
+work. `suspended` is explicitly nonterminal because required evidence remains
+pending.
 _Avoid_: Plan completed; model-declared completion
 
 ### Verified trace digest

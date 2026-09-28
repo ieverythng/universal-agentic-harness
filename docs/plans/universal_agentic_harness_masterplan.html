@@ -196,7 +196,7 @@
   <main class="doc">
 
 <h1>Universal Agentic Harness: Implementation Masterplan</h1>
-<p><strong>Status:</strong> Canonical implementation plan; H2 qualification gates active <strong>Date:</strong> 2026-09-08 <strong>Scope:</strong> Model-agnostic and task-agnostic harness kernel with domain-specific AB frames and adapters <strong>Extends:</strong> <code>../architecture/universal_agentic_harness_foundation.md</code> and <code>../architecture/neural_workbench_adaptive_ab_harness.md</code> <strong>Decision owner:</strong> UAH H0-H2 core; NeuralWorkbench H3+ companion track; NAO remains the first reference environment</p>
+<p><strong>Status:</strong> Canonical implementation plan; H2 qualification gates active <strong>Date:</strong> 2026-09-28 <strong>Scope:</strong> Model-agnostic and task-agnostic harness kernel with domain-specific AB frames and adapters <strong>Extends:</strong> <code>../architecture/universal_agentic_harness_foundation.md</code> and <code>../architecture/neural_workbench_adaptive_ab_harness.md</code> <strong>Decision owner:</strong> UAH H0-H2 core; NeuralWorkbench H3+ companion track; NAO remains the first reference environment</p>
 <h2>1. Executive Decision</h2>
 <p>The project should build a Universal Agentic Harness, but not by replacing the model loop, tool runtime, sandbox, session store, or provider layer of every existing agent.</p>
 <p>The defensible architecture is a hybrid:</p>
@@ -567,9 +567,34 @@ H6  AB5 policy-foundry hypothesis                         RESEARCH ONLY, NOT COM
 <td>Readiness evidence, exact profile/pack/runtime/owner matching, unique run and attestation identities, active registration and lookup</td>
 </tr>
 <tr>
+<td>Environment task registry</td>
+<td><code>task_registry.py</code></td>
+<td>Immutable environment-scoped task/trace lineage, duplicate-ingress/start rejection, acceptance-derived terminal state, content-addressed lifecycle events, and model-free ordered replay</td>
+</tr>
+<tr>
+<td>Task lifecycle store</td>
+<td><code>task_lifecycle_store.py</code></td>
+<td>Strict v1 event envelope, canonical fsynced JSONL append, complete-stream validation, and model-free registry reconstruction after process restart</td>
+</tr>
+<tr>
 <td>Environment ingress policy</td>
 <td><code>environment_ingress.py</code></td>
-<td>Immutable normalized ingress, exact profile/revision/run/binding/type checks, state-update classification, and typed rejection</td>
+<td>Immutable normalized ingress, exact profile/revision/run/binding/type checks, state-update classification, domain-owned task identity, deterministic UAH trace issuance, and same-run start/resume/notify decisions</td>
+</tr>
+<tr>
+<td>TaskSpec compiler</td>
+<td><code>task_compiler.py</code></td>
+<td>Accepted task-start provenance, effect-to-object/evidence rules, closed task projection, compiled obligations, prohibitions, budgets, and content-addressed <code>CompiledTask</code> artifact</td>
+</tr>
+<tr>
+<td>Proposal normalization and semantic admission</td>
+<td><code>proposal_admission.py</code></td>
+<td>Canonical one-operation <code>TypedProposal</code>, compiled-task lineage and scope checks, approved binding and obligation capture, typed rejection, and immutable <code>AdmittedOperation</code></td>
+</tr>
+<tr>
+<td>Domain lifecycle admission</td>
+<td><code>domain_lifecycle.py</code></td>
+<td>Independent environment-run, domain revision, binding-environment, attestation, and duplicate-operation checks before an operation-scoped <code>ExecutionLease</code> or rejection</td>
 </tr>
 <tr>
 <td>Task acceptance</td>
@@ -595,12 +620,11 @@ H6  AB5 policy-foundry hypothesis                         RESEARCH ONLY, NOT COM
 <h3>What H0 does not yet implement</h3>
 <p>The current proof is intentionally narrower than the desired H0 contract in the earlier foundation document. These are open seams, not failures:</p>
 <ul>
-<li>no serialized <code>HarnessSpec</code>, <code>TaskSpec</code>, <code>ModelProfile</code>, permission policy, or versioned schema envelope; environment profiles and runs currently use immutable in-memory contracts without persistence or signature verification;</li>
-<li>no TaskSpec compiler yet constructs effect obligations from a domain pack and task-ingress decision;</li>
-<li>task-bearing ingress remains disabled until task and trace identity issuance can return complete lineage; ingress persistence and duplicate delivery detection are also open;</li>
+<li>no serialized <code>HarnessSpec</code>, <code>ModelProfile</code>, permission policy, or general versioned schema envelope; TaskSpec has a versioned in-memory contract and serializable compiled artifact, while environment profiles and runs remain in-memory without persistence or signature verification;</li>
+<li>task-bearing ingress uses an environment registry for complete lineage, duplicate-start rejection, same-run resume/notify lookup, and acceptance-derived terminal state; its strict v1 events persist to a local, single-writer JSONL stream and reconstruct after process restart, while the common ledger, cross-process writer coordination, owner-authorized cancellation/failure, and state-update duplicate delivery detection remain open;</li>
 <li>registry object views do not yet carry full input/output schemas, owner authority, side-effect class, freshness, or evidence obligation types;</li>
-<li>projection starts from requested object IDs rather than compiling them from a complete task/effect contract;</li>
-<li>the output gate does not yet validate payload schemas, canonical aliases, preconditions, permissions, budgets, or evidence closure;</li>
+<li>the new TaskSpec compiler derives projection and obligations from effect rules, but legacy projector and recorded-qualification callers still supply object IDs or obligations directly until two-stage admission consumes <code>CompiledTask</code>;</li>
+<li>semantic admission now validates compiled-task lineage, role output ownership, projection reach, direct AB band, runtime callability, prohibited effects, binding status/owner/environment/runtime, schema-reference presence, and evidence-obligation presence; it does not yet validate arguments against the referenced input schema, canonical aliases, dynamic preconditions, permissions, or consumed budgets;</li>
 <li>the trace captures projection and gate decisions, not the full observation, model-call, validation, handoff, execution, feedback, cancellation, and terminal-evidence lifecycle;</li>
 <li>the chatbot adapter assumes <code>user_intent.type</code> can be interpreted as one object reference, which is not sufficient for all multi-intent or target cases;</li>
 <li>no live chatbot, planner, ROS, model provider, container, simulator, or external worker path invokes the package;</li>
@@ -774,6 +798,14 @@ AB5 candidate: designs/governs a population of AB4 policies or Workbenches,
 <tr>
 <td><code>TaskIngressDecision</code></td>
 <td>Deterministic state-update, start, resume, notify, or reject result with lineage</td>
+</tr>
+<tr>
+<td><code>TaskLineage</code></td>
+<td>Immutable environment-scoped association of one domain task, its UAH trace, and starting ingress</td>
+</tr>
+<tr>
+<td><code>TaskLifecycleEvent</code></td>
+<td>Strictly versioned, content-addressed task start, resume, notify, suspension, or acceptance-derived terminal event used for ordered replay and local restart recovery</td>
 </tr>
 <tr>
 <td><code>AgentRun</code></td>
@@ -1861,6 +1893,11 @@ evidence_closure | evaluator | resource_budget</code></pre>
 <td>Workbench candidate contains both supporting and counterexample provenance</td>
 <td>Accept bounded retrieval seam; keep promotion and mutation absent</td>
 </tr>
+<tr>
+<td>Normalize one model output and request execution</td>
+<td>Content-addressed proposal passes UAH semantic admission, then the environment lifecycle independently issues one operation lease; candidate, foreign-owner, AB0, revision, duplicate, and tamper cases reject</td>
+<td>Accept two-stage authority seam; require lease-bound fake-owner dispatch next</td>
+</tr>
 </tbody></table>
 <h2>14. Adversarial Audit</h2>
 <ul>
@@ -1882,7 +1919,11 @@ evidence_closure | evaluator | resource_budget</code></pre>
 <li>[x] Candidate bindings cannot resolve for runtime use.</li>
 <li>[x] An executable binding cannot claim another package&#x27;s effect ownership.</li>
 <li>[x] Configuration identity changes when registry or runtime parameters change.</li>
-<li>[x] State-update ingress is immutable and classified under exact environment profile, contract revision, run, binding, and type checks.</li>
+<li>[x] State/task-bearing ingress is immutable and classified under exact environment profile, contract revision, run, binding, and type checks; the task registry prevents duplicate starts and cross-run resume/notify lineage.</li>
+<li>[x] Acceptance-derived terminal task state uses content-addressed events and reconstructs the same ingress decision through ordered, model-free replay.</li>
+<li>[x] Strict v1 task events persist to canonical local JSONL and reconstruct a registry only after complete-stream validation.</li>
+<li>[x] Accepted start-task ingress, TaskSpec, role, frame, registry, and DomainContractPack compile into one content-addressed projection and obligation artifact.</li>
+<li>[x] One normalized typed proposal passes separate UAH semantic and domain lifecycle admission before an operation-scoped execution lease is issued.</li>
 <li>[x] Workbench retrieval is bounded, failure-aware, provenance-bearing, and candidate-only.</li>
 <li>[x] The smoke command has one accepted path and one no-dispatch rejection canary.</li>
 <li>[~] The first transport-neutral, fail-closed Workbench adapter contracts are tested; the declared NeuralWorkbench gitlink remains to be restored at the intended revision.</li>
@@ -1903,20 +1944,20 @@ evidence_closure | evaluator | resource_budget</code></pre>
 <h3>Now: close H0-H1 for the H2 launch candidate</h3>
 <ol>
 <li>Freeze schema versioning and serialization conventions.</li>
-<li>Retain the implemented in-memory <code>EnvironmentProfile</code>, <code>EnvironmentRun</code>, <code>EnvironmentIngress</code>, and state-update <code>TaskIngressDecision</code> contracts. Add serialization and task/trace identity issuance before task-bearing ingress.</li>
+<li>Retain the implemented in-memory <code>EnvironmentProfile</code>, <code>EnvironmentRun</code>, and <code>EnvironmentIngress</code> contracts, plus the persisted <code>TaskLineage</code>, <code>TaskLifecycleEvent</code>, and start/resume/notify <code>TaskIngressDecision</code> subset. Integrate the strict local task stream into the common lifecycle ledger with global sequence, timestamps, and explicit writer coordination.</li>
 <li>Freeze <code>OperationEdge</code>, <code>EffectObligation</code>, <code>TaskAcceptance</code>, and <code>VerifiedTraceDigest</code> before adding runtime policy.</li>
-<li>Preserve the confirmed task-acceptance, environment-registration, and state-update ingress seams. Next define task and trace lineage issuance.</li>
+<li>Preserve the confirmed task-acceptance, environment-registration, environment-bound ingress, and acceptance-replay seams. Next add owner-authorized cancellation/failure and the remaining lifecycle grammar without moving environment authority into the registry.</li>
 <li>Preserve the implemented semantic-object/implementation-binding split.</li>
 <li>Expand AB object effect/evidence/permission fields through a read-only adapter over the canonical registry.</li>
-<li>Compile one synthetic task from required effects to a closed object graph.</li>
-<li>Extend the deterministic gate and reason codes.</li>
-<li>Define full lifecycle <code>TraceEvent</code> variants and replay.</li>
+<li>Retain the implemented synthetic TaskSpec compiler and make its <code>CompiledTask</code> the sole input to typed proposal admission.</li>
+<li>Retain the implemented <code>TypedProposal</code>, <code>AdmittedOperation</code>, and <code>ExecutionLease</code> slice. Next require the fake owner to consume the exact lease and reject direct bypass dispatch.</li>
+<li>Define proposal, admission, lease, result, evidence, and acceptance <code>TraceEvent</code> variants and replay.</li>
 <li>Add stale evidence, timeout, cancellation, retry exhaustion, and false completion fixtures beside the implemented success and rejection cases.</li>
 <li>Keep the existing H0 API behind compatibility exports while tests migrate.</li>
 </ol>
 <h3>In parallel: H1 executable kernel</h3>
 <ol>
-<li>Extend implemented environment-run registration and state-update ingress with task-bearing association, attached agent-run lifecycle, and standby.</li>
+<li>Integrate the persisted task transitions into the full lifecycle ledger, then extend environment-run and task registration with attached agent-run lifecycle and standby.</li>
 <li>Implement the minimal operation lifecycle state machine.</li>
 <li>Add direct local/API model and synthetic runtime adapters.</li>
 <li>Add budget, approval, cancellation, and obligation-based acceptance.</li>
@@ -2082,8 +2123,8 @@ evidence_closure | evaluator | resource_budget</code></pre>
 </tr>
 <tr>
 <td>Task closure overclaims success</td>
-<td>Pure evaluator implemented; TaskSpec compiler and lifecycle integration absent</td>
-<td>Compile obligations from a frozen task and replay required failure plus best-effort deficit through the full ledger</td>
+<td>TaskSpec compiler, two-stage admission, and pure evaluator are implemented, but lease-bound dispatch and ledger integration are absent</td>
+<td>Execute only through an <code>ExecutionLease</code>, then replay required failure plus best-effort deficit through the full ledger</td>
 </tr>
 <tr>
 <td>AB5 remains relabeled optimization</td>
