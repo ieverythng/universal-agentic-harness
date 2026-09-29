@@ -196,7 +196,7 @@
   <main class="doc">
 
 <h1>UAH and NeuralWorkbench Technical Diligence</h1>
-<p><strong>Prepared:</strong> 2026-09-28</p>
+<p><strong>Prepared:</strong> 2026-09-30</p>
 <p><strong>Scope:</strong> product architecture, implementation evidence, authority boundaries, NeuralWorkbench design, portability, security posture, and open engineering risk</p>
 <h2>1. Technical thesis</h2>
 <p>The Universal Agentic Harness is a portable semantic and runtime control kernel for turning model output into bounded subsystem behavior. It does not replace the native domain runtime. It compiles what one role may see and propose for one task, validates typed proposals, requests domain admission, and accepts effects only from the owner responsible for producing them.</p>
@@ -250,7 +250,7 @@
         Ledger --&gt; Workbench
         Workbench -. &quot;candidate only&quot; .-&gt; Prompt
     end</code></pre></div>
-<p>Solid nodes represent the target architecture. Current implementation status is listed in Section 10. Two-stage admission and operation-scoped lease issuance are implemented as a narrow H0 slice. PromptCompiler, lease-bound owner dispatch, and the full lifecycle ledger are not yet complete.</p>
+<p>Solid nodes represent the target architecture. Current implementation status is listed in Section 10. Two-stage admission and operation-scoped lease issuance are implemented as a narrow H0 slice. Exact lease-only owner dispatch, accepted common-ledger replay, and verified digests are implemented. PromptCompiler and the complete failure lifecycle remain open.</p>
 <h2>3. Abstraction-boundary model</h2>
 <p>An AB object is a typed operation, observation, composition, strategy, or coupled system defined within an explicit abstraction frame. AB coordinates are frame-relative. AB1 in a robot runtime and AB1 in a software workspace need not represent the same capability or complexity.</p>
 <p>Each frame declares its substrate, atomicity rule, owners, and registry revision. A role receives a control band that separates:</p>
@@ -286,22 +286,23 @@
 <h2>5. Task compilation</h2>
 <p>The implemented <code>TaskSpecCompiler</code> closes a major source of semantic drift. Before this seam, callers could independently supply an object projection and effect obligations. The compiler now produces one <code>uah.compiled_task/v1</code> artifact from:</p>
 <ul>
-<li>a successful start-task decision;</li>
+<li>a content-verified start-task decision bound to a content-addressed ingress artifact, whose exact lineage is already recorded in the lifecycle ledger;</li>
 <li>task and trace lineage;</li>
 <li>a versioned TaskSpec;</li>
 <li>role and frame policy;</li>
 <li>a content-addressed registry snapshot;</li>
-<li>reviewed DomainContractPack rules.</li>
+<li>an injected, content-addressed DomainContractPack revision.</li>
 </ul>
+<p>The implemented <code>uah.domain_contract_pack/v1</code> revision covers the exact role/task allowlists, ingress rules, effect-to-object and evidence-owner rules, failure policy, and prohibited effects. Changing one of these rules changes the revision. The environment profile that pins this revision is currently a frozen validated in-memory contract, not a content-addressed artifact.</p>
 <p>The task selects semantic effects and marks each as required or best-effort. The domain pack determines which AB object owns the effect, which evidence owner may prove it, and which failure policy applies. The compiler produces:</p>
 <ul>
 <li>a closed <code>InteractionModuleSpec</code>, including inspectable decomposition;</li>
 <li>frozen <code>EffectObligation</code> values;</li>
 <li>merged prohibited effects;</li>
-<li>finite wall-time, model-call, and tool-call budgets;</li>
+<li>declared finite wall-time, model-call, and tool-call budgets;</li>
 <li>a content identity that excludes machine-local registry paths.</li>
 </ul>
-<p>Compilation fails on owner drift, undeclared observables, ambiguous rules, duplicate obligation identities, prohibited requested effects, mutable collections, mismatched lineage, mismatched revisions, unsupported roles or task types, and altered content identities. Resume and notification ingress must resolve the original compiled artifact rather than compile another one.</p>
+<p>Compilation fails on owner drift, undeclared observables, ambiguous rules, duplicate obligation identities, prohibited requested effects, mutable collections, mismatched lineage, mismatched revisions, unsupported roles or task types, and altered content identities. Resume and notification ingress must resolve the original compiled artifact rather than compile another one. No current runtime decrements or enforces the declared budgets.</p>
 <h2>6. Two-stage admission</h2>
 <p>The implemented kernel seam preserves two distinct kinds of authority:</p>
 <pre><code class="language-text">raw model output
@@ -312,7 +313,7 @@
   -&gt; ExecutionLease or rejection</code></pre>
 <p>UAH semantic admission verifies role ownership, frame reach, AB object, binding status and ownership, canonical arguments, schema-reference presence, prohibited effects, and evidence obligations. It does not yet evaluate the arguments against the referenced schema or assert that the native environment is ready.</p>
 <p>Domain lifecycle admission owns readiness and operation deduplication. The current slice rechecks the environment run, DomainContractPack revision, binding environment, lifecycle owner, and readiness attestation before issuing an operation-scoped lease. Native concurrency, cancellation, supersession, version fencing, and safety checks remain adapter-owned future work. A semantically valid operation may still be rejected.</p>
-<p>The accepted tracer reaches an <code>ExecutionLease</code> without calling the environment handler. Candidate bindings, foreign binding owners, inspection-only objects, domain-revision drift, duplicate leasing, and tampered authority artifacts fail closed. The immediate next step is to require the fake owner to consume this exact lease and reject direct dispatch.</p>
+<p>The accepted tracer reaches an <code>ExecutionLease</code>, records execution start, and calls the environment handler only with that exact lease. Direct object and argument dispatch is absent. Candidate bindings, foreign binding owners, inspection-only objects, domain-revision drift, duplicate leasing, complete binding drift, and tampered authority artifacts fail closed. The owner preserves the native result and normalized evidence in a content-addressed receipt.</p>
 <h2>7. Evidence and task acceptance</h2>
 <p>Model text cannot prove an external effect. UAH distinguishes:</p>
 <ol>
@@ -328,8 +329,8 @@
 <li><code>suspended</code> when required evidence is still pending;</li>
 <li><code>rejected</code> when a terminal required obligation fails.</li>
 </ul>
-<p>The environment task registry records suspension or terminal judgment and rejects later ingress for a terminal task. A strict <code>uah.task_lifecycle_event/v1</code> stream persists locally as canonical JSONL and reconstructs registry state after process restart without invoking a model or rerunning acceptance.</p>
-<p>The current store is local and single-writer. It does not yet provide the full ledger sequence, timestamps, parent-event links, cross-process coordination, or owner-authorized cancellation and native failure grammar.</p>
+<p>The environment task registry records suspension or terminal judgment and rejects later ingress for a terminal task. The strict, content-addressed <code>uah.trace_event/v1</code> stream persists locally as canonical JSONL and reconstructs registry and operation state after process restart without invoking a model or rerunning acceptance. Every event carries a global sequence, causal parent, and atomic <code>commit_id</code>/<code>commit_index</code>/<code>commit_size</code> position. Reload rejects incomplete or interleaved multi-event facts.</p>
+<p>The current store is local. Cooperating writers use an OS advisory lock and reload the complete stream before transition validation and append. It provides sequence, timestamps, causal links, accepted-path replay, and native execution-failure recording. The complete rejection, cancellation, timeout, and retry grammar remains open.</p>
 <h2>8. NeuralWorkbench</h2>
 <h3>8.1 Role in the product</h3>
 <p>NeuralWorkbench is the proposed adaptive memory and search engine. It is not an abstraction frame, model provider, runtime owner, or permission system. UAH supplies the active frame, task projection, constraints, candidate budget, and versioned context.</p>
@@ -370,7 +371,7 @@ observe(WorkbenchObservation) -&gt; no authority-bearing result</code></pre>
 <h2>10. Implementation status</h2>
 <table><thead><tr>
 <th>Capability</th>
-<th>State on 2026-09-28</th>
+<th>State on 2026-09-30</th>
 <th>Evidence or gap</th>
 </tr></thead><tbody>
 <tr>
@@ -391,12 +392,17 @@ observe(WorkbenchObservation) -&gt; no authority-bearing result</code></pre>
 <tr>
 <td>Environment activation and ingress</td>
 <td>Implemented narrow seam</td>
-<td>Profile and attestation checks, start/resume/notify lineage; environment close and full persistence remain open</td>
+<td>Profile and attestation checks, content-addressed ingress and decisions, ledger-backed start/resume/notify lineage; environment close remains open</td>
+</tr>
+<tr>
+<td>Domain contract authority</td>
+<td>Implemented narrow seam</td>
+<td>Content-derived revision covers role/task allowlists, ingress/effect-evidence rules, failure policy, and prohibitions</td>
 </tr>
 <tr>
 <td>TaskSpec compilation</td>
 <td>Implemented</td>
-<td>Content-addressed projection, obligations, prohibitions, budgets, and revision provenance</td>
+<td>Content-verified decision plus ledger-recorded start, content-addressed projection, obligations, prohibitions, declared budgets, and revision provenance; budget enforcement remains open</td>
 </tr>
 <tr>
 <td>Task acceptance</td>
@@ -404,14 +410,14 @@ observe(WorkbenchObservation) -&gt; no authority-bearing result</code></pre>
 <td>Required, best-effort, suspended, and terminal outcomes</td>
 </tr>
 <tr>
-<td>Task lifecycle persistence</td>
-<td>Implemented local seam</td>
-<td>Strict JSONL, restart recovery, corruption rejection; full common ledger absent</td>
+<td>Common lifecycle persistence</td>
+<td>Implemented accepted-path seam</td>
+<td>Global sequence, causal parents, atomic commit framing, advisory-lock serialized writers, strict JSONL restart recovery, operation transitions, suspension, acceptance, accepted-with-deficit replay, and verified digest; full failure grammar remains open</td>
 </tr>
 <tr>
 <td>Recorded NAO canary</td>
 <td>Implemented</td>
-<td>Accepted, rejected, support-retrieval, and counterexample-retrieval cases</td>
+<td>Injected domain pack, real ingress classification, strict planner payload handling, accepted lease-only execution, semantic no-dispatch rejection, restart replay, and verified digest</td>
 </tr>
 <tr>
 <td>PromptCompiler</td>
@@ -419,9 +425,9 @@ observe(WorkbenchObservation) -&gt; no authority-bearing result</code></pre>
 <td>No executable prompt artifact compiler</td>
 </tr>
 <tr>
-<td>Two-stage admission</td>
+<td>Two-stage admission and execution</td>
 <td>Implemented narrow seam</td>
-<td>Content-addressed proposal, semantic admission, binding and obligation capture, independent domain decision, attestation-bound operation lease, and typed rejections; dispatch and persistence remain open</td>
+<td>Content-addressed proposal, semantic admission, complete binding fingerprint, ledger-backed domain lease, exact lease-only dispatch, native result/evidence receipt, and typed rejections</td>
 </tr>
 <tr>
 <td>Agent identity and handles</td>
@@ -454,7 +460,7 @@ observe(WorkbenchObservation) -&gt; no authority-bearing result</code></pre>
 <td>No promoted AB2+ object</td>
 </tr>
 </tbody></table>
-<p>The current full suite reports <strong>144 passing tests</strong>. The repository hook suite checks Ruff, source-aware tests, repository hygiene, and generated Markdown/HTML synchronization.</p>
+<p>The current full suite reports <strong>146 passing tests</strong>, and the latest Ruff run passes. The complete repository hook, Markdown/HTML synchronization, and clean wheel gates are rerun before distributing a refreshed build.</p>
 <h2>11. Security and governance posture</h2>
 <p>The architecture applies least capability at task scope:</p>
 <ul>
@@ -535,12 +541,12 @@ observe(WorkbenchObservation) -&gt; no authority-bearing result</code></pre>
 </tbody></table>
 <h2>14. Next technical gates</h2>
 <ol>
-<li>Require the fake owner to execute only the exact <code>ExecutionLease</code> and reject direct dispatch.</li>
-<li>Extend the task store into a common lifecycle event envelope and derive <code>VerifiedTraceDigest</code>.</li>
+<li>Add typed normalization/admission/domain rejection and evidence-rejection events.</li>
+<li>Freeze <code>OperationEdge</code> and retain cross-process advisory writer coordination.</li>
 <li>Add stale evidence, timeout, owner failure, cancellation, retry exhaustion, supersession, and false-completion cases.</li>
 <li>Implement role, agent, handle, agent-run, operation, edge, lease, and model invocation identities.</li>
 <li>Add PromptCompiler, provider-neutral model port, fixed model lease, and startup preflight.</li>
-<li>Freeze the NAO <code>v1.0.0</code> DomainContractPack and package-owned fixtures.</li>
+<li>Owner-review and freeze the NAO <code>v1.0.0</code> DomainContractPack and package-owned parity fixtures.</li>
 <li>Run planner <code>legacy | shadow | uah</code> parity with fake or simulated owners.</li>
 <li>Attach NeuralWorkbench in shadow mode and run the first retrieval ablation.</li>
 <li>Prove one non-NAO adapter with the unchanged kernel.</li>

@@ -10,7 +10,23 @@ from ab_harness.contracts import ABObjectView
 
 
 class RegistrySnapshot:
-    def __init__(self, objects: tuple[ABObjectView, ...], *, source: str, version: str) -> None:
+    def __init__(
+        self,
+        objects: tuple[ABObjectView, ...],
+        *,
+        source: str,
+        version: str,
+    ) -> None:
+        object_ids = tuple(item.object_id for item in objects)
+        duplicate_ids = tuple(
+            dict.fromkeys(
+                object_id
+                for object_id in object_ids
+                if object_ids.count(object_id) > 1
+            )
+        )
+        if duplicate_ids:
+            raise ValueError("duplicate AB object id: %s" % ", ".join(duplicate_ids))
         self.objects = objects
         self.source = source
         self.version = version

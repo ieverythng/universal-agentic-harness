@@ -4,9 +4,7 @@ import pytest
 
 from ab_harness import AgentOutput
 from ab_harness import BindingCatalog
-from ab_harness import HarnessTrace
 from ab_harness import InteractionProjector
-from ab_harness import JsonlHarnessTraceStore
 from ab_harness import OutputGate
 from ab_harness import RegistrySnapshot
 from ab_harness_nao.contracts import CHATBOT_ROLE
@@ -114,33 +112,6 @@ def test_model_roles_cannot_claim_execution_effects():
 def test_unknown_registry_object_fails_projection_closed():
     with pytest.raises(ValueError, match='unknown AB object'):
         _module(PLANNER_ROLE, 'invented_skill')
-
-
-def test_h0_trace_round_trip_reconstructs_projection_and_gate(tmp_path):
-    module = _module(PLANNER_ROLE, 'find_object')
-    output = AgentOutput('executable_plan', {}, referenced_objects=('find_object',))
-    decision = OutputGate().evaluate(output, module)
-    trace = HarnessTrace(
-        trace_id='trace_h0_001',
-        task_id=module.task_id,
-        role_id=module.role.role_id,
-        frame_id=module.frame.frame_id,
-        registry_version=module.frame.registry_version,
-        projected_object_ids=tuple(sorted(module.object_ids)),
-        output_type=output.output_type,
-        referenced_objects=output.referenced_objects,
-        gate=decision,
-        evidence_refs=('planner_output:fixture_001',),
-        metadata={'mode': 'parent_repo_h0'},
-    )
-    store = JsonlHarnessTraceStore(tmp_path / 'h0.jsonl')
-
-    store.append(trace)
-    loaded = store.load_all()
-
-    assert loaded == (trace,)
-    assert loaded[0].gate.accepted is True
-    assert 'resolve_target_reference' in loaded[0].projected_object_ids
 
 
 def test_latest_nao_contract_seams_preserve_planner_gate_boundary():

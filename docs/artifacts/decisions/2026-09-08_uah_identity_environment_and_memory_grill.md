@@ -247,9 +247,9 @@ TaskAcceptanceEvaluator.evaluate(
 
 The first red-green slices now distinguish required-effect failure from a
 best-effort deficit using the same immutable evidence grammar. Duplicate
-obligation identities and empty obligation sets fail closed. The evaluator is
-also connected additively to the recorded NAO qualification result while the
-legacy `required_observables` compatibility field remains available.
+obligation identities and empty obligation sets fail closed. At this checkpoint
+the recorded NAO result retained a `required_observables` compatibility field.
+Decision 21 records its removal once typed obligations became the sole input.
 
 The owner-attested synthetic environment registration seam is now implemented.
 It requires a registered frozen `EnvironmentProfile`, exact owner, native
@@ -310,6 +310,9 @@ transaction guarantees, or native effect evidence.
 
 ## 17. Acceptance and Task Replay TDD Continuation on 2026-09-19
 
+Historical checkpoint. Section 21 supersedes the separate task-event authority
+described below with the common `LifecycleLedger`.
+
 This round connects the existing pure `TaskAcceptance` judgment to the
 environment task registry. `accepted`, `accepted_with_deficit`, and `rejected`
 become terminal registry states and reject later resume or notify ingress.
@@ -330,6 +333,10 @@ and native failure are not represented as generic terminal calls because their
 environment-owner authority contract has not yet been implemented.
 
 ## 18. Task Lifecycle Persistence TDD Continuation on 2026-09-23
+
+Historical checkpoint. `uah.task_lifecycle_event/v1` and
+`JsonlTaskLifecycleStore` were removed when `uah.trace_event/v1` became the
+single writable lifecycle envelope.
 
 This round applies Decision 5 to restart recovery without expanding the event
 authority model. `TaskLifecycleEvent` now serializes through the exact
@@ -418,10 +425,130 @@ CompiledTask + raw typed model output
   -> ExecutionLease or typed rejection
 ```
 
-All three artifacts reject content tampering. The implemented slice does not
-yet validate arguments against the binding's input schema, decrement task
+All three artifacts reject content tampering. At this checkpoint the slice did
+not validate arguments against the binding's input schema, decrement task
 budgets, dispatch to an environment owner, persist proposal and admission
 events in the common ledger, or implement cancellation, concurrency, expiry,
-and fencing. The next authority seam requires a fake environment owner to
-consume the exact lease, reject direct or altered calls, return a native result,
-and emit owner-issued effect evidence for task acceptance and replay.
+and fencing. Section 21 records the subsequent lease-only owner and accepted
+event chain. Argument-schema validation, runtime budget enforcement, and the
+remaining lifecycle controls remain open.
+
+## 21. Lease-Only Execution and Common-Ledger Continuation on 2026-09-28
+
+The next authority seam is implemented without retaining a direct-dispatch
+compatibility path. `InProcessEnvironmentOwner.execute(...)` accepts only an
+exact `ExecutionLease`. Before invoking the mounted native handler, it verifies
+environment and lifecycle ownership, re-resolves the approved binding, compares
+the complete binding fingerprint, and records `execution_started` in the common
+ledger. A repeated attempt is rejected even after constructing a new owner or
+domain-admission instance over the same ledger.
+
+Successful execution returns a content-addressed `uah.execution_receipt/v1`
+that keeps the native owner result separate from normalized `EffectEvidence`.
+The receipt preserves lease, admission, environment, task, trace, operation,
+binding, and evidence lineage. Native exceptions append `execution_failed`
+before propagating. A consumed lease is not retried implicitly; cancellation
+and reviewed retry authority require a later lifecycle contract.
+
+The old `HarnessTrace`, `JsonlHarnessTraceStore`, `TaskLifecycleEvent`, and
+`JsonlTaskLifecycleStore` were removed rather than layered beneath another
+store. `LifecycleLedger` is now the single writable authority. Its
+`uah.trace_event/v1` values provide global sequence, causal parent, timestamp,
+artifact references, strict canonical JSONL reload, optimistic sequence
+conflict checks, and transition validation. `EnvironmentTaskRegistry` rebuilds
+its routing projection from these events.
+
+The accepted tracer now records:
+
+```text
+task_started
+  -> task_compiled
+  -> proposal_normalized
+  -> semantic_admission_accepted
+  -> domain_admission_leased
+  -> execution_started
+  -> execution_completed
+  -> evidence_issued
+  -> effect_obligation_satisfied | effect_obligation_failed/pending
+  -> terminal_task_accepted | terminal_task_accepted_with_deficit
+```
+
+Strict restart replay derives a content-addressed
+`uah.verified_trace_digest/v1` without a model or native handler. The paired
+best-effort case remains accepted while preserving its deficit. Recorded NAO
+qualification now uses task-owned `TaskEffectRequest` values against an
+injected domain-owned contract pack and the same compiled authority chain; the
+older `required_observables` fallback and duplicate planner gate were removed.
+
+This continuation does not complete the lifecycle grammar. Proposal,
+semantic-admission, and domain-admission rejection artifacts, evidence
+rejection, required-effect failure, stale evidence, timeout, cancellation,
+retry exhaustion, false completion, `OperationEdge`, cross-process writer
+locking, and agent/model events remain scheduled H0/H1 work.
+
+## 22. Authority-Hardening Continuation on 2026-09-28
+
+The review rejected caller-authored routing and domain-rule provenance. The
+implemented `uah.domain_contract_pack/v1` now derives its SHA-256 revision from
+the exact pack/frame/registry identifiers, role and task allowlists, ingress
+rules, effect-to-object and evidence-owner rules, failure policies, and
+prohibited effects. Any covered rule change requires a new revision.
+
+`uah.environment_ingress/v1` now has a content-derived ingress artifact ID, and
+`uah.task_ingress_decision/v1` has a content-derived `decision_id` that binds
+that artifact. Identity verification is necessary but not sufficient:
+`TaskSpecCompiler` also calls `EnvironmentTaskRegistry.require_start(...)` and
+rejects a decision unless the same environment activation, starting ingress,
+task, and trace are already recorded in the common ledger. The ledger, not a
+caller-constructed decision, owns task-start authority. The internal start
+fact records the exact ingress artifact, decision ID, and pack revision; no
+public raw-lineage registration method can create compilation authority.
+
+`uah.trace_event/v1` now includes `commit_id`, `commit_index`, and
+`commit_size`. All events emitted for one lifecycle fact share a commit frame.
+Strict reload rejects an incomplete, noncontiguous, or interleaved commit, so a
+newline-terminated crash after only part of a multi-event fact cannot publish
+partial authority state. The ledger remains single-writer; cross-process
+coordination is still open.
+
+Recorded NAO qualification must receive an injected, content-addressed
+DomainContractPack. It may not synthesize policy from the qualification case.
+It routes the supplied
+`EnvironmentIngress` through the real `TaskIngressPolicy`, uses the
+ledger-backed decision for compilation, rejects malformed planner steps
+without dropping them, and content-hashes the complete raw planner payload.
+This is a strict recorded qualification of the generic seam, not H2 owner
+review, live-node, or planner-parity evidence.
+
+Task budgets remain immutable declarations in `CompiledTask`. No current
+runtime decrements wall time, model calls, or tool calls, so documentation and
+qualification must not describe budget enforcement as implemented.
+
+Terminal acceptance must account for the complete evidence set already
+recorded on the trace. Replay rejects both unrecorded evidence and omitted
+evidence. Receipt replay also compares the admission ID, AB object, binding,
+and evidence owner with the recorded semantic admission before accepting an
+execution result. The NAO recorded parser rejects unknown plan or step fields,
+so dependency, retry, and ordering semantics cannot be silently flattened.
+
+## 23. Seam-Audit Continuation on 2026-09-30
+
+The H0/H1 audit found that constructor-time hashing did not protect later trust
+crossings. Content-addressed ingress, compiled tasks, proposals, admitted
+operations, and execution leases now reverify their complete nested identity
+before policy classification, semantic admission, domain admission, ledger
+recording, receipt issuance, or native dispatch. A post-lease proposal change
+therefore fails before its handler can run.
+
+File-backed ledgers now coordinate cooperating processes with an OS advisory
+lock. A writer locks, reloads and validates the stream, evaluates the proposed
+transition, appends, and calls `fsync` before it releases the lock. Two stale
+ledger instances cannot consume the same lease twice. Strict reload still
+rejects a crash-truncated multi-event commit; automatic repair is not claimed.
+
+Resume and notify facts now retain the exact ingress artifact, decision, and
+DomainContractPack revision. Pre-dispatch suspension is representable without
+an invented lease. Registry snapshots reject duplicate object identity, frame
+projection rejects registry-revision mismatch, and replay rejects unknown event
+types. Typed counterexample and cancellation grammar remains the next H0/H1
+decision.

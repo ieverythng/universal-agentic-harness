@@ -24,7 +24,7 @@ access only through an explicit, task-scoped, read-only frame projection.
 ```mermaid
 %% uah-render: Figure 1. Admission, execution, and Observatory data flow
 flowchart TB
-    Prompt["Compiled Prompt + Schemas<br/>model-facing projection"]:::projection
+    Prompt["Model-facing Prompt + Schemas<br/>PromptCompiler planned"]:::projection
     Model["Model Output<br/>raw immutable artifact"]:::model
     Proposal["TypedProposal<br/>operation request"]:::proposal
     Semantic["UAH Semantic Admission<br/>role + frame + object + binding"]:::gate
@@ -49,9 +49,10 @@ flowchart TB
     Ledger --> Workbench
 ```
 
-Every stage, including rejection, appends its own event. The diagram shows the
-accepted path for readability. Neither Observatory nor NeuralWorkbench sits in
-the execution call chain.
+The diagram shows the target accepted path. The current ledger records the
+accepted authority chain and execution failure; complete normalization,
+admission, evidence, timeout, cancellation, and retry rejection branches remain
+open. Neither Observatory nor NeuralWorkbench sits in the execution call chain.
 
 ## 3. Layered Visualization Contract
 
@@ -87,9 +88,11 @@ render_observatory(
 - ordered event cards with inspectable raw payloads;
 - graph data embedded as inert JSON for later O2 reuse.
 
-### Mandatory identity envelope
+### Target mandatory identity envelope
 
-Every lifecycle event carries or resolves without heuristic reconstruction:
+The H1/H2 Observatory contract requires every lifecycle event to carry or
+resolve the following identities without heuristic reconstruction. The current
+H0 envelope implements only the subset documented below:
 
 | Identity | Scope |
 | --- | --- |
@@ -108,7 +111,7 @@ Every lifecycle event carries or resolves without heuristic reconstruction:
 | `domain_id`, `task_type_id`, `task_id` | Domain namespace, task family and work instance |
 | `operation_id`, `parent_operation_id`, `operation_relation` | One frame-relative AB-object lifecycle, related operation, and governed edge type such as decomposition or delegation |
 | `proposal_id`, `admission_id`, `execution_lease_id` | Proposal, UAH semantic decision and domain-granted authority |
-| `event_id`, `parent_event_id`, `sequence` | Append-only event ordering and causality |
+| `event_id`, `parent_event_id`, `sequence`, `commit_id`, `commit_index`, `commit_size` | Append-only event ordering, causality, and atomic multi-event fact framing |
 
 Each operation also records `frame_id`, `registry_version`, `ab_object_id`,
 `binding_id`, prompt and projection hashes, evidence obligations, native domain
@@ -119,7 +122,7 @@ handle, and actor views are query projections over one append-only ledger. They
 must not become independent trace stores whose ordering or terminal judgments
 can diverge.
 
-### Required lifecycle event families
+### Target lifecycle event families
 
 ```text
 registration_preflight_started | registration_preflight_passed | registration_preflight_failed
@@ -148,31 +151,62 @@ agent_run_detached | agent_run_terminated
 environment_run_closing | environment_run_closed
 ```
 
-The current H0 `TaskLifecycleEvent` implements the task subset:
-`task_started`, `task_resumed`, `task_notified`, `task_suspended`,
-`terminal_task_accepted`, `terminal_task_accepted_with_deficit`, and
-`terminal_task_rejected`. Its event ID is content-addressed, and ordered replay
-reconstructs registry state without a model. The exact
-`uah.task_lifecycle_event/v1` envelope is persisted in canonical local JSONL
-and can rebuild the registry after process restart. It does not yet supply a
-global sequence, parent-event links, timestamps, cross-process writer
-coordination, or the full common-ledger transaction. O1 must consume this
-subset through the common ledger envelope rather than treat the task store as
-a second authoritative trace ledger.
+The current H0 `LifecycleLedger` is the single writable trace authority. Its
+content-addressed `uah.trace_event/v1` envelope supplies global sequence,
+recorded time, causal parent, environment/task/trace/operation lineage,
+artifact references, canonical replay data, and atomic `commit_id`,
+`commit_index`, and `commit_size` positions. Task registration is a ledger
+projection rather than a second task event store. Strict JSONL reload rebuilds
+task and operation state after restart and rejects incomplete or interleaved
+multi-event facts. Cooperating processes serialize reload, transition
+validation, append, and `fsync` through an OS advisory lock. Crash recovery for
+an interrupted multi-event append still rejects the incomplete commit rather
+than repairing it automatically.
+
+The exact current envelope is:
+
+```text
+schema_version, event_id, sequence,
+commit_id, commit_index, commit_size,
+recorded_at, event_type,
+environment_run_id, task_id, trace_id, operation_id,
+parent_event_id, artifact_refs, data_json
+```
+
+`data_json` is a canonical JSON object serialized as a string. Agent, handle,
+model, provider, prompt, and operation-edge identities remain H1/H2 additions.
+
+The implemented `uah.domain_contract_pack/v1` revision covers its role/task
+allowlists, ingress rules, effect-to-object and evidence-owner rules, failure
+policy, and prohibited effects. `uah.environment_ingress/v1` and
+`uah.task_ingress_decision/v1` are also content-addressed, and the decision
+binds the ingress artifact identity. Compilation requires the exact accepted
+task start to be present in the lifecycle ledger, preventing a caller-authored
+decision from creating task authority. The task-start event preserves the
+ingress artifact ID, decision ID, and domain-pack revision; the registry does
+not expose a raw task-start mutation method.
 
 The H0 `CompiledTask` is now a content-addressed artifact binding start-task
 ingress, task and trace lineage, role, frame, registry, DomainContractPack,
 closed interaction projection, effect obligations, prohibited effects, and
-budgets. Its compiler does not yet emit `task_compiled` into the lifecycle
-ledger. O1 must render the artifact and its future event separately from the
-prompt, proposal, admission, lease, evidence, and terminal judgment.
+declared budgets. No runtime budget enforcement is implemented. The accepted
+tracer records its `task_compiled` event separately from proposal, admission,
+lease, evidence, and terminal judgment. Prompt compilation is a planned event,
+not part of the current tracer.
 
 The current H0 authority slice also emits content-addressed
 `uah.typed_proposal/v1`, `uah.admitted_operation/v1`, and
-`uah.execution_lease/v1` artifacts with typed rejection reasons. These values
-are not yet appended as `proposal_normalized`, semantic-admission, or
-domain-admission events. O1 must preserve their distinct identities and must
-not infer a lease from an admitted operation or an admission from a proposal.
+`uah.execution_lease/v1` artifacts with typed rejection reasons. Accepted
+values are appended as distinct proposal, semantic-admission, and
+domain-admission events. The environment owner accepts only the exact lease,
+records execution start before native dispatch, and emits a content-addressed
+receipt containing separate native result and normalized evidence artifacts.
+Replay verifies receipt admission, object, binding, and evidence-owner lineage.
+Terminal acceptance must reference the complete recorded evidence set rather
+than a caller-selected subset.
+Acceptance and best-effort-deficit traces replay into a deterministic
+`VerifiedTraceDigest`. Rejection, timeout, cancellation, retry, and stale
+evidence events remain incomplete. O1 must not infer absent failure events.
 
 This is the common startup-to-task order, not a rule that every lease ends with
 one task. A lease may be invocation-, task-, or run-scoped; its declared scope

@@ -3,6 +3,13 @@
 This file records the project vocabulary that should remain stable across code,
 documentation, evaluations, and environment adapters.
 
+Terms describe the target architecture unless an entry explicitly names an
+implemented schema or source seam. The current code distinguishes environment,
+ingress, task, trace, operation, proposal, admission, lease, result, evidence,
+and lifecycle-event identities. General role-configuration, agent, handle,
+agent-run, model-instance, model-lease, model-invocation, and PromptCompiler
+registries remain H1/H2 work.
+
 ## Core terms
 
 ### Abstraction frame
@@ -185,15 +192,20 @@ _Avoid_: Domain; environment profile; session
 
 ### Environment profile
 
-A reusable, content-addressed domain runtime contract that pins a
-DomainContractPack, native interface requirements, readiness policy, and stable
+A reusable frozen domain runtime contract that pins a DomainContractPack
+revision, native runtime and owner, required interfaces, and a stable
 agent-handle roster. Activating the profile produces a new environment run.
+The current `EnvironmentProfile` is validated in memory but is not itself
+content-addressed or serializable.
 
 ### Environment ingress
 
-A normalized observation, request, or feedback item received from an approved
-environment binding during an environment run. Ingress is not automatically a
-task, trace, model invocation, or execution authority.
+A content-addressed `uah.environment_ingress/v1` observation, request, or
+feedback item received from an approved environment binding during an
+environment run. Its artifact identity covers binding, ingress type, payload
+artifact, native lineage, observation time, and environment activation.
+Ingress is not automatically a task, trace, model invocation, or execution
+authority.
 _Avoid_: Prompt; task
 
 ### Task ingress policy
@@ -210,6 +222,19 @@ scheme version, environment run, and domain task identity. Resume and notify
 classification resolve registered lineage and cannot infer it from model
 output or an unregistered ingress item.
 
+### Task ingress decision
+
+A content-addressed `uah.task_ingress_decision/v1` classification result. An
+accepted `start_task` decision records the exact DomainContractPack revision,
+environment activation, starting ingress artifact, task, and trace. Its fields
+alone do not authorize compilation. `TaskSpecCompiler` also requires the
+matching task start to exist in the common lifecycle ledger through
+`EnvironmentTaskRegistry.require_start(...)`.
+The task-start event stores the ingress artifact ID, decision ID, and frozen
+domain-pack revision. The raw task-start fact is internal to the ledger
+projection; callers cannot authorize compilation through a public raw-lineage
+registration method.
+
 ### Environment task registry
 
 The environment-scoped registry of immutable task and trace lineage. It
@@ -219,23 +244,24 @@ only when the task is registered under that exact environment activation.
 Acceptance-derived terminal states reject later ingress. A suspended
 acceptance remains resumable. Registration does not prove native effects.
 
-### Task lifecycle event
+### Trace event
 
-A content-addressed, immutable registry event for task start, resume,
-notification, suspension, or acceptance-derived terminal judgment. Ordered
-replay reconstructs task lineage, duplicate-ingress protection, and terminal
-state without invoking a model or rerunning acceptance evaluation. The strict
-`uah.task_lifecycle_event/v1` envelope can be appended to a canonical local
-JSONL store and reloaded across process restart. These H0 events remain a
-bounded, single-writer subset of the lifecycle ledger. They do not yet provide
-a global sequence, cross-process writer coordination, or environment-owner
-cancellation/failure.
+A content-addressed `uah.trace_event/v1` fact in the globally sequenced common
+lifecycle ledger. It carries environment, task, trace, optional operation and
+causal-parent identities, immutable artifact references, a timestamp, and a
+minimal canonical replay projection. Each event also carries `commit_id`,
+`commit_index`, and `commit_size`, so strict reload rejects an incomplete or
+noncontiguous multi-event fact. Task start, resume, notification,
+compilation, proposal, admission, lease, execution, evidence, obligation, and
+terminal-acceptance events currently use this envelope. Cross-process locking,
+environment cancellation, retry, timeout, and rejection branches remain open.
 
 ### Prompt compiler
 
-A deterministic assembler of the universal UAH protocol, role contract,
-versioned domain policy, task-scoped AB projection, and current task context.
-It produces model-facing context but grants no execution authority.
+The planned deterministic assembler of the universal UAH protocol, role
+contract, versioned domain policy, task-scoped AB projection, and current task
+context. It will produce model-facing context but grant no execution authority.
+No executable PromptCompiler exists in the current H0/H1 slice.
 
 ### Prompt pack
 
@@ -257,11 +283,15 @@ an agent role configuration, but it does not create cross-frame equivalence.
 
 ### Domain contract pack
 
-An environment-owned, content-addressed package of abstraction frames, AB
-objects, binding policy, role and task-type rules, evidence ownership, failure
-policy, prohibited effects, minimal domain prompt policy, and qualification
-cases. It is semantic configuration rather than executable domain code.
-Assisted onboarding may propose one but cannot approve it.
+An environment-owned semantic package rather than executable domain code. The
+implemented `uah.domain_contract_pack/v1` identity covers the pack and frame
+IDs, registry version, allowed roles, supported task types, ingress rules,
+effect-to-object and evidence-owner rules, failure policy, and prohibited
+effects. Changing any covered rule changes its SHA-256 revision. Frames, AB
+objects, binding catalogs, minimal prompt policy, and qualification cases
+remain separate artifacts in the current slice; the longer-term onboarding
+contract may package them together after owner review. Assisted onboarding may
+propose a pack but cannot approve it.
 
 ### Proposal
 
@@ -284,7 +314,15 @@ A content-addressed `uah.execution_lease/v1` issued by the domain lifecycle
 owner after rechecking the environment activation, binding environment,
 DomainContractPack revision, operation deduplication, and readiness attestation.
 The lease authorizes exactly one admitted operation, is distinct from semantic
-admission, and cannot change the admitted value.
+admission, and cannot change the admitted value. The in-process owner accepts
+no direct object/argument call. It consumes the lease by durably recording
+`execution_started` before invoking the native handler, then records either a
+content-addressed execution receipt or a typed execution failure. A new owner
+instance cannot consume the same operation lease again from the same ledger.
+Replay checks each receipt and evidence artifact against the recorded
+admission ID, object, binding, and evidence owner. Terminal acceptance must
+name the complete evidence set recorded for the trace; omitted or unrecorded
+evidence is rejected.
 
 ### UAH trace
 
@@ -351,14 +389,22 @@ does not transfer evidence or execution authority.
 ### Lifecycle ledger
 
 The append-only source of UAH lifecycle events and artifact references across
-prompt compilation, proposal, admission, lease, execution, evidence, and
-terminal judgment. It records authority decisions but does not make them.
+task compilation, proposal, admission, lease, execution, evidence, and
+terminal judgment. The implemented `LifecycleLedger` owns global sequence,
+causal parent, canonical JSONL persistence, strict reload, optimistic sequence
+checks, atomic commit framing, transition validation, cross-process advisory
+writer locking, and replay-derived `VerifiedTraceDigest` artifacts. Each
+cooperating writer reloads and validates the stream while holding the lock
+before it appends and flushes a fact. The ledger records authority decisions
+but does not make them. The complete failure/cancellation grammar remains open.
 
 ### Recorded qualification
 
-A deterministic replay of frozen chatbot and planner outputs through the UAH
-projection, gates, mounted fake environment owner, and terminal evidence check.
-It validates harness mechanics without claiming live-node or model capability.
+A deterministic replay of frozen chatbot and planner outputs through
+`CompiledTask`, operation normalization, semantic admission, domain lease
+issuance, the lease-only fake environment owner, task acceptance, common-ledger
+reload, and verified digest construction. It validates harness mechanics
+without claiming live-node or model capability.
 
 ### Boot qualification
 

@@ -1,6 +1,6 @@
 # UAH and NeuralWorkbench GTM and Investment Case
 
-**Prepared:** 2026-09-28
+**Prepared:** 2026-09-30
 
 **Scope:** commercialization hypotheses, customer sequence, packaging,
 milestones, metrics, use of capital, and diligence disclosures
@@ -228,7 +228,7 @@ feature count.
 
 | Gate | Deliverable | Value created | Go or no-go evidence |
 | --- | --- | --- | --- |
-| G1: executable semantic center | Lease-bound owner dispatch, common ledger, full synthetic replay | Extends implemented two-stage admission into an end-to-end authority path | Success and failure replay identically without the model |
+| G1: executable semantic center | Complete failure grammar on the advisory-lock coordinated ledger | Extends the implemented accepted/deficit authority path into counterexample-complete replay | Success and failure replay identically without the model |
 | G2: H1 agent runtime | Agent identity, handles, PromptCompiler, provider port, fixed lease, startup preflight | Enables local and remote model trials under stable roles | Frozen suite runs through recorded and live provider modes |
 | G3: H2 NAO parity | Domain pack, planner adapter, report-result delegation, `legacy | shadow | uah` report | Demonstrates integration with a real multi-owner system | Reviewed parity and failure attribution, no duplicate action or speech |
 | G4: second-domain proof | Watson/software-engineering adapter using unchanged core | Tests portability and onboarding leverage | Measured reuse and same-model comparison |
@@ -243,8 +243,9 @@ cannot compensate for failed ownership, evidence, replay, or parity gates.
 Suggested categories, without assigning amounts before financing scope is
 known:
 
-1. **Kernel and runtime engineering:** lease-bound dispatch, ledger, replay,
-   identities, provider ports, allocator, and security hardening.
+1. **Kernel and runtime engineering:** failure grammar, operation edges,
+   concurrent ledger safety, identities, provider ports, allocator, and
+   security hardening.
 2. **Reference integrations:** NAO parity, Watson/software engineering, and one
    non-NAO qualification.
 3. **Evaluation infrastructure:** frozen suites, failure injection,
@@ -320,6 +321,11 @@ a separate sourced deliverable.
 - H0 is a tested contract proof, not a production release.
 - H1 agent lifecycle and live provider operation are incomplete.
 - H2 NAO planner parity and model qualification are not complete.
+- Compiled task budgets are immutable declarations; runtime consumption and
+  enforcement are not implemented.
+- The common ledger has atomic commit framing, restart replay, and advisory-lock
+  coordination for cooperating processes. Crash-truncated commit recovery is
+  fail-closed rather than automatic.
 - NeuralWorkbench improvement is unproven and remains an H3 experiment.
 - The intended NeuralWorkbench revision is documented, but its gitlink is
   absent from the current UAH tree.

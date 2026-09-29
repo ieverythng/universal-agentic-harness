@@ -3,10 +3,10 @@ import json
 import pytest
 
 from ab_harness import ABControlBand
+from ab_harness import ABObjectView
 from ab_harness import AbstractionFrame
 from ab_harness import AgentRoleSpec
 from ab_harness import InteractionProjector
-from ab_harness import JsonlHarnessTraceStore
 from ab_harness import RegistrySnapshot
 
 
@@ -57,5 +57,32 @@ def test_registry_version_tracks_exact_content(tmp_path):
     assert first.version != second.version
 
 
-def test_missing_trace_store_loads_as_empty_tuple(tmp_path):
-    assert JsonlHarnessTraceStore(tmp_path / "missing.jsonl").load_all() == ()
+def test_registry_snapshot_rejects_duplicate_object_identity():
+    first = ABObjectView("same_object", 0, "primitive", "test", "owner_a")
+    second = ABObjectView("same_object", 1, "skill", "test", "owner_b")
+
+    with pytest.raises(ValueError, match="duplicate AB object id: same_object"):
+        RegistrySnapshot(
+            (first, second),
+            source="fixture:duplicate",
+            version="sha256:duplicate",
+        )
+
+
+def test_projection_rejects_a_frame_from_another_registry():
+    item = ABObjectView("known_object", 0, "primitive", "test", "owner")
+    registry = RegistrySnapshot(
+        (item,),
+        source="fixture:registry",
+        version="sha256:registry-a",
+    )
+    role = AgentRoleSpec("worker", ("proposal",), ABControlBand(0, 0, 0))
+    frame = AbstractionFrame("test", "fixture", "AB0 is atomic", "sha256:registry-b")
+
+    with pytest.raises(ValueError, match="frame registry version does not match"):
+        InteractionProjector(registry).compile(
+            task_id="registry-mismatch",
+            role=role,
+            frame=frame,
+            requested_object_ids=(item.object_id,),
+        )

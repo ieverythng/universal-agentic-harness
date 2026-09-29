@@ -1133,6 +1133,11 @@ Parent H0 implementation checkpoint (2026-07-13):
 This is a contract proof, not a live node integration. Existing node validators
 and runtime ownership remain authoritative until a later cooperative ablation.
 
+The 2026-09-28 common-ledger continuation supersedes the `trace.py` checkpoint.
+`LifecycleLedger` is now the single writable trace authority and derives a
+verified digest for accepted and best-effort-deficit traces. This historical
+list is retained to show the earlier baseline.
+
 #### Legacy bundle L1: Candidate and recovery Workbench
 
 Goal: use the current symbolic Workbench behind the parent H0 contracts.

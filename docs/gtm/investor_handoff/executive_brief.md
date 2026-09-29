@@ -116,21 +116,31 @@ The repository currently demonstrates:
 - frame-relative AB control bands and closed task projections;
 - semantic object versus implementation-binding separation;
 - candidate-binding quarantine and deterministic role/output gating;
-- owner-attested environment activation and deterministic task ingress;
+- content-addressed domain ingress/effect authority, normalized ingress
+  artifacts, and task-ingress decisions;
+- owner-attested environment activation, deterministic task ingress, and
+  ledger-authorized task starts;
 - distinct environment-run, task, trace, and lifecycle-event identities;
 - content-addressed TaskSpec compilation into one projection, obligation,
   prohibition, and budget artifact;
 - content-addressed TypedProposal normalization, UAH semantic admission, and
   independent domain execution-lease issuance or typed rejection;
+- exact lease-only environment execution with complete binding fingerprint
+  fencing, separate native result and normalized evidence artifacts;
+- one common lifecycle ledger with strict restart replay and deterministic
+  `VerifiedTraceDigest` construction for accepted and best-effort-deficit tasks,
+  including atomic commit framing for multi-event facts;
 - required versus best-effort task acceptance from owner-issued evidence;
-- append-only local task lifecycle persistence and model-free restart replay;
-- a ROS-free NAO canary with accepted, rejected, supporting-trace, and
-  counterexample behavior;
-- **144 passing tests** and enforced repository validation.
+- append-only common lifecycle persistence and model-free restart replay;
+- a ROS-free NAO canary with accepted lease execution, semantic no-dispatch
+  rejection, restart replay, and verified digest output;
+- **146 passing tests** and passing Ruff validation. Complete pre-commit,
+  generated-document, and clean-wheel gates are rerun before release.
 
-The proof does not yet include a complete live agent loop, lease-bound owner
-dispatch, a full common ledger, model allocation, H2 NAO planner parity, a
-Watson/Bonsai comparison, production deployment, or measured Workbench uplift.
+The proof does not yet include a complete rejection/cancellation/retry grammar,
+a live agent loop, model allocation, H2 NAO planner parity, a Watson/Bonsai
+comparison, runtime budget enforcement, production deployment, or measured
+Workbench uplift.
 
 ## Commercial hypothesis
 
@@ -165,10 +175,10 @@ The investment case rests on four propositions that can be tested in sequence:
    recovery on held-out tasks without increasing unsafe actions or hiding
    uncertainty.
 
-The next value-inflection gates are lease-bound owner dispatch, a complete
-synthetic lifecycle replay, H2 NAO planner parity, and one non-NAO adapter using
-the unchanged kernel. These gates convert the project from a coherent contract
-proof into a repeatable product claim.
+The next value-inflection gates are complete failure lifecycle replay, H1 agent
+and provider runtime, H2 NAO planner parity, and one non-NAO adapter using the
+unchanged kernel. These gates convert the project from a coherent contract proof
+into a repeatable product claim.
 
 ## Diligence position
 
