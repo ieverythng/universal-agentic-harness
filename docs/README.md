@@ -45,6 +45,9 @@ and must be regenerated after canonical edits.
 - `research/jev_system_one_uah_research.md`: Jev and RLCD source review,
   local decision-model alternatives, UAH integration boundaries, hardware and
   schema-scaling analysis, and the proposed H3 shadow experiment.
+- `research/uah_h0_h1_seam_deepening.md`: lifecycle and task-ingress findings,
+  compared interface designs, the typed failure and operation-edge proposal,
+  and the UAH guardrails and future onboarding-skill boundary.
 
 ## Repository Relationship
 

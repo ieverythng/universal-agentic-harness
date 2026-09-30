@@ -782,6 +782,16 @@ semantic and domain rejection, stale evidence, timeout, cancellation, and retry
 exhaustion still need explicit artifacts and deterministic terminal or
 resumable transitions before the H2 cooperative planner proof.
 
+The follow-up architecture research is recorded in
+`../research/uah_h0_h1_seam_deepening.md`. It compares three interface shapes
+and recommends retaining the deep ledger interface, replacing the private
+task-start callback with one public task-ingress authority, freezing
+`OperationEdge`, and implementing failure families as TDD vertical slices. The
+repo-local `.codex/skills/uah-guardrails` skill now routes implementation and
+review work through the applicable authority, evidence, release, and validation
+checks. Domain onboarding remains a separate future skill because it authors
+and qualifies domain contracts rather than reviewing ordinary changes.
+
 ## Verification dashboard
 
 | Command | Result |
