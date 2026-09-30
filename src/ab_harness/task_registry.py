@@ -74,11 +74,40 @@ class EnvironmentTaskRegistry:
         self.ledger = ledger or LifecycleLedger()
         self._lineage_by_ingress: dict[tuple[str, str], TaskLineage] = {}
         self._lineage_by_task: dict[tuple[str, str], TaskLineage] = {}
-        self._rebuild_projection()
+        self._refresh_projection()
 
     def _record_policy_start(self, lineage: TaskLineage) -> None:
         """Record a start already classified by the frozen ingress policy."""
 
+        self._refresh_projection()
+        self._reject_existing_start(lineage)
+        try:
+            self.ledger.record(
+                TaskStartedFact(
+                    environment_run_id=lineage.environment_run_id,
+                    task_id=lineage.task_id,
+                    trace_id=lineage.trace_id,
+                    environment_ingress_id=lineage.starting_environment_ingress_id,
+                    ingress_artifact_id=lineage.starting_ingress_artifact_id,
+                    decision_id=lineage.starting_decision_id,
+                    domain_contract_pack_revision=(
+                        lineage.domain_contract_pack_revision
+                    ),
+                )
+            )
+        except ValueError:
+            self._refresh_projection()
+            self._reject_existing_start(lineage)
+            raise
+        ingress_key = (
+            lineage.environment_run_id,
+            lineage.starting_environment_ingress_id,
+        )
+        task_key = (lineage.environment_run_id, lineage.task_id)
+        self._lineage_by_ingress[ingress_key] = lineage
+        self._lineage_by_task[task_key] = lineage
+
+    def _reject_existing_start(self, lineage: TaskLineage) -> None:
         ingress_key = (
             lineage.environment_run_id,
             lineage.starting_environment_ingress_id,
@@ -90,19 +119,6 @@ class EnvironmentTaskRegistry:
         existing = self._lineage_by_task.get(task_key)
         if existing is not None:
             raise TaskAlreadyRegisteredError(existing)
-        self.ledger.record(
-            TaskStartedFact(
-                environment_run_id=lineage.environment_run_id,
-                task_id=lineage.task_id,
-                trace_id=lineage.trace_id,
-                environment_ingress_id=lineage.starting_environment_ingress_id,
-                ingress_artifact_id=lineage.starting_ingress_artifact_id,
-                decision_id=lineage.starting_decision_id,
-                domain_contract_pack_revision=(lineage.domain_contract_pack_revision),
-            )
-        )
-        self._lineage_by_ingress[ingress_key] = lineage
-        self._lineage_by_task[task_key] = lineage
 
     def register_existing_ingress(
         self,
@@ -116,6 +132,7 @@ class EnvironmentTaskRegistry:
         trace_id: str,
         ingress_action: str,
     ) -> TaskLineage:
+        self._refresh_projection()
         ingress_key = (environment_run_id, environment_ingress_id)
         existing = self._lineage_by_ingress.get(ingress_key)
         if existing is not None:
@@ -160,6 +177,7 @@ class EnvironmentTaskRegistry:
     ) -> TaskLineage:
         """Return the recorded start lineage or reject caller-authored authority."""
 
+        self._refresh_projection()
         lineage = self._lineage_by_ingress.get(
             (environment_run_id, environment_ingress_id)
         )
@@ -177,7 +195,9 @@ class EnvironmentTaskRegistry:
             raise ValueError("task-start ingress lineage does not match decision")
         return lineage
 
-    def _rebuild_projection(self) -> None:
+    def _refresh_projection(self) -> None:
+        self._lineage_by_ingress.clear()
+        self._lineage_by_task.clear()
         for event in self.ledger.events():
             if event.event_type == "task_started":
                 ingress_id = str(event.data["environment_ingress_id"])

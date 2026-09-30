@@ -791,6 +791,45 @@ def test_environment_owner_consumes_a_lease_when_native_execution_fails():
     assert calls == [{"label": "cup"}]
 
 
+def test_environment_owner_records_receipt_validation_failure():
+    compiled, catalog, environment_run = _admission_fixture()
+    proposal = _proposal(compiled, operation_id="operation:invalid-receipt")
+    semantic = SemanticAdmission(
+        catalog=catalog,
+        environment_id="nao_fake",
+        runtime_mode="fake",
+    ).admit(compiled, proposal)
+    assert semantic.admitted_operation is not None
+    ledger = _ledger_for_admission(compiled, proposal, semantic.admitted_operation)
+    lease = DomainLifecycleAdmission(
+        environment_run=environment_run,
+        environment_id="nao_fake",
+        lifecycle_ledger=ledger,
+    ).request_execution(semantic.admitted_operation).execution_lease
+    assert lease is not None
+    owner = InProcessEnvironmentOwner(
+        environment_id="nao_fake",
+        environment_run=environment_run,
+        catalog=catalog,
+        lifecycle_ledger=ledger,
+        handlers={
+            "fake_nao.skills:find_object": lambda _arguments: OwnerExecutionResult(
+                evidence_ref="fake-nao://evidence/invalid-receipt",
+                succeeded=True,
+                observed_effects=("fresh detector-backed result returned",),
+                payload={"confidence": float("nan")},
+            )
+        },
+    )
+
+    with pytest.raises(ValueError, match="finite JSON"):
+        owner.execute(lease)
+
+    assert tuple(event.event_type for event in ledger.replay(compiled.trace_id).events)[
+        -2:
+    ] == ("execution_started", "execution_failed")
+
+
 def test_environment_owner_consumes_a_lease_once_across_ledger_instances(tmp_path):
     compiled, catalog, environment_run = _admission_fixture()
     path = tmp_path / "contended-lifecycle.jsonl"

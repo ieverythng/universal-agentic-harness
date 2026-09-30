@@ -10,6 +10,7 @@ from ab_harness import EnvironmentProfileRegistry
 from ab_harness import EnvironmentRunAttestation
 from ab_harness import EnvironmentRunRegistry
 from ab_harness import EnvironmentTaskRegistry
+from ab_harness import LifecycleLedger
 from ab_harness import TaskIngressPolicy
 from ab_harness import TaskIngressRule
 from ab_harness import TaskIngressDecision
@@ -259,6 +260,50 @@ def test_replayed_start_ingress_is_rejected_with_its_registered_lineage():
     assert replay.reason_code == "duplicate_environment_ingress"
     assert replay.task_id == first.task_id
     assert replay.trace_id == first.trace_id
+
+
+def test_duplicate_start_is_rejected_across_stale_registry_instances(tmp_path):
+    environment_run = _active_environment_run()
+    path = tmp_path / "shared-lifecycle.jsonl"
+    first_registry = EnvironmentTaskRegistry(LifecycleLedger(path))
+    stale_registry = EnvironmentTaskRegistry(LifecycleLedger(path))
+    first_policy = TaskIngressPolicy(
+        environment_profile_id="environment-profile:synthetic:v1",
+        domain_contract_pack=DOMAIN_PACK,
+        task_registry=first_registry,
+    )
+    stale_policy = TaskIngressPolicy(
+        environment_profile_id="environment-profile:synthetic:v1",
+        domain_contract_pack=DOMAIN_PACK,
+        task_registry=stale_registry,
+    )
+    ingress = EnvironmentIngress(
+        environment_ingress_id="environment-ingress:synthetic:shared-start",
+        environment_run_id=environment_run.environment_run_id,
+        binding_id="binding:synthetic.request:v1",
+        ingress_type="user_request",
+        payload_artifact_id="artifact:sha256:shared-start",
+        native_lineage=(("goal_id", "goal:shared-start"),),
+        observed_at="2026-09-13T10:00:00Z",
+    )
+
+    first = first_policy.classify(environment_run, ingress)
+    duplicate = stale_policy.classify(environment_run, ingress)
+
+    assert first.action == "start_task"
+    assert duplicate.action == "reject"
+    assert duplicate.reason_code == "duplicate_environment_ingress"
+    assert duplicate.task_id == first.task_id
+    assert duplicate.trace_id == first.trace_id
+    assert EnvironmentTaskRegistry(LifecycleLedger(path)).require_start(
+        environment_run_id=first.environment_run_id,
+        environment_ingress_id=first.environment_ingress_id,
+        ingress_artifact_id=first.environment_ingress_artifact_id,
+        decision_id=first.decision_id,
+        domain_contract_pack_revision=first.domain_contract_pack_revision,
+        task_id=first.task_id,
+        trace_id=first.trace_id,
+    ).starting_decision_id == first.decision_id
 
 
 def test_second_start_for_a_registered_domain_task_is_rejected():

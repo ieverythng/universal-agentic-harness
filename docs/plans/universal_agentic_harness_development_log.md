@@ -766,8 +766,12 @@ The pass also closed four narrower consistency gaps:
 
 - resume and notify events retain the exact ingress artifact, decision, and
   DomainContractPack revision through restart;
+- stale task-registry projections reload before admitting start or existing-task
+  ingress, while replay rejects a second `task_started` fact on one trace;
 - a valid pre-dispatch `suspended` acceptance can be recorded without inventing
   an execution lease;
+- owner-result normalization and receipt construction failures record
+  `execution_failed` after the durable execution start and before propagation;
 - registry snapshots reject duplicate object identities and projection rejects
   a frame from another registry revision;
 - replay rejects event types outside the implemented lifecycle grammar.

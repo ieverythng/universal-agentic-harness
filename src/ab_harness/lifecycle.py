@@ -1074,6 +1074,8 @@ def _reduce_events(
                 or event.task_id != state.task_id
             ):
                 raise ValueError("lifecycle event lineage does not match trace")
+            if event.event_type == "task_started":
+                raise ValueError("trace already has a task start")
             if event.parent_event_id != state.last_event_id:
                 raise ValueError("trace parent event does not match causal tail")
             if state.terminal_status is not None:

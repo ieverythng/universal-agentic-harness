@@ -548,7 +548,9 @@ rejects a crash-truncated multi-event commit; automatic repair is not claimed.
 
 Resume and notify facts now retain the exact ingress artifact, decision, and
 DomainContractPack revision. Pre-dispatch suspension is representable without
-an invented lease. Registry snapshots reject duplicate object identity, frame
-projection rejects registry-revision mismatch, and replay rejects unknown event
-types. Typed counterexample and cancellation grammar remains the next H0/H1
-decision.
+an invented lease. Stale task-registry projections reload before start and
+existing-task admission, and replay rejects a second start on one trace.
+Receipt construction failures record `execution_failed` before they propagate.
+Registry snapshots reject duplicate object identity, frame projection rejects
+registry-revision mismatch, and replay rejects unknown event types. Typed
+counterexample and cancellation grammar remains the next H0/H1 decision.

@@ -394,13 +394,13 @@ class InProcessEnvironmentOwner:
                 handler=handler,
                 arguments=admitted.arguments,
             )
+            receipt = ExecutionReceipt.issue(
+                lease=lease,
+                owner_result=owner_result,
+                evidence=evidence,
+            )
         except Exception as exc:
             self._lifecycle_ledger.fail_execution(lease, exc)
             raise
-        receipt = ExecutionReceipt.issue(
-            lease=lease,
-            owner_result=owner_result,
-            evidence=evidence,
-        )
         self._lifecycle_ledger.complete_execution(receipt)
         return receipt
