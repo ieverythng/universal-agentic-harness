@@ -150,3 +150,30 @@ def test_common_ledger_rejects_an_unknown_event_type(tmp_path):
 
     with pytest.raises(ValueError, match="unsupported lifecycle event type"):
         LifecycleLedger(path)
+
+
+def test_common_ledger_fences_existing_task_ingress_across_stale_writers(tmp_path):
+    path = tmp_path / "contended-ingress.jsonl"
+    _ledger(path)
+    first = LifecycleLedger(path, clock=lambda: "2026-09-28T13:00:01Z")
+    stale = LifecycleLedger(path, clock=lambda: "2026-09-28T13:00:02Z")
+    fact = TaskIngressFact(
+        environment_run_id="environment-run:ledger:001",
+        task_id="task:ledger:001",
+        trace_id="trace:ledger:001",
+        environment_ingress_id="ingress:ledger:contended",
+        ingress_artifact_id="environment-ingress:sha256:ledger-contended",
+        decision_id="task-ingress-decision:sha256:ledger-contended",
+        domain_contract_pack_revision=DOMAIN_REVISION,
+        action="resume_task",
+    )
+
+    first.record(fact)
+    with pytest.raises(ValueError, match="duplicate task ingress"):
+        stale.record(fact)
+
+    assert tuple(
+        event.data.get("environment_ingress_id")
+        for event in LifecycleLedger(path).events()
+        if event.event_type in {"task_started", "task_resumed", "task_notified"}
+    ).count(fact.environment_ingress_id) == 1

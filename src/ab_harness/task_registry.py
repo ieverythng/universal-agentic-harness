@@ -149,18 +149,24 @@ class EnvironmentTaskRegistry:
             raise ValueError("existing-task ingress trace does not match lineage")
         if lineage.domain_contract_pack_revision != domain_contract_pack_revision:
             raise ValueError("existing-task ingress contract revision does not match")
-        self.ledger.record(
-            TaskIngressFact(
-                environment_run_id=environment_run_id,
-                task_id=task_id,
-                trace_id=lineage.trace_id,
-                environment_ingress_id=environment_ingress_id,
-                ingress_artifact_id=ingress_artifact_id,
-                decision_id=decision_id,
-                domain_contract_pack_revision=domain_contract_pack_revision,
-                action=ingress_action,
-            )
+        fact = TaskIngressFact(
+            environment_run_id=environment_run_id,
+            task_id=task_id,
+            trace_id=lineage.trace_id,
+            environment_ingress_id=environment_ingress_id,
+            ingress_artifact_id=ingress_artifact_id,
+            decision_id=decision_id,
+            domain_contract_pack_revision=domain_contract_pack_revision,
+            action=ingress_action,
         )
+        try:
+            self.ledger.record(fact)
+        except ValueError:
+            self._refresh_projection()
+            existing = self._lineage_by_ingress.get(ingress_key)
+            if existing is not None:
+                raise DuplicateEnvironmentIngressError(existing) from None
+            raise
         self._lineage_by_ingress[ingress_key] = lineage
         return lineage
 

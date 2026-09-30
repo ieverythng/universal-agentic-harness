@@ -1041,6 +1041,7 @@ def _reduce_events(
     _validate_commit_frames(events)
     states: dict[str, _TraceState] = {}
     known_event_ids: set[str] = set()
+    known_task_ingress: set[tuple[str, str]] = set()
     for index, event in enumerate(events, start=1):
         if require_global_sequence and event.sequence != index:
             raise ValueError("lifecycle event sequence is not contiguous")
@@ -1051,6 +1052,14 @@ def _reduce_events(
             and event.parent_event_id not in known_event_ids
         ):
             raise ValueError("lifecycle parent event is not available")
+        if event.event_type in {"task_started", "task_resumed", "task_notified"}:
+            ingress_id = event.data.get("environment_ingress_id")
+            if not isinstance(ingress_id, str) or not ingress_id.strip():
+                raise ValueError("task ingress event requires an ingress id")
+            ingress_key = (event.environment_run_id, ingress_id)
+            if ingress_key in known_task_ingress:
+                raise ValueError("duplicate task ingress in lifecycle ledger")
+            known_task_ingress.add(ingress_key)
         state = states.get(event.trace_id)
         if state is None:
             if event.event_type != "task_started":
