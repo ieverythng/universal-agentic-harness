@@ -1,6 +1,6 @@
 # UAH and NeuralWorkbench GTM and Investment Case
 
-**Prepared:** 2026-09-30
+**Prepared:** 2026-09-28
 
 **Scope:** commercialization hypotheses, customer sequence, packaging,
 milestones, metrics, use of capital, and diligence disclosures

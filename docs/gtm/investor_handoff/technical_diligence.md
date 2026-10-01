@@ -1,6 +1,6 @@
 # UAH and NeuralWorkbench Technical Diligence
 
-**Prepared:** 2026-09-30
+**Prepared:** 2026-09-28
 
 **Scope:** product architecture, implementation evidence, authority boundaries,
 NeuralWorkbench design, portability, security posture, and open engineering risk
@@ -335,7 +335,7 @@ responsibility.
 
 ## 10. Implementation status
 
-| Capability | State on 2026-09-30 | Evidence or gap |
+| Capability | State on 2026-09-28 | Evidence or gap |
 | --- | --- | --- |
 | Portable semantic kernel | Implemented H0 proof | Core has no ROS, NAO, provider SDK, or runtime-product imports |
 | Registry projection and output gate | Implemented | Closed object projection, AB band checks, role/output reach, effect-claim rejection |
