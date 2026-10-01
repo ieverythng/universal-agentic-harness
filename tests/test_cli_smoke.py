@@ -4,7 +4,7 @@ from ab_harness_nao.cli import main
 from ab_harness_nao.smoke import run_smoke
 
 
-def test_smoke_runs_accept_reject_and_workbench_canaries():
+def test_smoke_runs_accept_reject_and_replay_canaries():
     report = run_smoke()
 
     assert report["status"] == "passed"
@@ -14,12 +14,13 @@ def test_smoke_runs_accept_reject_and_workbench_canaries():
     assert report["checks"] == {
         "accepted_path": True,
         "rejected_path": True,
-        "workbench_support_retrieved": True,
-        "workbench_counterexample_retrieved": True,
+        "verified_trace_digest": True,
     }
     assert report["accepted_case"]["evidence_owner"] == "object_finder"
-    assert report["rejected_case"]["failure_stage"] == "planner_gate"
-    assert report["workbench_candidate"]["status"] == "candidate"
+    assert report["rejected_case"]["failure_stage"] == "semantic_admission"
+    assert report["verified_trace_digest"].startswith(
+        "verified-trace-digest:sha256:"
+    )
 
 
 def test_module_cli_prints_machine_readable_smoke_report(capsys):

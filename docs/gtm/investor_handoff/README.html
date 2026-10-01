@@ -270,10 +270,9 @@
 <h2>Current evidence in one page</h2>
 <p>As of 2026-09-28:</p>
 <ul>
-<li>the portable kernel and NAO compatibility package pass <strong>144 tests</strong>;</li>
-<li>repository pre-commit checks, Ruff, source-aware tests, and generated-document synchronization pass;</li>
-<li>H0 implements task projection, deterministic gates, binding quarantine, environment registration, task and trace lineage, TaskSpec compilation, two-stage operation admission, task acceptance, and local lifecycle restart replay;</li>
-<li>the deterministic NAO adapter canary covers accepted and rejected paths plus supporting and counterexample trace retrieval;</li>
+<li>the portable kernel and NAO compatibility package pass <strong>146 tests</strong>, and the latest Ruff validation passes; the complete pre-commit, document-render, and clean-wheel gates are rerun before distributing a refreshed package;</li>
+<li>H0 implements task projection, deterministic gates, binding quarantine, content-addressed domain rules, normalized ingress, and classification decisions, ledger-authorized task starts, environment registration, task and trace lineage, TaskSpec compilation, two-stage operation admission, exact lease-only execution, task acceptance, atomic commit-framed restart replay, and verified trace digests;</li>
+<li>the deterministic NAO adapter canary covers accepted lease execution, semantic no-dispatch rejection, restart replay, and verified digest output;</li>
 <li>H1 does not yet provide a complete live model and agent lifecycle;</li>
 <li>H2 NAO planner parity has not yet been demonstrated;</li>
 <li>the Watson/Bonsai model comparison has not started;</li>

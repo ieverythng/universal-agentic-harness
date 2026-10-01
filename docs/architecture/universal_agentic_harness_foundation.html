@@ -337,6 +337,7 @@ Phi   = measured capability profile</code></pre>
 </div>
 <p><code>AgentRoleConfiguration</code> is model-independent. Changing the role, model, prompt pack, or harness build creates a new <code>agent_id</code>. Restarting the same immutable agent creates only a new <code>agent_run_id</code>. A stable <code>agent_handle_id</code>, such as <code>watson.system.primary</code>, may be rebound to a newly qualified agent while preserving every prior immutable handle revision.</p>
 <p>Canonical handles use <code>&lt;domain&gt;.&lt;role&gt;.&lt;slot&gt;</code>, for example <code>watson.system.primary</code>, <code>nao.chatbot.primary</code>, <code>nao.planner.primary</code>, and <code>itrader.proposer.primary</code>. The <code>agent_id</code> is the handle&#x27;s immutable embodiment for one revision. An <code>agent_run_id</code> is an activation of that embodiment bound to exactly one <code>environment_run_id</code>. Agent and handle registration remain reusable across environment activations.</p>
+<p>This is the target identity spine. The current code implements environment profile/run, content-addressed ingress, task, trace, operation, proposal, admission, lease, result, evidence, and event identities plus a monolithic <code>ConfigurationIdentity</code>. <code>AgentRoleConfiguration</code>, agent and handle registries, <code>AgentRun</code>, model allocation, and invocation identities remain H1/H2 contracts rather than executable registries.</p>
 <h3>Hardware-aware model allocation spine</h3>
 <p>Logical agent identity and model placement are orthogonal. UAH schedules an agent&#x27;s fixed <code>ModelConfiguration</code> onto a compatible runtime from a provider pool, records the reservation as a model lease, and identifies every prompt-to-output call separately.</p>
 <div class="diagram uah-flow-diagram">
@@ -410,7 +411,7 @@ agent_run_id + trace_id + model_lease_id
         <path d="M 0 0 L 10 5 L 0 10 z" fill="#9aa8bd"></path>
       </marker>
     </defs>
-    <g font-family="Inter, Liberation Sans, Arial, sans-serif"><path d="M 238.3 106.0 C 238.3 137.0, 715.0 137.0, 715.0 168.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><path d="M 476.7 106.0 C 476.7 137.0, 715.0 137.0, 715.0 168.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><path d="M 715.0 106.0 C 715.0 137.0, 715.0 137.0, 715.0 168.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><path d="M 953.3 106.0 C 953.3 137.0, 715.0 137.0, 715.0 168.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><path d="M 1191.7 106.0 C 1191.7 137.0, 715.0 137.0, 715.0 168.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><path d="M 715.0 244.0 C 715.0 275.0, 715.0 275.0, 715.0 306.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><path d="M 715.0 382.0 C 715.0 413.0, 715.0 413.0, 715.0 444.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><path d="M 715.0 520.0 C 715.0 551.0, 715.0 551.0, 715.0 582.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><path d="M 715.0 658.0 C 715.0 689.0, 715.0 689.0, 715.0 720.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><rect x="126.3" y="30.0" width="224" height="76" rx="15" fill="#e5f5f2" stroke="#168778" stroke-width="2" /><text x="238.3" y="68.0" text-anchor="middle" font-size="13" fill="#172033"><tspan x="238.3" y="59.0" font-weight="700">TaskContract</tspan><tspan x="238.3" y="79.0" font-weight="500">goal + effects + budgets</tspan></text><rect x="364.7" y="30.0" width="224" height="76" rx="15" fill="#e5f5f2" stroke="#168778" stroke-width="2" /><text x="476.7" y="68.0" text-anchor="middle" font-size="12" fill="#172033"><tspan x="476.7" y="59.0" font-weight="700">DomainContractPack</tspan><tspan x="476.7" y="79.0" font-weight="500">frames + objects + binding policy</tspan></text><rect x="603.0" y="30.0" width="224" height="76" rx="15" fill="#e8edff" stroke="#5268d8" stroke-width="2" /><text x="715.0" y="68.0" text-anchor="middle" font-size="13" fill="#172033"><tspan x="715.0" y="59.0" font-weight="700">PrimaryFramePolicy</tspan><tspan x="715.0" y="79.0" font-weight="500">default semantics + routing</tspan></text><rect x="841.3" y="30.0" width="224" height="76" rx="15" fill="#e8edff" stroke="#5268d8" stroke-width="2" /><text x="953.3" y="68.0" text-anchor="middle" font-size="13" fill="#172033"><tspan x="953.3" y="59.0" font-weight="700">AuxiliaryFrameAllowlists</tspan><tspan x="953.3" y="79.0" font-weight="500">broad role-level catalog</tspan></text><rect x="1079.7" y="30.0" width="224" height="76" rx="15" fill="#e8f2ff" stroke="#2879c7" stroke-width="2" /><text x="1191.7" y="68.0" text-anchor="middle" font-size="12" fill="#172033"><tspan x="1191.7" y="59.0" font-weight="700">CurrentState</tspan><tspan x="1191.7" y="79.0" font-weight="500">fresh domain context + lineage</tspan></text><rect x="603.0" y="168.0" width="224" height="76" rx="15" fill="#e9f6e7" stroke="#3d8b4e" stroke-width="2" /><text x="715.0" y="206.0" text-anchor="middle" font-size="13" fill="#172033"><tspan x="715.0" y="197.0" font-weight="700">InteractionModuleCompiler</tspan><tspan x="715.0" y="217.0" font-weight="500">closed task AB projection</tspan></text><rect x="603.0" y="306.0" width="224" height="76" rx="15" fill="#e8f2ff" stroke="#2879c7" stroke-width="2" /><text x="715.0" y="344.0" text-anchor="middle" font-size="12" fill="#172033"><tspan x="715.0" y="335.0" font-weight="700">InteractionModuleSpec</tspan><tspan x="715.0" y="355.0" font-weight="500">objects + permissions + evidence closure</tspan></text><rect x="603.0" y="444.0" width="224" height="76" rx="15" fill="#e9f6e7" stroke="#3d8b4e" stroke-width="2" /><text x="715.0" y="482.0" text-anchor="middle" font-size="12" fill="#172033"><tspan x="715.0" y="473.0" font-weight="700">PromptCompiler</tspan><tspan x="715.0" y="493.0" font-weight="500">kernel + role + domain + task</tspan></text><rect x="603.0" y="582.0" width="224" height="76" rx="15" fill="#f0eaff" stroke="#7657b8" stroke-width="2" /><text x="715.0" y="620.0" text-anchor="middle" font-size="15" fill="#172033"><tspan x="715.0" y="611.0" font-weight="700">ModelAdapter</tspan><tspan x="715.0" y="631.0" font-weight="500">local or remote LLM</tspan></text><rect x="603.0" y="720.0" width="224" height="76" rx="15" fill="#f5ecff" stroke="#8b5bb7" stroke-width="2" /><text x="715.0" y="758.0" text-anchor="middle" font-size="13" fill="#172033"><tspan x="715.0" y="749.0" font-weight="700">TypedProposal</tspan><tspan x="715.0" y="769.0" font-weight="500">zero execution authority</tspan></text></g>
+    <g font-family="Inter, Liberation Sans, Arial, sans-serif"><path d="M 238.3 106.0 C 238.3 137.0, 715.0 137.0, 715.0 168.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><path d="M 476.7 106.0 C 476.7 137.0, 715.0 137.0, 715.0 168.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><path d="M 715.0 106.0 C 715.0 137.0, 715.0 137.0, 715.0 168.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><path d="M 953.3 106.0 C 953.3 137.0, 715.0 137.0, 715.0 168.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><path d="M 1191.7 106.0 C 1191.7 137.0, 715.0 137.0, 715.0 168.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><path d="M 715.0 244.0 C 715.0 275.0, 715.0 275.0, 715.0 306.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><path d="M 715.0 382.0 C 715.0 413.0, 715.0 413.0, 715.0 444.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><path d="M 715.0 520.0 C 715.0 551.0, 715.0 551.0, 715.0 582.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><path d="M 715.0 658.0 C 715.0 689.0, 715.0 689.0, 715.0 720.0" fill="none" stroke="#9aa8bd" stroke-width="2" marker-end="url(#uah-arrow)" /><rect x="126.3" y="30.0" width="224" height="76" rx="15" fill="#e5f5f2" stroke="#168778" stroke-width="2" /><text x="238.3" y="68.0" text-anchor="middle" font-size="13" fill="#172033"><tspan x="238.3" y="59.0" font-weight="700">TaskContract</tspan><tspan x="238.3" y="79.0" font-weight="500">goal + effects + budgets</tspan></text><rect x="364.7" y="30.0" width="224" height="76" rx="15" fill="#e5f5f2" stroke="#168778" stroke-width="2" /><text x="476.7" y="68.0" text-anchor="middle" font-size="13" fill="#172033"><tspan x="476.7" y="59.0" font-weight="700">DomainContractPack v1</tspan><tspan x="476.7" y="79.0" font-weight="500">ingress + effect authority</tspan></text><rect x="603.0" y="30.0" width="224" height="76" rx="15" fill="#e8edff" stroke="#5268d8" stroke-width="2" /><text x="715.0" y="68.0" text-anchor="middle" font-size="13" fill="#172033"><tspan x="715.0" y="59.0" font-weight="700">PrimaryFramePolicy</tspan><tspan x="715.0" y="79.0" font-weight="500">default semantics + routing</tspan></text><rect x="841.3" y="30.0" width="224" height="76" rx="15" fill="#e8edff" stroke="#5268d8" stroke-width="2" /><text x="953.3" y="68.0" text-anchor="middle" font-size="13" fill="#172033"><tspan x="953.3" y="59.0" font-weight="700">AuxiliaryFrameAllowlists</tspan><tspan x="953.3" y="79.0" font-weight="500">broad role-level catalog</tspan></text><rect x="1079.7" y="30.0" width="224" height="76" rx="15" fill="#e8f2ff" stroke="#2879c7" stroke-width="2" /><text x="1191.7" y="68.0" text-anchor="middle" font-size="12" fill="#172033"><tspan x="1191.7" y="59.0" font-weight="700">CurrentState</tspan><tspan x="1191.7" y="79.0" font-weight="500">fresh domain context + lineage</tspan></text><rect x="603.0" y="168.0" width="224" height="76" rx="15" fill="#e9f6e7" stroke="#3d8b4e" stroke-width="2" /><text x="715.0" y="206.0" text-anchor="middle" font-size="13" fill="#172033"><tspan x="715.0" y="197.0" font-weight="700">InteractionModuleCompiler</tspan><tspan x="715.0" y="217.0" font-weight="500">closed task AB projection</tspan></text><rect x="603.0" y="306.0" width="224" height="76" rx="15" fill="#e8f2ff" stroke="#2879c7" stroke-width="2" /><text x="715.0" y="344.0" text-anchor="middle" font-size="12" fill="#172033"><tspan x="715.0" y="335.0" font-weight="700">InteractionModuleSpec</tspan><tspan x="715.0" y="355.0" font-weight="500">objects + permissions + evidence closure</tspan></text><rect x="603.0" y="444.0" width="224" height="76" rx="15" fill="#e9f6e7" stroke="#3d8b4e" stroke-width="2" /><text x="715.0" y="482.0" text-anchor="middle" font-size="12" fill="#172033"><tspan x="715.0" y="473.0" font-weight="700">PromptCompiler (planned)</tspan><tspan x="715.0" y="493.0" font-weight="500">kernel + role + domain + task</tspan></text><rect x="603.0" y="582.0" width="224" height="76" rx="15" fill="#f0eaff" stroke="#7657b8" stroke-width="2" /><text x="715.0" y="620.0" text-anchor="middle" font-size="15" fill="#172033"><tspan x="715.0" y="611.0" font-weight="700">ModelAdapter</tspan><tspan x="715.0" y="631.0" font-weight="500">local or remote LLM</tspan></text><rect x="603.0" y="720.0" width="224" height="76" rx="15" fill="#f5ecff" stroke="#8b5bb7" stroke-width="2" /><text x="715.0" y="758.0" text-anchor="middle" font-size="13" fill="#172033"><tspan x="715.0" y="749.0" font-weight="700">TypedProposal</tspan><tspan x="715.0" y="769.0" font-weight="500">zero execution authority</tspan></text></g>
   </svg>
   <div class="caption">Figure 2. Role-authorized frames compiled into one task projection</div>
 </div>
@@ -427,10 +428,10 @@ agent_run_id + trace_id + model_lease_id
   </svg>
   <div class="caption">Figure 3. Semantic admission before domain lifecycle authority</div>
 </div>
-<p>The proposal has no authority. UAH semantic admission validates the frame-relative object, role reach, canonical arguments, approved binding, and evidence obligations. The environment owner then applies native readiness, duplicate suppression, concurrency, cancellation, supersession, and stale version checks before granting an <code>ExecutionLease</code>. The owner executes the immutable admitted value, not a reparsed copy of raw model output.</p>
-<p>The implemented H0 slice now covers one-operation proposal normalization and both decisions. <code>ProposalNormalizer</code> binds canonical finite-JSON arguments to the raw-output artifact, compiled task, environment run, task, trace, and operation. <code>SemanticAdmission</code> checks role output ownership, projection reach, direct-control band, runtime callability, prohibited effects, approved binding, binding owner/environment/runtime, schema-reference presence, and obligation lineage before emitting a content-addressed <code>AdmittedOperation</code>. <code>DomainLifecycleAdmission</code> independently rechecks activation, domain revision, binding environment, readiness attestation, and duplicate operation before issuing a content-addressed, operation-scoped <code>ExecutionLease</code>. Native concurrency, cancellation, supersession, version fencing, payload-schema evaluation, ledger persistence, and owner dispatch remain open.</p>
+<p>The proposal has no authority. UAH semantic admission validates the frame-relative object, role reach, finite canonical JSON arguments, approved binding, and evidence obligations. The current domain gate applies native readiness, duplicate suppression, environment, attestation, pack-revision, and binding checks before granting an <code>ExecutionLease</code>. Concurrency, cancellation, supersession, expiry, and runtime argument-schema validation remain planned. The owner executes the immutable admitted value, not a reparsed copy of raw model output.</p>
+<p>The implemented H0 slice now covers one-operation proposal normalization and both decisions. <code>ProposalNormalizer</code> binds canonical finite-JSON arguments to the raw-output artifact, compiled task, environment run, task, trace, and operation. <code>SemanticAdmission</code> checks role output ownership, projection reach, direct-control band, runtime callability, prohibited effects, approved binding, binding owner/environment/runtime, schema-reference presence, and obligation lineage before emitting a content-addressed <code>AdmittedOperation</code>. <code>DomainLifecycleAdmission</code> independently rechecks activation, domain revision, binding environment, readiness attestation, and duplicate operation before issuing a content-addressed, operation-scoped <code>ExecutionLease</code>. Native concurrency, cancellation, supersession, and payload-schema evaluation remain open. The implemented owner now accepts only the exact lease, fences the full binding fingerprint, records execution start before the handler, and preserves the native result separately from normalized evidence. The common ledger persists and replays the accepted chain into a deterministic trace digest.</p>
 <h3>Prompt compilation seam</h3>
-<p>The <code>PromptCompiler</code> renders one model-facing view from the same immutable <code>InteractionModuleSpec</code> consumed by semantic admission:</p>
+<p>The planned <code>PromptCompiler</code> will render one model-facing view from the same immutable <code>InteractionModuleSpec</code> consumed by semantic admission. It is not an executable module in the current repository:</p>
 <pre><code class="language-text">stable UAH protocol kernel
   + role contract from role_configuration_id
   + minimal versioned domain policy
@@ -671,8 +672,8 @@ ingress_type: user_request
 payload_artifact_id: artifact:sha256:...
 native_lineage: {goal_id: goal_123, request_id: request_123}
 observed_at: 2026-09-08T12:00:01Z</code></pre>
-<p>An environment profile is a reusable contract. An environment run is a single attested native activation. The environment owner mints the attestation after native preflight and UAH verifies it against the pinned profile and DomainContractPack. An ingress item is immutable input to deterministic task association. It is not automatically a task, prompt, or model invocation.</p>
-<p>For a reviewed <code>start_task</code> rule, <code>task_id_lineage_key</code> identifies the native lineage field that owns the domain task identity. UAH preserves that value and derives the initial trace as <code>sha256(&quot;uah-trace-v1&quot; NUL environment_run_id NUL task_id)</code>. This makes trace issuance deterministic and environment-scoped without replacing native goal or request identities. Resume and notification require a registered task lookup and reuse the original trace only within the same environment run. The current registry rejects duplicate starts and replayed task-bearing ingress. Acceptance-derived terminal judgments reject later ingress, while suspended judgments remain resumable. Content-addressed task events reconstruct these decisions through ordered model-free replay. The strict <code>uah.task_lifecycle_event/v1</code> subset is appended to canonical local JSONL and reconstructs the registry after process restart. This store is single-writer and task-scoped; it does not yet provide the global sequence, timestamps, parent links, or writer coordination of the common lifecycle ledger.</p>
+<p>An environment profile is a reusable frozen in-memory contract; it is not yet content-addressed or serializable. An environment run is a single attested native activation. The environment owner mints the attestation after native preflight and UAH verifies it against the pinned profile and DomainContractPack. The implemented <code>uah.domain_contract_pack/v1</code> derives its revision from the exact role/task allowlists, ingress rules, effect-evidence rules, failure policy, and prohibited effects. An ingress item is content-addressed input to deterministic task association. Its artifact identity is linked into the classification decision and task-start event. It is not automatically a task, prompt, or model invocation.</p>
+<p>For a reviewed <code>start_task</code> rule, <code>task_id_lineage_key</code> identifies the native lineage field that owns the domain task identity. UAH preserves that value and derives the initial trace as <code>sha256(&quot;uah-trace-v1&quot; NUL environment_run_id NUL task_id)</code>. This makes trace issuance deterministic and environment-scoped without replacing native goal or request identities. Resume and notification require a registered task lookup and reuse the original trace only within the same environment run. The current registry rejects duplicate starts and replayed task-bearing ingress. Acceptance-derived terminal judgments reject later ingress, while suspended judgments remain resumable. The task registry is a projection over the common <code>uah.trace_event/v1</code> ledger rather than a second event store. Global sequence, timestamps, causal parents, strict canonical JSONL, and model-free restart replay are implemented. Cooperating writers use an OS advisory lock and reload the stream before transition validation and append. The complete cancellation/failure grammar remains open. Each decision has a content-derived identity that includes the ingress artifact identity. Compilation also requires the exact start lineage to be present in the ledger, so constructing a matching decision value outside the ingress policy cannot grant task authority.</p>
 <h3>AgentRoleConfiguration</h3>
 <pre><code class="language-yaml">role_configuration_id: role:nao_planner:v1
 role_id: planner_llm
@@ -818,7 +819,7 @@ budgets:
   wall_time_sec: 90
   model_calls: 3
   tool_calls: 12</code></pre>
-<p>The implemented H0 compiler uses the narrower <code>uah.task_spec/v1</code> subset needed for the first executable proof. A successful start-task decision, task and trace lineage, role, frame, registry, budgets, and DomainContractPack revision produce one content-addressed <code>uah.compiled_task/v1</code> artifact. Effect requests carry requirement only; the reviewed domain pack supplies the AB object, evidence owner, and failure policy. The compiler rejects owner or observable drift, prohibited effects, revision mismatches, mutable collections, and resume-time recompilation. Prompt compilation and two-stage admission must consume this artifact rather than independently recreating projection or acceptance inputs.</p>
+<p>The implemented H0 compiler uses the narrower <code>uah.task_spec/v1</code> subset needed for the first executable proof. A successful start-task decision, task and trace lineage, role, frame, registry, budgets, and DomainContractPack revision produce one content-addressed <code>uah.compiled_task/v1</code> artifact. Effect requests carry requirement only; the reviewed domain pack supplies the AB object, evidence owner, and failure policy. The compiler rejects owner or observable drift, prohibited effects, revision mismatches, mutable collections, and resume-time recompilation. Two-stage admission already consumes this artifact. Future prompt compilation must consume it rather than independently recreating projection or acceptance inputs. The compiled budget values are declared limits only; runtime budget consumption and enforcement remain open.</p>
 <h3>InteractionModuleSpec</h3>
 <pre><code class="language-yaml">role_configuration_id: role:nao_planner:v1
 task_id: task_123
@@ -858,36 +859,27 @@ routing:
   require_same_output_schema: true</code></pre>
 <h3>TraceEvent</h3>
 <pre><code class="language-json">{
+  &quot;schema_version&quot;: &quot;uah.trace_event/v1&quot;,
+  &quot;event_id&quot;: &quot;trace-event:sha256:...&quot;,
+  &quot;sequence&quot;: 1,
+  &quot;commit_id&quot;: &quot;lifecycle-commit:sha256:...&quot;,
+  &quot;commit_index&quot;: 1,
+  &quot;commit_size&quot;: 1,
+  &quot;recorded_at&quot;: &quot;2026-09-28T12:00:00+00:00&quot;,
+  &quot;event_type&quot;: &quot;task_started&quot;,
   &quot;environment_run_id&quot;: &quot;environment-run:01J...&quot;,
-  &quot;environment_ingress_id&quot;: &quot;environment-ingress:01J...&quot;,
-  &quot;trace_id&quot;: &quot;trace_123&quot;,
-  &quot;operation_id&quot;: &quot;operation_find_123&quot;,
-  &quot;parent_operation_id&quot;: &quot;operation_goal_123&quot;,
-  &quot;operation_relation&quot;: &quot;decomposes_to&quot;,
-  &quot;role_configuration_id&quot;: &quot;role:nao_planner:v1&quot;,
-  &quot;agent_id&quot;: &quot;agent:nao_planner:qwen:v1&quot;,
-  &quot;agent_run_id&quot;: &quot;run:01J...&quot;,
-  &quot;domain_id&quot;: &quot;nao_ros4hri&quot;,
   &quot;task_id&quot;: &quot;task_123&quot;,
-  &quot;event_id&quot;: &quot;evt_009&quot;,
-  &quot;parent_event_id&quot;: &quot;evt_008&quot;,
-  &quot;stage&quot;: &quot;owner_evidence_issued&quot;,
-  &quot;frame_id&quot;: &quot;nao_runtime&quot;,
-  &quot;ab_object_id&quot;: &quot;find_object&quot;,
-  &quot;proposal_id&quot;: &quot;proposal_123&quot;,
-  &quot;admission_id&quot;: &quot;admission_123&quot;,
-  &quot;execution_lease_id&quot;: &quot;lease_123&quot;,
-  &quot;model_configuration_id&quot;: &quot;model:qwen_planner:q4:v3&quot;,
-  &quot;prompt_artifact_hash&quot;: &quot;sha256:...&quot;,
-  &quot;capability_projection_hash&quot;: &quot;sha256:...&quot;,
-  &quot;status&quot;: &quot;succeeded&quot;,
-  &quot;input_ref&quot;: &quot;artifact://...&quot;,
-  &quot;output_ref&quot;: &quot;artifact://...&quot;,
-  &quot;evidence&quot;: {&quot;entity_id&quot;: &quot;cup_1&quot;, &quot;captured_at_sec&quot;: 1783900000.0},
-  &quot;risk&quot;: {&quot;class&quot;: &quot;robot_motion&quot;, &quot;approved&quot;: true},
-  &quot;timing&quot;: {&quot;started_ms&quot;: 0, &quot;finished_ms&quot;: 1840}
+  &quot;trace_id&quot;: &quot;trace:sha256:...&quot;,
+  &quot;operation_id&quot;: null,
+  &quot;parent_event_id&quot;: null,
+  &quot;artifact_refs&quot;: [
+    &quot;environment-ingress:sha256:...&quot;,
+    &quot;task-ingress-decision:sha256:...&quot;,
+    &quot;sha256:...&quot;
+  ],
+  &quot;data_json&quot;: &quot;{\&quot;decision_id\&quot;:\&quot;task-ingress-decision:sha256:...\&quot;,\&quot;domain_contract_pack_revision\&quot;:\&quot;sha256:...\&quot;,\&quot;environment_ingress_id\&quot;:\&quot;environment-ingress:01J...\&quot;,\&quot;ingress_artifact_id\&quot;:\&quot;environment-ingress:sha256:...\&quot;}&quot;
 }</code></pre>
-<p>Every event identifies the actor through <code>agent_run_id</code>. A cross-agent causal workflow keeps one <code>trace_id</code>; actor-specific and environment-specific views are projections over the ledger. <code>operation_relation</code> records <code>decomposes_to</code>, <code>delegates_to</code>, <code>continues_with</code>, or another governed edge type. Terminal task judgment is a separate event derived from the declared effect obligations and owner-issued evidence.</p>
+<p>This is the implemented H0 envelope. <code>data_json</code> is a canonical JSON object, and the event identity covers every field except <code>event_id</code>. Multi-event facts share one commit identity and occupy every position from 1 to <code>commit_size</code>; strict reload rejects incomplete or interleaved commits. Agent, handle, model, prompt, allocation, and operation-edge identities belong to the target H1 envelope and are not emitted by the current tracer. A future cross-agent workflow will retain one <code>trace_id</code> while adding actor identity and typed <code>decomposes_to</code>, <code>delegates_to</code>, or <code>continues_with</code> edges.</p>
 <h2>6. Current Stack: Reusable Harness Mechanisms Already Implemented</h2>
 <p>The current NAO stack has already paid for substantial harness engineering. The correct first implementation is extraction and consolidation, not a parallel rewrite.</p>
 <table><thead><tr>
@@ -1110,36 +1102,31 @@ routing:
 </tbody></table>
 <h3>Decision</h3>
 <p>Proceed with H-02 as the architecture baseline, H-03 as a runtime-adapter track, and a narrow extraction slice from H-01. Reject H-04 and H-06 as the semantic core. Keep current nodes operational while the compatibility layer is proven.</p>
-<h2>9. Proposed Package Boundary</h2>
+<h2>9. Package Boundary</h2>
 <p>The portable package lives in this repository. NeuralWorkbench remains an independently versioned H3+ companion. UAH consumes content-addressed registry snapshots and does not import ROS, NAO packages, provider SDKs, or runtime products.</p>
 <pre><code class="language-text">src/ab_harness/
-    contracts.py               # role, frame, task, operation, admission, evidence
-    identity.py                # role, model, agent, run, trace, and operation identities
+    contracts.py               # role, frame, projection, evidence contracts
+    registry.py                # immutable AB registry snapshot
     projection.py              # AB graph closure and task interaction modules
-    prompt_compiler.py         # layered deterministic prompt assembly
-    structured_output.py       # schema-aware parse/repair result types
-    prompt_packs.py            # versioned pack loading, no embedded domain policy
-    admission.py               # UAH semantic admission
-    providers/
-      base.py
-      ollama.py
-      openai_compatible.py
-      capability_probe.py
-    policy/
-      risk.py
-      approvals.py
-      budgets.py
-    runtime/
-      adapter.py
-      lifecycle.py
-      lease.py
-      result.py
-    trace/
-      events.py
-      store.py
-    evals/
-      runner.py
-      metrics.py</code></pre>
+    domain_contracts.py        # content-addressed ingress/effect authority
+    environment_profiles.py    # frozen reusable environment profiles
+    environment_runs.py        # attested activation registration
+    environment_ingress.py     # normalized ingress and classified decisions
+    task_registry.py           # ledger-projected task/trace lineage
+    task_compiler.py           # TaskSpec and content-addressed CompiledTask
+    proposal_admission.py      # TypedProposal and semantic admission
+    domain_lifecycle.py        # domain gate and ExecutionLease
+    environment.py             # lease-only in-process owner and receipt
+    acceptance.py              # obligation-based task acceptance
+    lifecycle.py               # TraceEvent v1, JSONL replay, verified digest
+    bindings.py                # approved implementation-binding catalog
+    gate.py                    # legacy role/output gate used by chatbot path
+    configuration.py           # compatibility configuration identity
+    workbench.py               # candidate-only bounded trace retrieval
+    workbench_protocol.py      # transport-neutral candidate protocol
+
+src/ab_harness_nao/            # ROS-free NAO contracts and recorded qualification</code></pre>
+<p><code>identity.py</code>, <code>agent_registry.py</code>, <code>prompt_compiler.py</code>, provider adapters, runtime budget enforcement, and the Observatory renderer are planned H1/H2 modules. They are not present in the current source tree.</p>
 <p>Runtime and domain adapters remain outside the portable semantic core:</p>
 <pre><code class="language-text">adapters/
   nao_ros4hri/
@@ -1148,7 +1135,7 @@ routing:
   openhands/
   mcp/
   shell_sandbox/</code></pre>
-<p><code>ab_harness</code> depends on <code>skill_common</code>. It must not own or duplicate <code>ab_registry.json</code>.</p>
+<p><code>ab_harness</code> currently consumes its own portable registry snapshot and imports no NeuralWorkbench or <code>skill_common</code> runtime package. A future companion adapter may translate reviewed NeuralWorkbench artifacts without making that repository a core dependency.</p>
 <h3>Reference-port rule</h3>
 <p>The first NAO integration may be staged in the NAO repository when that makes parity testing and review easier. A module belongs in the portable UAH core only if:</p>
 <ol>
@@ -1391,12 +1378,12 @@ H6 optional AB5 policy-foundry research</code></pre>
 <h2>14. Immediate Work Queue</h2>
 <ol>
 <li>Freeze and review the environment, identity, task-ingress, operation-edge, effect-obligation, and task-acceptance schemas.</li>
-<li>Retain the implemented task-acceptance, profile-verified environment-run, environment-bound ingress, and strict local task-event persistence seams. Next integrate those records into the common lifecycle ledger and add owner-authorized cancellation/failure transitions.</li>
-<li>Retain the implemented <code>CompiledTask -&gt; TypedProposal -&gt; AdmittedOperation -&gt; ExecutionLease</code> slice. Require fake and native owners to consume the exact lease and reject direct or reparsed dispatch.</li>
+<li>Retain the implemented task acceptance, profile-verified environment run, environment-bound ingress, common ledger, restart replay, and verified digest. Next add owner-authorized rejection, cancellation, timeout, and retry transitions.</li>
+<li>Retain the implemented <code>CompiledTask -&gt; TypedProposal -&gt; AdmittedOperation -&gt; ExecutionLease -&gt; ExecutionReceipt</code> slice. Direct or reparsed dispatch is absent and must not be reintroduced.</li>
 <li>Build golden projection cases for dialogue, knowledge query, scan/find, navigation failure, and grouped delivery.</li>
 <li>Define the shared provider capability record from the union of current chatbot and planner transport behavior.</li>
 <li>Extract a generic prompt-pack loader behind compatibility wrappers.</li>
-<li>Define one append-only trace event schema and adapters from <code>chatbot_turn_trace</code>, planner decisions, orchestrator feedback, and Workbench traces.</li>
+<li>Extend the common trace event schema with adapters from <code>chatbot_turn_trace</code>, planner decisions, orchestrator feedback, and Workbench traces.</li>
 <li>Correct the NAO <code>report_result</code> registry projection through an owner-reviewed DomainContractPack revision, then record its cross-frame delegation as one causal trace.</li>
 <li>Run current chatbot/planner tests as the behavior baseline.</li>
 <li>Add same-model generic-versus-AB-projected harness ablations.</li>
@@ -1418,7 +1405,7 @@ H6 optional AB5 policy-foundry research</code></pre>
 <li>[x] Cross-frame work uses explicit delegation edges.</li>
 <li>[x] Task closure is compiled from required and best-effort effect obligations.</li>
 <li>[x] One accepted task start compiles role, frame, registry, domain evidence rules, prohibitions, and budgets into a content-addressed source of truth.</li>
-<li>[~] Core H0 frame, band, role, projection, gate, trace, task-acceptance, profile-verified environment-run registration, and environment-bound task ingress/replay are implemented and tested; the strict task subset now reloads from a local, single-writer JSONL store, while common-ledger integration, cross-process coordination, state-update duplicate handling, and the remaining lifecycle grammar remain open.</li>
+<li>[~] Core H0 frame, band, role, projection, gate, task acceptance, profile-verified environment-run registration, content-addressed ingress decisions, ledger-authorized task starts, two-stage admission, lease-only execution, and accepted-path replay are implemented and tested. The common ledger uses atomic commit-framed JSONL with cross-process advisory writer coordination; state-update duplicate handling, operation edges, and the remaining failure/cancellation grammar remain open.</li>
 <li>[ ] No same-model harness ablation has yet measured uplift.</li>
 <li>[ ] No external Pi/OpenHands adapter has yet been prototyped.</li>
 <li>[ ] Live ROS and robot behavior remain outside this documentation-only pass.</li>

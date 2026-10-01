@@ -20,43 +20,55 @@ H0 proves:
 - task projection with inspectable decomposition closure;
 - deterministic output-type, object-reachability, AB-level, and effect-claim
   gates;
-- append-only JSONL trace round trips;
+- one append-only, globally sequenced lifecycle ledger with strict JSONL reload;
 - a separate `ab_harness_nao` package for thin chatbot/planner payload adapters;
 - semantic implementation bindings with candidate quarantine;
-- an in-process environment-owner adapter that issues effect evidence;
-- one recorded, ROS-free chatbot-to-planner-to-fake-owner qualification path;
+- a lease-only in-process environment owner that preserves the native result
+  separately from normalized effect evidence;
+- one recorded, ROS-free chatbot-to-planner-to-fake-owner qualification path
+  through `CompiledTask`, two-stage admission, and exact lease dispatch;
 - content-addressed model-harness-environment configuration identity;
 - bounded Neural Workbench retrieval of supporting and counterexample traces;
 - profile-verified registration of owner-attested environment activations;
-- immutable, profile-bound classification of normalized state/new-task
-  ingress with domain task identity and deterministic UAH trace issuance;
-- in-memory environment task registration with duplicate-start protection and
-  same-run resume/notify lineage;
-- strict content-addressed task lifecycle events with canonical local JSONL
-  persistence and model-free terminal-state reload across process restart;
+- content-addressed `DomainContractPack` revisions whose identity covers role,
+  task-type, ingress, effect-evidence, and prohibited-effect rules;
+- content-addressed, profile-bound normalized ingress and classification
+  decisions with domain task identity and deterministic UAH trace issuance;
+- task lineage projected from the common ledger with duplicate-start protection,
+  same-run resume/notify lineage, and terminal-state reload across restart;
 - deterministic TaskSpec compilation into one content-addressed projection,
-  obligation, prohibition, and budget artifact;
+  obligation, prohibition, and declared-budget artifact (budget consumption is
+  not yet enforced at runtime);
 - content-addressed typed proposals, UAH semantic admission, and domain-owned
   operation leases with deterministic rejection reasons;
-- a machine-readable NAO reference canary.
+- content-addressed execution receipts, replay-derived task acceptance, and
+  deterministic `VerifiedTraceDigest` artifacts;
+- content-addressed `uah.trace_event/v1` records with atomic commit framing for
+  multi-event lifecycle facts;
+- a machine-readable NAO reference canary with accepted replay and
+  no-dispatch semantic rejection.
 
 It does **not** yet provide a complete live agent loop. Provider adapters, full
-task/environment schemas, lifecycle events, stale-evidence handling, model
-evaluation, live-node parity, and cross-domain conformance remain on the H1-H5
-roadmap.
+task/environment schemas, rejection/failure lifecycle coverage, stale-evidence
+handling, model evaluation, live-node parity, and cross-domain conformance
+remain on the H1-H5 roadmap.
 
 ```mermaid
 flowchart LR
-    task["Task + role + AB frame"] --> compiler["Interaction projector"]
+    task["Task + role + AB frame"] --> compiler["TaskSpec compiler"]
     registry["Versioned AB registry"] --> compiler
-    compiler --> module["Task-scoped interaction module"]
+    compiler --> module["CompiledTask"]
     model["Model / worker adapter"] --> output["Typed proposal"]
-    module --> gate["Deterministic output gate"]
-    output --> gate
-    gate -->|accepted proposal| runtime["Environment-owned runtime"]
-    gate --> trace["Append-only trace"]
-    runtime --> evidence["Owner-issued effect evidence"]
-    evidence --> trace
+    module --> admission["UAH semantic admission"]
+    output --> admission
+    admission --> lease["Domain ExecutionLease"]
+    lease --> runtime["Lease-only environment owner"]
+    runtime --> receipt["Native result + effect evidence"]
+    module --> ledger["Common lifecycle ledger"]
+    admission --> ledger
+    lease --> ledger
+    receipt --> ledger
+    ledger --> digest["VerifiedTraceDigest"]
 ```
 
 ## Quick start
@@ -71,9 +83,10 @@ python -m ab_harness_nao
 ```
 
 The adapter canary is a deterministic boot qualification over recorded NAO
-proposals and a fake environment. It exercises the portable control seam and
-Workbench quarantine through the explicit `ab_harness_nao` boundary. It does
-not claim live-model, ROS, or general agentic capability.
+outputs and a fake environment. It compiles typed task authority, admits each
+operation, dispatches only the exact domain lease, reloads the lifecycle, and
+derives a verified digest through the explicit `ab_harness_nao` boundary. It
+does not claim live-model, ROS, or general agentic capability.
 
 ## Development environment
 

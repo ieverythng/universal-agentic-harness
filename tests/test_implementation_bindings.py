@@ -4,8 +4,6 @@ import pytest
 
 from ab_harness import ABImplementationBinding
 from ab_harness import BindingCatalog
-from ab_harness import InProcessEnvironmentOwner
-from ab_harness import OwnerExecutionResult
 from ab_harness import RegistrySnapshot
 
 
@@ -77,59 +75,6 @@ def test_runtime_mode_is_part_of_binding_resolution():
         catalog.resolve("find_object", runtime_mode="live")
 
 
-def test_environment_owner_dispatches_approved_ab1_and_issues_evidence():
-    catalog = BindingCatalog(_registry(), (_binding(),))
-
-    def find_object(arguments):
-        assert arguments == {"label": "cup"}
-        return OwnerExecutionResult(
-            evidence_ref="fake-nao://evidence/detection-001",
-            succeeded=True,
-            observed_effects=("fresh detector-backed result returned",),
-            payload={"canonical_target_id": "cup_01"},
-        )
-
-    owner = InProcessEnvironmentOwner(
-        environment_id="nao_fake",
-        catalog=catalog,
-        handlers={"fake_nao.skills:find_object": find_object},
-    )
-
-    evidence = owner.execute(
-        object_id="find_object",
-        arguments={"label": "cup"},
-        runtime_mode="fake",
-    )
-
-    assert evidence.object_id == "find_object"
-    assert evidence.binding_id == "nao_fake.find_object.v1"
-    assert evidence.environment_id == "nao_fake"
-    assert evidence.owner == "object_finder"
-    assert evidence.succeeded is True
-    assert evidence.observed_effects == ("fresh detector-backed result returned",)
-    assert evidence.payload == {"canonical_target_id": "cup_01"}
-
-
-def test_environment_owner_refuses_to_dispatch_an_ab0_contract_binding():
-    binding = _binding(
-        object_id="/planner/request",
-        implementation_owner="chatbot_llm",
-    )
-    catalog = BindingCatalog(_registry(), (binding,))
-    owner = InProcessEnvironmentOwner(
-        environment_id="nao_fake",
-        catalog=catalog,
-        handlers={binding.locator: lambda _: None},
-    )
-
-    with pytest.raises(ValueError, match="not runtime callable"):
-        owner.execute(
-            object_id="/planner/request",
-            arguments={"goal_text": "find the cup"},
-            runtime_mode="fake",
-        )
-
-
 def test_ab0_contract_binding_does_not_change_admission_owner():
     binding = _binding(
         object_id="/planner/request",
@@ -141,26 +86,3 @@ def test_ab0_contract_binding_does_not_change_admission_owner():
     assert catalog.bindings_for("/planner/request")[0].implementation_owner == (
         "planner_common"
     )
-
-
-def test_environment_owner_rejects_ab1_binding_owned_by_another_component():
-    binding = _binding(implementation_owner="planner_llm")
-    catalog = BindingCatalog(_registry(), (binding,))
-    owner = InProcessEnvironmentOwner(
-        environment_id="nao_fake",
-        catalog=catalog,
-        handlers={
-            binding.locator: lambda _: OwnerExecutionResult(
-                evidence_ref="fake-nao://evidence/invalid-owner",
-                succeeded=True,
-                observed_effects=("fresh detector-backed result returned",),
-            )
-        },
-    )
-
-    with pytest.raises(ValueError, match="does not own executable AB object"):
-        owner.execute(
-            object_id="find_object",
-            arguments={"label": "cup"},
-            runtime_mode="fake",
-        )

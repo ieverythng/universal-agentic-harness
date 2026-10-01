@@ -3,27 +3,100 @@ from dataclasses import replace
 import pytest
 
 from ab_harness import EnvironmentIngress
+from ab_harness import DomainContractPack
+from ab_harness import DomainEffectRule
 from ab_harness import EnvironmentProfile
 from ab_harness import EnvironmentProfileRegistry
 from ab_harness import EnvironmentRunAttestation
 from ab_harness import EnvironmentRunRegistry
 from ab_harness import EnvironmentTaskRegistry
+from ab_harness import LifecycleLedger
 from ab_harness import TaskIngressPolicy
 from ab_harness import TaskIngressRule
+from ab_harness import TaskIngressDecision
 from ab_harness import TaskLineage
 
 
+DOMAIN_PACK = DomainContractPack.issue(
+    domain_contract_pack_id="domain-pack:synthetic:v1",
+    frame_id="synthetic_runtime",
+    registry_version="sha256:synthetic-registry",
+    allowed_role_ids=("synthetic_agent",),
+    supported_task_type_ids=("synthetic_task",),
+    ingress_rules=(
+        TaskIngressRule(
+            binding_id="binding:synthetic.observation:v1",
+            ingress_type="observation",
+            action="state_update",
+        ),
+        TaskIngressRule(
+            binding_id="binding:synthetic.request:v1",
+            ingress_type="user_request",
+            action="start_task",
+            task_id_lineage_key="goal_id",
+        ),
+        TaskIngressRule(
+            binding_id="binding:synthetic.feedback:v1",
+            ingress_type="resume_request",
+            action="resume_task",
+            task_id_lineage_key="goal_id",
+        ),
+        TaskIngressRule(
+            binding_id="binding:synthetic.feedback:v1",
+            ingress_type="task_notification",
+            action="notify_task",
+            task_id_lineage_key="goal_id",
+        ),
+        TaskIngressRule(
+            binding_id="binding:synthetic.unknown:v1",
+            ingress_type="observation",
+            action="state_update",
+        ),
+    ),
+    effect_rules=(
+        DomainEffectRule(
+            effect_id="synthetic effect observed",
+            object_id="synthetic_action",
+            evidence_owner="synthetic.runtime.owner",
+            failure_policy="terminal",
+        ),
+    ),
+)
+OTHER_DOMAIN_PACK = DomainContractPack.issue(
+    domain_contract_pack_id=DOMAIN_PACK.domain_contract_pack_id,
+    frame_id=DOMAIN_PACK.frame_id,
+    registry_version=DOMAIN_PACK.registry_version,
+    allowed_role_ids=DOMAIN_PACK.allowed_role_ids,
+    supported_task_type_ids=DOMAIN_PACK.supported_task_type_ids,
+    ingress_rules=DOMAIN_PACK.ingress_rules,
+    effect_rules=DOMAIN_PACK.effect_rules,
+    prohibited_effects=("another_effect",),
+)
+
+
+def _pack_with_rules(rules):
+    return DomainContractPack.issue(
+        domain_contract_pack_id=DOMAIN_PACK.domain_contract_pack_id,
+        frame_id=DOMAIN_PACK.frame_id,
+        registry_version=DOMAIN_PACK.registry_version,
+        allowed_role_ids=DOMAIN_PACK.allowed_role_ids,
+        supported_task_type_ids=DOMAIN_PACK.supported_task_type_ids,
+        ingress_rules=rules,
+        effect_rules=DOMAIN_PACK.effect_rules,
+    )
+
+
 def _active_environment_run(
-    environment_run_id='environment-run:synthetic:001',
-    attestation_id='environment-attestation:sha256:001',
+    environment_run_id="environment-run:synthetic:001",
+    attestation_id="environment-attestation:sha256:001",
 ):
     profile = EnvironmentProfile(
-        environment_profile_id='environment-profile:synthetic:v1',
-        domain_contract_pack_id='domain-pack:synthetic:v1',
-        domain_contract_pack_revision='sha256:domain-pack-revision',
-        native_runtime_revision='synthetic-runtime:v1',
-        environment_owner_id='synthetic.runtime.owner',
-        required_interface_ids=('synthetic.observation',),
+        environment_profile_id="environment-profile:synthetic:v1",
+        domain_contract_pack_id="domain-pack:synthetic:v1",
+        domain_contract_pack_revision=DOMAIN_PACK.revision,
+        native_runtime_revision="synthetic-runtime:v1",
+        environment_owner_id="synthetic.runtime.owner",
+        required_interface_ids=("synthetic.observation",),
     )
     runs = EnvironmentRunRegistry(EnvironmentProfileRegistry((profile,)))
     return runs.register(
@@ -34,8 +107,8 @@ def _active_environment_run(
             native_runtime_revision=profile.native_runtime_revision,
             environment_owner_id=profile.environment_owner_id,
             attestation_id=attestation_id,
-            started_at='2026-09-11T09:00:00Z',
-            readiness_evidence_refs=('artifact:readiness:001',),
+            started_at="2026-09-11T09:00:00Z",
+            readiness_evidence_refs=("artifact:readiness:001",),
         )
     )
 
@@ -43,32 +116,26 @@ def _active_environment_run(
 def test_normalized_observation_is_classified_as_an_environment_state_update():
     environment_run = _active_environment_run()
     ingress = EnvironmentIngress(
-        environment_ingress_id='environment-ingress:synthetic:001',
+        environment_ingress_id="environment-ingress:synthetic:001",
         environment_run_id=environment_run.environment_run_id,
-        binding_id='binding:synthetic.observation:v1',
-        ingress_type='observation',
-        payload_artifact_id='artifact:sha256:observation-001',
-        native_lineage=(('observation_id', 'native-observation-001'),),
-        observed_at='2026-09-11T09:00:01Z',
+        binding_id="binding:synthetic.observation:v1",
+        ingress_type="observation",
+        payload_artifact_id="artifact:sha256:observation-001",
+        native_lineage=(("observation_id", "native-observation-001"),),
+        observed_at="2026-09-11T09:00:01Z",
     )
     policy = TaskIngressPolicy(
-        environment_profile_id='environment-profile:synthetic:v1',
-        domain_contract_pack_revision='sha256:domain-pack-revision',
-        rules=(
-            TaskIngressRule(
-                binding_id='binding:synthetic.observation:v1',
-                ingress_type='observation',
-                action='state_update',
-            ),
-        ),
+        environment_profile_id="environment-profile:synthetic:v1",
+        domain_contract_pack=DOMAIN_PACK,
+        task_registry=EnvironmentTaskRegistry(),
     )
 
     decision = policy.classify(environment_run, ingress)
 
     assert decision.environment_ingress_id == ingress.environment_ingress_id
     assert decision.environment_run_id == environment_run.environment_run_id
-    assert decision.action == 'state_update'
-    assert decision.reason_code == 'matched_rule'
+    assert decision.action == "state_update"
+    assert decision.reason_code == "matched_rule"
     assert decision.task_id is None
     assert decision.trace_id is None
 
@@ -76,69 +143,93 @@ def test_normalized_observation_is_classified_as_an_environment_state_update():
 def test_new_task_preserves_domain_identity_and_receives_a_uah_trace():
     environment_run = _active_environment_run()
     ingress = EnvironmentIngress(
-        environment_ingress_id='environment-ingress:synthetic:task-001',
+        environment_ingress_id="environment-ingress:synthetic:task-001",
         environment_run_id=environment_run.environment_run_id,
-        binding_id='binding:synthetic.request:v1',
-        ingress_type='user_request',
-        payload_artifact_id='artifact:sha256:request-001',
-        native_lineage=(('goal_id', 'goal:bring-cup:001'),),
-        observed_at='2026-09-13T09:00:00Z',
+        binding_id="binding:synthetic.request:v1",
+        ingress_type="user_request",
+        payload_artifact_id="artifact:sha256:request-001",
+        native_lineage=(("goal_id", "goal:bring-cup:001"),),
+        observed_at="2026-09-13T09:00:00Z",
     )
     policy = TaskIngressPolicy(
-        environment_profile_id='environment-profile:synthetic:v1',
-        domain_contract_pack_revision='sha256:domain-pack-revision',
+        environment_profile_id="environment-profile:synthetic:v1",
+        domain_contract_pack=DOMAIN_PACK,
         task_registry=EnvironmentTaskRegistry(),
-        rules=(
-            TaskIngressRule(
-                binding_id='binding:synthetic.request:v1',
-                ingress_type='user_request',
-                action='start_task',
-                task_id_lineage_key='goal_id',
-            ),
-        ),
     )
 
     decision = policy.classify(environment_run, ingress)
 
-    assert decision.action == 'start_task'
-    assert decision.reason_code == 'matched_rule'
-    assert decision.domain_contract_pack_revision == 'sha256:domain-pack-revision'
-    assert decision.task_id == 'goal:bring-cup:001'
+    assert decision.action == "start_task"
+    assert decision.reason_code == "matched_rule"
+    assert decision.domain_contract_pack_revision == DOMAIN_PACK.revision
+    assert decision.task_id == "goal:bring-cup:001"
     assert decision.trace_id == (
-        'trace:sha256:'
-        '9665443f9db9073cc24dbebb5d288bd0cf928157f1509d8d8f83d8c0f578de9e'
+        "trace:sha256:9665443f9db9073cc24dbebb5d288bd0cf928157f1509d8d8f83d8c0f578de9e"
     )
+    assert decision.decision_id.startswith("task-ingress-decision:sha256:")
+
+
+def test_task_ingress_decision_detects_post_construction_content_changes():
+    decision = TaskIngressDecision(
+        environment_ingress_id="environment-ingress:test",
+        environment_ingress_artifact_id="environment-ingress:sha256:test",
+        environment_run_id="environment-run:test",
+        action="state_update",
+        reason_code="matched_rule",
+    )
+    object.__setattr__(decision, "reason_code", "tampered")
+
+    with pytest.raises(ValueError, match="identity does not match"):
+        decision.to_dict()
+
+
+def test_ingress_policy_rejects_post_construction_content_changes():
+    environment_run = _active_environment_run()
+    ingress = EnvironmentIngress(
+        environment_ingress_id="environment-ingress:synthetic:tampered",
+        environment_run_id=environment_run.environment_run_id,
+        binding_id="binding:synthetic.request:v1",
+        ingress_type="user_request",
+        payload_artifact_id="artifact:sha256:request-tampered",
+        native_lineage=(("goal_id", "goal:original"),),
+        observed_at="2026-09-13T09:00:00Z",
+    )
+    object.__setattr__(
+        ingress,
+        "native_lineage",
+        (("goal_id", "goal:tampered-after-hashing"),),
+    )
+    policy = TaskIngressPolicy(
+        environment_profile_id="environment-profile:synthetic:v1",
+        domain_contract_pack=DOMAIN_PACK,
+        task_registry=EnvironmentTaskRegistry(),
+    )
+
+    with pytest.raises(ValueError, match="ingress identity does not match"):
+        policy.classify(environment_run, ingress)
 
 
 def test_new_task_without_the_domain_identity_is_rejected():
     environment_run = _active_environment_run()
     ingress = EnvironmentIngress(
-        environment_ingress_id='environment-ingress:synthetic:task-missing',
+        environment_ingress_id="environment-ingress:synthetic:task-missing",
         environment_run_id=environment_run.environment_run_id,
-        binding_id='binding:synthetic.request:v1',
-        ingress_type='user_request',
-        payload_artifact_id='artifact:sha256:request-missing',
-        native_lineage=(('request_id', 'request:001'),),
-        observed_at='2026-09-13T09:00:01Z',
+        binding_id="binding:synthetic.request:v1",
+        ingress_type="user_request",
+        payload_artifact_id="artifact:sha256:request-missing",
+        native_lineage=(("request_id", "request:001"),),
+        observed_at="2026-09-13T09:00:01Z",
     )
     policy = TaskIngressPolicy(
-        environment_profile_id='environment-profile:synthetic:v1',
-        domain_contract_pack_revision='sha256:domain-pack-revision',
+        environment_profile_id="environment-profile:synthetic:v1",
+        domain_contract_pack=DOMAIN_PACK,
         task_registry=EnvironmentTaskRegistry(),
-        rules=(
-            TaskIngressRule(
-                binding_id='binding:synthetic.request:v1',
-                ingress_type='user_request',
-                action='start_task',
-                task_id_lineage_key='goal_id',
-            ),
-        ),
     )
 
     decision = policy.classify(environment_run, ingress)
 
-    assert decision.action == 'reject'
-    assert decision.reason_code == 'missing_task_identity'
+    assert decision.action == "reject"
+    assert decision.reason_code == "missing_task_identity"
     assert decision.task_id is None
     assert decision.trace_id is None
 
@@ -146,85 +237,113 @@ def test_new_task_without_the_domain_identity_is_rejected():
 def test_replayed_start_ingress_is_rejected_with_its_registered_lineage():
     environment_run = _active_environment_run()
     ingress = EnvironmentIngress(
-        environment_ingress_id='environment-ingress:synthetic:replayed-start',
+        environment_ingress_id="environment-ingress:synthetic:replayed-start",
         environment_run_id=environment_run.environment_run_id,
-        binding_id='binding:synthetic.request:v1',
-        ingress_type='user_request',
-        payload_artifact_id='artifact:sha256:replayed-start',
-        native_lineage=(('goal_id', 'goal:replayed-start'),),
-        observed_at='2026-09-13T10:00:00Z',
+        binding_id="binding:synthetic.request:v1",
+        ingress_type="user_request",
+        payload_artifact_id="artifact:sha256:replayed-start",
+        native_lineage=(("goal_id", "goal:replayed-start"),),
+        observed_at="2026-09-13T10:00:00Z",
     )
     registry = EnvironmentTaskRegistry()
     policy = TaskIngressPolicy(
-        environment_profile_id='environment-profile:synthetic:v1',
-        domain_contract_pack_revision='sha256:domain-pack-revision',
+        environment_profile_id="environment-profile:synthetic:v1",
+        domain_contract_pack=DOMAIN_PACK,
         task_registry=registry,
-        rules=(
-            TaskIngressRule(
-                binding_id='binding:synthetic.request:v1',
-                ingress_type='user_request',
-                action='start_task',
-                task_id_lineage_key='goal_id',
-            ),
-        ),
     )
 
     first = policy.classify(environment_run, ingress)
     replay = policy.classify(environment_run, ingress)
 
-    assert first.action == 'start_task'
-    assert replay.action == 'reject'
-    assert replay.reason_code == 'duplicate_environment_ingress'
+    assert first.action == "start_task"
+    assert replay.action == "reject"
+    assert replay.reason_code == "duplicate_environment_ingress"
     assert replay.task_id == first.task_id
     assert replay.trace_id == first.trace_id
+
+
+def test_duplicate_start_is_rejected_across_stale_registry_instances(tmp_path):
+    environment_run = _active_environment_run()
+    path = tmp_path / "shared-lifecycle.jsonl"
+    first_registry = EnvironmentTaskRegistry(LifecycleLedger(path))
+    stale_registry = EnvironmentTaskRegistry(LifecycleLedger(path))
+    first_policy = TaskIngressPolicy(
+        environment_profile_id="environment-profile:synthetic:v1",
+        domain_contract_pack=DOMAIN_PACK,
+        task_registry=first_registry,
+    )
+    stale_policy = TaskIngressPolicy(
+        environment_profile_id="environment-profile:synthetic:v1",
+        domain_contract_pack=DOMAIN_PACK,
+        task_registry=stale_registry,
+    )
+    ingress = EnvironmentIngress(
+        environment_ingress_id="environment-ingress:synthetic:shared-start",
+        environment_run_id=environment_run.environment_run_id,
+        binding_id="binding:synthetic.request:v1",
+        ingress_type="user_request",
+        payload_artifact_id="artifact:sha256:shared-start",
+        native_lineage=(("goal_id", "goal:shared-start"),),
+        observed_at="2026-09-13T10:00:00Z",
+    )
+
+    first = first_policy.classify(environment_run, ingress)
+    duplicate = stale_policy.classify(environment_run, ingress)
+
+    assert first.action == "start_task"
+    assert duplicate.action == "reject"
+    assert duplicate.reason_code == "duplicate_environment_ingress"
+    assert duplicate.task_id == first.task_id
+    assert duplicate.trace_id == first.trace_id
+    assert EnvironmentTaskRegistry(LifecycleLedger(path)).require_start(
+        environment_run_id=first.environment_run_id,
+        environment_ingress_id=first.environment_ingress_id,
+        ingress_artifact_id=first.environment_ingress_artifact_id,
+        decision_id=first.decision_id,
+        domain_contract_pack_revision=first.domain_contract_pack_revision,
+        task_id=first.task_id,
+        trace_id=first.trace_id,
+    ).starting_decision_id == first.decision_id
 
 
 def test_second_start_for_a_registered_domain_task_is_rejected():
     environment_run = _active_environment_run()
     first_ingress = EnvironmentIngress(
-        environment_ingress_id='environment-ingress:synthetic:first-start',
+        environment_ingress_id="environment-ingress:synthetic:first-start",
         environment_run_id=environment_run.environment_run_id,
-        binding_id='binding:synthetic.request:v1',
-        ingress_type='user_request',
-        payload_artifact_id='artifact:sha256:first-start',
-        native_lineage=(('goal_id', 'goal:one-activation'),),
-        observed_at='2026-09-13T10:01:00Z',
+        binding_id="binding:synthetic.request:v1",
+        ingress_type="user_request",
+        payload_artifact_id="artifact:sha256:first-start",
+        native_lineage=(("goal_id", "goal:one-activation"),),
+        observed_at="2026-09-13T10:01:00Z",
     )
     second_ingress = replace(
         first_ingress,
-        environment_ingress_id='environment-ingress:synthetic:second-start',
-        payload_artifact_id='artifact:sha256:second-start',
-        observed_at='2026-09-13T10:01:01Z',
+        environment_ingress_id="environment-ingress:synthetic:second-start",
+        payload_artifact_id="artifact:sha256:second-start",
+        observed_at="2026-09-13T10:01:01Z",
     )
     policy = TaskIngressPolicy(
-        environment_profile_id='environment-profile:synthetic:v1',
-        domain_contract_pack_revision='sha256:domain-pack-revision',
+        environment_profile_id="environment-profile:synthetic:v1",
+        domain_contract_pack=DOMAIN_PACK,
         task_registry=EnvironmentTaskRegistry(),
-        rules=(
-            TaskIngressRule(
-                binding_id='binding:synthetic.request:v1',
-                ingress_type='user_request',
-                action='start_task',
-                task_id_lineage_key='goal_id',
-            ),
-        ),
     )
 
     first = policy.classify(environment_run, first_ingress)
     duplicate_start = policy.classify(environment_run, second_ingress)
 
-    assert first.action == 'start_task'
-    assert duplicate_start.action == 'reject'
-    assert duplicate_start.reason_code == 'task_already_registered'
+    assert first.action == "start_task"
+    assert duplicate_start.action == "reject"
+    assert duplicate_start.reason_code == "task_already_registered"
     assert duplicate_start.task_id == first.task_id
     assert duplicate_start.trace_id == first.trace_id
 
 
 @pytest.mark.parametrize(
-    'action,ingress_type',
+    "action,ingress_type",
     (
-        ('resume_task', 'resume_request'),
-        ('notify_task', 'task_notification'),
+        ("resume_task", "resume_request"),
+        ("notify_task", "task_notification"),
     ),
 )
 def test_registered_task_receives_existing_task_ingress_with_its_trace(
@@ -233,94 +352,75 @@ def test_registered_task_receives_existing_task_ingress_with_its_trace(
     environment_run = _active_environment_run()
     registry = EnvironmentTaskRegistry()
     start_policy = TaskIngressPolicy(
-        environment_profile_id='environment-profile:synthetic:v1',
-        domain_contract_pack_revision='sha256:domain-pack-revision',
+        environment_profile_id="environment-profile:synthetic:v1",
+        domain_contract_pack=DOMAIN_PACK,
         task_registry=registry,
-        rules=(
-            TaskIngressRule(
-                binding_id='binding:synthetic.request:v1',
-                ingress_type='user_request',
-                action='start_task',
-                task_id_lineage_key='goal_id',
-            ),
-        ),
     )
     started = start_policy.classify(
         environment_run,
         EnvironmentIngress(
-            environment_ingress_id='environment-ingress:synthetic:start-resume',
+            environment_ingress_id="environment-ingress:synthetic:start-resume",
             environment_run_id=environment_run.environment_run_id,
-            binding_id='binding:synthetic.request:v1',
-            ingress_type='user_request',
-            payload_artifact_id='artifact:sha256:start-resume',
-            native_lineage=(('goal_id', 'goal:resume-me'),),
-            observed_at='2026-09-13T10:00:00Z',
+            binding_id="binding:synthetic.request:v1",
+            ingress_type="user_request",
+            payload_artifact_id="artifact:sha256:start-resume",
+            native_lineage=(("goal_id", "goal:resume-me"),),
+            observed_at="2026-09-13T10:00:00Z",
         ),
     )
     existing_task_policy = TaskIngressPolicy(
-        environment_profile_id='environment-profile:synthetic:v1',
-        domain_contract_pack_revision='sha256:domain-pack-revision',
+        environment_profile_id="environment-profile:synthetic:v1",
+        domain_contract_pack=DOMAIN_PACK,
         task_registry=registry,
-        rules=(
-            TaskIngressRule(
-                binding_id='binding:synthetic.feedback:v1',
-                ingress_type=ingress_type,
-                action=action,
-                task_id_lineage_key='goal_id',
-            ),
-        ),
     )
 
-    associated = existing_task_policy.classify(
-        environment_run,
-        EnvironmentIngress(
-            environment_ingress_id='environment-ingress:synthetic:resume',
-            environment_run_id=environment_run.environment_run_id,
-            binding_id='binding:synthetic.feedback:v1',
-            ingress_type=ingress_type,
-            payload_artifact_id='artifact:sha256:resume',
-            native_lineage=(('goal_id', 'goal:resume-me'),),
-            observed_at='2026-09-13T12:01:00Z',
-        ),
+    ingress = EnvironmentIngress(
+        environment_ingress_id="environment-ingress:synthetic:resume",
+        environment_run_id=environment_run.environment_run_id,
+        binding_id="binding:synthetic.feedback:v1",
+        ingress_type=ingress_type,
+        payload_artifact_id="artifact:sha256:resume",
+        native_lineage=(("goal_id", "goal:resume-me"),),
+        observed_at="2026-09-13T12:01:00Z",
     )
+    associated = existing_task_policy.classify(environment_run, ingress)
 
     assert associated.action == action
-    assert associated.reason_code == 'matched_registered_task'
+    assert associated.reason_code == "matched_registered_task"
     assert associated.task_id == started.task_id
     assert associated.trace_id == started.trace_id
+    assert associated.domain_contract_pack_revision == DOMAIN_PACK.revision
+    recorded = registry.ledger.events()[-1]
+    assert recorded.artifact_refs == (
+        ingress.ingress_artifact_id,
+        associated.decision_id,
+        DOMAIN_PACK.revision,
+    )
 
 
 def test_existing_task_ingress_for_an_unknown_task_is_rejected():
     environment_run = _active_environment_run()
     policy = TaskIngressPolicy(
-        environment_profile_id='environment-profile:synthetic:v1',
-        domain_contract_pack_revision='sha256:domain-pack-revision',
+        environment_profile_id="environment-profile:synthetic:v1",
+        domain_contract_pack=DOMAIN_PACK,
         task_registry=EnvironmentTaskRegistry(),
-        rules=(
-            TaskIngressRule(
-                binding_id='binding:synthetic.feedback:v1',
-                ingress_type='resume_request',
-                action='resume_task',
-                task_id_lineage_key='goal_id',
-            ),
-        ),
     )
 
     decision = policy.classify(
         environment_run,
         EnvironmentIngress(
-            environment_ingress_id='environment-ingress:synthetic:unknown-task',
+            environment_ingress_id="environment-ingress:synthetic:unknown-task",
             environment_run_id=environment_run.environment_run_id,
-            binding_id='binding:synthetic.feedback:v1',
-            ingress_type='resume_request',
-            payload_artifact_id='artifact:sha256:unknown-task',
-            native_lineage=(('goal_id', 'goal:not-registered'),),
-            observed_at='2026-09-13T12:02:00Z',
+            binding_id="binding:synthetic.feedback:v1",
+            ingress_type="resume_request",
+            payload_artifact_id="artifact:sha256:unknown-task",
+            native_lineage=(("goal_id", "goal:not-registered"),),
+            observed_at="2026-09-13T12:02:00Z",
         ),
     )
 
-    assert decision.action == 'reject'
-    assert decision.reason_code == 'unknown_task_identity'
+    assert decision.action == "reject"
+    assert decision.reason_code == "unknown_task_identity"
     assert decision.task_id is None
     assert decision.trace_id is None
 
@@ -328,64 +428,48 @@ def test_existing_task_ingress_for_an_unknown_task_is_rejected():
 def test_existing_task_ingress_cannot_cross_environment_runs():
     first_run = _active_environment_run()
     second_run = _active_environment_run(
-        environment_run_id='environment-run:synthetic:002',
-        attestation_id='environment-attestation:sha256:002',
+        environment_run_id="environment-run:synthetic:002",
+        attestation_id="environment-attestation:sha256:002",
     )
     registry = EnvironmentTaskRegistry()
     start_policy = TaskIngressPolicy(
-        environment_profile_id='environment-profile:synthetic:v1',
-        domain_contract_pack_revision='sha256:domain-pack-revision',
+        environment_profile_id="environment-profile:synthetic:v1",
+        domain_contract_pack=DOMAIN_PACK,
         task_registry=registry,
-        rules=(
-            TaskIngressRule(
-                binding_id='binding:synthetic.request:v1',
-                ingress_type='user_request',
-                action='start_task',
-                task_id_lineage_key='goal_id',
-            ),
-        ),
     )
     start_policy.classify(
         first_run,
         EnvironmentIngress(
-            environment_ingress_id='environment-ingress:synthetic:first-run',
+            environment_ingress_id="environment-ingress:synthetic:first-run",
             environment_run_id=first_run.environment_run_id,
-            binding_id='binding:synthetic.request:v1',
-            ingress_type='user_request',
-            payload_artifact_id='artifact:sha256:first-run',
-            native_lineage=(('goal_id', 'goal:run-scoped'),),
-            observed_at='2026-09-13T12:03:00Z',
+            binding_id="binding:synthetic.request:v1",
+            ingress_type="user_request",
+            payload_artifact_id="artifact:sha256:first-run",
+            native_lineage=(("goal_id", "goal:run-scoped"),),
+            observed_at="2026-09-13T12:03:00Z",
         ),
     )
     resume_policy = TaskIngressPolicy(
-        environment_profile_id='environment-profile:synthetic:v1',
-        domain_contract_pack_revision='sha256:domain-pack-revision',
+        environment_profile_id="environment-profile:synthetic:v1",
+        domain_contract_pack=DOMAIN_PACK,
         task_registry=registry,
-        rules=(
-            TaskIngressRule(
-                binding_id='binding:synthetic.feedback:v1',
-                ingress_type='resume_request',
-                action='resume_task',
-                task_id_lineage_key='goal_id',
-            ),
-        ),
     )
 
     decision = resume_policy.classify(
         second_run,
         EnvironmentIngress(
-            environment_ingress_id='environment-ingress:synthetic:second-run',
+            environment_ingress_id="environment-ingress:synthetic:second-run",
             environment_run_id=second_run.environment_run_id,
-            binding_id='binding:synthetic.feedback:v1',
-            ingress_type='resume_request',
-            payload_artifact_id='artifact:sha256:second-run',
-            native_lineage=(('goal_id', 'goal:run-scoped'),),
-            observed_at='2026-09-13T12:03:01Z',
+            binding_id="binding:synthetic.feedback:v1",
+            ingress_type="resume_request",
+            payload_artifact_id="artifact:sha256:second-run",
+            native_lineage=(("goal_id", "goal:run-scoped"),),
+            observed_at="2026-09-13T12:03:01Z",
         ),
     )
 
-    assert decision.action == 'reject'
-    assert decision.reason_code == 'unknown_task_identity'
+    assert decision.action == "reject"
+    assert decision.reason_code == "unknown_task_identity"
     assert decision.task_id is None
     assert decision.trace_id is None
 
@@ -393,260 +477,226 @@ def test_existing_task_ingress_cannot_cross_environment_runs():
 def test_ingress_from_another_environment_run_is_rejected():
     environment_run = _active_environment_run()
     ingress = EnvironmentIngress(
-        environment_ingress_id='environment-ingress:synthetic:002',
-        environment_run_id='environment-run:synthetic:other',
-        binding_id='binding:synthetic.observation:v1',
-        ingress_type='observation',
-        payload_artifact_id='artifact:sha256:observation-002',
+        environment_ingress_id="environment-ingress:synthetic:002",
+        environment_run_id="environment-run:synthetic:other",
+        binding_id="binding:synthetic.observation:v1",
+        ingress_type="observation",
+        payload_artifact_id="artifact:sha256:observation-002",
         native_lineage=(),
-        observed_at='2026-09-11T09:00:02Z',
+        observed_at="2026-09-11T09:00:02Z",
     )
     policy = TaskIngressPolicy(
-        environment_profile_id='environment-profile:synthetic:v1',
-        domain_contract_pack_revision='sha256:domain-pack-revision',
-        rules=(
-            TaskIngressRule(
-                binding_id='binding:synthetic.observation:v1',
-                ingress_type='observation',
-                action='state_update',
-            ),
-        ),
+        environment_profile_id="environment-profile:synthetic:v1",
+        domain_contract_pack=DOMAIN_PACK,
+        task_registry=EnvironmentTaskRegistry(),
     )
 
     decision = policy.classify(environment_run, ingress)
 
-    assert decision.action == 'reject'
-    assert decision.reason_code == 'environment_run_mismatch'
+    assert decision.action == "reject"
+    assert decision.reason_code == "environment_run_mismatch"
 
 
 def test_ingress_without_a_frozen_rule_is_rejected():
     environment_run = _active_environment_run()
     ingress = EnvironmentIngress(
-        environment_ingress_id='environment-ingress:synthetic:003',
+        environment_ingress_id="environment-ingress:synthetic:003",
         environment_run_id=environment_run.environment_run_id,
-        binding_id='binding:synthetic.unknown:v1',
-        ingress_type='unknown_event',
-        payload_artifact_id='artifact:sha256:unknown-003',
+        binding_id="binding:synthetic.unknown:v1",
+        ingress_type="unknown_event",
+        payload_artifact_id="artifact:sha256:unknown-003",
         native_lineage=(),
-        observed_at='2026-09-11T09:00:03Z',
+        observed_at="2026-09-11T09:00:03Z",
     )
     policy = TaskIngressPolicy(
-        environment_profile_id='environment-profile:synthetic:v1',
-        domain_contract_pack_revision='sha256:domain-pack-revision',
-        rules=(
-            TaskIngressRule(
-                binding_id='binding:synthetic.unknown:v1',
-                ingress_type='observation',
-                action='state_update',
-            ),
-        ),
+        environment_profile_id="environment-profile:synthetic:v1",
+        domain_contract_pack=DOMAIN_PACK,
+        task_registry=EnvironmentTaskRegistry(),
     )
 
     decision = policy.classify(environment_run, ingress)
 
-    assert decision.action == 'reject'
-    assert decision.reason_code == 'unsupported_ingress_type'
+    assert decision.action == "reject"
+    assert decision.reason_code == "unsupported_ingress_type"
 
 
 def test_duplicate_ingress_rule_is_rejected():
     rule = TaskIngressRule(
-        binding_id='binding:synthetic.observation:v1',
-        ingress_type='observation',
-        action='state_update',
+        binding_id="binding:synthetic.observation:v1",
+        ingress_type="observation",
+        action="state_update",
     )
 
-    with pytest.raises(ValueError, match='ingress rule already registered'):
-        TaskIngressPolicy(
-            environment_profile_id='environment-profile:synthetic:v1',
-            domain_contract_pack_revision='sha256:domain-pack-revision',
-            rules=(rule, rule),
-        )
+    with pytest.raises(ValueError, match="duplicate domain ingress rules"):
+        _pack_with_rules((rule, rule))
 
 
 def test_environment_ingress_requires_an_identity():
-    with pytest.raises(ValueError, match='ingress fields must not be empty'):
+    with pytest.raises(ValueError, match="ingress fields must not be empty"):
         EnvironmentIngress(
-            environment_ingress_id='',
-            environment_run_id='environment-run:synthetic:001',
-            binding_id='binding:synthetic.observation:v1',
-            ingress_type='observation',
-            payload_artifact_id='artifact:sha256:observation-004',
+            environment_ingress_id="",
+            environment_run_id="environment-run:synthetic:001",
+            binding_id="binding:synthetic.observation:v1",
+            ingress_type="observation",
+            payload_artifact_id="artifact:sha256:observation-004",
             native_lineage=(),
-            observed_at='2026-09-11T09:00:04Z',
+            observed_at="2026-09-11T09:00:04Z",
         )
 
 
 def test_environment_ingress_rejects_mutable_native_lineage():
-    with pytest.raises(TypeError, match='native lineage must be an immutable tuple'):
+    with pytest.raises(TypeError, match="native lineage must be an immutable tuple"):
         EnvironmentIngress(
-            environment_ingress_id='environment-ingress:synthetic:mutable',
-            environment_run_id='environment-run:synthetic:001',
-            binding_id='binding:synthetic.observation:v1',
-            ingress_type='observation',
-            payload_artifact_id='artifact:sha256:observation-mutable',
-            native_lineage=[('observation_id', 'native-observation-mutable')],
-            observed_at='2026-09-11T09:00:04Z',
+            environment_ingress_id="environment-ingress:synthetic:mutable",
+            environment_run_id="environment-run:synthetic:001",
+            binding_id="binding:synthetic.observation:v1",
+            ingress_type="observation",
+            payload_artifact_id="artifact:sha256:observation-mutable",
+            native_lineage=[("observation_id", "native-observation-mutable")],
+            observed_at="2026-09-11T09:00:04Z",
         )
 
 
 def test_environment_ingress_rejects_duplicate_native_lineage_keys():
-    with pytest.raises(ValueError, match='native lineage keys must be unique'):
+    with pytest.raises(ValueError, match="native lineage keys must be unique"):
         EnvironmentIngress(
-            environment_ingress_id='environment-ingress:synthetic:duplicate',
-            environment_run_id='environment-run:synthetic:001',
-            binding_id='binding:synthetic.request:v1',
-            ingress_type='user_request',
-            payload_artifact_id='artifact:sha256:request-duplicate',
+            environment_ingress_id="environment-ingress:synthetic:duplicate",
+            environment_run_id="environment-run:synthetic:001",
+            binding_id="binding:synthetic.request:v1",
+            ingress_type="user_request",
+            payload_artifact_id="artifact:sha256:request-duplicate",
             native_lineage=(
-                ('goal_id', 'goal:001'),
-                ('goal_id', 'goal:002'),
+                ("goal_id", "goal:001"),
+                ("goal_id", "goal:002"),
             ),
-            observed_at='2026-09-13T09:00:02Z',
+            observed_at="2026-09-13T09:00:02Z",
         )
 
 
 def test_environment_ingress_rejects_empty_native_lineage_values():
-    with pytest.raises(ValueError, match='native lineage fields must not be empty'):
+    with pytest.raises(ValueError, match="native lineage fields must not be empty"):
         EnvironmentIngress(
-            environment_ingress_id='environment-ingress:synthetic:empty-lineage',
-            environment_run_id='environment-run:synthetic:001',
-            binding_id='binding:synthetic.request:v1',
-            ingress_type='user_request',
-            payload_artifact_id='artifact:sha256:request-empty-lineage',
-            native_lineage=(('goal_id', ''),),
-            observed_at='2026-09-13T09:00:03Z',
+            environment_ingress_id="environment-ingress:synthetic:empty-lineage",
+            environment_run_id="environment-run:synthetic:001",
+            binding_id="binding:synthetic.request:v1",
+            ingress_type="user_request",
+            payload_artifact_id="artifact:sha256:request-empty-lineage",
+            native_lineage=(("goal_id", ""),),
+            observed_at="2026-09-13T09:00:03Z",
         )
 
 
 def test_unconfigured_binding_cannot_reuse_an_allowed_ingress_type():
     environment_run = _active_environment_run()
     ingress = EnvironmentIngress(
-        environment_ingress_id='environment-ingress:synthetic:005',
+        environment_ingress_id="environment-ingress:synthetic:005",
         environment_run_id=environment_run.environment_run_id,
-        binding_id='binding:unconfigured.observation:v1',
-        ingress_type='observation',
-        payload_artifact_id='artifact:sha256:observation-005',
+        binding_id="binding:unconfigured.observation:v1",
+        ingress_type="observation",
+        payload_artifact_id="artifact:sha256:observation-005",
         native_lineage=(),
-        observed_at='2026-09-11T09:00:05Z',
+        observed_at="2026-09-11T09:00:05Z",
     )
     policy = TaskIngressPolicy(
-        environment_profile_id='environment-profile:synthetic:v1',
-        domain_contract_pack_revision='sha256:domain-pack-revision',
-        rules=(
-            TaskIngressRule(
-                binding_id='binding:synthetic.observation:v1',
-                ingress_type='observation',
-                action='state_update',
-            ),
-        ),
+        environment_profile_id="environment-profile:synthetic:v1",
+        domain_contract_pack=DOMAIN_PACK,
+        task_registry=EnvironmentTaskRegistry(),
     )
 
     decision = policy.classify(environment_run, ingress)
 
-    assert decision.action == 'reject'
-    assert decision.reason_code == 'unsupported_ingress_binding'
+    assert decision.action == "reject"
+    assert decision.reason_code == "unsupported_ingress_binding"
 
 
 def test_policy_for_another_environment_profile_cannot_classify_ingress():
     environment_run = _active_environment_run()
     ingress = EnvironmentIngress(
-        environment_ingress_id='environment-ingress:synthetic:006',
+        environment_ingress_id="environment-ingress:synthetic:006",
         environment_run_id=environment_run.environment_run_id,
-        binding_id='binding:synthetic.observation:v1',
-        ingress_type='observation',
-        payload_artifact_id='artifact:sha256:observation-006',
+        binding_id="binding:synthetic.observation:v1",
+        ingress_type="observation",
+        payload_artifact_id="artifact:sha256:observation-006",
         native_lineage=(),
-        observed_at='2026-09-11T09:00:06Z',
+        observed_at="2026-09-11T09:00:06Z",
     )
     policy = TaskIngressPolicy(
-        environment_profile_id='environment-profile:other:v1',
-        domain_contract_pack_revision='sha256:domain-pack-revision',
-        rules=(
-            TaskIngressRule(
-                binding_id='binding:synthetic.observation:v1',
-                ingress_type='observation',
-                action='state_update',
-            ),
-        ),
+        environment_profile_id="environment-profile:other:v1",
+        domain_contract_pack=DOMAIN_PACK,
+        task_registry=EnvironmentTaskRegistry(),
     )
 
     decision = policy.classify(environment_run, ingress)
 
-    assert decision.action == 'reject'
-    assert decision.reason_code == 'policy_environment_profile_mismatch'
+    assert decision.action == "reject"
+    assert decision.reason_code == "policy_environment_profile_mismatch"
 
 
 def test_policy_from_another_domain_contract_revision_is_rejected():
     environment_run = _active_environment_run()
     ingress = EnvironmentIngress(
-        environment_ingress_id='environment-ingress:synthetic:007',
+        environment_ingress_id="environment-ingress:synthetic:007",
         environment_run_id=environment_run.environment_run_id,
-        binding_id='binding:synthetic.observation:v1',
-        ingress_type='observation',
-        payload_artifact_id='artifact:sha256:observation-007',
+        binding_id="binding:synthetic.observation:v1",
+        ingress_type="observation",
+        payload_artifact_id="artifact:sha256:observation-007",
         native_lineage=(),
-        observed_at='2026-09-11T09:00:07Z',
+        observed_at="2026-09-11T09:00:07Z",
     )
     policy = TaskIngressPolicy(
-        environment_profile_id='environment-profile:synthetic:v1',
-        domain_contract_pack_revision='sha256:other-domain-pack',
-        rules=(
-            TaskIngressRule(
-                binding_id='binding:synthetic.observation:v1',
-                ingress_type='observation',
-                action='state_update',
-            ),
-        ),
+        environment_profile_id="environment-profile:synthetic:v1",
+        domain_contract_pack=OTHER_DOMAIN_PACK,
+        task_registry=EnvironmentTaskRegistry(),
     )
 
     decision = policy.classify(environment_run, ingress)
 
-    assert decision.action == 'reject'
-    assert decision.reason_code == 'policy_contract_revision_mismatch'
+    assert decision.action == "reject"
+    assert decision.reason_code == "policy_contract_revision_mismatch"
 
 
 def test_start_task_rule_requires_a_domain_identity_lineage_key():
-    with pytest.raises(ValueError, match='task-bearing rule requires'):
+    with pytest.raises(ValueError, match="task-bearing rule requires"):
         TaskIngressRule(
-            binding_id='binding:synthetic.request:v1',
-            ingress_type='user_request',
-            action='start_task',
+            binding_id="binding:synthetic.request:v1",
+            ingress_type="user_request",
+            action="start_task",
         )
 
 
-@pytest.mark.parametrize(
-    'action', ('start_task', 'resume_task', 'notify_task')
-)
+@pytest.mark.parametrize("action", ("start_task", "resume_task", "notify_task"))
 def test_task_bearing_actions_require_a_task_registry(action):
     rule = TaskIngressRule(
-        binding_id='binding:synthetic.request:v1',
-        ingress_type='user_request',
+        binding_id="binding:synthetic.request:v1",
+        ingress_type="user_request",
         action=action,
-        task_id_lineage_key='goal_id',
+        task_id_lineage_key="goal_id",
     )
 
-    with pytest.raises(ValueError, match='requires a task registry'):
+    with pytest.raises(ValueError, match="requires a task registry"):
         TaskIngressPolicy(
-            environment_profile_id='environment-profile:synthetic:v1',
-            domain_contract_pack_revision='sha256:domain-pack-revision',
-            rules=(rule,),
+            environment_profile_id="environment-profile:synthetic:v1",
+            domain_contract_pack=_pack_with_rules((rule,)),
         )
 
 
 def test_task_lineage_requires_complete_identity():
-    with pytest.raises(ValueError, match='task lineage fields must not be empty'):
+    with pytest.raises(ValueError, match="task lineage fields must not be empty"):
         TaskLineage(
-            environment_run_id='environment-run:synthetic:001',
-            task_id='',
-            trace_id='trace:sha256:complete',
-            starting_environment_ingress_id='environment-ingress:synthetic:001',
+            environment_run_id="environment-run:synthetic:001",
+            task_id="",
+            trace_id="trace:sha256:complete",
+            starting_environment_ingress_id="environment-ingress:synthetic:001",
+            starting_ingress_artifact_id="environment-ingress:sha256:complete",
+            starting_decision_id="task-ingress-decision:sha256:complete",
+            domain_contract_pack_revision="sha256:complete",
         )
 
 
 def test_ingress_rule_rejects_an_unknown_action():
-    with pytest.raises(ValueError, match='invalid ingress action'):
+    with pytest.raises(ValueError, match="invalid ingress action"):
         TaskIngressRule(
-            binding_id='binding:synthetic.observation:v1',
-            ingress_type='observation',
-            action='invoke_model',
+            binding_id="binding:synthetic.observation:v1",
+            ingress_type="observation",
+            action="invoke_model",
         )

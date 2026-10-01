@@ -19,6 +19,8 @@ class InteractionProjector:
         requested_object_ids: tuple[str, ...],
         include_decomposition: bool = True,
     ) -> InteractionModuleSpec:
+        if frame.registry_version != self._registry.version:
+            raise ValueError("frame registry version does not match projection registry")
         selected: dict[str, object] = {}
         pending = list(requested_object_ids)
         while pending:

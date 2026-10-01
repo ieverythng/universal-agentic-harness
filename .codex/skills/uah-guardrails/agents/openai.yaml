@@ -1,0 +1,4 @@
+interface:
+  display_name: "UAH Guardrails"
+  short_description: "Preserve UAH authority and evidence boundaries"
+  default_prompt: "Use $uah-guardrails to review this UAH change against the current architecture and H0-H2 gates."
