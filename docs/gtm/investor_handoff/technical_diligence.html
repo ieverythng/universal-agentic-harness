@@ -330,7 +330,7 @@
 <li><code>rejected</code> when a terminal required obligation fails.</li>
 </ul>
 <p>The environment task registry records suspension or terminal judgment and rejects later ingress for a terminal task. The strict, content-addressed <code>uah.trace_event/v1</code> stream persists locally as canonical JSONL and reconstructs registry and operation state after process restart without invoking a model or rerunning acceptance. Every event carries a global sequence, causal parent, and atomic <code>commit_id</code>/<code>commit_index</code>/<code>commit_size</code> position. Reload rejects incomplete or interleaved multi-event facts.</p>
-<p>The current store is local. Cooperating writers use an OS advisory lock and reload the complete stream before transition validation and append. It provides sequence, timestamps, causal links, accepted-path replay, and native execution-failure recording. The complete rejection, cancellation, timeout, and retry grammar remains open.</p>
+<p>The current store is local and single-writer. It provides sequence, timestamps, causal links, accepted-path replay, and native execution-failure recording. It does not yet provide cross-process coordination or the complete rejection/cancellation/timeout/retry grammar.</p>
 <h2>8. NeuralWorkbench</h2>
 <h3>8.1 Role in the product</h3>
 <p>NeuralWorkbench is the proposed adaptive memory and search engine. It is not an abstraction frame, model provider, runtime owner, or permission system. UAH supplies the active frame, task projection, constraints, candidate budget, and versioned context.</p>
@@ -412,7 +412,7 @@ observe(WorkbenchObservation) -&gt; no authority-bearing result</code></pre>
 <tr>
 <td>Common lifecycle persistence</td>
 <td>Implemented accepted-path seam</td>
-<td>Global sequence, causal parents, atomic commit framing, advisory-lock serialized writers, strict JSONL restart recovery, operation transitions, suspension, acceptance, accepted-with-deficit replay, and verified digest; full failure grammar remains open</td>
+<td>Global sequence, causal parents, atomic commit framing, strict JSONL restart recovery, operation transitions, acceptance, accepted-with-deficit replay, and verified digest; full failure grammar and cross-process locking remain open</td>
 </tr>
 <tr>
 <td>Recorded NAO canary</td>
@@ -542,7 +542,7 @@ observe(WorkbenchObservation) -&gt; no authority-bearing result</code></pre>
 <h2>14. Next technical gates</h2>
 <ol>
 <li>Add typed normalization/admission/domain rejection and evidence-rejection events.</li>
-<li>Freeze <code>OperationEdge</code> and retain cross-process advisory writer coordination.</li>
+<li>Freeze <code>OperationEdge</code> and add cross-process writer coordination.</li>
 <li>Add stale evidence, timeout, owner failure, cancellation, retry exhaustion, supersession, and false-completion cases.</li>
 <li>Implement role, agent, handle, agent-run, operation, edge, lease, and model invocation identities.</li>
 <li>Add PromptCompiler, provider-neutral model port, fixed model lease, and startup preflight.</li>

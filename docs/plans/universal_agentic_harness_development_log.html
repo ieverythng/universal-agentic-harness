@@ -596,6 +596,7 @@
 <li>replay rejects event types outside the implemented lifecycle grammar.</li>
 </ul>
 <p>The next blocking seam is typed counterexample replay. Native exceptions, semantic and domain rejection, stale evidence, timeout, cancellation, and retry exhaustion still need explicit artifacts and deterministic terminal or resumable transitions before the H2 cooperative planner proof.</p>
+<p>Observatory O1 now advances in parallel with those final H0 lifecycle slices. Its first implementation target is a read-only projection and static renderer for accepted, semantic-rejected, and domain-rejected traces. The ledger remains the only writer. Each later failure family joins O1 only after restart replay is stable, preventing the visualization layer from defining or repairing runtime truth.</p>
 <p>The follow-up architecture research is recorded in <code>../research/uah_h0_h1_seam_deepening.md</code>. It compares three interface shapes and recommends retaining the deep ledger interface, replacing the private task-start callback with one public task-ingress authority, freezing <code>OperationEdge</code>, and implementing failure families as TDD vertical slices. The repo-local <code>.codex/skills/uah-guardrails</code> skill now routes implementation and review work through the applicable authority, evidence, release, and validation checks. Domain onboarding remains a separate future skill because it authors and qualifies domain contracts rather than reviewing ordinary changes.</p>
 <h2>Verification dashboard</h2>
 <table><thead><tr>
@@ -603,8 +604,8 @@
 <th>Result</th>
 </tr></thead><tbody>
 <tr>
-<td><code>PYTHONPATH=src python -m pytest -q</code> on 2026-09-28</td>
-<td>150 passed after authority hardening: content-addressed domain packs, ingress, and decisions; exact ledger-backed task-start authority; complete evidence-set closure; receipt-to-admission lineage checks; atomic event commits; exact lease-only dispatch; strict recorded NAO ingress/proposal handling; replay/digest reconstruction; adapter isolation; and stale-wheel regression coverage</td>
+<td><code>PYTHONPATH=.:src .venv/bin/pytest -q</code> on 2026-09-30</td>
+<td>162 passed after authority hardening: content-addressed domain packs, ingress, and decisions; exact ledger-backed task-start authority; complete evidence-set closure; receipt-to-admission lineage checks; advisory-lock serialized event commits; exact lease-only dispatch; strict recorded NAO ingress/proposal handling; replay/digest reconstruction; adapter isolation; and stale-wheel regression coverage</td>
 </tr>
 <tr>
 <td><code>.venv\Scripts\python.exe -m pytest -q -p no:cacheprovider --basetemp .test-tmp\full-suite</code></td>

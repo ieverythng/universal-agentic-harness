@@ -555,3 +555,8 @@ Receipt construction failures record `execution_failed` before they propagate.
 Registry snapshots reject duplicate object identity, frame projection rejects
 registry-revision mismatch, and replay rejects unknown event types. Typed
 counterexample and cancellation grammar remains the next H0/H1 decision.
+
+The final H0 lifecycle slices and Observatory O1 now proceed in parallel. O1 is
+a read-only replay projection and static review surface over the common ledger.
+It cannot append events, issue evidence, repair traces, or promote memory. Each
+failure family enters O1 only after its restart-replay contract is stable.

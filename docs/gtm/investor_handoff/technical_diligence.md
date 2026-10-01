@@ -238,11 +238,10 @@ without invoking a model or rerunning acceptance. Every event carries a global
 sequence, causal parent, and atomic `commit_id`/`commit_index`/`commit_size`
 position. Reload rejects incomplete or interleaved multi-event facts.
 
-The current store is local. Cooperating writers use an OS advisory lock and
-reload the complete stream before transition validation and append. It provides
-sequence, timestamps, causal links, accepted-path replay, and native
-execution-failure recording. The complete rejection, cancellation, timeout,
-and retry grammar remains open.
+The current store is local and single-writer. It provides sequence, timestamps,
+causal links, accepted-path replay, and native execution-failure recording. It
+does not yet provide cross-process coordination or the complete
+rejection/cancellation/timeout/retry grammar.
 
 ## 8. NeuralWorkbench
 
@@ -345,7 +344,7 @@ responsibility.
 | Domain contract authority | Implemented narrow seam | Content-derived revision covers role/task allowlists, ingress/effect-evidence rules, failure policy, and prohibitions |
 | TaskSpec compilation | Implemented | Content-verified decision plus ledger-recorded start, content-addressed projection, obligations, prohibitions, declared budgets, and revision provenance; budget enforcement remains open |
 | Task acceptance | Implemented narrow seam | Required, best-effort, suspended, and terminal outcomes |
-| Common lifecycle persistence | Implemented accepted-path seam | Global sequence, causal parents, atomic commit framing, advisory-lock serialized writers, strict JSONL restart recovery, operation transitions, suspension, acceptance, accepted-with-deficit replay, and verified digest; full failure grammar remains open |
+| Common lifecycle persistence | Implemented accepted-path seam | Global sequence, causal parents, atomic commit framing, strict JSONL restart recovery, operation transitions, acceptance, accepted-with-deficit replay, and verified digest; full failure grammar and cross-process locking remain open |
 | Recorded NAO canary | Implemented | Injected domain pack, real ingress classification, strict planner payload handling, accepted lease-only execution, semantic no-dispatch rejection, restart replay, and verified digest |
 | PromptCompiler | Specified | No executable prompt artifact compiler |
 | Two-stage admission and execution | Implemented narrow seam | Content-addressed proposal, semantic admission, complete binding fingerprint, ledger-backed domain lease, exact lease-only dispatch, native result/evidence receipt, and typed rejections |
@@ -415,7 +414,7 @@ and accept a materially different task before universality is claimed.
 
 1. Add typed normalization/admission/domain rejection and evidence-rejection
    events.
-2. Freeze `OperationEdge` and retain cross-process advisory writer coordination.
+2. Freeze `OperationEdge` and add cross-process writer coordination.
 3. Add stale evidence, timeout, owner failure, cancellation, retry exhaustion,
    supersession, and false-completion cases.
 4. Implement role, agent, handle, agent-run, operation, edge, lease, and model

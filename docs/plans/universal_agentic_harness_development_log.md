@@ -782,6 +782,13 @@ semantic and domain rejection, stale evidence, timeout, cancellation, and retry
 exhaustion still need explicit artifacts and deterministic terminal or
 resumable transitions before the H2 cooperative planner proof.
 
+Observatory O1 now advances in parallel with those final H0 lifecycle slices.
+Its first implementation target is a read-only projection and static renderer
+for accepted, semantic-rejected, and domain-rejected traces. The ledger remains
+the only writer. Each later failure family joins O1 only after restart replay is
+stable, preventing the visualization layer from defining or repairing runtime
+truth.
+
 The follow-up architecture research is recorded in
 `../research/uah_h0_h1_seam_deepening.md`. It compares three interface shapes
 and recommends retaining the deep ledger interface, replacing the private
@@ -796,7 +803,7 @@ and qualifies domain contracts rather than reviewing ordinary changes.
 
 | Command | Result |
 | --- | --- |
-| `PYTHONPATH=src python -m pytest -q` on 2026-09-28 | 150 passed after authority hardening: content-addressed domain packs, ingress, and decisions; exact ledger-backed task-start authority; complete evidence-set closure; receipt-to-admission lineage checks; atomic event commits; exact lease-only dispatch; strict recorded NAO ingress/proposal handling; replay/digest reconstruction; adapter isolation; and stale-wheel regression coverage |
+| `PYTHONPATH=.:src .venv/bin/pytest -q` on 2026-09-30 | 162 passed after authority hardening: content-addressed domain packs, ingress, and decisions; exact ledger-backed task-start authority; complete evidence-set closure; receipt-to-admission lineage checks; advisory-lock serialized event commits; exact lease-only dispatch; strict recorded NAO ingress/proposal handling; replay/digest reconstruction; adapter isolation; and stale-wheel regression coverage |
 | `.venv\Scripts\python.exe -m pytest -q -p no:cacheprovider --basetemp .test-tmp\full-suite` | 42 passed |
 | Focused `tests/test_workbench_protocol.py` red-green pass | 9 passed after strict identity, capability, duplicate-ID, and JSON checks |
 | `PYTHONPATH=src .venv/bin/python -m ab_harness_nao` | Passed accepted lease-only execution, semantic no-dispatch rejection, strict replay, and verified-digest canaries through the explicit NAO adapter package |

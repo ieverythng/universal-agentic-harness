@@ -1389,6 +1389,7 @@ Workbench learning  -&gt; consumes traces and registry snapshots, never executor
 <h3>Observatory O1 and O2</h3>
 <p>Observatory is the canonical trace visualization surface. O1 freezes a read-only API and static HTML renderer for H1 lifecycle and H2 parity review. O2 is the proper interactive implementation developed through H4 and polished at H5. It may display registry, binding, proposal, gate, evidence, replay, pulse, energy, entropy, retrieval, and crystallization graphs, but it never authorizes execution or issues evidence. Conceptual and synthetic graphs are labeled and cannot masquerade as measured traces. See <code>../architecture/observatory_contract.md</code>.</p>
 <p>The kernel always emits lifecycle events. Agent-visible observability is a separate, explicit frame projection and is normally read-only and task-scoped. The universal prompt explains evidence and trace semantics without exposing the complete trace store to every role.</p>
+<p>O1 implementation starts with the final H0 lifecycle families rather than after the complete H1 runtime. Each accepted or rejected event family must gain a read-only O1 projection as its replay contract stabilizes. H0 remains owned by the semantic kernel and ledger, while the O1 static renderer is required before the corresponding H1/H2 evidence can be reviewed as a release candidate.</p>
 <h3>Domain initialization and model coupling</h3>
 <p>Automated domain initialization is an H3+ product stream, not an H2 dependency. Manual and LLM-assisted frontends produce the same <code>DomainContractPackCandidate</code>. Discovery never activates objects. Deterministic validation, replay/sandbox qualification, and environment-owner review are required. Coupling and runtime models are separate configuration roles, and admission is attached to the full model-harness-domain configuration. See <code>domain_initialization_and_ab_coupling.md</code>.</p>
 <p>The onboarding workflow may use a domain guardrail skill, TDD, SkillOpt and deslop. Those developer workflows do not become runtime AB objects unless a named abstraction frame and approved binding explicitly make them so.</p>
@@ -1975,6 +1976,14 @@ evidence_closure | evaluator | resource_budget</code></pre>
 <li>Implement milestones and minefields.</li>
 <li>Extend the frozen synthetic conformance suite across explicit failure branches and compare deterministic trace digests.</li>
 <li>Deslop only after behavior is covered; avoid framework-building beyond tested needs.</li>
+</ol>
+<h3>In parallel with final H0 slices: Observatory O1</h3>
+<ol>
+<li>Freeze a read-only projection over common-ledger replay; do not create a second event store or write API.</li>
+<li>Render environment-run, task/trace, actor, operation, admission, evidence, obligation, and terminal-outcome views from shared event identities.</li>
+<li>Add each rejection and failure family to O1 when its lifecycle contract becomes replay-stable.</li>
+<li>Require explicit labels for recorded, synthetic, and conceptual data.</li>
+<li>Use the static O1 renderer for H1 failure-suite and H2 NAO parity review; leave interactive filtering and annotation to O2.</li>
 </ol>
 <h3>H2 target: cooperative NAO planner proof</h3>
 <ol>

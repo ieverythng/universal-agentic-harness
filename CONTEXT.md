@@ -398,6 +398,12 @@ cooperating writer reloads and validates the stream while holding the lock
 before it appends and flushes a fact. The ledger records authority decisions
 but does not make them. The complete failure/cancellation grammar remains open.
 
+Observatory O1 begins alongside the final H0 lifecycle slices. It consumes
+replay-stable ledger events through read-only projections and a static renderer.
+O1 never appends lifecycle facts, issues evidence, or changes admission. This
+parallel track is required for H1/H2 review, but it does not become a second
+authority writer for H0.
+
 ### Recorded qualification
 
 A deterministic replay of frozen chatbot and planner outputs through

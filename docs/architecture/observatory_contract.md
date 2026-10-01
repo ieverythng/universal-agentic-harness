@@ -176,6 +176,13 @@ parent_event_id, artifact_refs, data_json
 `data_json` is a canonical JSON object serialized as a string. Agent, handle,
 model, provider, prompt, and operation-edge identities remain H1/H2 additions.
 
+O1 implementation begins during final H0 lifecycle closure. The first static
+renderer covers the accepted path plus the first typed semantic and domain
+rejection families. Later cancellation, timeout, retry, stale-evidence, and
+false-completion views follow their replay-stable event contracts. This order
+keeps traceability available during H1 development without making Observatory a
+writer or a prerequisite for ledger correctness.
+
 The implemented `uah.domain_contract_pack/v1` revision covers its role/task
 allowlists, ingress rules, effect-to-object and evidence-owner rules, failure
 policy, and prohibited effects. `uah.environment_ingress/v1` and

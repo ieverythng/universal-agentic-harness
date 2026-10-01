@@ -39,6 +39,9 @@ Follow the changed value from origin to effect:
 ```text
 environment ingress
   -> task lineage and compiled projection
+  -> PromptCompiler artifact (when inference is required)
+  -> ModelLease and ModelInvocation
+  -> raw model output
   -> typed proposal
   -> semantic admission
   -> domain execution lease
@@ -68,6 +71,14 @@ At every affected seam, verify these invariants:
 - Terminal success follows declared obligations and owner evidence. Timeout,
   cancellation, stale evidence, retry exhaustion, and false completion remain
   typed outcomes rather than exceptions erased from replay.
+- Agent registration never reserves hardware, loads a model, or invokes a
+  provider. Releasing a model lease does not terminate the logical agent run.
+- Provider responses are untrusted inputs, never authority or effect evidence.
+  Keep provider credentials and sensitive configuration out of artifacts and logs.
+- Endpoint smoke tests qualify provider connectivity only. They do not qualify
+  H2 semantic admission, domain admission, execution, evidence, or task closure.
+- O1 begins alongside final H0 closure. It consumes replay-stable ledger events
+  through read-only projections and never writes authority back into the ledger.
 - Adaptive or learned structures remain quarantined until replay,
   counterexample, holdout, owner-review, provenance, and rollback gates pass.
 - Documentation labels H0 implementation, H1 work, H2 qualification, and H3+

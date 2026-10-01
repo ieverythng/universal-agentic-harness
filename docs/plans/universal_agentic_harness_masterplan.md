@@ -1136,6 +1136,12 @@ separate, explicit frame projection and is normally read-only and task-scoped.
 The universal prompt explains evidence and trace semantics without exposing the
 complete trace store to every role.
 
+O1 implementation starts with the final H0 lifecycle families rather than after
+the complete H1 runtime. Each accepted or rejected event family must gain a
+read-only O1 projection as its replay contract stabilizes. H0 remains owned by
+the semantic kernel and ledger, while the O1 static renderer is required before
+the corresponding H1/H2 evidence can be reviewed as a release candidate.
+
 ### Domain initialization and model coupling
 
 Automated domain initialization is an H3+ product stream, not an H2 dependency.
@@ -1510,6 +1516,18 @@ protocol is frozen and conformance-tested.
    branches and compare deterministic trace digests.
 7. Deslop only after behavior is covered; avoid framework-building beyond
    tested needs.
+
+### In parallel with final H0 slices: Observatory O1
+
+1. Freeze a read-only projection over common-ledger replay; do not create a
+   second event store or write API.
+2. Render environment-run, task/trace, actor, operation, admission, evidence,
+   obligation, and terminal-outcome views from shared event identities.
+3. Add each rejection and failure family to O1 when its lifecycle contract
+   becomes replay-stable.
+4. Require explicit labels for recorded, synthetic, and conceptual data.
+5. Use the static O1 renderer for H1 failure-suite and H2 NAO parity review;
+   leave interactive filtering and annotation to O2.
 
 ### H2 target: cooperative NAO planner proof
 
