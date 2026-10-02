@@ -4,9 +4,8 @@ from __future__ import annotations
 
 from collections import defaultdict
 from dataclasses import asdict
-import hashlib
-import json
 
+from ab_harness._content_addressing import content_id
 from ab_harness.contracts import ABImplementationBinding, ABObjectView
 from ab_harness.registry import RegistrySnapshot
 
@@ -14,13 +13,7 @@ from ab_harness.registry import RegistrySnapshot
 def binding_fingerprint(binding: ABImplementationBinding) -> str:
     """Identify the complete reviewed binding contract, not only its revision label."""
 
-    encoded = json.dumps(
-        asdict(binding),
-        allow_nan=False,
-        sort_keys=True,
-        separators=(",", ":"),
-    ).encode("utf-8")
-    return "binding:sha256:%s" % hashlib.sha256(encoded).hexdigest()
+    return content_id("binding", asdict(binding))
 
 
 class BindingCatalog:

@@ -5,10 +5,9 @@ from __future__ import annotations
 from collections.abc import Callable, Mapping
 from dataclasses import asdict
 from dataclasses import dataclass
-import hashlib
-import json
 from typing import Any, TYPE_CHECKING
 
+from ab_harness._content_addressing import content_id
 from ab_harness.bindings import BindingCatalog
 from ab_harness.bindings import binding_fingerprint
 from ab_harness.contracts import ABImplementationBinding
@@ -19,10 +18,13 @@ from ab_harness.environment_runs import EnvironmentRun
 
 if TYPE_CHECKING:
     from ab_harness.lifecycle import LifecycleLedger
+    from ab_harness.proposal_admission import AdmittedOperation
+    from ab_harness.runtime_controls import ExecutionCancellationDecision
 
 
 Handler = Callable[[dict[str, Any]], OwnerExecutionResult]
 EXECUTION_RECEIPT_SCHEMA = "uah.execution_receipt/v1"
+EVIDENCE_REJECTION_SCHEMA = "uah.evidence_rejection/v1"
 
 
 def _receipt_payload(
@@ -46,15 +48,16 @@ def _receipt_payload(
 
 def _receipt_id(payload: dict[str, object]) -> str:
     try:
-        encoded = json.dumps(
-            payload,
-            allow_nan=False,
-            sort_keys=True,
-            separators=(",", ":"),
-        ).encode("utf-8")
+        return content_id("execution-receipt", payload)
     except (TypeError, ValueError) as exc:
         raise ValueError("execution result must contain finite JSON values") from exc
-    return "execution-receipt:sha256:%s" % hashlib.sha256(encoded).hexdigest()
+
+
+def _evidence_rejection_id(payload: dict[str, object]) -> str:
+    try:
+        return content_id("evidence-rejection", payload)
+    except (TypeError, ValueError) as exc:
+        raise ValueError("evidence rejection must contain finite JSON values") from exc
 
 
 @dataclass(frozen=True)
@@ -248,6 +251,121 @@ class ExecutionReceipt:
         )
 
 
+def _evidence_rejection_payload(
+    *,
+    lease: ExecutionLease,
+    owner_result: OwnerExecutionResult,
+    reason_codes: tuple[str, ...],
+) -> dict[str, object]:
+    return {
+        "schema_version": EVIDENCE_REJECTION_SCHEMA,
+        "lease": lease.to_dict(),
+        "owner_result": asdict(owner_result),
+        "reason_codes": reason_codes,
+    }
+
+
+@dataclass(frozen=True)
+class EvidenceRejection:
+    """Owner result retained without accepting it as effect evidence."""
+
+    rejection_id: str
+    lease: ExecutionLease
+    owner_result: OwnerExecutionResult
+    reason_codes: tuple[str, ...]
+    schema_version: str = EVIDENCE_REJECTION_SCHEMA
+
+    def __post_init__(self) -> None:
+        self.verify_identity()
+
+    @classmethod
+    def issue(
+        cls,
+        *,
+        lease: ExecutionLease,
+        owner_result: OwnerExecutionResult,
+        reason_codes: tuple[str, ...],
+    ) -> EvidenceRejection:
+        fields = {
+            "lease": lease,
+            "owner_result": owner_result,
+            "reason_codes": reason_codes,
+        }
+        return cls(
+            rejection_id=_evidence_rejection_id(
+                _evidence_rejection_payload(**fields)
+            ),
+            **fields,
+        )
+
+    def verify_identity(self) -> None:
+        self.lease.verify_identity()
+        if self.schema_version != EVIDENCE_REJECTION_SCHEMA:
+            raise ValueError("unsupported evidence rejection schema")
+        if not self.reason_codes or any(
+            not reason.strip() for reason in self.reason_codes
+        ):
+            raise ValueError("evidence rejection requires reason codes")
+        expected = _evidence_rejection_id(
+            _evidence_rejection_payload(
+                lease=self.lease,
+                owner_result=self.owner_result,
+                reason_codes=self.reason_codes,
+            )
+        )
+        if self.rejection_id != expected:
+            raise ValueError("evidence rejection identity does not match content")
+
+    @property
+    def execution_result_id(self) -> str:
+        return self.rejection_id
+
+    @property
+    def environment_run_id(self) -> str:
+        return self.lease.environment_run_id
+
+    @property
+    def task_id(self) -> str:
+        return self.lease.admitted_operation.task_id
+
+    @property
+    def trace_id(self) -> str:
+        return self.lease.admitted_operation.trace_id
+
+    @property
+    def operation_id(self) -> str:
+        return self.lease.operation_id
+
+    def to_dict(self) -> dict[str, object]:
+        self.verify_identity()
+        payload = _evidence_rejection_payload(
+            lease=self.lease,
+            owner_result=self.owner_result,
+            reason_codes=self.reason_codes,
+        )
+        result = dict(payload["owner_result"])
+        result["observed_effects"] = list(self.owner_result.observed_effects)
+        payload["owner_result"] = result
+        payload["reason_codes"] = list(self.reason_codes)
+        return {"rejection_id": self.rejection_id, **payload}
+
+
+@dataclass(frozen=True)
+class EvidenceDecision:
+    """Accepted execution receipt or typed evidence-contract rejection."""
+
+    receipt: ExecutionReceipt | None = None
+    rejection: EvidenceRejection | None = None
+
+    def __post_init__(self) -> None:
+        if (self.receipt is None) == (self.rejection is None):
+            raise ValueError("evidence decision requires receipt or rejection")
+
+    @property
+    def accepted(self) -> bool:
+        return self.receipt is not None
+
+
 def _resolve_handler(
     *,
     environment_id: str,
@@ -290,25 +408,22 @@ def _execute_handler(
     binding: ABImplementationBinding,
     handler: Handler,
     arguments: dict[str, Any],
-) -> tuple[OwnerExecutionResult, EffectEvidence]:
+) -> tuple[OwnerExecutionResult, EffectEvidence, tuple[str, ...]]:
     result = handler(dict(arguments))
     if not isinstance(result, OwnerExecutionResult):
         raise TypeError("environment handler must return OwnerExecutionResult")
+    reasons: list[str] = []
     if not result.evidence_ref.strip():
-        raise ValueError("environment owner returned evidence without a reference")
-
+        reasons.append("missing_evidence_reference")
     undeclared = tuple(
         effect
         for effect in result.observed_effects
         if effect not in item.observable_success
     )
     if undeclared:
-        raise ValueError(
-            "environment owner returned undeclared observables: %s"
-            % ", ".join(undeclared)
-        )
+        reasons.append("undeclared_observed_effect")
     if result.succeeded and item.observable_success and not result.observed_effects:
-        raise ValueError("successful execution requires declared effect evidence")
+        reasons.append("successful_result_without_observable")
 
     result = OwnerExecutionResult(
         evidence_ref=result.evidence_ref,
@@ -326,7 +441,7 @@ def _execute_handler(
         observed_effects=result.observed_effects,
         payload=dict(result.payload),
     )
-    return result, evidence
+    return result, evidence, tuple(reasons)
 
 
 class InProcessEnvironmentOwner:
@@ -351,7 +466,73 @@ class InProcessEnvironmentOwner:
         self._handlers = dict(handlers)
         self._lifecycle_ledger = lifecycle_ledger
 
-    def execute(self, lease: ExecutionLease) -> ExecutionReceipt:
+    def execute(self, lease: ExecutionLease) -> EvidenceDecision:
+        admitted = self._validate_lease(lease)
+
+        item, binding, handler = _resolve_handler(
+            environment_id=self.environment_id,
+            catalog=self._catalog,
+            handlers=self._handlers,
+            object_id=admitted.object_id,
+            runtime_mode=admitted.runtime_mode,
+        )
+        if (
+            binding.binding_id != admitted.binding_id
+            or binding.source_revision != admitted.binding_source_revision
+            or binding_fingerprint(binding) != admitted.binding_fingerprint
+        ):
+            raise ValueError("execution lease binding no longer matches the catalog")
+
+        self._lifecycle_ledger.start_execution(lease)
+        try:
+            owner_result, evidence, rejection_reasons = _execute_handler(
+                environment_id=self.environment_id,
+                item=item,
+                binding=binding,
+                handler=handler,
+                arguments=admitted.arguments,
+            )
+            if rejection_reasons:
+                rejection = EvidenceRejection.issue(
+                    lease=lease,
+                    owner_result=owner_result,
+                    reason_codes=rejection_reasons,
+                )
+                self._lifecycle_ledger.record(rejection)
+                return EvidenceDecision(rejection=rejection)
+            receipt = ExecutionReceipt.issue(
+                lease=lease,
+                owner_result=owner_result,
+                evidence=evidence,
+            )
+        except Exception as exc:
+            self._lifecycle_ledger.fail_execution(lease, exc)
+            raise
+        self._lifecycle_ledger.complete_execution(receipt)
+        return EvidenceDecision(receipt=receipt)
+
+    def cancel(
+        self,
+        lease: ExecutionLease,
+        *,
+        requester_id: str,
+        request_artifact_id: str,
+        reason_code: str,
+    ) -> ExecutionCancellationDecision:
+        self._validate_lease(lease)
+        from ab_harness.runtime_controls import ExecutionCancellationDecision
+
+        decision = ExecutionCancellationDecision.issue(
+            lease=lease,
+            requester_id=requester_id,
+            request_artifact_id=request_artifact_id,
+            deciding_owner_id=self.environment_run.attestation.environment_owner_id,
+            reason_code=reason_code,
+        )
+        self._lifecycle_ledger.record(decision)
+        return decision
+
+    def _validate_lease(self, lease: ExecutionLease) -> AdmittedOperation:
         if not isinstance(lease, ExecutionLease):
             raise TypeError("lease-bound owner requires an ExecutionLease")
         lease.verify_identity()
@@ -370,37 +551,4 @@ class InProcessEnvironmentOwner:
         admitted = lease.admitted_operation
         if admitted.environment_id != self.environment_id:
             raise ValueError("execution lease belongs to another environment")
-
-        item, binding, handler = _resolve_handler(
-            environment_id=self.environment_id,
-            catalog=self._catalog,
-            handlers=self._handlers,
-            object_id=admitted.object_id,
-            runtime_mode=admitted.runtime_mode,
-        )
-        if (
-            binding.binding_id != admitted.binding_id
-            or binding.source_revision != admitted.binding_source_revision
-            or binding_fingerprint(binding) != admitted.binding_fingerprint
-        ):
-            raise ValueError("execution lease binding no longer matches the catalog")
-
-        self._lifecycle_ledger.start_execution(lease)
-        try:
-            owner_result, evidence = _execute_handler(
-                environment_id=self.environment_id,
-                item=item,
-                binding=binding,
-                handler=handler,
-                arguments=admitted.arguments,
-            )
-            receipt = ExecutionReceipt.issue(
-                lease=lease,
-                owner_result=owner_result,
-                evidence=evidence,
-            )
-        except Exception as exc:
-            self._lifecycle_ledger.fail_execution(lease, exc)
-            raise
-        self._lifecycle_ledger.complete_execution(receipt)
-        return receipt
+        return admitted

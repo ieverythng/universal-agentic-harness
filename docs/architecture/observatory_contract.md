@@ -1,7 +1,8 @@
 # Observatory Contract
 
-**Status:** O1 API and identity grammar frozen; O2 implementation deferred
-**Date:** 2026-09-08
+**Status:** Initial O1 ledger projection and static renderer implemented; full
+identity envelope and O2 deferred
+**Date:** 2026-10-01
 **Applies to:** UAH H0-H6 and NeuralWorkbench H3+
 
 ## 1. Decision
@@ -50,9 +51,11 @@ flowchart TB
 ```
 
 The diagram shows the target accepted path. The current ledger records the
-accepted authority chain and execution failure; complete normalization,
-admission, evidence, timeout, cancellation, and retry rejection branches remain
-open. Neither Observatory nor NeuralWorkbench sits in the execution call chain.
+accepted authority chain, execution failure, and semantic/domain rejection
+facts. Semantic rejection is appended explicitly by the coordinating caller;
+domain rejection is appended by the domain lifecycle owner. Normalization,
+evidence, timeout, cancellation, and retry rejection branches remain open.
+Neither Observatory nor NeuralWorkbench sits in the execution call chain.
 
 ## 3. Layered Visualization Contract
 
@@ -65,8 +68,8 @@ open. Neither Observatory nor NeuralWorkbench sits in the execution call chain.
 
 ## 4. O1 API
 
-O1 accepts immutable, JSON-compatible inputs and returns a self-contained review
-document:
+The complete O1 contract accepts immutable, JSON-compatible inputs and returns
+a self-contained review document:
 
 ```text
 render_observatory(
@@ -87,6 +90,23 @@ render_observatory(
   owner, gate outcome, event type, and failure stage;
 - ordered event cards with inspectable raw payloads;
 - graph data embedded as inert JSON for later O2 reuse.
+
+The implemented 2026-10-01 slice is narrower:
+
+```text
+render_observatory(
+  validated_ledger_or_event_collection,
+  title = optional,
+  data_label = inferred
+) -> ObservatoryDocument
+```
+
+It groups immutable `TraceEvent` values by trace, verifies consistent task and
+environment lineage, derives terminal status only from explicit terminal facts,
+retains nonterminal failure stages, escapes displayed payloads, and embeds an
+inert graph payload. A `recorded` label requires a validated `LifecycleLedger`;
+an arbitrary event collection defaults to `synthetic`. Configuration comparison
+and the remaining identity facets are not implemented.
 
 ### Target mandatory identity envelope
 
@@ -173,12 +193,15 @@ environment_run_id, task_id, trace_id, operation_id,
 parent_event_id, artifact_refs, data_json
 ```
 
-`data_json` is a canonical JSON object serialized as a string. Agent, handle,
-model, provider, prompt, and operation-edge identities remain H1/H2 additions.
+`data_json` is a canonical JSON object serialized as a string. In-memory agent,
+handle, and standby-run registries now exist, but their identities are not yet
+part of scoped lifecycle events. Model, provider, prompt, and operation-edge
+identities remain H1/H2 additions.
 
-O1 implementation begins during final H0 lifecycle closure. The first static
-renderer covers the accepted path plus the first typed semantic and domain
-rejection families. Later cancellation, timeout, retry, stale-evidence, and
+The initial O1 static renderer now covers trace grouping, explicit terminal
+status, failure-stage visibility, searchable event cards, and inert graph JSON
+for the accepted path plus semantic and domain rejection families. Later actor,
+configuration, cancellation, timeout, retry, stale-evidence, and
 false-completion views follow their replay-stable event contracts. This order
 keeps traceability available during H1 development without making Observatory a
 writer or a prerequisite for ledger correctness.
@@ -202,18 +225,22 @@ lease, evidence, and terminal judgment. Prompt compilation is a planned event,
 not part of the current tracer.
 
 The current H0 authority slice also emits content-addressed
-`uah.typed_proposal/v1`, `uah.admitted_operation/v1`, and
-`uah.execution_lease/v1` artifacts with typed rejection reasons. Accepted
-values are appended as distinct proposal, semantic-admission, and
-domain-admission events. The environment owner accepts only the exact lease,
+`uah.typed_proposal/v1`, `uah.admitted_operation/v2`, and
+`uah.execution_lease/v1` artifacts. `AdmittedOperation` pins the reviewed
+input-schema identity. Accepted values are appended as distinct proposal,
+semantic-admission, and domain-admission events. Semantic rejection is appended
+by the coordinating caller; the domain owner appends its own rejection. The
+environment owner accepts only the exact lease,
 records execution start before native dispatch, and emits a content-addressed
 receipt containing separate native result and normalized evidence artifacts.
 Replay verifies receipt admission, object, binding, and evidence-owner lineage.
 Terminal acceptance must reference the complete recorded evidence set rather
 than a caller-selected subset.
 Acceptance and best-effort-deficit traces replay into a deterministic
-`VerifiedTraceDigest`. Rejection, timeout, cancellation, retry, and stale
-evidence events remain incomplete. O1 must not infer absent failure events.
+`VerifiedTraceDigest`. Semantic and domain rejection replay as nonterminal
+failure stages. Normalization rejection, evidence rejection, terminal
+counterexamples, timeout, cancellation, retry, and stale-evidence events remain
+incomplete. O1 does not infer absent failure or terminal events.
 
 This is the common startup-to-task order, not a rule that every lease ends with
 one task. A lease may be invocation-, task-, or run-scoped; its declared scope
@@ -314,6 +341,10 @@ grammar, but it must never present synthetic or conceptual values as runtime
 evidence.
 
 ## 7. O1 Exit Gate
+
+The initial renderer does not satisfy this exit gate. Actor/configuration
+facets, artifact-separated prompt and model views, comparison, and the H2 parity
+trace remain open.
 
 O1 is complete when one accepted and one rejected H1 lifecycle plus the H2 NAO
 planner parity run can be rendered with:

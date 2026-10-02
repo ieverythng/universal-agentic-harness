@@ -35,6 +35,9 @@ and must be regenerated after canonical edits.
   retained-template review of the 2026-09-08 architecture checkpoint.
 - `artifacts/system-design/`: system-design document, retained template, and
   architecture figure.
+- `artifacts/observatory/o1_recorded_nao_canary.html`: generated O1 static
+  projection of the deterministic recorded NAO canary. It is not a live H2
+  parity result.
 - `artifacts/provenance.md`: source and extraction provenance.
 - `artifacts/h0_source_readme.md`: retained H0 source note.
 

@@ -203,24 +203,27 @@ inventing an empty or synthetic task identity would weaken lineage semantics.
 This is the strongest reason to consider a trace-event v2. It should not be
 introduced merely to reorganize Python code.
 
-### 4.4 Content-addressing code is repeated but not yet one contract
+### 4.4 Strict authority artifacts now share one byte-level identity contract
 
-Several modules implement canonical JSON plus SHA-256. Their observable
-behavior is not identical. Prefixes, error messages, finite-number checks,
-separator choices, and payload schemas differ. Extracting `_content_id(prefix,
-payload)` today would centralize syntax while leaving compatibility policy
-distributed.
+The initial audit found several superficially similar SHA-256 implementations
+with different compatibility policies. The later H0/H1 slices added operation
+edges, runtime-control decisions, portable input schemas, and agent manifests.
+The strict authority artifacts now converge on finite JSON, sorted keys,
+compact separators, UTF-8, and namespaced SHA-256 identities.
 
-**Deletion test:** a generic hashing helper can be deleted with little effect
-on callers or domain policy, so it is shallow. A canonical artifact codec earns
-depth only if it owns serialization rules, schema validation, identity issuance,
-and verification for more than one artifact family.
+**Deletion test:** deleting the shared byte-level primitive would reintroduce
+the same persisted serialization algorithm across more than ten modules. The
+primitive therefore supplies leverage and locality. Deleting any artifact's
+`verify_identity()` would instead remove schema, nested-authority, and domain
+checks, so those verifiers remain local.
 
-**Decision:** first freeze serialization conventions with golden tests for each
-authority artifact. Keep public `issue()`, `from_dict()`, `to_dict()`, and
-`verify_identity()` behavior on the artifact. If the conventions converge,
-introduce one private fixed codec. Do not expose a pluggable hash service or
-caller-facing `content_id()` utility.
+**Decision:** `_content_addressing.py` privately owns canonical bytes and the
+namespaced digest. Public `issue()`, `from_dict()`, `to_dict()`, and
+`verify_identity()` behavior remains on each artifact. Golden public-artifact
+tests freeze representative identities. Registry raw-byte versions,
+configuration snapshots, trace IDs, and Workbench artifacts keep their distinct
+compatibility policies. No artifact base class, mixin, pluggable hash adapter,
+or public caller-selected hashing utility is introduced.
 
 ### 4.5 `AdmittedOperation` contains a real but not yet proven data clump
 
@@ -450,6 +453,8 @@ qualification evidence without special cases.
 - closed typed rejection and failure facts;
 - one task-ingress authority and read-only registry projection;
 - `OperationEdge` v1 before multi-operation policy;
+- one private canonical JSON and namespaced SHA-256 primitive for strict
+  authority artifacts, with artifact-owned verification;
 - public-seam TDD and restart-equivalent replay for each vertical slice;
 - the repo-local UAH guardrails skill.
 
@@ -458,7 +463,6 @@ qualification evidence without special cases.
 - a common `HarnessLifecycle` runtime facade;
 - an `AuthorityRepository` or standalone artifact-store interface;
 - `AdmittedBindingContext` extraction;
-- a canonical artifact codec shared by all modules;
 - package-root export removal;
 - a separate lifecycle grammar file;
 - the domain-onboarding skill.

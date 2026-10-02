@@ -1,6 +1,6 @@
 # UAH and NeuralWorkbench Investor Handoff
 
-**Prepared:** 2026-09-28
+**Prepared:** 2026-10-01
 
 **Audience:** prospective investors, design partners, strategic operators, and
 technical diligence teams
@@ -22,7 +22,8 @@ as one product thesis with separate authority boundaries:
   proposes reusable structures without receiving execution authority.
 - **Observatory** is the read-only evidence surface. It renders model output,
   admission, execution, evidence, acceptance, and Workbench provenance without
-  becoming another source of truth.
+  becoming another source of truth. The current implementation is an initial
+  static event/trace renderer; the broader product views remain roadmap work.
 
 The package separates implemented behavior from the roadmap. Commercial and
 market statements are hypotheses for validation unless identified as
@@ -70,20 +71,24 @@ the handoff when the recipient requests technical depth:
 
 ## Current evidence in one page
 
-As of 2026-09-28:
+As of 2026-10-01:
 
-- the portable kernel and NAO compatibility package pass **146 tests**, and the
+- the portable kernel and NAO compatibility package pass **200 tests**, and the
   latest Ruff validation passes; the complete pre-commit, document-render, and
   clean-wheel gates are rerun before distributing a refreshed package;
 - H0 implements task projection, deterministic gates, binding quarantine,
   content-addressed domain rules, normalized ingress, and classification
   decisions, ledger-authorized task starts, environment registration, task and
-  trace lineage, TaskSpec compilation, two-stage operation admission, exact
-  lease-only execution, task
-  acceptance, atomic commit-framed restart replay, and verified trace digests;
+  trace lineage, TaskSpec compilation, bounded input-schema validation,
+  two-stage operation admission, nonterminal semantic/domain rejection replay,
+  exact lease-only execution, task acceptance, advisory-lock-coordinated restart
+  replay, and verified trace digests;
 - the deterministic NAO adapter canary covers accepted lease execution,
-  semantic no-dispatch rejection, restart replay, and verified digest output;
-- H1 does not yet provide a complete live model and agent lifecycle;
+  recorded semantic no-dispatch rejection, restart replay, and verified digest
+  output;
+- initial H1 agent-manifest, handle, and standby-run registries and an initial
+  O1 static renderer are implemented, but H1 does not yet provide a complete
+  live model and agent lifecycle;
 - H2 NAO planner parity has not yet been demonstrated;
 - the Watson/Bonsai model comparison has not started;
 - NeuralWorkbench is an optional H3 companion, and its intended repository

@@ -11,10 +11,11 @@ from ab_harness import EnvironmentIngress
 from ab_harness import EnvironmentRun
 from ab_harness import EnvironmentRunAttestation
 from ab_harness import EnvironmentTaskRegistry
+from ab_harness import LifecycleLedger
 from ab_harness import RegistrySnapshot
 from ab_harness import TaskBudgets
 from ab_harness import TaskEffectRequest
-from ab_harness import TaskIngressPolicy
+from ab_harness import TaskIngressAuthority
 from ab_harness import TaskIngressRule
 from ab_harness import TaskSpec
 from ab_harness import TaskSpecCompiler
@@ -57,7 +58,8 @@ def _compiler_inputs():
         ),
         prohibited_effects=("direct_kb_write",),
     )
-    task_registry = EnvironmentTaskRegistry()
+    ledger = LifecycleLedger()
+    task_registry = EnvironmentTaskRegistry(ledger)
     environment_run = EnvironmentRun(
         EnvironmentRunAttestation(
             environment_run_id="environment-run:nao:001",
@@ -79,11 +81,11 @@ def _compiler_inputs():
         native_lineage=(("goal_id", "goal:find-cup:001"),),
         observed_at="2026-09-28T09:00:01Z",
     )
-    ingress = TaskIngressPolicy(
+    ingress = TaskIngressAuthority(
         environment_profile_id=environment_run.attestation.environment_profile_id,
         domain_contract_pack=domain,
-        task_registry=task_registry,
-    ).classify(environment_run, normalized_ingress)
+        lifecycle_ledger=ledger,
+    ).admit(environment_run, normalized_ingress)
     task = TaskSpec(
         task_id=ingress.task_id,
         trace_id=ingress.trace_id,
@@ -155,12 +157,13 @@ def _use_domain(inputs, domain):
         native_lineage=(("goal_id", previous.task_id),),
         observed_at="2026-09-28T09:00:01Z",
     )
-    task_registry = EnvironmentTaskRegistry()
-    ingress = TaskIngressPolicy(
+    ledger = LifecycleLedger()
+    task_registry = EnvironmentTaskRegistry(ledger)
+    ingress = TaskIngressAuthority(
         environment_profile_id=environment_run.attestation.environment_profile_id,
         domain_contract_pack=domain,
-        task_registry=task_registry,
-    ).classify(environment_run, normalized_ingress)
+        lifecycle_ledger=ledger,
+    ).admit(environment_run, normalized_ingress)
     inputs["domain_contract_pack"] = domain
     inputs["task_registry"] = task_registry
     inputs["task_ingress_decision"] = ingress
@@ -190,7 +193,7 @@ def test_task_spec_compiles_one_frozen_projection_and_obligation_set():
     assert compiled.budgets == inputs["task_spec"].budgets
     assert compiled.compiled_task_id == (
         "compiled-task:sha256:"
-        "0e16a007b5d533505bded1f44b7125370c8ea3f0084f9b4c57fb8cc9d0c87af1"
+        "54b3dd46199545f76341b5c1dfaa69023a9147e5adc5c758515802aacfba9739"
     )
 
 
@@ -273,13 +276,20 @@ def test_compiled_task_artifact_serializes_without_machine_local_registry_path()
 
     payload = compiled.to_dict()
 
-    assert payload["schema_version"] == "uah.compiled_task/v1"
+    assert payload["schema_version"] == "uah.compiled_task/v2"
     assert payload["compiled_task_id"] == compiled.compiled_task_id
     assert payload["task_spec"]["task_id"] == compiled.task_id
     assert payload["interaction_module"]["object_ids"] == (
         "resolve_target_reference",
         "find_object",
     )
+    assert "budgets" not in payload
+    assert payload["task_spec"]["budgets"] == {
+        "wall_time_seconds": 90,
+        "model_calls": 3,
+        "tool_calls": 12,
+        "retry_attempts": 0,
+    }
     assert "registry_source" not in payload["interaction_module"]
 
 

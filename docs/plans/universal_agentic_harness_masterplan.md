@@ -1,7 +1,7 @@
 # Universal Agentic Harness: Implementation Masterplan
 
 **Status:** Canonical implementation plan; H0/H1 partial implementation and H2 qualification gates specified
-**Date:** 2026-09-28
+**Date:** 2026-10-02
 **Scope:** Model-agnostic and task-agnostic harness kernel with domain-specific AB frames and adapters
 **Extends:** `../architecture/universal_agentic_harness_foundation.md` and `../architecture/neural_workbench_adaptive_ab_harness.md`
 **Decision owner:** UAH H0-H2 core; NeuralWorkbench H3+ companion track; NAO remains the first reference environment
@@ -359,8 +359,10 @@ correct scope + correct ownership + valid output + evidence-complete effect
   many tasks, model leases, and model invocations. Releasing a lease moves the
   actor to standby; it does not terminate the run.
 - Every native stimulus enters as immutable `EnvironmentIngress`.
-  `TaskIngressPolicy` deterministically classifies it as a state update, new
-  task, resumed task, notification, or rejection before any model call.
+  `TaskIngressAuthority` deterministically classifies it as a state update,
+  new task, resumed task, notification, or rejection before any model call.
+  It is the only public writer for task-bearing ingress. The task registry is
+  a read-only projection over the lifecycle ledger.
 - One `trace_id` may contain several actor agent runs. Environment, task, and
   actor traces are read-only projections over the same append-only ledger.
 - Each operation has one frame-relative coordinate. Same-frame refinement uses
@@ -404,21 +406,25 @@ contains no ROS or NAO imports in the core and currently proves:
 | Read-only canonical registry snapshot | `registry.py` | JSON load, object views, SHA-256 content identity |
 | Task projection and decomposition closure | `projection.py` | Requested objects plus inspectable lower decomposition |
 | Deterministic role/output gate | `gate.py` | Output ownership, reachability, direct AB level, effect-claim rejection |
-| Common lifecycle ledger | `lifecycle.py` | Global sequence, causal parents, atomic commit framing, strict JSONL reload, transition validation, model-free replay, and content-addressed `VerifiedTraceDigest` |
+| Common lifecycle ledger | `lifecycle.py` | Global sequence, causal parents, atomic commit framing, strict JSONL reload, transition validation, proposal/semantic/domain/evidence rejection stages, model-free replay, terminal required-effect counterexamples, and content-addressed `VerifiedTraceDigest` |
 | Semantic implementation bindings | `bindings.py` | Stable AB objects, candidate quarantine, revisioned locators, runtime-mode resolution |
-| Portable environment owner | `environment.py` | Exact lease-only dispatch, complete-binding fingerprint fencing, one-shot execution start, native result receipt, and normalized effect evidence |
+| Portable environment owner | `environment.py` | Exact lease-only dispatch, complete-binding fingerprint fencing, atomic tool-budget grant plus execution start, native result receipt, normalized effect evidence, typed evidence rejection, and owner-authorized pre-dispatch cancellation |
 | Environment profile registry | `environment_profiles.py` | Frozen domain pack, runtime, owner, interface, and handle-roster authority with duplicate and incomplete-profile rejection |
 | Environment activation registry | `environment_runs.py` | Readiness evidence, exact profile/pack/runtime/owner matching, unique run and attestation identities, active registration and lookup |
-| Environment task registry | `task_registry.py` | Immutable environment-scoped task/trace lineage projected from the common ledger, duplicate-ingress/start rejection, resume/notify routing, and terminal-state enforcement after restart |
+| Environment task registry | `task_registry.py` | Read-only environment-scoped task/trace lineage projected from the common ledger, including terminal-state reconstruction after restart |
 | Domain contract rules | `domain_contracts.py` | SHA-256 revision over role/task allowlists, ingress rules, effect-to-object/evidence-owner rules, failure policy, and prohibited effects |
-| Environment ingress policy | `environment_ingress.py` | Content-addressed normalized ingress and decisions, exact profile/revision/run/binding/type checks, domain-owned task identity, deterministic UAH trace issuance, and same-run start/resume/notify decisions |
-| TaskSpec compiler | `task_compiler.py` | Content-verified decision plus ledger-recorded task-start provenance, effect-to-object/evidence rules, closed task projection, compiled obligations, prohibitions, declared budgets, and content-addressed `CompiledTask` artifact |
-| Proposal normalization and semantic admission | `proposal_admission.py` | Canonical one-operation `TypedProposal`, compiled-task lineage and scope checks, approved binding and obligation capture, typed rejection, and immutable `AdmittedOperation` |
-| Domain lifecycle admission | `domain_lifecycle.py` | Independent environment-run, domain revision, binding-environment, attestation, and ledger-backed duplicate-operation checks before an operation-scoped `ExecutionLease` or rejection |
+| Task ingress authority | `task_ingress_authority.py` | Sole task-bearing ingress writer, with frozen rule snapshots, exact profile/revision/run/binding/type checks, domain-owned task identity, deterministic UAH trace issuance, duplicate fencing, and same-run start/resume/notify decisions |
+| TaskSpec compiler | `task_compiler.py` | Content-verified decision plus ledger-recorded task-start provenance, effect-to-object/evidence rules, closed task projection, compiled obligations, prohibitions, retry-aware budgets, and content-addressed `uah.compiled_task/v2` artifact |
+| Proposal normalization and semantic admission | `proposal_admission.py`, `schema_validation.py` | Canonical one-operation `TypedProposal` or content-addressed normalization rejection, compiled-task lineage and scope checks, reviewed portable input-schema validation, approved binding and obligation capture, semantic rejection, and immutable `uah.admitted_operation/v2` with the validated schema identity |
+| Domain lifecycle admission | `domain_lifecycle.py` | Independent environment-run, domain revision, binding-environment, and attestation checks before an operation-scoped `ExecutionLease` or replayable typed rejection; an exact repeated request returns the same lease idempotently |
+| Operation graph | `operation_edges.py` | Content-addressed same-frame decomposition and continuation, cycle and structural-parent rejection, frame validation, and explicit cross-frame delegation grammar that fails closed until a target projection is compiled |
+| Initial runtime controls | `runtime_controls.py` | Idempotent model/tool budget decisions, recorded-time timeout checks, typed execution failure, bounded retry decisions, and pre-dispatch cancellation; no scheduler or in-flight interruption is claimed |
+| Agent identity registries | `agent_identity.py` | Content-addressed agent manifests, initial immutable handle revisions with declared fidelity-evidence references, and environment-roster-bound agent runs in `attached_standby`; rebinding, model reservation, and invocation are unavailable |
+| Initial Observatory O1 slice | `observatory.py` | Validated-ledger projections and self-contained static HTML, terminal-status honesty, explicit operation nodes and recorded edges, control/rejection failure-stage visibility, provenance labels, and no write or execution authority |
 | Task acceptance | `acceptance.py` | Required versus best-effort closure, terminal failure, suspension, duplicate and empty obligation rejection |
 | NAO compatibility package | `ab_harness_nao/contracts.py` | Chatbot route, planner-step mapping, and binding candidates without importing the native NAO stack |
 | Recorded NAO qualification | `ab_harness_nao/qualification.py` | Injected content-addressed DomainContractPack, real ingress classification and ledger-backed start, strict planner-step validation, content-addressed raw output, operation normalization, semantic admission, domain lease, lease-only fake execution, explicit acceptance, replay, and verified digest; H2 owner review remains open |
-| Focused fail-closed tests | `test_two_stage_admission.py`, `test_lifecycle_ledger.py` | Accepted and deficit replay, unknown/out-of-projection objects, binding drift, duplicate lease/start, bypass rejection, one-shot failure, event tamper, and restart reconstruction |
+| Focused fail-closed tests | `test_two_stage_admission.py`, `test_lifecycle_ledger.py` | Accepted and deficit replay, unknown/out-of-projection objects, binding drift, idempotent lease replay, duplicate start, bypass rejection, one-shot failure, event tamper, and restart reconstruction |
 
 ### What H0 does not yet implement
 
@@ -434,40 +440,53 @@ earlier foundation document. These are open seams, not failures:
   resume/notify lookup, and acceptance-derived terminal state. Strict v1 trace
   events persist to local JSONL and reconstruct after restart. Cooperating
   writers serialize reload, transition validation, append, and `fsync` through
-  an OS advisory lock. Owner-authorized cancellation and state-update duplicate
-  delivery detection remain open;
-- registry object views do not yet carry full input/output schemas, owner
-  authority, side-effect class, freshness, or evidence obligation types;
+  an OS advisory lock. Cancellation is owner-authorized before dispatch only;
+  in-flight interruption, supersession, and state-update duplicate delivery
+  detection remain open;
+- registry object views do not yet carry full output schemas, owner authority,
+  side-effect class, freshness, or evidence obligation types. Input argument
+  validation is resolved through a reviewed, content-addressed portable subset
+  covering required fields, top-level JSON types, and additional properties;
 - the TaskSpec compiler derives projection and obligations from typed domain
-  effect rules in a content-addressed DomainContractPack. It records declared
-  budgets but no runtime component decrements or enforces them. Recorded
+  effect rules in a content-addressed DomainContractPack. Tool-call budgets are
+  atomically consumed at dispatch, retry limits govern replay-checked retry
+  decisions, and model-call decisions are available but have no provider
+  consumer yet. Token, cost, and hardware budgets remain open. Recorded
   qualification uses the compiled artifact as the sole admission and
   acceptance authority;
 - semantic admission now validates compiled-task lineage, role output ownership,
   projection reach, direct AB band, runtime callability, prohibited effects,
-  binding status/owner/environment/runtime, schema-reference presence, and
-  evidence-obligation presence; it does not yet validate arguments against the
-  referenced input schema, canonical aliases, dynamic preconditions,
+  binding status/owner/environment/runtime, referenced input-schema content,
+  canonical argument types, and evidence-obligation presence; it does not yet
+  validate output schemas, canonical aliases, dynamic preconditions,
   permissions, or consumed budgets;
 - the common ledger captures accepted task compilation, proposal, admission,
   lease, execution, native result, evidence, obligation, and terminal judgment.
-  It does not yet cover model calls, prompt compilation, proposal/admission
-  rejection, cancellation, timeout, retry, or multi-actor operation edges;
+  It supports replayable semantic- and domain-admission rejection facts. The
+  semantic coordinator must append its returned rejection; the domain owner
+  appends its own rejection.
+  It now covers proposal normalization rejection, evidence rejection,
+  operation edges, tool budget consumption, pre-dispatch cancellation,
+  recorded timeout decisions, retry policy decisions, and terminal
+  required-effect rejection. It does not yet cover prompt compilation, model
+  invocation, stale evidence, supersession, or scoped multi-actor events;
 - the chatbot adapter assumes `user_intent.type` can be interpreted as one
   object reference, which is not sufficient for all multi-intent or target
   cases;
 - no live chatbot, planner, ROS, model provider, container, simulator, or
   external worker path invokes the package;
-- the recorded qualification accepted path is serialized and replayable, while
-  semantic rejection is fail-closed but does not yet emit a complete terminal
-  failure trace. Freshness, timeout, cancellation, and retry remain open;
+- proposal, semantic, domain, and evidence rejection are serialized and
+  replayable operation facts, but they do not invent terminal task rejection.
+  Explicit task-acceptance authority now produces required-effect
+  counterexamples. Freshness and false-completion policy remain open;
 - no same-model harness ablation has measured uplift.
 
 Therefore the correct status is:
 
-> H0 semantic center and accepted lifecycle tracer implemented; H0 failure
-> grammar completion and H1 agent runtime
-> integration remain open.
+> H0 now includes typed operation relations, proposal/evidence rejection, and
+> terminal required-effect counterexample replay. H1 control mechanics have
+> begun, while stale-evidence policy, the executable model runtime, and live H2
+> parity remain open.
 
 ### Existing seams worth preserving
 
@@ -728,12 +747,14 @@ all current H0 tests
 **Purpose:** Turn the contracts into a small runnable harness without migrating
 NAO nodes.
 
-**Current state:** One deliberately narrow vertical slice is implemented. It
+**Current state:** One deliberately narrow runtime slice and an initial identity
+registration slice are implemented. The runtime slice
 replays recorded chatbot and planner outputs, applies role/projection gates,
 resolves an approved in-process AB1 binding, calls a fake environment owner,
 checks owner-issued terminal evidence, and exposes a machine-readable smoke
-CLI. It proves the control seam but is not the complete H1 lifecycle or a live
-model loop.
+CLI. The identity slice registers immutable agent manifests and initial handles,
+then attaches rostered runs in `attached_standby` without model allocation. The
+combined proof is not the complete H1 lifecycle or a live model loop.
 
 **Deliverables:**
 
@@ -1086,12 +1107,14 @@ the H3+ search/adaptation engine.
 | `ab_harness.agent_registry` | Immutable agent manifests, handle revisions, run pinning and fidelity evidence lookup | H1, dynamic promotion H3 |
 | `ab_harness.registry` | Read-only snapshots, frame maps, object resolution | H0 |
 | `ab_harness.task_compiler` | Implemented task/effect to minimal AB closure and declared-budget artifact | H0-H1 |
+| `ab_harness.operation_edges` | Implemented frame-relative operation relations and replay invariants | H0 |
+| `ab_harness.runtime_controls` | Initial typed execution failure, budget, cancellation, timeout, and retry policy artifacts | H1 |
 | `ab_harness.prompt_compiler` | Deterministic UAH kernel, role, domain, projection and task-context assembly | H1-H2 |
 | `ab_harness.policy` | Role authority, permissions, budgets, approvals | H1 |
 | `ab_harness.proposal_admission` | Implemented typed proposal normalization and UAH semantic admission | H0-H1 |
 | `ab_harness.gate` | Schema, reach, effect, evidence, and terminal checks | H0-H1 |
 | `ab_harness.domain_lifecycle` and `ab_harness.environment` | Implemented domain lifecycle admission, execution leases, and lease-only in-process owner; broader adapter orchestration is planned | H0-H1 |
-| `ab_harness.lifecycle` | Implemented common event grammar, atomic commit frames, canonical JSONL, authority-state replay, and verified trace digest | H0-H1 |
+| `ab_harness.lifecycle` | Implemented common event grammar, atomic commit frames, canonical JSONL, authority-state replay, control/rejection branches, and accepted or rejected verified trace digests | H0-H1 |
 | `ab_harness.acceptance` | Implemented obligation-based task acceptance; milestones, minefields, and cost/process metrics remain planned | H0-H2 |
 | `ab_harness.providers` | Direct local/API model capability normalization | H1 |
 | `ab_harness.model_allocator` | Fixed-instance lease interface and startup preflight in H1-H2; provider-pool scheduling and arbitration in H3 | H1-H3 |
@@ -1136,11 +1159,15 @@ separate, explicit frame projection and is normally read-only and task-scoped.
 The universal prompt explains evidence and trace semantics without exposing the
 complete trace store to every role.
 
-O1 implementation starts with the final H0 lifecycle families rather than after
-the complete H1 runtime. Each accepted or rejected event family must gain a
-read-only O1 projection as its replay contract stabilizes. H0 remains owned by
-the semantic kernel and ledger, while the O1 static renderer is required before
-the corresponding H1/H2 evidence can be reviewed as a release candidate.
+The initial O1 implementation projects validated ledger events by trace,
+preserves nonterminal failure stages, derives status only from explicit
+terminal facts, escapes raw payloads, and returns static searchable HTML plus
+inert graph JSON. Graph data contains lifecycle-event nodes, explicit operation
+nodes, ledger-parent edges, and only recorded `OperationEdge` relations. The
+committed recorded-NAO example contains accepted, open semantic-rejection, and
+terminal required-effect-rejection traces. O1 does not yet render the full
+actor, configuration, provider, comparison, or Workbench envelope. H0 remains
+owned by the semantic kernel and ledger.
 
 ### Domain initialization and model coupling
 
@@ -1442,13 +1469,18 @@ point, not agentic parity.
   fingerprint, and preserves native result plus normalized evidence.
 - [x] Accepted and best-effort-deficit traces derive a deterministic
   `VerifiedTraceDigest` after strict restart replay.
+- [x] Same-frame operation edges, normalization rejection, evidence rejection,
+  and terminal required-effect counterexamples replay from the common ledger.
+- [x] Initial H1 controls record atomic tool-budget dispatch, pre-dispatch
+  cancellation, recorded-time timeout, and bounded retry decisions.
 - [x] Workbench retrieval is bounded, failure-aware, provenance-bearing, and candidate-only.
 - [x] The smoke command has one accepted path and one no-dispatch rejection canary.
 - [~] The first transport-neutral, fail-closed Workbench adapter contracts are
   tested; the declared NeuralWorkbench gitlink remains to be restored at the
   intended revision.
 - [ ] Full H0 schemas and lifecycle traces are not implemented.
-- [ ] Only one synthetic H1 vertical slice exists; the required failure suite is incomplete.
+- [ ] The H1 control slice lacks provider-consumed model budgets, stale-evidence
+  policy, in-flight interruption, durable agent-run transitions, and model leases.
 - [ ] No NAO shadow-mode adapter has been run.
 - [ ] No external harness adapter has passed conformance.
 - [ ] Entropy proxies and capability posteriors are not calibrated.
@@ -1481,11 +1513,11 @@ protocol is frozen and conformance-tested.
    `TaskIngressDecision` contracts projected from the common lifecycle ledger.
    Retain cross-process advisory writer coordination without creating another
    task store.
-3. Retain `EffectObligation`, `TaskAcceptance`, and the replay-derived
-   `VerifiedTraceDigest`; freeze `OperationEdge` before multi-operation policy.
+3. Retain `EffectObligation`, `TaskAcceptance`, the replay-derived
+   `VerifiedTraceDigest`, and the frozen `OperationEdge` invariants.
 4. Preserve the confirmed task-acceptance, environment-registration,
-   environment-bound ingress, and acceptance-replay seams. Next add
-   owner-authorized cancellation/failure and the remaining lifecycle grammar
+   authoritative environment ingress, operation-edge, rejection, and
+   counterexample seams. Extend stale-evidence and false-completion policy
    without moving environment authority into the registry.
 5. Preserve the implemented semantic-object/implementation-binding split.
 6. Expand AB object effect/evidence/permission fields through a read-only
@@ -1495,22 +1527,22 @@ protocol is frozen and conformance-tested.
 8. Retain the implemented `TypedProposal`, `AdmittedOperation`,
    ledger-backed `ExecutionLease`, lease-only owner, and content-addressed
    execution receipt. No direct dispatch compatibility path is permitted.
-9. Extend the implemented accepted-path `TraceEvent` grammar with explicit
-   normalization, semantic-admission, domain-admission, evidence-rejection,
-   timeout, cancellation, and retry failure branches.
-10. Add stale evidence, timeout, cancellation, retry exhaustion, and false
-   completion fixtures beside the implemented success and rejection cases.
+9. Retain normalization, semantic, domain, and evidence rejection facts plus
+   cancellation, timeout, retry, and budget events.
+10. Add stale-evidence and false-completion fixtures beside the implemented
+   success, counterexample, cancellation, timeout, and retry-exhaustion cases.
 11. Remove superseded trace/task stores when their behavior moves into the
     common ledger; do not retain unproven compatibility exports.
 
 ### In parallel: H1 executable kernel
 
-1. Extend the common ledger with environment-run and attached agent-run
-   lifecycle plus standby.
-2. Add typed `OperationEdge` values and the remaining operation failure state
+1. Extend the in-memory agent/handle/standby registries with scoped
+   environment-run and agent-run lifecycle events, without synthetic task IDs.
+2. Retain typed `OperationEdge` values and the initial runtime-control state
    machine over the implemented start/completion transitions.
-3. Add direct local/API model and synthetic runtime adapters.
-4. Add budget, approval, cancellation, and obligation-based acceptance.
+3. Add scoped agent-run transitions, fixed-instance model leases, preflights,
+   and direct local/API model adapters.
+4. Connect model-call accounting to provider invocation and add approval policy.
 5. Implement milestones and minefields.
 6. Extend the frozen synthetic conformance suite across explicit failure
    branches and compare deterministic trace digests.
@@ -1663,17 +1695,18 @@ provenance.
 | Environment restarts mix evidence | Accepted-path replay retains environment-run lineage, but the two-activation isolation probe is absent | Replay identical tasks across distinct attested activations and require isolated digests |
 | Cross-agent trace projections diverge | No multi-actor ledger implementation | Render environment, task, chatbot, and planner views from one event store and compare event identities |
 | NAO `report_result` semantics drift | Intended registry and `v1.0.0` runtime disagree | Owner-review the DomainContractPack revision and run recorded delegation parity |
-| Task closure overclaims success | Accepted and best-effort-deficit traces replay, but required failure and rejection branches are incomplete | Add owner failure, semantic rejection, stale evidence, cancellation, and retry-exhaustion terminal traces |
+| Task closure overclaims success | Accepted, best-effort-deficit, and required-effect-rejected traces replay; operation rejection and H1 controls remain correctly nonterminal | Add stale-evidence and false-completion terminal fixtures without inferring task status from an operation fact |
 | AB5 remains relabeled optimization | No higher-order object | Require held-out population-of-AB4 governance experiment |
 
 The accepted H1 synthetic tracer now registers one attested environment run,
 compiles required and best-effort obligations, executes only through a ledger
 recorded lease, preserves native result and evidence, derives
 `TaskAcceptance`, and reconstructs a `VerifiedTraceDigest` without a model or
-handler. The immediate next probe adds typed semantic/domain rejection, native
-failure, stale evidence, timeout, cancellation, retry exhaustion, and false
-completion branches plus `OperationEdge` lineage. Only then should H1 agent
-identity, prompt compilation, and provider allocation become the active seam.
+handler. The immediate next probe adds scoped activation events, fixed model
+leases, startup preflights, and agent-run transitions. Stale-evidence and
+false-completion fixtures remain H0 closure work. The initial H1 identity
+registries remain non-executable until those transitions, prompt compilation,
+and provider invocation are implemented.
 
 ## 20. Primary Sources and Implementation References
 

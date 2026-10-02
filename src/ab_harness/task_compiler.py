@@ -4,9 +4,8 @@ from __future__ import annotations
 
 from dataclasses import asdict
 from dataclasses import dataclass
-import hashlib
-import json
 
+from ab_harness._content_addressing import content_id
 from ab_harness.contracts import AbstractionFrame
 from ab_harness.contracts import AgentRoleSpec
 from ab_harness.contracts import EffectObligation
@@ -18,8 +17,8 @@ from ab_harness.registry import RegistrySnapshot
 from ab_harness.task_registry import EnvironmentTaskRegistry
 
 
-TASK_SPEC_SCHEMA = "uah.task_spec/v1"
-COMPILED_TASK_SCHEMA = "uah.compiled_task/v1"
+TASK_SPEC_SCHEMA = "uah.task_spec/v2"
+COMPILED_TASK_SCHEMA = "uah.compiled_task/v2"
 
 
 def _required_strings(values: dict[str, str], contract: str) -> None:
@@ -61,17 +60,11 @@ def _compiled_task_payload(
         "interaction_module": _interaction_module_payload(interaction_module),
         "effect_obligations": tuple(asdict(item) for item in effect_obligations),
         "prohibited_effects": prohibited_effects,
-        "budgets": asdict(task_spec.budgets),
     }
 
 
 def _compiled_task_id(payload: dict[str, object]) -> str:
-    encoded = json.dumps(
-        payload,
-        sort_keys=True,
-        separators=(",", ":"),
-    ).encode("utf-8")
-    return "compiled-task:sha256:%s" % hashlib.sha256(encoded).hexdigest()
+    return content_id("compiled-task", payload)
 
 
 @dataclass(frozen=True)
@@ -81,11 +74,12 @@ class TaskBudgets:
     wall_time_seconds: int
     model_calls: int
     tool_calls: int
+    retry_attempts: int = 0
 
     def __post_init__(self) -> None:
         if self.wall_time_seconds <= 0:
             raise ValueError("task wall-time budget must be positive")
-        if self.model_calls < 0 or self.tool_calls < 0:
+        if self.model_calls < 0 or self.tool_calls < 0 or self.retry_attempts < 0:
             raise ValueError("task call budgets must not be negative")
 
 
@@ -253,9 +247,10 @@ class TaskSpecCompiler:
         task_registry: EnvironmentTaskRegistry,
     ) -> CompiledTask:
         task_ingress_decision.verify_identity()
-        if task_ingress_decision.action != "start_task":
-            raise ValueError("task compilation requires accepted start_task ingress")
-        if task_ingress_decision.reason_code != "matched_rule":
+        if (
+            task_ingress_decision.action != "start_task"
+            or task_ingress_decision.reason_code != "matched_rule"
+        ):
             raise ValueError("task compilation requires accepted start_task ingress")
         if (
             task_ingress_decision.domain_contract_pack_revision

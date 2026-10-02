@@ -193,10 +193,10 @@ raw model output
 ```
 
 UAH semantic admission verifies role ownership, frame reach, AB object, binding
-status and ownership, canonical arguments, schema-reference presence,
-prohibited effects, and evidence obligations. It does not yet evaluate the
-arguments against the referenced schema or assert that the native environment
-is ready.
+status and ownership, canonical arguments, reviewed input-schema content,
+prohibited effects, and evidence obligations. The portable schema subset checks
+required fields, top-level JSON types, and additional-property policy. It does
+not validate output payloads or assert that the native environment is ready.
 
 Domain lifecycle admission owns readiness and operation deduplication. The
 current slice rechecks the environment run, DomainContractPack revision,
@@ -208,9 +208,11 @@ semantically valid operation may still be rejected.
 The accepted tracer reaches an `ExecutionLease`, records execution start, and
 calls the environment handler only with that exact lease. Direct object and
 argument dispatch is absent. Candidate bindings, foreign binding owners,
-inspection-only objects, domain-revision drift, duplicate leasing, complete
-binding drift, and tampered authority artifacts fail closed. The owner preserves
-the native result and normalized evidence in a content-addressed receipt.
+inspection-only objects, domain-revision drift, complete binding drift, and
+tampered authority artifacts fail closed. An exact repeated lease request is
+idempotent and returns the same lease; a changed domain context cannot
+reconsider an already leased operation. The owner preserves the native result
+and normalized evidence in a content-addressed receipt.
 
 ## 7. Evidence and task acceptance
 
@@ -238,10 +240,12 @@ without invoking a model or rerunning acceptance. Every event carries a global
 sequence, causal parent, and atomic `commit_id`/`commit_index`/`commit_size`
 position. Reload rejects incomplete or interleaved multi-event facts.
 
-The current store is local and single-writer. It provides sequence, timestamps,
-causal links, accepted-path replay, and native execution-failure recording. It
-does not yet provide cross-process coordination or the complete
-rejection/cancellation/timeout/retry grammar.
+The current store is local JSONL with advisory-lock coordination among
+cooperating processes. It provides sequence, timestamps, causal links,
+accepted-path replay, native execution-failure recording, and nonterminal
+semantic/domain rejection replay. It rejects rather than repairs a
+crash-truncated commit and does not yet provide the complete
+normalization/evidence-rejection, cancellation, timeout, or retry grammar.
 
 ## 8. NeuralWorkbench
 
@@ -344,18 +348,18 @@ responsibility.
 | Domain contract authority | Implemented narrow seam | Content-derived revision covers role/task allowlists, ingress/effect-evidence rules, failure policy, and prohibitions |
 | TaskSpec compilation | Implemented | Content-verified decision plus ledger-recorded start, content-addressed projection, obligations, prohibitions, declared budgets, and revision provenance; budget enforcement remains open |
 | Task acceptance | Implemented narrow seam | Required, best-effort, suspended, and terminal outcomes |
-| Common lifecycle persistence | Implemented accepted-path seam | Global sequence, causal parents, atomic commit framing, strict JSONL restart recovery, operation transitions, acceptance, accepted-with-deficit replay, and verified digest; full failure grammar and cross-process locking remain open |
-| Recorded NAO canary | Implemented | Injected domain pack, real ingress classification, strict planner payload handling, accepted lease-only execution, semantic no-dispatch rejection, restart replay, and verified digest |
+| Common lifecycle persistence | Implemented accepted and operation-rejection seam | Global sequence, causal parents, atomic commit framing, advisory-lock coordination, strict JSONL restart recovery, operation transitions, nonterminal semantic/domain rejection, acceptance, accepted-with-deficit replay, and verified digest; full terminal failure grammar remains open |
+| Recorded NAO canary | Implemented | Injected domain pack, authoritative ingress admission, strict planner payload handling, input-schema validation, accepted lease-only execution, recorded semantic no-dispatch rejection, restart replay, and verified digest |
 | PromptCompiler | Specified | No executable prompt artifact compiler |
-| Two-stage admission and execution | Implemented narrow seam | Content-addressed proposal, semantic admission, complete binding fingerprint, ledger-backed domain lease, exact lease-only dispatch, native result/evidence receipt, and typed rejections |
-| Agent identity and handles | Partially specified | Environment/task identities exist; role, agent, run, handle, operation, and invocation registries incomplete |
+| Two-stage admission and execution | Implemented narrow seam | Content-addressed proposal, reviewed input-schema validation, semantic admission, complete binding fingerprint, ledger-backed domain lease, exact lease-only dispatch, native result/evidence receipt, and replayable nonterminal typed rejections |
+| Agent identity and handles | Initial H1 slice | Content-addressed manifests, one-time handle registration, and roster-bound standby run attachment are in memory; role/model registries, persistence, run lifecycle, fixed leases, invocations, and fidelity evaluation remain open |
 | Live model port and allocator | Not implemented | No Watson/Bonsai runner; fixed lease and startup preflight remain open |
 | H2 NAO planner parity | Not started | No explicit `legacy`, `shadow`, and `uah` comparison report |
-| Observatory renderer | Contract frozen | Static O1 implementation remains open |
+| Observatory renderer | Initial O1 slice | Validated-ledger trace projection, honest terminal status, failure stages, static searchable HTML, and inert graph JSON; full actor/configuration/comparison views remain open |
 | NeuralWorkbench retrieval | Candidate slice only | Bounded UAH-side memory and protocol exist; complete companion attachment and uplift test remain open |
 | Crystallization | Quarantined design | No promoted AB2+ object |
 
-The current full suite reports **146 passing tests**, and the latest Ruff run
+The current full suite reports **200 passing tests**, and the latest Ruff run
 passes. The complete repository hook, Markdown/HTML synchronization, and clean
 wheel gates are rerun before distributing a refreshed build.
 
@@ -412,13 +416,14 @@ and accept a materially different task before universality is claimed.
 
 ## 14. Next technical gates
 
-1. Add typed normalization/admission/domain rejection and evidence-rejection
-   events.
-2. Freeze `OperationEdge` and add cross-process writer coordination.
+1. Freeze `OperationEdge` and its restart-replay invariants.
+2. Add typed normalization and evidence-rejection events plus a terminal
+   required-effect counterexample.
 3. Add stale evidence, timeout, owner failure, cancellation, retry exhaustion,
    supersession, and false-completion cases.
-4. Implement role, agent, handle, agent-run, operation, edge, lease, and model
-   invocation identities.
+4. Extend the initial agent/handle/standby registries with role/model identity,
+   scoped activation events, fixed leases, preflights, and model invocation
+   identity.
 5. Add PromptCompiler, provider-neutral model port, fixed model lease, and
    startup preflight.
 6. Owner-review and freeze the NAO `v1.0.0` DomainContractPack and

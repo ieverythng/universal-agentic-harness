@@ -3,15 +3,15 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-import hashlib
-import json
 
+from ab_harness._content_addressing import content_id
 from ab_harness.environment_runs import EnvironmentRun
 from ab_harness.lifecycle import LifecycleLedger
 from ab_harness.proposal_admission import AdmittedOperation
 
 
 EXECUTION_LEASE_SCHEMA = "uah.execution_lease/v1"
+DOMAIN_ADMISSION_REJECTION_SCHEMA = "uah.domain_admission_rejection/v1"
 
 
 def _lease_payload(
@@ -30,13 +30,11 @@ def _lease_payload(
 
 
 def _lease_id(payload: dict[str, object]) -> str:
-    encoded = json.dumps(
-        payload,
-        allow_nan=False,
-        sort_keys=True,
-        separators=(",", ":"),
-    ).encode("utf-8")
-    return "execution-lease:sha256:%s" % hashlib.sha256(encoded).hexdigest()
+    return content_id("execution-lease", payload)
+
+
+def _domain_rejection_id(payload: dict[str, object]) -> str:
+    return content_id("domain-rejection", payload)
 
 
 @dataclass(frozen=True)
@@ -128,20 +126,128 @@ def _new_execution_lease(
     )
 
 
+def _domain_rejection_payload(
+    *,
+    admitted_operation: AdmittedOperation,
+    environment_run_id: str,
+    environment_id: str,
+    environment_attestation_id: str,
+    reason_codes: tuple[str, ...],
+) -> dict[str, object]:
+    return {
+        "schema_version": DOMAIN_ADMISSION_REJECTION_SCHEMA,
+        "admitted_operation": admitted_operation.to_dict(),
+        "environment_run_id": environment_run_id,
+        "environment_id": environment_id,
+        "environment_attestation_id": environment_attestation_id,
+        "reason_codes": reason_codes,
+    }
+
+
+@dataclass(frozen=True)
+class DomainAdmissionRejection:
+    """Content-addressed domain-owner refusal to issue an execution lease."""
+
+    rejection_id: str
+    admitted_operation: AdmittedOperation
+    environment_run_id: str
+    environment_id: str
+    environment_attestation_id: str
+    reason_codes: tuple[str, ...]
+    schema_version: str = DOMAIN_ADMISSION_REJECTION_SCHEMA
+
+    def __post_init__(self) -> None:
+        self.verify_identity()
+
+    def verify_identity(self) -> None:
+        self.admitted_operation.verify_identity()
+        if self.schema_version != DOMAIN_ADMISSION_REJECTION_SCHEMA:
+            raise ValueError(
+                "unsupported domain rejection schema: %s" % self.schema_version
+            )
+        required = (
+            self.environment_run_id,
+            self.environment_id,
+            self.environment_attestation_id,
+        )
+        if any(not value.strip() for value in required):
+            raise ValueError("domain rejection identities must not be empty")
+        if not isinstance(self.reason_codes, tuple) or not self.reason_codes:
+            raise ValueError("domain rejection requires ordered reason codes")
+        if any(not reason.strip() for reason in self.reason_codes):
+            raise ValueError("domain rejection reason codes must not be empty")
+        payload = _domain_rejection_payload(
+            admitted_operation=self.admitted_operation,
+            environment_run_id=self.environment_run_id,
+            environment_id=self.environment_id,
+            environment_attestation_id=self.environment_attestation_id,
+            reason_codes=self.reason_codes,
+        )
+        if self.rejection_id != _domain_rejection_id(payload):
+            raise ValueError("domain rejection identity does not match content")
+
+    @property
+    def task_id(self) -> str:
+        return self.admitted_operation.task_id
+
+    @property
+    def trace_id(self) -> str:
+        return self.admitted_operation.trace_id
+
+    @property
+    def operation_id(self) -> str:
+        return self.admitted_operation.operation_id
+
+    def to_dict(self) -> dict[str, object]:
+        self.verify_identity()
+        return {
+            "rejection_id": self.rejection_id,
+            **_domain_rejection_payload(
+                admitted_operation=self.admitted_operation,
+                environment_run_id=self.environment_run_id,
+                environment_id=self.environment_id,
+                environment_attestation_id=self.environment_attestation_id,
+                reason_codes=self.reason_codes,
+            ),
+        }
+
+
+def _new_domain_rejection(
+    *,
+    admitted_operation: AdmittedOperation,
+    environment_run: EnvironmentRun,
+    environment_id: str,
+    reason_codes: tuple[str, ...],
+) -> DomainAdmissionRejection:
+    fields = {
+        "admitted_operation": admitted_operation,
+        "environment_run_id": environment_run.environment_run_id,
+        "environment_id": environment_id,
+        "environment_attestation_id": environment_run.attestation.attestation_id,
+        "reason_codes": reason_codes,
+    }
+    rejection_id = _domain_rejection_id(_domain_rejection_payload(**fields))
+    return DomainAdmissionRejection(rejection_id=rejection_id, **fields)
+
+
 @dataclass(frozen=True)
 class ExecutionLeaseDecision:
     """Execution lease or deterministic domain lifecycle rejection reasons."""
 
     execution_lease: ExecutionLease | None = None
-    reason_codes: tuple[str, ...] = ()
+    rejection: DomainAdmissionRejection | None = None
 
     def __post_init__(self) -> None:
-        if (self.execution_lease is None) == (not self.reason_codes):
-            raise ValueError("lease decision must contain lease or reasons")
+        if (self.execution_lease is None) == (self.rejection is None):
+            raise ValueError("lease decision must contain lease or rejection")
 
     @property
     def accepted(self) -> bool:
         return self.execution_lease is not None
+
+    @property
+    def reason_codes(self) -> tuple[str, ...]:
+        return self.rejection.reason_codes if self.rejection is not None else ()
 
 
 class DomainLifecycleAdmission:
@@ -165,6 +271,35 @@ class DomainLifecycleAdmission:
         admitted_operation: AdmittedOperation,
     ) -> ExecutionLeaseDecision:
         admitted_operation.verify_identity()
+        already_leased = self._lifecycle_ledger.has_operation_event(
+            trace_id=admitted_operation.trace_id,
+            operation_id=admitted_operation.operation_id,
+            event_type="domain_admission_leased",
+        )
+        if already_leased:
+            if (
+                self._environment_run.status != "active"
+                or admitted_operation.environment_run_id
+                != self._environment_run.environment_run_id
+                or admitted_operation.environment_id != self._environment_id
+                or admitted_operation.domain_contract_pack_revision
+                != self._environment_run.attestation.domain_contract_pack_revision
+            ):
+                raise ValueError(
+                    "leased operation cannot be reconsidered under changed domain context"
+                )
+            return ExecutionLeaseDecision(
+                execution_lease=_new_execution_lease(
+                    admitted_operation=admitted_operation,
+                    lease_owner_id=(
+                        self._environment_run.attestation.environment_owner_id
+                    ),
+                    environment_attestation_id=(
+                        self._environment_run.attestation.attestation_id
+                    ),
+                )
+            )
+
         reasons: list[str] = []
         if self._environment_run.status != "active":
             reasons.append("environment_run_not_active")
@@ -180,14 +315,15 @@ class DomainLifecycleAdmission:
             != self._environment_run.attestation.domain_contract_pack_revision
         ):
             reasons.append("domain_contract_revision_mismatch")
-        if self._lifecycle_ledger.has_operation_event(
-            trace_id=admitted_operation.trace_id,
-            operation_id=admitted_operation.operation_id,
-            event_type="domain_admission_leased",
-        ):
-            reasons.append("operation_already_leased")
         if reasons:
-            return ExecutionLeaseDecision(reason_codes=tuple(reasons))
+            rejection = _new_domain_rejection(
+                admitted_operation=admitted_operation,
+                environment_run=self._environment_run,
+                environment_id=self._environment_id,
+                reason_codes=tuple(reasons),
+            )
+            self._lifecycle_ledger.record(rejection)
+            return ExecutionLeaseDecision(rejection=rejection)
 
         lease = _new_execution_lease(
             admitted_operation=admitted_operation,
@@ -196,5 +332,14 @@ class DomainLifecycleAdmission:
                 self._environment_run.attestation.attestation_id
             ),
         )
-        self._lifecycle_ledger.record(lease)
+        try:
+            self._lifecycle_ledger.record(lease)
+        except ValueError:
+            if self._lifecycle_ledger.has_operation_event(
+                trace_id=admitted_operation.trace_id,
+                operation_id=admitted_operation.operation_id,
+                event_type="domain_admission_leased",
+            ):
+                return ExecutionLeaseDecision(execution_lease=lease)
+            raise
         return ExecutionLeaseDecision(execution_lease=lease)

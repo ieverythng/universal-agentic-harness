@@ -6,9 +6,11 @@ documentation, evaluations, and environment adapters.
 Terms describe the target architecture unless an entry explicitly names an
 implemented schema or source seam. The current code distinguishes environment,
 ingress, task, trace, operation, proposal, admission, lease, result, evidence,
-and lifecycle-event identities. General role-configuration, agent, handle,
-agent-run, model-instance, model-lease, model-invocation, and PromptCompiler
-registries remain H1/H2 work.
+and lifecycle-event identities. Content-addressed agent manifests, initial
+handle revisions, and roster-bound standby agent runs now have in-memory
+registries. General role-configuration, durable agent lifecycle,
+model-instance, model-lease, model-invocation, and PromptCompiler registries
+remain H1/H2 work.
 
 ## Core terms
 
@@ -160,7 +162,9 @@ _Avoid_: Agent instance; runtime instance
 
 A stable human-facing or deployment-facing identity that resolves through an
 immutable revision to one active agent. Rebinding preserves the role contract
-but requires fidelity evidence and rollback lineage.
+but requires fidelity evaluation and rollback lineage. The current H1 slice
+registers only the initial revision and refuses rebinding. H3 owns qualified
+revision promotion.
 
 ### Agent registration
 
@@ -174,6 +178,10 @@ It owns activation-scoped state and may span several domain tasks, model
 leases, and model invocations until shutdown, failure, or replacement ends the
 activation.
 _Avoid_: Agent embodiment; model invocation; turn
+
+The current `AgentRunRegistry` implements only in-memory roster-bound
+attachment in `attached_standby`. Termination, replacement, persistence,
+lifecycle events, preflight, and model leasing remain open.
 
 ### Agent standby
 
@@ -208,12 +216,15 @@ Ingress is not automatically a task, trace, model invocation, or execution
 authority.
 _Avoid_: Prompt; task
 
-### Task ingress policy
+### Task ingress authority
 
-The deterministic, environment-scoped policy that associates environment
-ingress with state updates, new tasks, resumed tasks, notifications, or
-rejection. A model may interpret admitted content but cannot rewrite its task
-or trace lineage.
+The deterministic `TaskIngressAuthority.admit(environment_run, ingress)` module
+that associates environment ingress with state updates, new tasks, resumed
+tasks, notifications, or rejection. It owns rule matching, deterministic task
+and trace identities, duplicate fencing, and ledger append for accepted
+task-bearing ingress. State updates, ignored items, and rejected items do not
+yet have environment-scoped ledger facts. A model may interpret admitted
+content but cannot rewrite its task or trace lineage.
 
 A new task preserves the domain-owned task identifier selected from a named
 native-lineage field in the reviewed ingress rule. The task identity is scoped
@@ -237,12 +248,13 @@ registration method.
 
 ### Environment task registry
 
-The environment-scoped registry of immutable task and trace lineage. It
-rejects replayed task-bearing ingress and a second start for the same domain
-task within one environment run. Resume and notify ingress may reuse a lineage
-only when the task is registered under that exact environment activation.
-Acceptance-derived terminal states reject later ingress. A suspended
-acceptance remains resumable. Registration does not prove native effects.
+The read-only environment-scoped projection of immutable task and trace lineage
+from the common ledger. `TaskIngressAuthority` rejects replayed task-bearing
+ingress and a second start for the same domain task within one environment run.
+Resume and notify ingress may reuse a lineage only when the task is registered
+under that exact environment activation. Acceptance-derived terminal states
+reject later ingress. A suspended acceptance remains resumable. The registry
+has no task-ingress write interface and does not prove native effects.
 
 ### Trace event
 
@@ -253,8 +265,10 @@ minimal canonical replay projection. Each event also carries `commit_id`,
 `commit_index`, and `commit_size`, so strict reload rejects an incomplete or
 noncontiguous multi-event fact. Task start, resume, notification,
 compilation, proposal, admission, lease, execution, evidence, obligation, and
-terminal-acceptance events currently use this envelope. Cross-process locking,
-environment cancellation, retry, timeout, and rejection branches remain open.
+terminal-acceptance events currently use this envelope. Cooperating writers
+use cross-process advisory locking. Semantic and domain rejection facts are
+implemented; normalization rejection, evidence rejection, environment
+cancellation, retry, timeout, and complete terminal failure remain open.
 
 ### Prompt compiler
 
@@ -303,10 +317,23 @@ rejected during normalization.
 
 ### Admitted operation
 
-An immutable, content-addressed `uah.admitted_operation/v1` proving that a typed
+An immutable, content-addressed `uah.admitted_operation/v2` proving that a typed
 proposal passed UAH semantic admission for one compiled task, role, frame, AB
-object, approved binding revision, argument set, runtime mode, and evidence
-obligation set. It still has no domain execution authority.
+object, approved binding revision, validated input-schema identity, argument
+set, runtime mode, and evidence obligation set. It still has no domain
+execution authority.
+
+### Admission rejection
+
+`uah.semantic_admission_rejection/v1` and
+`uah.domain_admission_rejection/v1` are content-addressed operation-scoped
+facts with ordered stable reason codes. Semantic rejection proves that no
+`AdmittedOperation` was issued for that decision. Domain rejection proves that
+the environment owner did not issue an execution lease for that request. Domain
+admission records its own rejection. Semantic rejection becomes replayable
+when the coordinating caller appends the returned artifact. O1 exposes both as
+nonterminal failure stages and does not relabel either as terminal task
+rejection.
 
 ### Execution lease
 
@@ -398,11 +425,11 @@ cooperating writer reloads and validates the stream while holding the lock
 before it appends and flushes a fact. The ledger records authority decisions
 but does not make them. The complete failure/cancellation grammar remains open.
 
-Observatory O1 begins alongside the final H0 lifecycle slices. It consumes
-replay-stable ledger events through read-only projections and a static renderer.
-O1 never appends lifecycle facts, issues evidence, or changes admission. This
-parallel track is required for H1/H2 review, but it does not become a second
-authority writer for H0.
+Observatory O1 now consumes replay-stable ledger events through immutable trace
+projections and a self-contained static HTML renderer. It distinguishes
+terminal task status from recoverable admission or execution failures and
+labels recorded, synthetic, conceptual, measured, or reviewed data. O1 never
+appends lifecycle facts, issues evidence, or changes admission.
 
 ### Recorded qualification
 

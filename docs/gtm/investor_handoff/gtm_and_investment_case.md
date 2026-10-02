@@ -228,8 +228,8 @@ feature count.
 
 | Gate | Deliverable | Value created | Go or no-go evidence |
 | --- | --- | --- | --- |
-| G1: executable semantic center | Complete failure grammar and cross-process ledger coordination | Extends the implemented accepted/deficit authority path into counterexample-complete replay | Success and failure replay identically without the model |
-| G2: H1 agent runtime | Agent identity, handles, PromptCompiler, provider port, fixed lease, startup preflight | Enables local and remote model trials under stable roles | Frozen suite runs through recorded and live provider modes |
+| G1: executable semantic center | Operation edges, terminal counterexample grammar, and remaining evidence/lifecycle failures | Extends accepted/deficit and nonterminal admission-rejection replay into counterexample-complete replay | Success and failure replay identically without the model |
+| G2: H1 agent runtime | Extend initial agent/handle/standby registries with durable lifecycle, PromptCompiler, provider port, fixed lease, and startup preflight | Enables local and remote model trials under stable roles | Frozen suite runs through recorded and live provider modes |
 | G3: H2 NAO parity | Domain pack, planner adapter, report-result delegation, `legacy | shadow | uah` report | Demonstrates integration with a real multi-owner system | Reviewed parity and failure attribution, no duplicate action or speech |
 | G4: second-domain proof | Watson/software-engineering adapter using unchanged core | Tests portability and onboarding leverage | Measured reuse and same-model comparison |
 | G5: H3 Workbench shadow | Verified trace digest, retrieval, candidate provenance, counterexample-aware memory | Tests adaptive advantage without authority risk | Held-out uplift or recovery improvement with safety/evidence parity |
@@ -323,12 +323,14 @@ a separate sourced deliverable.
 - H2 NAO planner parity and model qualification are not complete.
 - Compiled task budgets are immutable declarations; runtime consumption and
   enforcement are not implemented.
-- The common ledger has atomic commit framing and restart replay but remains a
-  local single-writer store without cross-process coordination.
+- The common ledger has atomic commit framing, restart replay, and advisory-lock
+  coordination among cooperating processes. It remains local JSONL and rejects
+  rather than repairs a crash-truncated commit.
 - NeuralWorkbench improvement is unproven and remains an H3 experiment.
 - The intended NeuralWorkbench revision is documented, but its gitlink is
   absent from the current UAH tree.
-- Observatory has a frozen contract but no complete product renderer.
+- Observatory has an initial static ledger renderer but no complete product
+  view across actors, configurations, providers, comparisons, or Workbench.
 - Cross-domain universality is not established.
 - There are no customer, revenue, pricing, market-size, compliance, security
   certification, or production-scale claims in the repository.

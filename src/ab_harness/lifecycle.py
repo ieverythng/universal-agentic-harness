@@ -6,22 +6,34 @@ from dataclasses import asdict
 from dataclasses import dataclass
 from dataclasses import field
 from datetime import datetime, timezone
-import hashlib
 import json
 import os
 from pathlib import Path
+from types import MappingProxyType
 from types import TracebackType
 from typing import Callable, TYPE_CHECKING
 
+from ab_harness._content_addressing import canonical_json
+from ab_harness._content_addressing import content_id
 from ab_harness.acceptance import TaskAcceptanceEvaluator
 from ab_harness.contracts import EffectEvidence
 from ab_harness.contracts import TaskAcceptance
 
 if TYPE_CHECKING:
+    from ab_harness.domain_lifecycle import DomainAdmissionRejection
     from ab_harness.domain_lifecycle import ExecutionLease
     from ab_harness.environment import ExecutionReceipt
+    from ab_harness.environment import EvidenceRejection
+    from ab_harness.operation_edges import OperationEdge
     from ab_harness.proposal_admission import AdmittedOperation
+    from ab_harness.proposal_admission import ProposalNormalizationRejection
+    from ab_harness.proposal_admission import SemanticAdmissionRejection
     from ab_harness.proposal_admission import TypedProposal
+    from ab_harness.runtime_controls import BudgetDecision
+    from ab_harness.runtime_controls import ExecutionCancellationDecision
+    from ab_harness.runtime_controls import ExecutionFailure
+    from ab_harness.runtime_controls import RetryDecision
+    from ab_harness.runtime_controls import TaskTimeoutDecision
     from ab_harness.task_compiler import CompiledTask
 
 
@@ -31,21 +43,16 @@ VERIFIED_TRACE_DIGEST_SCHEMA = "uah.verified_trace_digest/v1"
 
 def _canonical_json(payload: object) -> str:
     try:
-        return json.dumps(
-            payload,
-            allow_nan=False,
-            sort_keys=True,
-            separators=(",", ":"),
-        )
+        return canonical_json(payload)
     except (TypeError, ValueError) as exc:
         raise ValueError("lifecycle content must contain finite JSON values") from exc
 
 
 def _content_id(prefix: str, payload: object) -> str:
-    return "%s:sha256:%s" % (
-        prefix,
-        hashlib.sha256(_canonical_json(payload).encode("utf-8")).hexdigest(),
-    )
+    try:
+        return content_id(prefix, payload)
+    except (TypeError, ValueError) as exc:
+        raise ValueError("lifecycle content must contain finite JSON values") from exc
 
 
 def _artifact_id(prefix: str, artifact: object) -> str:
@@ -228,10 +235,9 @@ class ExecutionStartedFact:
 
 
 @dataclass(frozen=True)
-class ExecutionFailedFact:
+class ExecutionDispatchFact:
     lease: ExecutionLease
-    failure_ref: str
-    failure_type: str
+    budget_decision: BudgetDecision
 
 
 @dataclass(frozen=True)
@@ -247,11 +253,21 @@ if TYPE_CHECKING:
         | TaskIngressFact
         | CompiledTask
         | TypedProposal
+        | ProposalNormalizationRejection
+        | SemanticAdmissionRejection
         | AdmittedOperation
+        | DomainAdmissionRejection
         | ExecutionLease
         | ExecutionStartedFact
+        | ExecutionDispatchFact
         | ExecutionReceipt
-        | ExecutionFailedFact
+        | EvidenceRejection
+        | ExecutionFailure
+        | BudgetDecision
+        | ExecutionCancellationDecision
+        | TaskTimeoutDecision
+        | RetryDecision
+        | OperationEdge
         | AcceptanceFact
     )
 else:
@@ -261,6 +277,10 @@ else:
 @dataclass(frozen=True)
 class LifecycleCommit:
     events: tuple[TraceEvent, ...]
+
+
+class LifecycleSequenceConflict(ValueError):
+    """Raised when a snapshot-bound append loses its sequence race."""
 
 
 @dataclass(frozen=True)
@@ -407,6 +427,7 @@ _DIGEST_FIELDS = {
 class LifecycleReplay:
     events: tuple[TraceEvent, ...]
     terminal_status: str | None
+    failure_stage: str | None
     verified_trace_digest: VerifiedTraceDigest | None
 
 
@@ -423,23 +444,37 @@ class _TraceState:
     frame_id: str | None = None
     registry_version: str | None = None
     terminal_status: str | None = None
+    failure_stage: str | None = None
     last_event_id: str | None = None
     event_types: list[str] = field(default_factory=list)
     leased_operation_ids: set[str] = field(default_factory=set)
     started_operation_ids: set[str] = field(default_factory=set)
     terminal_operation_ids: set[str] = field(default_factory=set)
     evidence_artifact_ids: set[str] = field(default_factory=set)
+    evidence_issued_operation_ids: set[str] = field(default_factory=set)
+    evidence_rejected_operation_ids: set[str] = field(default_factory=set)
     proposal_by_operation: dict[str, str] = field(default_factory=dict)
+    rejected_operation_ids: set[str] = field(default_factory=set)
     admission_by_operation: dict[str, str] = field(default_factory=dict)
     object_by_operation: dict[str, str] = field(default_factory=dict)
     binding_by_operation: dict[str, str] = field(default_factory=dict)
     owner_by_operation: dict[str, str] = field(default_factory=dict)
+    frame_by_operation: dict[str, str] = field(default_factory=dict)
     lease_by_operation: dict[str, str] = field(default_factory=dict)
     result_by_operation: dict[str, str] = field(default_factory=dict)
+    operation_edges: set[tuple[str, str, str]] = field(default_factory=set)
+    budget_limits: dict[str, int] = field(default_factory=dict)
+    budget_consumed: dict[str, int] = field(default_factory=dict)
+    budget_subjects: set[tuple[str, str]] = field(default_factory=set)
+    tool_budget_granted_operation_ids: set[str] = field(default_factory=set)
+    task_timed_out: bool = False
+    failure_by_operation: dict[str, tuple[str, str]] = field(default_factory=dict)
+    retry_decided_failure_ids: set[str] = field(default_factory=set)
+    retry_target_operation_ids: set[str] = field(default_factory=set)
 
 
 class LifecycleLedger:
-    """Single-writer lifecycle authority with replay-derived trace digests."""
+    """Append-only lifecycle authority with coordinated file-backed writers."""
 
     def __init__(
         self,
@@ -469,7 +504,7 @@ class LifecycleLedger:
                 expected_sequence is not None
                 and expected_sequence != self.next_sequence
             ):
-                raise ValueError("lifecycle ledger sequence conflict")
+                raise LifecycleSequenceConflict("lifecycle ledger sequence conflict")
             specs = _event_specs(fact)
             if not specs:
                 raise ValueError("lifecycle fact produced no events")
@@ -509,7 +544,46 @@ class LifecycleLedger:
             return LifecycleCommit(events=tuple(staged))
 
     def start_execution(self, lease: ExecutionLease) -> LifecycleCommit:
-        return self.record(ExecutionStartedFact(lease))
+        from ab_harness.runtime_controls import BudgetExhaustedError
+        from ab_harness.runtime_controls import TaskBudgetAuthority
+
+        authority = TaskBudgetAuthority(self)
+        for attempt in range(2):
+            assessment = authority.assess(
+                trace_id=lease.admitted_operation.trace_id,
+                resource="tool_call",
+                subject_id=lease.operation_id,
+            )
+            decision = assessment.decision
+            if decision.outcome == "exhausted":
+                if not assessment.already_recorded:
+                    try:
+                        self.record(
+                            decision,
+                            expected_sequence=assessment.expected_sequence,
+                        )
+                    except LifecycleSequenceConflict:
+                        if not attempt:
+                            continue
+                        raise
+                raise BudgetExhaustedError(
+                    "tool_call budget exhausted for %s" % lease.operation_id
+                )
+            fact: LifecycleFact
+            if assessment.already_recorded:
+                fact = ExecutionStartedFact(lease)
+            else:
+                fact = ExecutionDispatchFact(lease, decision)
+            try:
+                return self.record(
+                    fact,
+                    expected_sequence=assessment.expected_sequence,
+                )
+            except LifecycleSequenceConflict:
+                if not attempt:
+                    continue
+                raise
+        raise RuntimeError("execution dispatch retry exhausted")
 
     def complete_execution(self, receipt: ExecutionReceipt) -> LifecycleCommit:
         return self.record(receipt)
@@ -524,11 +598,15 @@ class LifecycleLedger:
             "execution-failure",
             {"failure_type": failure_type, "message": str(error)},
         )
+        from ab_harness.runtime_controls import ExecutionFailure
+
         return self.record(
-            ExecutionFailedFact(
+            ExecutionFailure.issue(
                 lease=lease,
                 failure_ref=failure_ref,
-                failure_type=failure_type,
+                failure_code=failure_type,
+                failure_stage="native_execution",
+                retry_disposition="terminal",
             )
         )
 
@@ -569,6 +647,7 @@ class LifecycleLedger:
             return LifecycleReplay(
                 events=events,
                 terminal_status=state.terminal_status,
+                failure_stage=state.failure_stage,
                 verified_trace_digest=digest,
             )
 
@@ -723,10 +802,20 @@ def _new_event(
 
 
 def _event_specs(fact: LifecycleFact) -> tuple[dict[str, object], ...]:
+    from ab_harness.domain_lifecycle import DomainAdmissionRejection
     from ab_harness.domain_lifecycle import ExecutionLease
     from ab_harness.environment import ExecutionReceipt
+    from ab_harness.environment import EvidenceRejection
+    from ab_harness.operation_edges import OperationEdge
     from ab_harness.proposal_admission import AdmittedOperation
+    from ab_harness.proposal_admission import ProposalNormalizationRejection
+    from ab_harness.proposal_admission import SemanticAdmissionRejection
     from ab_harness.proposal_admission import TypedProposal
+    from ab_harness.runtime_controls import BudgetDecision
+    from ab_harness.runtime_controls import ExecutionCancellationDecision
+    from ab_harness.runtime_controls import ExecutionFailure
+    from ab_harness.runtime_controls import RetryDecision
+    from ab_harness.runtime_controls import TaskTimeoutDecision
     from ab_harness.task_compiler import CompiledTask
 
     if isinstance(fact, TaskStartedFact):
@@ -778,6 +867,17 @@ def _event_specs(fact: LifecycleFact) -> tuple[dict[str, object], ...]:
                 },
             ),
         )
+    if isinstance(fact, ExecutionDispatchFact):
+        if (
+            fact.budget_decision.resource != "tool_call"
+            or fact.budget_decision.subject_id != fact.lease.operation_id
+            or fact.budget_decision.outcome != "granted"
+        ):
+            raise ValueError("execution dispatch requires its granted tool-call budget")
+        return (
+            *_event_specs(fact.budget_decision),
+            *_event_specs(ExecutionStartedFact(fact.lease)),
+        )
     if isinstance(fact, CompiledTask):
         fact.verify_identity()
         return (
@@ -793,6 +893,7 @@ def _event_specs(fact: LifecycleFact) -> tuple[dict[str, object], ...]:
                     "role_id": fact.interaction_module.role.role_id,
                     "frame_id": fact.interaction_module.frame.frame_id,
                     "registry_version": fact.interaction_module.frame.registry_version,
+                    "budgets": asdict(fact.budgets),
                 },
             ),
         )
@@ -814,6 +915,41 @@ def _event_specs(fact: LifecycleFact) -> tuple[dict[str, object], ...]:
                 },
             ),
         )
+    if isinstance(fact, ProposalNormalizationRejection):
+        fact.verify_identity()
+        artifact_refs = (fact.rejection_id, fact.compiled_task_id)
+        if fact.raw_output_artifact_id is not None:
+            artifact_refs = (*artifact_refs, fact.raw_output_artifact_id)
+        return (
+            _spec(
+                event_type="proposal_rejected",
+                environment_run_id=fact.environment_run_id,
+                task_id=fact.task_id,
+                trace_id=fact.trace_id,
+                operation_id=fact.operation_id,
+                artifact_refs=artifact_refs,
+                data=fact.to_dict(),
+            ),
+        )
+    if isinstance(fact, SemanticAdmissionRejection):
+        fact.verify_identity()
+        return (
+            _operation_spec(
+                fact.proposal,
+                event_type="semantic_admission_rejected",
+                artifact_refs=(
+                    fact.rejection_id,
+                    fact.proposal.proposal_id,
+                    fact.compiled_task_id,
+                ),
+                data={
+                    "rejection_id": fact.rejection_id,
+                    "proposal_id": fact.proposal.proposal_id,
+                    "compiled_task_id": fact.compiled_task_id,
+                    "reason_codes": fact.reason_codes,
+                },
+            ),
+        )
     if isinstance(fact, AdmittedOperation):
         fact.verify_identity()
         return (
@@ -827,8 +963,30 @@ def _event_specs(fact: LifecycleFact) -> tuple[dict[str, object], ...]:
                     "object_id": fact.object_id,
                     "binding_id": fact.binding_id,
                     "binding_owner": fact.binding_owner,
+                    "input_schema_id": fact.input_schema_id,
                     "ab_level": fact.ab_level,
                     "frame_id": fact.frame_id,
+                },
+            ),
+        )
+    if isinstance(fact, DomainAdmissionRejection):
+        fact.verify_identity()
+        admitted = fact.admitted_operation
+        return (
+            _operation_spec(
+                admitted.proposal,
+                event_type="domain_admission_rejected",
+                artifact_refs=(
+                    fact.rejection_id,
+                    admitted.admission_id,
+                    fact.environment_attestation_id,
+                ),
+                data={
+                    "rejection_id": fact.rejection_id,
+                    "admission_id": admitted.admission_id,
+                    "environment_attestation_id": fact.environment_attestation_id,
+                    "environment_id": fact.environment_id,
+                    "reason_codes": fact.reason_codes,
                 },
             ),
         )
@@ -904,18 +1062,169 @@ def _event_specs(fact: LifecycleFact) -> tuple[dict[str, object], ...]:
             **common,
         )
         return completed, evidence
-    if isinstance(fact, ExecutionFailedFact):
+    if isinstance(fact, EvidenceRejection):
+        fact.verify_identity()
         lease = fact.lease
-        lease.verify_identity()
+        common = {
+            "environment_run_id": fact.environment_run_id,
+            "task_id": fact.task_id,
+            "trace_id": fact.trace_id,
+            "operation_id": fact.operation_id,
+        }
+        completed = _spec(
+            event_type="execution_completed",
+            artifact_refs=(fact.execution_result_id, lease.execution_lease_id),
+            data={
+                "execution_result_id": fact.execution_result_id,
+                "execution_lease_id": lease.execution_lease_id,
+                "admission_id": lease.admission_id,
+                "object_id": lease.object_id,
+                "binding_id": lease.binding_id,
+                "owner": lease.admitted_operation.binding_owner,
+                "succeeded": fact.owner_result.succeeded,
+            },
+            **common,
+        )
+        rejected = _spec(
+            event_type="evidence_rejected",
+            artifact_refs=(fact.rejection_id, fact.execution_result_id),
+            data={
+                "rejection_id": fact.rejection_id,
+                "execution_result_id": fact.execution_result_id,
+                "execution_lease_id": lease.execution_lease_id,
+                "object_id": lease.object_id,
+                "binding_id": lease.binding_id,
+                "owner": lease.admitted_operation.binding_owner,
+                "native_evidence_ref": fact.owner_result.evidence_ref,
+                "reason_codes": fact.reason_codes,
+            },
+            **common,
+        )
+        return completed, rejected
+    if isinstance(fact, ExecutionFailure):
+        fact.verify_identity()
+        lease = fact.lease
         return (
             _operation_spec(
                 lease.admitted_operation.proposal,
                 event_type="execution_failed",
-                artifact_refs=(lease.execution_lease_id, fact.failure_ref),
+                artifact_refs=(
+                    lease.execution_lease_id,
+                    fact.failure_id,
+                    fact.failure_ref,
+                ),
                 data={
                     "execution_lease_id": lease.execution_lease_id,
+                    "failure_id": fact.failure_id,
                     "failure_ref": fact.failure_ref,
-                    "failure_type": fact.failure_type,
+                    "failure_code": fact.failure_code,
+                    "failure_stage": fact.failure_stage,
+                    "retry_disposition": fact.retry_disposition,
+                },
+            ),
+        )
+    if isinstance(fact, OperationEdge):
+        fact.verify_identity()
+        artifact_refs = (fact.edge_id,)
+        if fact.artifact_contract_ref is not None:
+            artifact_refs = (*artifact_refs, fact.artifact_contract_ref)
+        return (
+            _spec(
+                event_type="operation_edge_recorded",
+                environment_run_id=fact.environment_run_id,
+                task_id=fact.task_id,
+                trace_id=fact.trace_id,
+                operation_id=fact.source_operation_id,
+                artifact_refs=artifact_refs,
+                data=fact.to_dict(),
+            ),
+        )
+    if isinstance(fact, BudgetDecision):
+        fact.verify_identity()
+        return (
+            _spec(
+                event_type="budget_%s" % fact.outcome,
+                environment_run_id=fact.environment_run_id,
+                task_id=fact.task_id,
+                trace_id=fact.trace_id,
+                operation_id=(
+                    fact.subject_id
+                    if fact.resource == "tool_call"
+                    else None
+                ),
+                artifact_refs=(fact.decision_id, fact.compiled_task_id),
+                data=fact.to_dict(),
+            ),
+        )
+    if isinstance(fact, ExecutionCancellationDecision):
+        fact.verify_identity()
+        lease = fact.lease
+        return (
+            _operation_spec(
+                lease.admitted_operation.proposal,
+                event_type="execution_cancelled",
+                artifact_refs=(
+                    fact.decision_id,
+                    lease.execution_lease_id,
+                    fact.request_artifact_id,
+                ),
+                data={
+                    "decision_id": fact.decision_id,
+                    "execution_lease_id": lease.execution_lease_id,
+                    "requester_id": fact.requester_id,
+                    "request_artifact_id": fact.request_artifact_id,
+                    "deciding_owner_id": fact.deciding_owner_id,
+                    "phase": fact.phase,
+                    "outcome": fact.outcome,
+                    "reason_code": fact.reason_code,
+                },
+            ),
+        )
+    if isinstance(fact, TaskTimeoutDecision):
+        fact.verify_identity()
+        compiled = fact.compiled_task
+        return (
+            _spec(
+                event_type="task_timeout_recorded",
+                environment_run_id=compiled.environment_run_id,
+                task_id=compiled.task_id,
+                trace_id=compiled.trace_id,
+                artifact_refs=(fact.decision_id, compiled.compiled_task_id),
+                data={
+                    "decision_id": fact.decision_id,
+                    "compiled_task_id": compiled.compiled_task_id,
+                    "task_started_at": fact.task_started_at,
+                    "deadline_at": fact.deadline_at,
+                    "observed_at": fact.observed_at,
+                    "policy_revision": fact.policy_revision,
+                    "outcome": fact.outcome,
+                },
+            ),
+        )
+    if isinstance(fact, RetryDecision):
+        fact.verify_identity()
+        return (
+            _spec(
+                event_type="retry_%s" % fact.outcome,
+                environment_run_id=fact.environment_run_id,
+                task_id=fact.task_id,
+                trace_id=fact.trace_id,
+                operation_id=fact.source_operation_id,
+                artifact_refs=(
+                    fact.decision_id,
+                    fact.source_failure_id,
+                    fact.compiled_task_id,
+                ),
+                data={
+                    "decision_id": fact.decision_id,
+                    "compiled_task_id": fact.compiled_task_id,
+                    "source_failure_id": fact.source_failure_id,
+                    "source_operation_id": fact.source_operation_id,
+                    "target_operation_id": fact.target_operation_id,
+                    "attempt_ordinal": fact.attempt_ordinal,
+                    "retry_limit": fact.retry_limit,
+                    "policy_revision": fact.policy_revision,
+                    "outcome": fact.outcome,
                 },
             ),
         )
@@ -1115,75 +1424,91 @@ def _validate_commit_frames(events: tuple[TraceEvent, ...]) -> None:
         offset = end
 
 
-_SUPPORTED_EVENT_TYPES = {
-    "task_started",
-    "task_compiled",
-    "task_resumed",
-    "task_notified",
-    "proposal_normalized",
-    "semantic_admission_accepted",
-    "domain_admission_leased",
-    "execution_started",
-    "execution_completed",
-    "execution_failed",
-    "evidence_issued",
-    "effect_obligation_satisfied",
-    "effect_obligation_failed",
-    "effect_obligation_pending",
-    "terminal_task_accepted",
-    "terminal_task_accepted_with_deficit",
-    "terminal_task_rejected",
-    "task_suspended",
-}
-_EVENT_PREREQUISITES = {
-    "task_compiled": "task_started",
-    "task_resumed": "task_started",
-    "task_notified": "task_started",
-    "proposal_normalized": "task_compiled",
-    "semantic_admission_accepted": "proposal_normalized",
-    "domain_admission_leased": "semantic_admission_accepted",
-    "execution_started": "domain_admission_leased",
-    "execution_completed": "execution_started",
-    "execution_failed": "execution_started",
-    "evidence_issued": "execution_completed",
-    "effect_obligation_satisfied": "evidence_issued",
-    "effect_obligation_pending": "task_compiled",
-    "terminal_task_accepted": "effect_obligation_satisfied",
-    "terminal_task_accepted_with_deficit": "effect_obligation_failed",
-    "terminal_task_rejected": "effect_obligation_failed",
-    "task_suspended": "effect_obligation_pending",
-}
-_OPERATION_EVENT_TYPES = {
-    "proposal_normalized",
-    "semantic_admission_accepted",
-    "domain_admission_leased",
-    "execution_started",
-    "execution_completed",
-    "execution_failed",
-    "evidence_issued",
-}
+@dataclass(frozen=True)
+class _EventRule:
+    prerequisite: str | None = None
+    operation_scoped: bool = False
+
+
+_EVENT_RULES = MappingProxyType(
+    {
+        "task_started": _EventRule(),
+        "task_compiled": _EventRule("task_started"),
+        "task_resumed": _EventRule("task_started"),
+        "task_notified": _EventRule("task_started"),
+        "proposal_normalized": _EventRule("task_compiled", True),
+        "proposal_rejected": _EventRule("task_compiled"),
+        "semantic_admission_accepted": _EventRule("proposal_normalized", True),
+        "semantic_admission_rejected": _EventRule("proposal_normalized", True),
+        "domain_admission_leased": _EventRule("semantic_admission_accepted", True),
+        "domain_admission_rejected": _EventRule(
+            "semantic_admission_accepted", True
+        ),
+        "execution_started": _EventRule("domain_admission_leased", True),
+        "execution_completed": _EventRule("execution_started", True),
+        "execution_failed": _EventRule("execution_started", True),
+        "execution_cancelled": _EventRule("domain_admission_leased", True),
+        "evidence_issued": _EventRule("execution_completed", True),
+        "evidence_rejected": _EventRule("execution_completed", True),
+        "operation_edge_recorded": _EventRule("proposal_normalized", True),
+        "budget_granted": _EventRule("task_compiled"),
+        "budget_exhausted": _EventRule("task_compiled"),
+        "task_timeout_recorded": _EventRule("task_compiled"),
+        "retry_approved": _EventRule("execution_failed", True),
+        "retry_not_retryable": _EventRule("execution_failed", True),
+        "retry_exhausted": _EventRule("execution_failed", True),
+        "effect_obligation_satisfied": _EventRule("evidence_issued"),
+        "effect_obligation_failed": _EventRule(),
+        "effect_obligation_pending": _EventRule("task_compiled"),
+        "terminal_task_accepted": _EventRule("effect_obligation_satisfied"),
+        "terminal_task_accepted_with_deficit": _EventRule(
+            "effect_obligation_failed"
+        ),
+        "terminal_task_rejected": _EventRule("effect_obligation_failed"),
+        "task_suspended": _EventRule("effect_obligation_pending"),
+    }
+)
 
 
 def _apply_event(state: _TraceState, event: TraceEvent) -> None:
-    if event.event_type not in _SUPPORTED_EVENT_TYPES:
+    rule = _EVENT_RULES.get(event.event_type)
+    if rule is None:
         raise ValueError("unsupported lifecycle event type: %s" % event.event_type)
     data = event.data
-    _validate_event_prerequisite(state, event.event_type, data)
-    operation_id = _event_operation_id(event)
+    _validate_event_prerequisite(state, event.event_type, data, rule)
+    operation_id = _event_operation_id(event, rule)
     if event.event_type == "task_compiled":
         _apply_compiled_task(state, data)
     elif event.event_type == "proposal_normalized":
         _apply_proposal(state, operation_id, data)
+    elif event.event_type == "proposal_rejected":
+        _apply_normalization_rejection(state, event.operation_id, data)
     elif event.event_type == "semantic_admission_accepted":
         _apply_semantic_admission(state, operation_id, data)
+    elif event.event_type == "semantic_admission_rejected":
+        _apply_semantic_rejection(state, operation_id, data)
     elif event.event_type == "domain_admission_leased":
         _apply_execution_lease(state, operation_id, data)
+    elif event.event_type == "domain_admission_rejected":
+        _apply_domain_rejection(state, operation_id, data)
     elif event.event_type == "execution_started":
         _apply_execution_start(state, operation_id, data)
     elif event.event_type in {"execution_completed", "execution_failed"}:
         _apply_execution_terminal(state, event.event_type, operation_id, data)
+    elif event.event_type == "execution_cancelled":
+        _apply_execution_cancellation(state, operation_id, data)
     elif event.event_type == "evidence_issued":
         _apply_evidence(state, operation_id, data)
+    elif event.event_type == "evidence_rejected":
+        _apply_evidence_rejection(state, operation_id, data)
+    elif event.event_type == "operation_edge_recorded":
+        _apply_operation_edge(state, operation_id, data)
+    elif event.event_type in {"budget_granted", "budget_exhausted"}:
+        _apply_budget_decision(state, event.event_type, data)
+    elif event.event_type == "task_timeout_recorded":
+        _apply_timeout_decision(state, data)
+    elif event.event_type.startswith("retry_"):
+        _apply_retry_decision(state, event.event_type, operation_id, data)
     if event.event_type.startswith("terminal_task_") or (
         event.event_type == "task_suspended"
     ):
@@ -1195,12 +1520,11 @@ def _validate_event_prerequisite(
     state: _TraceState,
     event_type: str,
     data: dict[str, object],
+    rule: _EventRule,
 ) -> None:
-    prerequisite = _EVENT_PREREQUISITES.get(event_type)
+    prerequisite = rule.prerequisite
     if prerequisite is not None and prerequisite not in state.event_types:
-        raise ValueError(
-            "lifecycle event %s requires %s" % (event_type, prerequisite)
-        )
+        raise ValueError("lifecycle event %s requires %s" % (event_type, prerequisite))
     if event_type == "effect_obligation_failed":
         failure_prerequisite = {
             "deficit": "task_compiled",
@@ -1215,8 +1539,8 @@ def _validate_event_prerequisite(
             )
 
 
-def _event_operation_id(event: TraceEvent) -> str:
-    if event.event_type not in _OPERATION_EVENT_TYPES:
+def _event_operation_id(event: TraceEvent, rule: _EventRule) -> str:
+    if not rule.operation_scoped:
         return ""
     if event.operation_id is None or not event.operation_id.strip():
         raise ValueError("operation lifecycle event requires an operation id")
@@ -1232,6 +1556,24 @@ def _apply_compiled_task(state: _TraceState, data: dict[str, object]) -> None:
     state.role_id = str(data["role_id"])
     state.frame_id = str(data["frame_id"])
     state.registry_version = str(data["registry_version"])
+    budgets = data.get("budgets")
+    if not isinstance(budgets, dict):
+        raise ValueError("compiled task requires budget limits")
+    expected_budget_keys = {
+        "wall_time_seconds",
+        "model_calls",
+        "tool_calls",
+        "retry_attempts",
+    }
+    if set(budgets) != expected_budget_keys or any(
+        not isinstance(value, int) for value in budgets.values()
+    ):
+        raise ValueError("compiled task budget limits are invalid")
+    state.budget_limits = {str(name): value for name, value in budgets.items()}
+    state.budget_consumed = {
+        "model_call": 0,
+        "tool_call": 0,
+    }
 
 
 def _apply_proposal(
@@ -1243,7 +1585,30 @@ def _apply_proposal(
         raise ValueError("proposal does not match recorded compiled task")
     if operation_id in state.proposal_by_operation:
         raise ValueError("operation already has a normalized proposal")
+    if operation_id in state.rejected_operation_ids:
+        raise ValueError("rejected operation id cannot be normalized")
     state.proposal_by_operation[operation_id] = str(data["proposal_id"])
+
+
+def _apply_normalization_rejection(
+    state: _TraceState,
+    operation_id: str | None,
+    data: dict[str, object],
+) -> None:
+    from ab_harness.proposal_admission import ProposalNormalizationRejection
+
+    rejection = ProposalNormalizationRejection.from_dict(data)
+    if rejection.compiled_task_id != state.compiled_task_id:
+        raise ValueError("proposal rejection does not match compiled task")
+    if operation_id != rejection.operation_id:
+        raise ValueError("proposal rejection event operation does not match artifact")
+    if operation_id is not None:
+        if operation_id in state.proposal_by_operation:
+            raise ValueError("normalized operation cannot later be rejected")
+        if operation_id in state.rejected_operation_ids:
+            raise ValueError("operation already has a proposal rejection")
+        state.rejected_operation_ids.add(operation_id)
+    state.failure_stage = "proposal_normalization"
 
 
 def _apply_semantic_admission(
@@ -1259,6 +1624,24 @@ def _apply_semantic_admission(
     state.object_by_operation[operation_id] = str(data["object_id"])
     state.binding_by_operation[operation_id] = str(data["binding_id"])
     state.owner_by_operation[operation_id] = str(data["binding_owner"])
+    state.frame_by_operation[operation_id] = str(data["frame_id"])
+
+
+def _apply_semantic_rejection(
+    state: _TraceState,
+    operation_id: str,
+    data: dict[str, object],
+) -> None:
+    if data["compiled_task_id"] != state.compiled_task_id:
+        raise ValueError("semantic rejection does not match compiled task")
+    if data["proposal_id"] != state.proposal_by_operation.get(operation_id):
+        raise ValueError("semantic rejection does not match operation proposal")
+    reason_codes = data["reason_codes"]
+    if not isinstance(reason_codes, list) or not reason_codes:
+        raise ValueError("semantic rejection requires reason codes")
+    if operation_id in state.admission_by_operation:
+        raise ValueError("accepted operation cannot be semantically rejected")
+    state.failure_stage = "semantic_admission"
 
 
 def _apply_execution_lease(
@@ -1274,6 +1657,21 @@ def _apply_execution_lease(
     state.lease_by_operation[operation_id] = str(data["execution_lease_id"])
 
 
+def _apply_domain_rejection(
+    state: _TraceState,
+    operation_id: str,
+    data: dict[str, object],
+) -> None:
+    if data["admission_id"] != state.admission_by_operation.get(operation_id):
+        raise ValueError("domain rejection does not match semantic admission")
+    reason_codes = data["reason_codes"]
+    if not isinstance(reason_codes, list) or not reason_codes:
+        raise ValueError("domain rejection requires reason codes")
+    if operation_id in state.leased_operation_ids:
+        raise ValueError("leased operation cannot later be domain rejected")
+    state.failure_stage = "domain_admission"
+
+
 def _apply_execution_start(
     state: _TraceState,
     operation_id: str,
@@ -1283,8 +1681,14 @@ def _apply_execution_start(
         raise ValueError("execution started without a recorded lease")
     if data["execution_lease_id"] != state.lease_by_operation.get(operation_id):
         raise ValueError("execution start does not match operation lease")
+    if state.task_timed_out:
+        raise ValueError("execution cannot start after task timeout")
+    if operation_id not in state.tool_budget_granted_operation_ids:
+        raise ValueError("execution start requires a granted tool-call budget")
     if operation_id in state.started_operation_ids:
         raise ValueError("execution lease already consumed")
+    if operation_id in state.terminal_operation_ids:
+        raise ValueError("cancelled operation cannot start execution")
     state.started_operation_ids.add(operation_id)
 
 
@@ -1316,6 +1720,18 @@ def _apply_execution_terminal(
         if observed != expected:
             raise ValueError("execution receipt does not match admitted operation")
         state.result_by_operation[operation_id] = str(data["execution_result_id"])
+    else:
+        failure_id = data.get("failure_id")
+        retry_disposition = data.get("retry_disposition")
+        if not isinstance(failure_id, str) or not isinstance(
+            retry_disposition, str
+        ):
+            raise ValueError("execution failure contract is incomplete")
+        state.failure_by_operation[operation_id] = (
+            failure_id,
+            retry_disposition,
+        )
+        state.failure_stage = "execution"
     state.terminal_operation_ids.add(operation_id)
 
 
@@ -1338,7 +1754,254 @@ def _apply_evidence(
     observed_lineage = (data["object_id"], data["binding_id"], data["owner"])
     if observed_lineage != expected_lineage:
         raise ValueError("effect evidence does not match admitted operation")
+    if operation_id in state.evidence_rejected_operation_ids:
+        raise ValueError("rejected evidence cannot later be issued")
+    if operation_id in state.evidence_issued_operation_ids:
+        raise ValueError("operation already has issued evidence")
     state.evidence_artifact_ids.add(str(data["evidence_artifact_id"]))
+    state.evidence_issued_operation_ids.add(operation_id)
+
+
+def _apply_evidence_rejection(
+    state: _TraceState,
+    operation_id: str,
+    data: dict[str, object],
+) -> None:
+    if operation_id not in state.terminal_operation_ids:
+        raise ValueError("evidence rejected before execution completed")
+    if data["execution_lease_id"] != state.lease_by_operation.get(operation_id):
+        raise ValueError("evidence rejection does not match operation lease")
+    if data["execution_result_id"] != state.result_by_operation.get(operation_id):
+        raise ValueError("evidence rejection does not match execution result")
+    expected_lineage = (
+        state.object_by_operation.get(operation_id),
+        state.binding_by_operation.get(operation_id),
+        state.owner_by_operation.get(operation_id),
+    )
+    observed_lineage = (data["object_id"], data["binding_id"], data["owner"])
+    if observed_lineage != expected_lineage:
+        raise ValueError("evidence rejection does not match admitted operation")
+    reasons = data["reason_codes"]
+    if not isinstance(reasons, list) or not reasons:
+        raise ValueError("evidence rejection requires reason codes")
+    if operation_id in state.evidence_issued_operation_ids:
+        raise ValueError("issued evidence cannot later be rejected")
+    if operation_id in state.evidence_rejected_operation_ids:
+        raise ValueError("operation already has rejected evidence")
+    state.evidence_rejected_operation_ids.add(operation_id)
+    state.failure_stage = "evidence"
+
+
+def _apply_budget_decision(
+    state: _TraceState,
+    event_type: str,
+    data: dict[str, object],
+) -> None:
+    if data["compiled_task_id"] != state.compiled_task_id:
+        raise ValueError("budget decision does not match compiled task")
+    resource = data["resource"]
+    if resource not in {"model_call", "tool_call"}:
+        raise ValueError("budget decision resource is invalid")
+    subject_id = data["subject_id"]
+    if not isinstance(subject_id, str) or not subject_id.strip():
+        raise ValueError("budget decision subject is invalid")
+    subject_key = (str(resource), subject_id)
+    if subject_key in state.budget_subjects:
+        raise ValueError("budget subject already has a decision")
+    limit_key = {
+        "model_call": "model_calls",
+        "tool_call": "tool_calls",
+    }[str(resource)]
+    if data["limit"] != state.budget_limits.get(limit_key):
+        raise ValueError("budget decision limit does not match compiled task")
+    consumed = state.budget_consumed[str(resource)]
+    if data["consumed_before"] != consumed:
+        raise ValueError("budget decision consumption is stale")
+    units = data["units"]
+    if not isinstance(units, int) or units <= 0:
+        raise ValueError("budget decision units are invalid")
+    outcome = data.get("outcome")
+    reason_code = data.get("reason_code")
+    if event_type != "budget_%s" % outcome:
+        raise ValueError("budget event does not match decision outcome")
+    if event_type == "budget_granted":
+        if reason_code != "within_budget" or consumed + units > data["limit"]:
+            raise ValueError("budget grant outcome is inconsistent")
+        if resource == "tool_call":
+            if subject_id not in state.leased_operation_ids:
+                raise ValueError("tool-call budget requires a recorded lease")
+            if state.task_timed_out:
+                raise ValueError("timed-out task cannot consume tool-call budget")
+            if (
+                subject_id in state.terminal_operation_ids
+                and subject_id not in state.started_operation_ids
+            ):
+                raise ValueError("cancelled operation cannot consume tool-call budget")
+        if data["consumed_after"] != consumed + units:
+            raise ValueError("budget grant consumption is invalid")
+        state.budget_consumed[str(resource)] = consumed + units
+        if resource == "tool_call":
+            state.tool_budget_granted_operation_ids.add(subject_id)
+    else:
+        if reason_code != "budget_exhausted" or consumed + units <= data["limit"]:
+            raise ValueError("budget exhaustion outcome is inconsistent")
+        if data["consumed_after"] != consumed:
+            raise ValueError("exhausted budget cannot consume units")
+        state.failure_stage = "budget"
+    state.budget_subjects.add(subject_key)
+
+
+def _apply_execution_cancellation(
+    state: _TraceState,
+    operation_id: str,
+    data: dict[str, object],
+) -> None:
+    if data["execution_lease_id"] != state.lease_by_operation.get(operation_id):
+        raise ValueError("cancellation does not match operation lease")
+    if operation_id in state.started_operation_ids:
+        raise ValueError("pre-dispatch cancellation cannot follow execution start")
+    if operation_id in state.terminal_operation_ids:
+        raise ValueError("operation already has a terminal result")
+    if data["phase"] != "pre_dispatch" or data["outcome"] != "accepted":
+        raise ValueError("unsupported cancellation decision")
+    state.terminal_operation_ids.add(operation_id)
+    state.failure_stage = "cancellation"
+
+
+def _apply_timeout_decision(
+    state: _TraceState,
+    data: dict[str, object],
+) -> None:
+    if data["compiled_task_id"] != state.compiled_task_id:
+        raise ValueError("timeout decision does not match compiled task")
+    if state.task_timed_out:
+        raise ValueError("task already has a terminal timeout decision")
+    outcome = data["outcome"]
+    if outcome not in {"within_budget", "timed_out"}:
+        raise ValueError("timeout decision outcome is invalid")
+    if outcome == "timed_out":
+        state.task_timed_out = True
+        state.failure_stage = "timeout"
+
+
+def _apply_retry_decision(
+    state: _TraceState,
+    event_type: str,
+    operation_id: str,
+    data: dict[str, object],
+) -> None:
+    if data["compiled_task_id"] != state.compiled_task_id:
+        raise ValueError("retry decision does not match compiled task")
+    failure = state.failure_by_operation.get(operation_id)
+    if failure is None or data["source_failure_id"] != failure[0]:
+        raise ValueError("retry decision does not match execution failure")
+    if data["source_operation_id"] != operation_id:
+        raise ValueError("retry decision source operation is invalid")
+    if failure[0] in state.retry_decided_failure_ids:
+        raise ValueError("execution failure already has a retry decision")
+    target_operation_id = data["target_operation_id"]
+    if (
+        not isinstance(target_operation_id, str)
+        or not target_operation_id.strip()
+        or target_operation_id in state.retry_target_operation_ids
+    ):
+        raise ValueError("retry target operation is invalid or already reserved")
+    outcome = str(data["outcome"])
+    if event_type != "retry_%s" % outcome:
+        raise ValueError("retry event does not match decision outcome")
+    retry_limit = state.budget_limits["retry_attempts"]
+    if data["retry_limit"] != retry_limit:
+        raise ValueError("retry decision limit does not match compiled task")
+    prior_approved = sum(
+        event == "retry_approved" for event in state.event_types
+    )
+    expected_ordinal = prior_approved + 1
+    if data["attempt_ordinal"] != expected_ordinal:
+        raise ValueError("retry decision ordinal is invalid")
+    expected_outcome = (
+        "not_retryable"
+        if failure[1] != "retryable"
+        else "approved" if expected_ordinal <= retry_limit else "exhausted"
+    )
+    if outcome != expected_outcome:
+        raise ValueError("retry decision outcome is inconsistent")
+    if outcome in {"exhausted", "not_retryable"}:
+        state.failure_stage = "retry"
+    state.retry_decided_failure_ids.add(failure[0])
+    state.retry_target_operation_ids.add(target_operation_id)
+
+
+def _apply_operation_edge(
+    state: _TraceState,
+    operation_id: str,
+    data: dict[str, object],
+) -> None:
+    from ab_harness.operation_edges import OperationEdge
+
+    edge = OperationEdge.from_dict(data)
+    if operation_id != edge.source_operation_id:
+        raise ValueError("operation edge event does not match source operation")
+    if (
+        edge.environment_run_id != state.environment_run_id
+        or edge.task_id != state.task_id
+        or edge.trace_id != state.trace_id
+    ):
+        raise ValueError("operation edge lineage does not match trace")
+    if edge.source_operation_id not in state.proposal_by_operation:
+        raise ValueError("edge source operation is not recorded")
+    if edge.target_operation_id not in state.proposal_by_operation:
+        raise ValueError("edge target operation is not recorded")
+    source_frame = state.frame_by_operation.get(edge.source_operation_id)
+    target_frame = state.frame_by_operation.get(edge.target_operation_id)
+    if source_frame is None or target_frame is None:
+        raise ValueError("operation edge requires semantically admitted operations")
+    if source_frame != edge.source_frame_id or target_frame != edge.target_frame_id:
+        raise ValueError("operation edge frame does not match admitted operations")
+    if edge.relation == "delegates_to":
+        raise ValueError(
+            "cross-frame delegation requires a separately compiled target projection"
+        )
+    pair = (edge.source_operation_id, edge.target_operation_id)
+    if any(existing[:2] == pair for existing in state.operation_edges):
+        raise ValueError("operation edge pair already recorded")
+    if edge.relation == "decomposes_to" and any(
+        target == edge.target_operation_id
+        and relation in {"decomposes_to", "delegates_to"}
+        for _source, target, relation in state.operation_edges
+    ):
+        raise ValueError("operation already has a structural parent")
+    if _operation_path_exists(
+        state.operation_edges,
+        edge.target_operation_id,
+        edge.source_operation_id,
+    ):
+        raise ValueError("operation edge would create a cycle")
+    if edge.target_operation_id in state.leased_operation_ids:
+        raise ValueError("operation edge cannot be added after target lease")
+    state.operation_edges.add(
+        (edge.source_operation_id, edge.target_operation_id, edge.relation)
+    )
+
+
+def _operation_path_exists(
+    edges: set[tuple[str, str, str]],
+    source: str,
+    target: str,
+) -> bool:
+    adjacency: dict[str, set[str]] = {}
+    for edge_source, edge_target, _relation in edges:
+        adjacency.setdefault(edge_source, set()).add(edge_target)
+    pending = [source]
+    visited: set[str] = set()
+    while pending:
+        current = pending.pop()
+        if current == target:
+            return True
+        if current in visited:
+            continue
+        visited.add(current)
+        pending.extend(adjacency.get(current, ()))
+    return False
 
 
 def _apply_task_judgment(
@@ -1353,6 +2016,8 @@ def _apply_task_judgment(
         raise ValueError("task acceptance evidence set is incomplete or unrecorded")
     if event_type.startswith("terminal_task_"):
         state.terminal_status = str(data["status"])
+        if event_type == "terminal_task_rejected":
+            state.failure_stage = "task_acceptance"
 
 
 def _digest(events: tuple[TraceEvent, ...], state: _TraceState) -> VerifiedTraceDigest:
@@ -1404,7 +2069,7 @@ def _digest(events: tuple[TraceEvent, ...], state: _TraceState) -> VerifiedTrace
         "pending_obligation_ids": tuple(terminal["pending_obligation_ids"]),
         "failed_obligation_ids": tuple(terminal["failed_obligation_ids"]),
         "terminal_status": state.terminal_status or "",
-        "failure_stage": None,
+        "failure_stage": state.failure_stage,
     }
     return VerifiedTraceDigest(
         digest_id=_content_id("verified-trace-digest", fields),

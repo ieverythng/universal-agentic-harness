@@ -14,10 +14,17 @@ def test_smoke_runs_accept_reject_and_replay_canaries():
     assert report["checks"] == {
         "accepted_path": True,
         "rejected_path": True,
+        "terminal_counterexample": True,
         "verified_trace_digest": True,
     }
     assert report["accepted_case"]["evidence_owner"] == "object_finder"
     assert report["rejected_case"]["failure_stage"] == "semantic_admission"
+    assert report["counterexample_case"] == {
+        "passed": False,
+        "failure_stage": "evidence_closure",
+        "acceptance_status": "rejected",
+        "missing_observables": ["fresh detector-backed result returned"],
+    }
     assert report["verified_trace_digest"].startswith(
         "verified-trace-digest:sha256:"
     )

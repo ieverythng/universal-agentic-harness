@@ -104,10 +104,12 @@ readiness from discovery alone.
 task or model call?
 
 **Decision:** No. Approved bindings normalize input into immutable
-`EnvironmentIngress`. Deterministic `TaskIngressPolicy` classifies each item as
-an environment state update, new task, resumed task, notification to an
-existing task, or rejection. A model may interpret admitted task content but
-cannot rewrite the assigned task or trace lineage.
+`EnvironmentIngress`. Deterministic `TaskIngressAuthority` classifies and
+admits each item as an environment state update, new task, resumed task,
+notification to an existing task, or rejection. It is the only public writer
+for accepted task-bearing ingress; the task registry is a read-only ledger
+projection. A model may interpret admitted task content but cannot rewrite the
+assigned task or trace lineage.
 
 Domain task IDs retain native meaning. NAO goal, request, plan, version, and
 step IDs cross the UAH boundary unchanged. UAH identities supplement this
@@ -560,3 +562,46 @@ The final H0 lifecycle slices and Observatory O1 now proceed in parallel. O1 is
 a read-only replay projection and static review surface over the common ledger.
 It cannot append events, issue evidence, repair traces, or promote memory. Each
 failure family enters O1 only after its restart-replay contract is stable.
+
+## 24. Executable-Seam Continuation on 2026-10-01
+
+The public task-ingress authority is implemented. It snapshots primitive
+DomainContractPack rule values, owns accepted task-bearing ledger writes, and
+refreshes its read-only task projection before duplicate and terminal checks.
+State updates and rejected ingress still require an environment-scoped event
+family before they can claim durable replay.
+
+Semantic admission now validates canonical arguments through a reviewed,
+content-addressed portable object-schema subset. The subset covers required
+fields, top-level JSON types, and additional-property policy. Executable
+callable validators were removed because a source-revision string did not make
+captured callable state deterministic. `uah.admitted_operation/v2` records the
+validated input-schema identity.
+
+`uah.semantic_admission_rejection/v1` and
+`uah.domain_admission_rejection/v1` are immutable operation-scoped facts. The
+semantic coordinator appends the returned semantic rejection; the domain
+lifecycle owner appends its own rejection. Replay exposes either as a
+nonterminal failure stage. Only explicit task-acceptance authority may make the
+trace terminal. Repeated requests for an already issued domain lease return the
+same deterministic lease and do not append a contradictory rejection.
+
+Initial H1 identity registries now implement content-addressed `AgentManifest`,
+one-time `AgentHandleRevision` registration, and roster-bound `AgentRun`
+attachment in `attached_standby`. The handle registry refuses rebinding because
+the required fidelity evaluator is H3 work. These registries are in-memory and
+do not emit lifecycle events, perform preflight, allocate a model, persist run
+state, or invoke a provider.
+
+The initial O1 implementation projects validated ledger events into immutable
+trace views and static searchable HTML. It derives terminal status only from
+explicit terminal facts, retains operation failure stages, escapes raw payloads,
+and embeds inert graph JSON. Arbitrary event collections default to
+`synthetic`; the `recorded` label requires a validated `LifecycleLedger`. The
+full actor, configuration, provider, comparison, and Workbench views remain
+open.
+
+The next ordered seams are `OperationEdge`, typed normalization and evidence
+rejection, terminal required-effect counterexample replay, scoped activation
+events, fixed-instance model leases and preflights, then `PromptCompiler` and a
+provider-neutral invocation port.

@@ -125,22 +125,29 @@ The repository currently demonstrates:
   prohibition, and budget artifact;
 - content-addressed TypedProposal normalization, UAH semantic admission, and
   independent domain execution-lease issuance or typed rejection;
+- reviewed portable input-schema validation with the validated schema identity
+  pinned in each admitted operation;
 - exact lease-only environment execution with complete binding fingerprint
   fencing, separate native result and normalized evidence artifacts;
 - one common lifecycle ledger with strict restart replay and deterministic
   `VerifiedTraceDigest` construction for accepted and best-effort-deficit tasks,
-  including atomic commit framing for multi-event facts;
+  including atomic commit framing, advisory-lock writer coordination, and
+  nonterminal semantic/domain rejection replay;
 - required versus best-effort task acceptance from owner-issued evidence;
 - append-only common lifecycle persistence and model-free restart replay;
 - a ROS-free NAO canary with accepted lease execution, semantic no-dispatch
   rejection, restart replay, and verified digest output;
-- **146 passing tests** and passing Ruff validation. Complete pre-commit,
+- in-memory content-addressed agent manifests, one-time handle registration,
+  and roster-bound standby agent runs;
+- an initial read-only Observatory projection and static renderer with honest
+  terminal status and explicit provenance labels;
+- **200 passing tests** and passing Ruff validation. Complete pre-commit,
   generated-document, and clean-wheel gates are rerun before release.
 
-The proof does not yet include a complete rejection/cancellation/retry grammar,
-a live agent loop, model allocation, H2 NAO planner parity, a Watson/Bonsai
-comparison, runtime budget enforcement, production deployment, or measured
-Workbench uplift.
+The proof does not yet include complete normalization/evidence rejection or
+terminal cancellation/retry grammar, a live agent loop, model allocation, H2
+NAO planner parity, a Watson/Bonsai comparison, runtime budget enforcement,
+production deployment, or measured Workbench uplift.
 
 ## Commercial hypothesis
 

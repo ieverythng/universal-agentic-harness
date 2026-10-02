@@ -311,9 +311,9 @@
   -&gt; AdmittedOperation
   -&gt; domain lifecycle admission
   -&gt; ExecutionLease or rejection</code></pre>
-<p>UAH semantic admission verifies role ownership, frame reach, AB object, binding status and ownership, canonical arguments, schema-reference presence, prohibited effects, and evidence obligations. It does not yet evaluate the arguments against the referenced schema or assert that the native environment is ready.</p>
+<p>UAH semantic admission verifies role ownership, frame reach, AB object, binding status and ownership, canonical arguments, reviewed input-schema content, prohibited effects, and evidence obligations. The portable schema subset checks required fields, top-level JSON types, and additional-property policy. It does not validate output payloads or assert that the native environment is ready.</p>
 <p>Domain lifecycle admission owns readiness and operation deduplication. The current slice rechecks the environment run, DomainContractPack revision, binding environment, lifecycle owner, and readiness attestation before issuing an operation-scoped lease. Native concurrency, cancellation, supersession, version fencing, and safety checks remain adapter-owned future work. A semantically valid operation may still be rejected.</p>
-<p>The accepted tracer reaches an <code>ExecutionLease</code>, records execution start, and calls the environment handler only with that exact lease. Direct object and argument dispatch is absent. Candidate bindings, foreign binding owners, inspection-only objects, domain-revision drift, duplicate leasing, complete binding drift, and tampered authority artifacts fail closed. The owner preserves the native result and normalized evidence in a content-addressed receipt.</p>
+<p>The accepted tracer reaches an <code>ExecutionLease</code>, records execution start, and calls the environment handler only with that exact lease. Direct object and argument dispatch is absent. Candidate bindings, foreign binding owners, inspection-only objects, domain-revision drift, complete binding drift, and tampered authority artifacts fail closed. An exact repeated lease request is idempotent and returns the same lease; a changed domain context cannot reconsider an already leased operation. The owner preserves the native result and normalized evidence in a content-addressed receipt.</p>
 <h2>7. Evidence and task acceptance</h2>
 <p>Model text cannot prove an external effect. UAH distinguishes:</p>
 <ol>
@@ -330,7 +330,7 @@
 <li><code>rejected</code> when a terminal required obligation fails.</li>
 </ul>
 <p>The environment task registry records suspension or terminal judgment and rejects later ingress for a terminal task. The strict, content-addressed <code>uah.trace_event/v1</code> stream persists locally as canonical JSONL and reconstructs registry and operation state after process restart without invoking a model or rerunning acceptance. Every event carries a global sequence, causal parent, and atomic <code>commit_id</code>/<code>commit_index</code>/<code>commit_size</code> position. Reload rejects incomplete or interleaved multi-event facts.</p>
-<p>The current store is local and single-writer. It provides sequence, timestamps, causal links, accepted-path replay, and native execution-failure recording. It does not yet provide cross-process coordination or the complete rejection/cancellation/timeout/retry grammar.</p>
+<p>The current store is local JSONL with advisory-lock coordination among cooperating processes. It provides sequence, timestamps, causal links, accepted-path replay, native execution-failure recording, and nonterminal semantic/domain rejection replay. It rejects rather than repairs a crash-truncated commit and does not yet provide the complete normalization/evidence-rejection, cancellation, timeout, or retry grammar.</p>
 <h2>8. NeuralWorkbench</h2>
 <h3>8.1 Role in the product</h3>
 <p>NeuralWorkbench is the proposed adaptive memory and search engine. It is not an abstraction frame, model provider, runtime owner, or permission system. UAH supplies the active frame, task projection, constraints, candidate budget, and versioned context.</p>
@@ -411,13 +411,13 @@ observe(WorkbenchObservation) -&gt; no authority-bearing result</code></pre>
 </tr>
 <tr>
 <td>Common lifecycle persistence</td>
-<td>Implemented accepted-path seam</td>
-<td>Global sequence, causal parents, atomic commit framing, strict JSONL restart recovery, operation transitions, acceptance, accepted-with-deficit replay, and verified digest; full failure grammar and cross-process locking remain open</td>
+<td>Implemented accepted and operation-rejection seam</td>
+<td>Global sequence, causal parents, atomic commit framing, advisory-lock coordination, strict JSONL restart recovery, operation transitions, nonterminal semantic/domain rejection, acceptance, accepted-with-deficit replay, and verified digest; full terminal failure grammar remains open</td>
 </tr>
 <tr>
 <td>Recorded NAO canary</td>
 <td>Implemented</td>
-<td>Injected domain pack, real ingress classification, strict planner payload handling, accepted lease-only execution, semantic no-dispatch rejection, restart replay, and verified digest</td>
+<td>Injected domain pack, authoritative ingress admission, strict planner payload handling, input-schema validation, accepted lease-only execution, recorded semantic no-dispatch rejection, restart replay, and verified digest</td>
 </tr>
 <tr>
 <td>PromptCompiler</td>
@@ -427,12 +427,12 @@ observe(WorkbenchObservation) -&gt; no authority-bearing result</code></pre>
 <tr>
 <td>Two-stage admission and execution</td>
 <td>Implemented narrow seam</td>
-<td>Content-addressed proposal, semantic admission, complete binding fingerprint, ledger-backed domain lease, exact lease-only dispatch, native result/evidence receipt, and typed rejections</td>
+<td>Content-addressed proposal, reviewed input-schema validation, semantic admission, complete binding fingerprint, ledger-backed domain lease, exact lease-only dispatch, native result/evidence receipt, and replayable nonterminal typed rejections</td>
 </tr>
 <tr>
 <td>Agent identity and handles</td>
-<td>Partially specified</td>
-<td>Environment/task identities exist; role, agent, run, handle, operation, and invocation registries incomplete</td>
+<td>Initial H1 slice</td>
+<td>Content-addressed manifests, one-time handle registration, and roster-bound standby run attachment are in memory; role/model registries, persistence, run lifecycle, fixed leases, invocations, and fidelity evaluation remain open</td>
 </tr>
 <tr>
 <td>Live model port and allocator</td>
@@ -446,8 +446,8 @@ observe(WorkbenchObservation) -&gt; no authority-bearing result</code></pre>
 </tr>
 <tr>
 <td>Observatory renderer</td>
-<td>Contract frozen</td>
-<td>Static O1 implementation remains open</td>
+<td>Initial O1 slice</td>
+<td>Validated-ledger trace projection, honest terminal status, failure stages, static searchable HTML, and inert graph JSON; full actor/configuration/comparison views remain open</td>
 </tr>
 <tr>
 <td>NeuralWorkbench retrieval</td>
@@ -460,7 +460,7 @@ observe(WorkbenchObservation) -&gt; no authority-bearing result</code></pre>
 <td>No promoted AB2+ object</td>
 </tr>
 </tbody></table>
-<p>The current full suite reports <strong>146 passing tests</strong>, and the latest Ruff run passes. The complete repository hook, Markdown/HTML synchronization, and clean wheel gates are rerun before distributing a refreshed build.</p>
+<p>The current full suite reports <strong>200 passing tests</strong>, and the latest Ruff run passes. The complete repository hook, Markdown/HTML synchronization, and clean wheel gates are rerun before distributing a refreshed build.</p>
 <h2>11. Security and governance posture</h2>
 <p>The architecture applies least capability at task scope:</p>
 <ul>
@@ -541,10 +541,10 @@ observe(WorkbenchObservation) -&gt; no authority-bearing result</code></pre>
 </tbody></table>
 <h2>14. Next technical gates</h2>
 <ol>
-<li>Add typed normalization/admission/domain rejection and evidence-rejection events.</li>
-<li>Freeze <code>OperationEdge</code> and add cross-process writer coordination.</li>
+<li>Freeze <code>OperationEdge</code> and its restart-replay invariants.</li>
+<li>Add typed normalization and evidence-rejection events plus a terminal required-effect counterexample.</li>
 <li>Add stale evidence, timeout, owner failure, cancellation, retry exhaustion, supersession, and false-completion cases.</li>
-<li>Implement role, agent, handle, agent-run, operation, edge, lease, and model invocation identities.</li>
+<li>Extend the initial agent/handle/standby registries with role/model identity, scoped activation events, fixed leases, preflights, and model invocation identity.</li>
 <li>Add PromptCompiler, provider-neutral model port, fixed model lease, and startup preflight.</li>
 <li>Owner-review and freeze the NAO <code>v1.0.0</code> DomainContractPack and package-owned parity fixtures.</li>
 <li>Run planner <code>legacy | shadow | uah</code> parity with fake or simulated owners.</li>

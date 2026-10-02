@@ -4,6 +4,7 @@ import json
 import pytest
 
 from ab_harness.lifecycle import LifecycleLedger
+from ab_harness.lifecycle import LifecycleSequenceConflict
 from ab_harness.lifecycle import TaskIngressFact
 from ab_harness.lifecycle import TaskStartedFact
 from ab_harness.lifecycle import TraceEvent
@@ -103,7 +104,7 @@ def test_common_ledger_rejects_non_utf8_content(tmp_path):
 def test_expected_sequence_rejects_a_stale_writer(tmp_path):
     ledger = _ledger(tmp_path / "sequence.jsonl")
 
-    with pytest.raises(ValueError, match="sequence conflict"):
+    with pytest.raises(LifecycleSequenceConflict, match="sequence conflict"):
         ledger.record(
             TaskIngressFact(
                 environment_run_id="environment-run:ledger:001",
