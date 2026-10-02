@@ -213,6 +213,8 @@ class AgentRun:
             raise ValueError(
                 "agent run fields must not be empty: %s" % ", ".join(missing)
             )
+        if self.status != "attached_standby":
+            raise ValueError("unsupported agent run status: %s" % self.status)
 
 
 class EnvironmentRunLookup(Protocol):

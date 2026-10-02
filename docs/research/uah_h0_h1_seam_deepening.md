@@ -80,12 +80,13 @@ the following sources:
 - the iTrader `itrader-architecture-check` skill and the NAO
   `iiia-ros4hri-check` and `seam-hypothesis-audit` skills.
 
-The deslop audit found no hard repository-standard violation after the
-correctness fixes. It retained four judgment calls: lifecycle grammar locality,
-the private task-start seam, repeated content-ID mechanics, and the admitted
-operation field group. The specification review found the accepted path sound
-and identified the typed counterexample grammar as the remaining partial H0/H1
-requirement.
+The initial deslop audit retained four judgment calls: lifecycle grammar
+locality, the private task-start seam, repeated content-ID mechanics, and the
+admitted-operation field group. The current pass resolved the private task-start
+seam and repeated content-ID mechanics. Lifecycle grammar locality and the
+admitted-operation field group remain deliberate deferrals. The specification
+review found the accepted path sound and identified the typed counterexample
+grammar as the remaining partial H0/H1 requirement.
 
 ## 3. Current strengths to preserve
 
@@ -97,9 +98,9 @@ append, flush, and `fsync`. `replay()` derives terminal status and a
 `VerifiedTraceDigest` without a model. Deleting this module would spread
 ordering, persistence, and replay mechanics across every authority owner.
 
-The module's 1,412 lines are therefore not sufficient evidence for a split.
-The relevant measure is interface depth. Its small write and replay interface
-hides substantial implementation detail and supplies high leverage.
+The module's size is not sufficient evidence for a split. The relevant measure
+is interface depth. Its small write and replay interface hides substantial
+implementation detail and supplies high leverage.
 
 ### 3.2 Authority artifacts fail closed at trust crossings
 
@@ -118,8 +119,8 @@ closed across cooperating processes.
 ### 3.4 The task registry is a projection, not a second event store
 
 `EnvironmentTaskRegistry` reconstructs task and ingress lineage from lifecycle
-events. This matches the masterplan and should remain true after the task-start
-interface changes.
+events. This matches the masterplan and remains true behind
+`TaskIngressAuthority`.
 
 ## 4. Findings and deletion tests
 
@@ -130,40 +131,37 @@ Adding one event currently requires coordinated edits to several regions of
 
 - the accepted `LifecycleFact` union;
 - `_event_specs()` conversion;
-- `_SUPPORTED_EVENT_TYPES`;
-- `_EVENT_PREREQUISITES` and operation-event classification;
+- `_EVENT_RULES` support, prerequisite, and operation-scope metadata;
 - `_apply_event()` dispatch and a reducer function;
 - digest projection where the event contributes to the verified result.
 
-This is a repeated-switch problem. It becomes material when the remaining
-failure families are added. A partial extraction that moves only the event-name
-set would make the module shallower because contributors would still need to
-know every other location.
+This remains a repeated-switch problem. Rejection, budget, timeout, retry,
+cancellation, and operation-edge families now meet the original extraction
+threshold. A partial extraction that moves only event metadata would make the
+module shallower because contributors would still need to know every other
+location.
 
 **Deletion test:** deleting a cohesive typed grammar would return event
 conversion, transition rules, state reduction, and digest projection to
 separate switches. It earns a seam once at least two failure families use it.
 
-**Decision:** keep the public ledger interface. During the first rejection
-slice, co-locate the new fact, conversion, transition, and projection logic.
-Extract an internal grammar module only after the pattern is proven by a second
-slice.
+**Decision:** keep the public ledger interface. The metadata tables have been
+consolidated into `_EVENT_RULES`. Extract a private typed grammar only when the
+active DEV event families stabilize enough to move conversion, transition,
+reduction, and digest behavior together.
 
-### 4.2 Task ingress crosses a private mutation seam
+### 4.2 Task ingress now has one public authority seam
 
-`TaskIngressPolicy` constructs `TaskLineage` and calls
-`EnvironmentTaskRegistry._record_policy_start()`. The policy therefore performs
-stateful authority work while its name and public shape suggest pure
-classification. The registry exposes public mutation for resume and notify but
-a private mutation for start. The division is difficult to explain and creates
-an implementation-shaped test surface.
+`TaskIngressAuthority.admit()` owns rule matching, deterministic IDs, duplicate
+and terminal checks, ledger writes, and projection refresh for start, resume,
+and notify ingress. `EnvironmentTaskRegistry` is a read-only projection of the
+common ledger. The former private task-start mutation seam has been removed.
 
 **Deletion test:** deleting a task-ingress authority would force every domain
 adapter to coordinate rule matching, deterministic IDs, duplicate checks,
 terminal checks, ledger writes, and projection refresh. The module earns depth.
 
-**Decision:** introduce one public task-ingress authority with an operation such
-as:
+**Implemented interface:**
 
 ```python
 class TaskIngressAuthority:
@@ -174,15 +172,9 @@ class TaskIngressAuthority:
     ) -> TaskIngressDecision: ...
 ```
 
-`admit()` owns rule matching, content verification, deterministic task and trace
-identity, duplicate and terminal checks, decision issuance, ledger append, and
-projection refresh. The task registry becomes an internal or explicitly
-read-only projection. The compiler continues to require the accepted start
-decision and exact recorded lineage.
-
-The migration should preserve the present decision schema until the first
-counterexample proves that a new schema is needed. A broad
-`AuthorityRepository` abstraction is deferred.
+The compiler continues to require the accepted start decision and exact
+recorded lineage. The decision schema remains unchanged. A broad
+`AuthorityRepository` abstraction remains deferred.
 
 ### 4.3 The current event envelope assumes a task already exists
 
@@ -369,10 +361,10 @@ restart replay.
    - Test inactive run, revision mismatch, binding-environment mismatch, and
      duplicate lease.
    - Require no execution start and deterministic replay.
-3. **Task-ingress authority**
-   - Test start, resume, notify, duplicate ingress, second start, terminal task,
-     restart, and two independently opened writers through one public method.
-   - Remove `_record_policy_start()` only after parity.
+3. **Task-ingress authority (implemented)**
+   - Start, resume, notify, duplicate ingress, second start, terminal task,
+     restart, and independently opened writers use one public method.
+   - The private `_record_policy_start()` seam has been removed.
 4. **OperationEdge**
    - Test same-frame decomposition, explicit cross-frame delegation,
      continuation, missing endpoint, self-edge, cycle, and cross-trace rejection.

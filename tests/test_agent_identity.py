@@ -5,6 +5,7 @@ import pytest
 from ab_harness.agent_identity import AgentManifest
 from ab_harness.agent_identity import AgentHandleRegistry
 from ab_harness.agent_identity import AgentRegistry
+from ab_harness.agent_identity import AgentRun
 from ab_harness.agent_identity import AgentRunRegistry
 from ab_harness.environment_profiles import EnvironmentProfile
 from ab_harness.environment_profiles import EnvironmentProfileRegistry
@@ -280,6 +281,18 @@ def test_agent_run_attaches_to_an_active_rostered_environment_in_standby():
     assert run.started_from_agent_id == handle_revision.active_agent_id
     assert run.resolved_handle_revision_id == handle_revision.revision_id
     assert agent_runs.get(run.agent_run_id) is run
+
+
+def test_agent_run_rejects_an_unimplemented_lifecycle_status():
+    with pytest.raises(ValueError, match="unsupported agent run status"):
+        AgentRun(
+            agent_run_id="agent-run:synthetic:unsupported",
+            environment_run_id="environment-run:synthetic:001",
+            agent_handle_id="handle:synthetic.worker.primary",
+            resolved_handle_revision_id="agent-handle-revision:synthetic:v1",
+            started_from_agent_id="agent:synthetic:v1",
+            status="running",  # type: ignore[arg-type]
+        )
 
 
 def test_registered_agent_run_pins_the_resolved_handle_revision():

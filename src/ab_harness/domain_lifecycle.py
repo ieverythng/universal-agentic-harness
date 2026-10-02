@@ -271,12 +271,8 @@ class DomainLifecycleAdmission:
         admitted_operation: AdmittedOperation,
     ) -> ExecutionLeaseDecision:
         admitted_operation.verify_identity()
-        already_leased = self._lifecycle_ledger.has_operation_event(
-            trace_id=admitted_operation.trace_id,
-            operation_id=admitted_operation.operation_id,
-            event_type="domain_admission_leased",
-        )
-        if already_leased:
+        recorded_lease = self._recorded_lease_identity(admitted_operation)
+        if recorded_lease is not None:
             if (
                 self._environment_run.status != "active"
                 or admitted_operation.environment_run_id
@@ -288,17 +284,12 @@ class DomainLifecycleAdmission:
                 raise ValueError(
                     "leased operation cannot be reconsidered under changed domain context"
                 )
-            return ExecutionLeaseDecision(
-                execution_lease=_new_execution_lease(
-                    admitted_operation=admitted_operation,
-                    lease_owner_id=(
-                        self._environment_run.attestation.environment_owner_id
-                    ),
-                    environment_attestation_id=(
-                        self._environment_run.attestation.attestation_id
-                    ),
-                )
+            lease = self._new_lease(admitted_operation)
+            self._require_exact_recorded_lease(
+                lease,
+                recorded_lease=recorded_lease,
             )
+            return ExecutionLeaseDecision(execution_lease=lease)
 
         reasons: list[str] = []
         if self._environment_run.status != "active":
@@ -325,21 +316,60 @@ class DomainLifecycleAdmission:
             self._lifecycle_ledger.record(rejection)
             return ExecutionLeaseDecision(rejection=rejection)
 
-        lease = _new_execution_lease(
+        lease = self._new_lease(admitted_operation)
+        try:
+            self._lifecycle_ledger.record(lease)
+        except ValueError:
+            recorded_lease = self._recorded_lease_identity(admitted_operation)
+            if recorded_lease is not None:
+                self._require_exact_recorded_lease(
+                    lease,
+                    recorded_lease=recorded_lease,
+                )
+                return ExecutionLeaseDecision(execution_lease=lease)
+            raise
+        return ExecutionLeaseDecision(execution_lease=lease)
+
+    def _new_lease(self, admitted_operation: AdmittedOperation) -> ExecutionLease:
+        return _new_execution_lease(
             admitted_operation=admitted_operation,
             lease_owner_id=self._environment_run.attestation.environment_owner_id,
             environment_attestation_id=(
                 self._environment_run.attestation.attestation_id
             ),
         )
-        try:
-            self._lifecycle_ledger.record(lease)
-        except ValueError:
-            if self._lifecycle_ledger.has_operation_event(
-                trace_id=admitted_operation.trace_id,
-                operation_id=admitted_operation.operation_id,
-                event_type="domain_admission_leased",
-            ):
-                return ExecutionLeaseDecision(execution_lease=lease)
-            raise
-        return ExecutionLeaseDecision(execution_lease=lease)
+
+    def _recorded_lease_identity(
+        self,
+        admitted_operation: AdmittedOperation,
+    ) -> tuple[str, str] | None:
+        event = next(
+            (
+                event
+                for event in reversed(self._lifecycle_ledger.events())
+                if event.trace_id == admitted_operation.trace_id
+                and event.operation_id == admitted_operation.operation_id
+                and event.event_type == "domain_admission_leased"
+            ),
+            None,
+        )
+        if event is None:
+            return None
+        admission_id = event.data.get("admission_id")
+        execution_lease_id = event.data.get("execution_lease_id")
+        if not isinstance(admission_id, str) or not isinstance(
+            execution_lease_id, str
+        ):
+            raise ValueError("recorded execution lease identity is invalid")
+        return admission_id, execution_lease_id
+
+    @staticmethod
+    def _require_exact_recorded_lease(
+        lease: ExecutionLease,
+        *,
+        recorded_lease: tuple[str, str],
+    ) -> None:
+        if recorded_lease != (lease.admission_id, lease.execution_lease_id):
+            raise ValueError(
+                "leased operation requires the exact admitted operation"
+            )

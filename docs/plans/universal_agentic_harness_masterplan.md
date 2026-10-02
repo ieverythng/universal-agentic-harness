@@ -330,10 +330,11 @@ correct scope + correct ownership + valid output + evidence-complete effect
   restored and verified.
 - The target architecture distinguishes role, model, agent, activation, task,
   trace, and operation identities. `AgentRoleConfiguration` is
-  model-independent by contract. General role/agent/handle/run registries are
-  not implemented yet.
-- The planned `agent_handle_id` supplies a stable deployment-facing identity
-  such as `watson.system.primary`. Each future immutable handle revision will
+  model-independent by contract. At this 2026-09-03 checkpoint, general
+  role/agent/handle/run registries were not implemented. The current status
+  table below records the later initial agent, handle, and attached-run slice.
+- The `agent_handle_id` contract supplies a stable deployment-facing identity
+  such as `watson.system.primary`. Each immutable handle revision must
   resolve to one `agent_id`, preserve the required role configuration, record
   fidelity evidence, and retain rollback lineage. Hardware allocation will not
   be permitted to rebind the handle.

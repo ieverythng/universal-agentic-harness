@@ -640,6 +640,7 @@
 <li>optimistic ledger races use the typed <code>LifecycleSequenceConflict</code> rather than parsing exception text;</li>
 <li>the duplicate accepted-start compiler condition is one predicate.</li>
 </ul>
+<p>The final two-axis review also found and closed two fail-closed defects. Domain lease idempotency now accepts only the exact recorded <code>AdmittedOperation</code> and lease identity, including the concurrent-writer fallback. <code>AgentRun</code> now rejects lifecycle states other than the sole implemented <code>attached_standby</code> state. Public-seam regression tests cover both cases.</p>
 <p>The large lifecycle reducer remains cohesive and replay-tested. A separate grammar module, operation-state rewrite, artifact base class, compiler context wrapper, and broad runtime facade remain deferred because they would increase the active DEV conflict surface or fail the deletion test.</p>
 <h2>Verification dashboard</h2>
 <table><thead><tr>
@@ -648,7 +649,7 @@
 </tr></thead><tbody>
 <tr>
 <td><code>.venv/bin/python -m pytest -q</code> on 2026-10-02</td>
-<td>221 passed after operation-edge replay, rejection counterexamples, atomic tool-budget dispatch, cancellation, monotonic recorded-timeout validation, retry exhaustion, O1 rendering, identity-byte characterization, and lifecycle/compiler deslop</td>
+<td>223 passed after operation-edge replay, rejection counterexamples, exact lease-idempotency fencing, agent-run status validation, runtime controls, O1 rendering, identity-byte characterization, and lifecycle/compiler deslop</td>
 </tr>
 <tr>
 <td><code>.venv/bin/python scripts/render_observatory_example.py --check</code></td>
@@ -685,6 +686,10 @@
 <tr>
 <td>NAO planner supervisor and orchestrator gate focused read-only baseline</td>
 <td>41 passed against the <code>v1.0.0</code> source boundary</td>
+</tr>
+<tr>
+<td>Current NAO/chatbot reference recheck at <code>81b14ef...</code></td>
+<td>Chatbot <code>DialogueTurnEngine</code>: 112 passed; pure NAO planner gate: 18 passed. The orchestrator relay-guard test remains ROS-environment dependent because generated <code>chatbot_msgs</code> is unavailable in the standalone Python environment</td>
 </tr>
 <tr>
 <td>Wheel packaging regression</td>

@@ -905,6 +905,12 @@ The bounded corrections are:
   parsing exception text;
 - the duplicate accepted-start compiler condition is one predicate.
 
+The final two-axis review also found and closed two fail-closed defects. Domain
+lease idempotency now accepts only the exact recorded `AdmittedOperation` and
+lease identity, including the concurrent-writer fallback. `AgentRun` now
+rejects lifecycle states other than the sole implemented `attached_standby`
+state. Public-seam regression tests cover both cases.
+
 The large lifecycle reducer remains cohesive and replay-tested. A separate
 grammar module, operation-state rewrite, artifact base class, compiler context
 wrapper, and broad runtime facade remain deferred because they would increase
@@ -914,7 +920,7 @@ the active DEV conflict surface or fail the deletion test.
 
 | Command | Result |
 | --- | --- |
-| `.venv/bin/python -m pytest -q` on 2026-10-02 | 221 passed after operation-edge replay, rejection counterexamples, atomic tool-budget dispatch, cancellation, monotonic recorded-timeout validation, retry exhaustion, O1 rendering, identity-byte characterization, and lifecycle/compiler deslop |
+| `.venv/bin/python -m pytest -q` on 2026-10-02 | 223 passed after operation-edge replay, rejection counterexamples, exact lease-idempotency fencing, agent-run status validation, runtime controls, O1 rendering, identity-byte characterization, and lifecycle/compiler deslop |
 | `.venv/bin/python scripts/render_observatory_example.py --check` | Passed; committed O1 example matches the deterministic recorded NAO canary byte for byte |
 | `.venv\Scripts\python.exe -m pytest -q -p no:cacheprovider --basetemp .test-tmp\full-suite` | 42 passed |
 | Focused `tests/test_workbench_protocol.py` red-green pass | 9 passed after strict identity, capability, duplicate-ID, and JSON checks |
@@ -924,6 +930,7 @@ the active DEV conflict surface or fail the deletion test.
 | Chatbot planner-handoff/grounding/request-adapter seam suite | 72 passed with `planner_common` and `kb_skills` on `PYTHONPATH` |
 | Chatbot `DialogueTurnEngine` focused read-only baseline | 112 passed against revision `a2ecca796...` |
 | NAO planner supervisor and orchestrator gate focused read-only baseline | 41 passed against the `v1.0.0` source boundary |
+| Current NAO/chatbot reference recheck at `81b14ef...` | Chatbot `DialogueTurnEngine`: 112 passed; pure NAO planner gate: 18 passed. The orchestrator relay-guard test remains ROS-environment dependent because generated `chatbot_msgs` is unavailable in the standalone Python environment |
 | Wheel packaging regression | Passed: a temporary stale `build/lib` was seeded with five removed core modules, the wheel was rebuilt without isolation, and all removed modules were absent while `ab_harness_nao` remained packaged |
 | Core forbidden-import audit | Passed; only stdlib and `ab_harness` imports |
 | `./scripts/run_precommit.sh` | Passed after the authority-hardening, packaging, and documentation pass |

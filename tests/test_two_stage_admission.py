@@ -683,6 +683,37 @@ def test_domain_lifecycle_replays_the_same_lease_idempotently():
     )
 
 
+def test_domain_lifecycle_rejects_a_different_admission_for_a_leased_operation():
+    compiled, catalog, environment_run = _admission_fixture()
+    proposal = _proposal(compiled)
+    semantic = _semantic_admission(catalog).admit(compiled, proposal)
+    assert semantic.admitted_operation is not None
+    ledger = _ledger_for_admission(compiled, proposal, semantic.admitted_operation)
+    lifecycle = DomainLifecycleAdmission(
+        environment_run=environment_run,
+        environment_id="nao_fake",
+        lifecycle_ledger=ledger,
+    )
+    lifecycle.request_execution(semantic.admitted_operation)
+    changed_binding = replace(
+        catalog.bindings_for("find_object")[0],
+        source_revision="fixture-rev-2",
+    )
+    changed_catalog = BindingCatalog(
+        RegistrySnapshot.from_json_file("tests/fixtures/ab_registry.json"),
+        (changed_binding,),
+    )
+    changed_semantic = _semantic_admission(changed_catalog).admit(compiled, proposal)
+    assert changed_semantic.admitted_operation is not None
+    assert (
+        changed_semantic.admitted_operation.admission_id
+        != semantic.admitted_operation.admission_id
+    )
+
+    with pytest.raises(ValueError, match="exact admitted operation"):
+        lifecycle.request_execution(changed_semantic.admitted_operation)
+
+
 def test_domain_lifecycle_rechecks_domain_revision_before_leasing():
     compiled, catalog, environment_run = _admission_fixture()
     proposal = _proposal(compiled)
