@@ -605,3 +605,37 @@ The next ordered seams are `OperationEdge`, typed normalization and evidence
 rejection, terminal required-effect counterexample replay, scoped activation
 events, fixed-instance model leases and preflights, then `PromptCompiler` and a
 provider-neutral invocation port.
+
+## 25. Operation, Counterexample, Control, and O1 Continuation on 2026-10-02
+
+`uah.operation_edge/v1` is the immutable relationship artifact for
+`decomposes_to`, `continues_with`, and `delegates_to`. The ledger accepts an
+edge only when both endpoint operations and their semantic admissions exist,
+the recorded frames match the edge, the target has no lease, and the edge does
+not create a duplicate pair, second structural parent, or cycle. Same-frame
+decomposition and continuation are executable. Cross-frame delegation remains
+fail-closed until the target has its own compiled projection and artifact
+contract.
+
+Proposal normalization owns malformed or noncanonical model output rejection.
+The environment evidence adapter owns rejection of a valid native result that
+cannot become accepted evidence. A valid negative owner result is not an
+evidence rejection. It may reach the task acceptance evaluator, fail a required
+obligation, emit `terminal_task_rejected`, and derive a rejected
+`VerifiedTraceDigest`. Operation rejection remains nonterminal unless explicit
+task acceptance closes the trace.
+
+`uah.task_spec/v2` and `uah.compiled_task/v2` add `retry_attempts`. Tool-call
+budget grants and execution start share one atomic ledger commit. Budget
+subjects are idempotent and cannot change units. Cancellation is
+owner-authorized and pre-dispatch only. Timeout decisions derive task start
+from the recorded ledger and retain the observed time; they do not imply an
+asynchronous scheduler. Retry decisions validate the failure disposition,
+compiled limit, ordinal, and fresh target identity. They grant no proposal or
+execution authority. Model-call accounting has no provider consumer yet.
+
+O1 remains a read-only projection. Its graph contains lifecycle-event nodes,
+explicit operation nodes, ledger-parent edges, and only recorded operation
+relations. Control and rejection events expose failure stages but do not create
+terminal status. The committed recorded-canary HTML contains one accepted
+trace, one open semantic rejection, and one terminal required-effect rejection.

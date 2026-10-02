@@ -5,7 +5,7 @@ from __future__ import annotations
 from dataclasses import asdict
 from dataclasses import dataclass
 from dataclasses import field
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 import json
 import os
 from pathlib import Path
@@ -438,6 +438,7 @@ class _TraceState:
     trace_id: str
     environment_ingress_artifact_id: str = ""
     task_ingress_decision_id: str = ""
+    task_started_at: str = ""
     compiled_task_id: str | None = None
     domain_contract_pack_revision: str | None = None
     role_id: str | None = None
@@ -461,6 +462,7 @@ class _TraceState:
     owner_by_operation: dict[str, str] = field(default_factory=dict)
     frame_by_operation: dict[str, str] = field(default_factory=dict)
     lease_by_operation: dict[str, str] = field(default_factory=dict)
+    lease_owner_by_operation: dict[str, str] = field(default_factory=dict)
     result_by_operation: dict[str, str] = field(default_factory=dict)
     operation_edges: set[tuple[str, str, str]] = field(default_factory=set)
     budget_limits: dict[str, int] = field(default_factory=dict)
@@ -468,6 +470,8 @@ class _TraceState:
     budget_subjects: set[tuple[str, str]] = field(default_factory=set)
     tool_budget_granted_operation_ids: set[str] = field(default_factory=set)
     task_timed_out: bool = False
+    timeout_decision_ids: set[str] = field(default_factory=set)
+    last_timeout_observed_at: datetime | None = None
     failure_by_operation: dict[str, tuple[str, str]] = field(default_factory=dict)
     retry_decided_failure_ids: set[str] = field(default_factory=set)
     retry_target_operation_ids: set[str] = field(default_factory=set)
@@ -1381,6 +1385,7 @@ def _reduce_events(
                 trace_id=event.trace_id,
                 environment_ingress_artifact_id=str(event.data["ingress_artifact_id"]),
                 task_ingress_decision_id=str(event.data["decision_id"]),
+                task_started_at=event.recorded_at,
                 domain_contract_pack_revision=str(
                     event.data["domain_contract_pack_revision"]
                 ),
@@ -1655,6 +1660,7 @@ def _apply_execution_lease(
         raise ValueError("operation already has an execution lease")
     state.leased_operation_ids.add(operation_id)
     state.lease_by_operation[operation_id] = str(data["execution_lease_id"])
+    state.lease_owner_by_operation[operation_id] = str(data["lease_owner_id"])
 
 
 def _apply_domain_rejection(
@@ -1727,6 +1733,13 @@ def _apply_execution_terminal(
             retry_disposition, str
         ):
             raise ValueError("execution failure contract is incomplete")
+        if retry_disposition not in {"retryable", "terminal"}:
+            raise ValueError("execution failure retry disposition is invalid")
+        if any(
+            not isinstance(data.get(name), str) or not str(data[name]).strip()
+            for name in ("failure_ref", "failure_code", "failure_stage")
+        ):
+            raise ValueError("execution failure details are invalid")
         state.failure_by_operation[operation_id] = (
             failure_id,
             retry_disposition,
@@ -1864,6 +1877,19 @@ def _apply_execution_cancellation(
         raise ValueError("operation already has a terminal result")
     if data["phase"] != "pre_dispatch" or data["outcome"] != "accepted":
         raise ValueError("unsupported cancellation decision")
+    if data["deciding_owner_id"] != state.lease_owner_by_operation.get(operation_id):
+        raise ValueError("cancellation decision owner does not own lease")
+    cancellation_fields = (
+        "decision_id",
+        "requester_id",
+        "request_artifact_id",
+        "reason_code",
+    )
+    if not all(
+        isinstance(data.get(name), str) and str(data[name]).strip()
+        for name in cancellation_fields
+    ):
+        raise ValueError("cancellation decision contract is incomplete")
     state.terminal_operation_ids.add(operation_id)
     state.failure_stage = "cancellation"
 
@@ -1874,11 +1900,48 @@ def _apply_timeout_decision(
 ) -> None:
     if data["compiled_task_id"] != state.compiled_task_id:
         raise ValueError("timeout decision does not match compiled task")
+    decision_id = data.get("decision_id")
+    if not isinstance(decision_id, str) or not decision_id.strip():
+        raise ValueError("timeout decision identity is invalid")
+    if decision_id in state.timeout_decision_ids:
+        raise ValueError("timeout decision is duplicated")
     if state.task_timed_out:
         raise ValueError("task already has a terminal timeout decision")
     outcome = data["outcome"]
     if outcome not in {"within_budget", "timed_out"}:
         raise ValueError("timeout decision outcome is invalid")
+    if data.get("task_started_at") != state.task_started_at:
+        raise ValueError("timeout decision start does not match recorded task start")
+    try:
+        started = datetime.fromisoformat(state.task_started_at.replace("Z", "+00:00"))
+        deadline = datetime.fromisoformat(
+            str(data["deadline_at"]).replace("Z", "+00:00")
+        )
+        observed = datetime.fromisoformat(
+            str(data["observed_at"]).replace("Z", "+00:00")
+        )
+    except (KeyError, ValueError) as exc:
+        raise ValueError("timeout decision timestamps are invalid") from exc
+    if any(value.tzinfo is None for value in (started, deadline, observed)):
+        raise ValueError("timeout decision timestamps require timezone")
+    if not isinstance(data.get("policy_revision"), str) or not str(
+        data["policy_revision"]
+    ).strip():
+        raise ValueError("timeout policy revision is invalid")
+    if deadline != started + timedelta(
+        seconds=state.budget_limits["wall_time_seconds"]
+    ):
+        raise ValueError("timeout deadline does not match compiled budget")
+    expected_outcome = "timed_out" if observed > deadline else "within_budget"
+    if outcome != expected_outcome:
+        raise ValueError("timeout outcome does not match recorded timestamps")
+    if (
+        state.last_timeout_observed_at is not None
+        and observed < state.last_timeout_observed_at
+    ):
+        raise ValueError("timeout observations must be monotonic")
+    state.timeout_decision_ids.add(decision_id)
+    state.last_timeout_observed_at = observed
     if outcome == "timed_out":
         state.task_timed_out = True
         state.failure_stage = "timeout"

@@ -87,14 +87,14 @@ controllable AB objects presented to a model or worker.
 
 ### Task spec
 
-A frozen `uah.task_spec/v1` intent created for one accepted task start. It pins
+A frozen `uah.task_spec/v2` intent created for one accepted task start. It pins
 task and trace lineage, task type, role, frame, DomainContractPack revision,
 requested effects, prohibited effects, and finite budgets. Resume and notify
 ingress reuse the compiled task rather than compiling a replacement.
 
 ### Compiled task
 
-The content-addressed `uah.compiled_task/v1` artifact produced once from an
+The content-addressed `uah.compiled_task/v2` artifact produced once from an
 accepted start-task decision, TaskSpec, role, frame, registry, and
 DomainContractPack. It is the shared source of the interaction module, effect
 obligations, prohibited effects, and budgets for prompt compilation, semantic
@@ -264,11 +264,12 @@ causal-parent identities, immutable artifact references, a timestamp, and a
 minimal canonical replay projection. Each event also carries `commit_id`,
 `commit_index`, and `commit_size`, so strict reload rejects an incomplete or
 noncontiguous multi-event fact. Task start, resume, notification,
-compilation, proposal, admission, lease, execution, evidence, obligation, and
-terminal-acceptance events currently use this envelope. Cooperating writers
-use cross-process advisory locking. Semantic and domain rejection facts are
-implemented; normalization rejection, evidence rejection, environment
-cancellation, retry, timeout, and complete terminal failure remain open.
+compilation, proposal, admission, operation edge, lease, budget, execution,
+evidence, cancellation, timeout, retry, obligation, and terminal-acceptance or
+rejection events currently use this envelope. Cooperating writers use
+cross-process advisory locking. Proposal, semantic, domain, and evidence
+rejection facts are implemented. Stale-evidence and false-completion policy,
+scoped actor events, and the model runtime remain open.
 
 ### Prompt compiler
 
@@ -423,7 +424,9 @@ checks, atomic commit framing, transition validation, cross-process advisory
 writer locking, and replay-derived `VerifiedTraceDigest` artifacts. Each
 cooperating writer reloads and validates the stream while holding the lock
 before it appends and flushes a fact. The ledger records authority decisions
-but does not make them. The complete failure/cancellation grammar remains open.
+but does not make them. Initial pre-dispatch cancellation, recorded timeout,
+retry, and runtime-budget facts are present; in-flight interruption and
+task-level closure policy for those facts remain open.
 
 Observatory O1 now consumes replay-stable ledger events through immutable trace
 projections and a self-contained static HTML renderer. It distinguishes

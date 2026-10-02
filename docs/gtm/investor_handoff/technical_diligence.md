@@ -1,6 +1,6 @@
 # UAH and NeuralWorkbench Technical Diligence
 
-**Prepared:** 2026-09-28
+**Prepared:** 2026-10-02
 
 **Scope:** product architecture, implementation evidence, authority boundaries,
 NeuralWorkbench design, portability, security posture, and open engineering risk
@@ -145,7 +145,7 @@ that attestation against a frozen profile and DomainContractPack revision.
 
 The implemented `TaskSpecCompiler` closes a major source of semantic drift.
 Before this seam, callers could independently supply an object projection and
-effect obligations. The compiler now produces one `uah.compiled_task/v1`
+effect obligations. The compiler now produces one `uah.compiled_task/v2`
 artifact from:
 
 - a content-verified start-task decision bound to a content-addressed ingress
@@ -169,7 +169,7 @@ may prove it, and which failure policy applies. The compiler produces:
 - a closed `InteractionModuleSpec`, including inspectable decomposition;
 - frozen `EffectObligation` values;
 - merged prohibited effects;
-- declared finite wall-time, model-call, and tool-call budgets;
+- declared finite wall-time, model-call, tool-call, and retry-attempt budgets;
 - a content identity that excludes machine-local registry paths.
 
 Compilation fails on owner drift, undeclared observables, ambiguous rules,
@@ -177,7 +177,9 @@ duplicate obligation identities, prohibited requested effects, mutable
 collections, mismatched lineage, mismatched revisions, unsupported roles or
 task types, and altered content identities. Resume and notification ingress
 must resolve the original compiled artifact rather than compile another one.
-No current runtime decrements or enforces the declared budgets.
+Tool-call budget consumption is atomic with execution start. Retry and timeout
+decisions use the compiled limits. Model-call consumption awaits the provider
+port; token, cost, and hardware budgets are not implemented.
 
 ## 6. Two-stage admission
 
@@ -244,8 +246,9 @@ The current store is local JSONL with advisory-lock coordination among
 cooperating processes. It provides sequence, timestamps, causal links,
 accepted-path replay, native execution-failure recording, and nonterminal
 semantic/domain rejection replay. It rejects rather than repairs a
-crash-truncated commit and does not yet provide the complete
-normalization/evidence-rejection, cancellation, timeout, or retry grammar.
+crash-truncated commit. Proposal/evidence rejection, pre-dispatch cancellation,
+recorded timeout, retry policy, and terminal required-effect counterexamples
+now replay. Stale evidence and false-completion policy remain open.
 
 ## 8. NeuralWorkbench
 
@@ -339,27 +342,27 @@ responsibility.
 
 ## 10. Implementation status
 
-| Capability | State on 2026-09-28 | Evidence or gap |
+| Capability | State on 2026-10-02 | Evidence or gap |
 | --- | --- | --- |
 | Portable semantic kernel | Implemented H0 proof | Core has no ROS, NAO, provider SDK, or runtime-product imports |
 | Registry projection and output gate | Implemented | Closed object projection, AB band checks, role/output reach, effect-claim rejection |
 | Binding quarantine | Implemented | Candidate bindings cannot resolve for runtime use |
 | Environment activation and ingress | Implemented narrow seam | Profile and attestation checks, content-addressed ingress and decisions, ledger-backed start/resume/notify lineage; environment close remains open |
 | Domain contract authority | Implemented narrow seam | Content-derived revision covers role/task allowlists, ingress/effect-evidence rules, failure policy, and prohibitions |
-| TaskSpec compilation | Implemented | Content-verified decision plus ledger-recorded start, content-addressed projection, obligations, prohibitions, declared budgets, and revision provenance; budget enforcement remains open |
+| TaskSpec compilation | Implemented v2 | Content-verified decision plus ledger-recorded start, content-addressed projection, obligations, prohibitions, retry-aware budgets, and revision provenance; model-call provider accounting remains open |
 | Task acceptance | Implemented narrow seam | Required, best-effort, suspended, and terminal outcomes |
-| Common lifecycle persistence | Implemented accepted and operation-rejection seam | Global sequence, causal parents, atomic commit framing, advisory-lock coordination, strict JSONL restart recovery, operation transitions, nonterminal semantic/domain rejection, acceptance, accepted-with-deficit replay, and verified digest; full terminal failure grammar remains open |
-| Recorded NAO canary | Implemented | Injected domain pack, authoritative ingress admission, strict planner payload handling, input-schema validation, accepted lease-only execution, recorded semantic no-dispatch rejection, restart replay, and verified digest |
+| Common lifecycle persistence | Implemented H0 plus initial H1 controls | Global sequence, causal parents, operation edges, typed rejection branches, atomic dispatch budget, cancellation, timeout, retry, accepted/deficit/rejected replay, and verified digests; stale evidence and actor lifecycle remain open |
+| Recorded NAO canary | Implemented | Injected domain pack, authoritative ingress admission, strict planner payload handling, accepted lease-only execution, semantic no-dispatch rejection, terminal required-effect counterexample, restart replay, and verified digest |
 | PromptCompiler | Specified | No executable prompt artifact compiler |
-| Two-stage admission and execution | Implemented narrow seam | Content-addressed proposal, reviewed input-schema validation, semantic admission, complete binding fingerprint, ledger-backed domain lease, exact lease-only dispatch, native result/evidence receipt, and replayable nonterminal typed rejections |
+| Two-stage admission and execution | Implemented narrow seam | Content-addressed proposal or normalization rejection, reviewed input-schema validation, semantic/domain decisions, exact lease-only dispatch, evidence decision, explicit operation edges, and replayable terminal counterexample |
 | Agent identity and handles | Initial H1 slice | Content-addressed manifests, one-time handle registration, and roster-bound standby run attachment are in memory; role/model registries, persistence, run lifecycle, fixed leases, invocations, and fidelity evaluation remain open |
 | Live model port and allocator | Not implemented | No Watson/Bonsai runner; fixed lease and startup preflight remain open |
 | H2 NAO planner parity | Not started | No explicit `legacy`, `shadow`, and `uah` comparison report |
-| Observatory renderer | Initial O1 slice | Validated-ledger trace projection, honest terminal status, failure stages, static searchable HTML, and inert graph JSON; full actor/configuration/comparison views remain open |
+| Observatory renderer | Initial O1 slice | Validated-ledger trace projection, honest terminal status, control/rejection stages, explicit operation graph, static searchable HTML, and a committed recorded-canary example; full actor/configuration/comparison views remain open |
 | NeuralWorkbench retrieval | Candidate slice only | Bounded UAH-side memory and protocol exist; complete companion attachment and uplift test remain open |
 | Crystallization | Quarantined design | No promoted AB2+ object |
 
-The current full suite reports **200 passing tests**, and the latest Ruff run
+The current full suite reports **220 passing tests**, and the latest Ruff run
 passes. The complete repository hook, Markdown/HTML synchronization, and clean
 wheel gates are rerun before distributing a refreshed build.
 
@@ -416,21 +419,18 @@ and accept a materially different task before universality is claimed.
 
 ## 14. Next technical gates
 
-1. Freeze `OperationEdge` and its restart-replay invariants.
-2. Add typed normalization and evidence-rejection events plus a terminal
-   required-effect counterexample.
-3. Add stale evidence, timeout, owner failure, cancellation, retry exhaustion,
-   supersession, and false-completion cases.
-4. Extend the initial agent/handle/standby registries with role/model identity,
+1. Add stale-evidence and false-completion fixtures to the completed operation,
+   rejection, and counterexample replay grammar.
+2. Extend the initial agent/handle/standby registries with role/model identity,
    scoped activation events, fixed leases, preflights, and model invocation
    identity.
-5. Add PromptCompiler, provider-neutral model port, fixed model lease, and
+3. Add PromptCompiler, provider-neutral model port, fixed model lease, and
    startup preflight.
-6. Owner-review and freeze the NAO `v1.0.0` DomainContractPack and
+4. Owner-review and freeze the NAO `v1.0.0` DomainContractPack and
    package-owned parity fixtures.
-7. Run planner `legacy | shadow | uah` parity with fake or simulated owners.
-8. Attach NeuralWorkbench in shadow mode and run the first retrieval ablation.
-9. Prove one non-NAO adapter with the unchanged kernel.
+5. Run planner `legacy | shadow | uah` parity with fake or simulated owners.
+6. Attach NeuralWorkbench in shadow mode and run the first retrieval ablation.
+7. Prove one non-NAO adapter with the unchanged kernel.
 
 ## 15. Reproduction entry points
 

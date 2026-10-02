@@ -839,10 +839,9 @@ creating a trace-scoped rejection that could not replay under either lineage.
 The recorded NAO semantic-rejection canary appends its typed rejection, so O1
 can inspect the no-dispatch path.
 
-The next H0 seam is `OperationEdge`, followed by typed normalization and
-evidence rejection plus a terminal required-effect counterexample. H1 then
-adds scoped activation events, fixed-instance model leases, preflights,
-PromptCompiler, and the provider-neutral invocation port.
+At the 2026-10-01 checkpoint, the next H0 seam was `OperationEdge`, followed by
+typed normalization and evidence rejection plus a terminal required-effect
+counterexample. The following section records their completion.
 
 ### 2026-10-02: Operation graph, counterexamples, runtime controls, and O1 example
 
@@ -915,7 +914,7 @@ the active DEV conflict surface or fail the deletion test.
 
 | Command | Result |
 | --- | --- |
-| `.venv/bin/python -m pytest -q` on 2026-10-02 | 220 passed after operation-edge replay, normalization/evidence rejection, terminal counterexample digest, runtime controls, O1 rendering, identity-byte characterization, and lifecycle/compiler deslop |
+| `.venv/bin/python -m pytest -q` on 2026-10-02 | 221 passed after operation-edge replay, rejection counterexamples, atomic tool-budget dispatch, cancellation, monotonic recorded-timeout validation, retry exhaustion, O1 rendering, identity-byte characterization, and lifecycle/compiler deslop |
 | `.venv/bin/python scripts/render_observatory_example.py --check` | Passed; committed O1 example matches the deterministic recorded NAO canary byte for byte |
 | `.venv\Scripts\python.exe -m pytest -q -p no:cacheprovider --basetemp .test-tmp\full-suite` | 42 passed |
 | Focused `tests/test_workbench_protocol.py` red-green pass | 9 passed after strict identity, capability, duplicate-ID, and JSON checks |

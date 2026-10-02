@@ -1,6 +1,6 @@
 # UAH and NeuralWorkbench Investor Handoff
 
-**Prepared:** 2026-10-01
+**Prepared:** 2026-10-02
 
 **Audience:** prospective investors, design partners, strategic operators, and
 technical diligence teams
@@ -71,21 +71,22 @@ the handoff when the recipient requests technical depth:
 
 ## Current evidence in one page
 
-As of 2026-10-01:
+As of 2026-10-02:
 
-- the portable kernel and NAO compatibility package pass **200 tests**, and the
+- the portable kernel and NAO compatibility package pass **220 tests**, and the
   latest Ruff validation passes; the complete pre-commit, document-render, and
   clean-wheel gates are rerun before distributing a refreshed package;
 - H0 implements task projection, deterministic gates, binding quarantine,
   content-addressed domain rules, normalized ingress, and classification
   decisions, ledger-authorized task starts, environment registration, task and
   trace lineage, TaskSpec compilation, bounded input-schema validation,
-  two-stage operation admission, nonterminal semantic/domain rejection replay,
-  exact lease-only execution, task acceptance, advisory-lock-coordinated restart
-  replay, and verified trace digests;
+  two-stage operation admission, explicit operation edges, typed rejection
+  replay, atomic tool-budget dispatch, pre-dispatch cancellation, recorded
+  timeout and retry policy, exact lease-only execution, task acceptance,
+  advisory-lock-coordinated restart replay, and verified trace digests;
 - the deterministic NAO adapter canary covers accepted lease execution,
-  recorded semantic no-dispatch rejection, restart replay, and verified digest
-  output;
+  recorded semantic no-dispatch rejection, terminal required-effect
+  counterexample, restart replay, and verified digest output;
 - initial H1 agent-manifest, handle, and standby-run registries and an initial
   O1 static renderer are implemented, but H1 does not yet provide a complete
   live model and agent lifecycle;

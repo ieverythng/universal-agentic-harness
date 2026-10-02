@@ -1,6 +1,6 @@
 # UAH and NeuralWorkbench GTM and Investment Case
 
-**Prepared:** 2026-09-28
+**Prepared:** 2026-10-02
 
 **Scope:** commercialization hypotheses, customer sequence, packaging,
 milestones, metrics, use of capital, and diligence disclosures
@@ -228,7 +228,7 @@ feature count.
 
 | Gate | Deliverable | Value created | Go or no-go evidence |
 | --- | --- | --- | --- |
-| G1: executable semantic center | Operation edges, terminal counterexample grammar, and remaining evidence/lifecycle failures | Extends accepted/deficit and nonterminal admission-rejection replay into counterexample-complete replay | Success and failure replay identically without the model |
+| G1: executable semantic center | Operation edges, typed evidence/rejection grammar, terminal counterexample, and initial runtime controls | Extends accepted/deficit replay into model-free counterexample and control replay | Success and failure replay identically without the model |
 | G2: H1 agent runtime | Extend initial agent/handle/standby registries with durable lifecycle, PromptCompiler, provider port, fixed lease, and startup preflight | Enables local and remote model trials under stable roles | Frozen suite runs through recorded and live provider modes |
 | G3: H2 NAO parity | Domain pack, planner adapter, report-result delegation, `legacy | shadow | uah` report | Demonstrates integration with a real multi-owner system | Reviewed parity and failure attribution, no duplicate action or speech |
 | G4: second-domain proof | Watson/software-engineering adapter using unchanged core | Tests portability and onboarding leverage | Measured reuse and same-model comparison |
@@ -321,8 +321,9 @@ a separate sourced deliverable.
 - H0 is a tested contract proof, not a production release.
 - H1 agent lifecycle and live provider operation are incomplete.
 - H2 NAO planner parity and model qualification are not complete.
-- Compiled task budgets are immutable declarations; runtime consumption and
-  enforcement are not implemented.
+- Tool-call budgets are consumed atomically at dispatch, and retry/timeout
+  decisions use compiled limits. Provider-consumed model budgets, token/cost
+  limits, and hardware allocation remain open.
 - The common ledger has atomic commit framing, restart replay, and advisory-lock
   coordination among cooperating processes. It remains local JSONL and rejects
   rather than repairs a crash-truncated commit.

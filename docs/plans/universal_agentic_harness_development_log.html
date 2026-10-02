@@ -618,7 +618,7 @@
 <li>Initial H1 identity registries now cover content-addressed <code>AgentManifest</code>, one-time <code>AgentHandleRevision</code> registration, and environment-roster-bound <code>AgentRun</code> attachment in <code>attached_standby</code>. The registry refuses handle rebinding because the H3 fidelity evaluator is not implemented. It does not persist runs, emit lifecycle events, perform preflight, reserve hardware, or invoke a provider.</li>
 </ul>
 <p>The integrity pass also made domain lease requests idempotent. Repeating an exact request returns the same deterministic lease without appending a conflicting rejection. Cross-task proposal/admission misuse now raises before creating a trace-scoped rejection that could not replay under either lineage. The recorded NAO semantic-rejection canary appends its typed rejection, so O1 can inspect the no-dispatch path.</p>
-<p>The next H0 seam is <code>OperationEdge</code>, followed by typed normalization and evidence rejection plus a terminal required-effect counterexample. H1 then adds scoped activation events, fixed-instance model leases, preflights, PromptCompiler, and the provider-neutral invocation port.</p>
+<p>At the 2026-10-01 checkpoint, the next H0 seam was <code>OperationEdge</code>, followed by typed normalization and evidence rejection plus a terminal required-effect counterexample. The following section records their completion.</p>
 <h3>2026-10-02: Operation graph, counterexamples, runtime controls, and O1 example</h3>
 <p>The next three ordered seams now have executable, replay-checked slices:</p>
 <ul>
@@ -648,7 +648,7 @@
 </tr></thead><tbody>
 <tr>
 <td><code>.venv/bin/python -m pytest -q</code> on 2026-10-02</td>
-<td>220 passed after operation-edge replay, normalization/evidence rejection, terminal counterexample digest, runtime controls, O1 rendering, identity-byte characterization, and lifecycle/compiler deslop</td>
+<td>221 passed after operation-edge replay, rejection counterexamples, atomic tool-budget dispatch, cancellation, monotonic recorded-timeout validation, retry exhaustion, O1 rendering, identity-byte characterization, and lifecycle/compiler deslop</td>
 </tr>
 <tr>
 <td><code>.venv/bin/python scripts/render_observatory_example.py --check</code></td>

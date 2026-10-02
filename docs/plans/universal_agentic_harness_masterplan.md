@@ -36,7 +36,7 @@ The release strategy is deliberately conservative:
 
 ```text
 H0  AB contract spine and deterministic gate             PARTIAL IMPLEMENTED PROOF
-H1  Executable harness runtime and complete lifecycle     NEXT ENGINEERING TARGET
+H1  Executable harness runtime and complete lifecycle     PARTIAL CONTROL SLICE
 H2  Cooperative NAO adapter and parity ablation           FIRST REAL ENVIRONMENT
 H3  Trace-adaptive Neural Workbench                       OFFLINE-FIRST ADAPTATION
 H4  Crystallization and reviewed AB promotion             QUARANTINED LEARNING
@@ -423,7 +423,7 @@ contains no ROS or NAO imports in the core and currently proves:
 | Initial Observatory O1 slice | `observatory.py` | Validated-ledger projections and self-contained static HTML, terminal-status honesty, explicit operation nodes and recorded edges, control/rejection failure-stage visibility, provenance labels, and no write or execution authority |
 | Task acceptance | `acceptance.py` | Required versus best-effort closure, terminal failure, suspension, duplicate and empty obligation rejection |
 | NAO compatibility package | `ab_harness_nao/contracts.py` | Chatbot route, planner-step mapping, and binding candidates without importing the native NAO stack |
-| Recorded NAO qualification | `ab_harness_nao/qualification.py` | Injected content-addressed DomainContractPack, real ingress classification and ledger-backed start, strict planner-step validation, content-addressed raw output, operation normalization, semantic admission, domain lease, lease-only fake execution, explicit acceptance, replay, and verified digest; H2 owner review remains open |
+| Recorded NAO qualification | `ab_harness_nao/qualification.py` | Injected content-addressed DomainContractPack, real ingress classification and ledger-backed start, strict planner-step validation, content-addressed raw output, admission, lease-only fake execution, accepted and required-effect-rejected task judgments, replay, and verified digest; H2 owner review remains open |
 | Focused fail-closed tests | `test_two_stage_admission.py`, `test_lifecycle_ledger.py` | Accepted and deficit replay, unknown/out-of-projection objects, binding drift, idempotent lease replay, duplicate start, bypass rejection, one-shot failure, event tamper, and restart reconstruction |
 
 ### What H0 does not yet implement

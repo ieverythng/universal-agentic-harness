@@ -1857,6 +1857,26 @@ def test_timeout_check_can_progress_from_within_budget_to_recorded_timeout():
     assert ledger.replay(compiled.trace_id).failure_stage == "timeout"
 
 
+def test_timeout_observations_must_progress_monotonically():
+    compiled, _catalog, _environment_run = _admission_fixture()
+    ledger = LifecycleLedger(clock=lambda: "2026-10-02T09:00:00Z")
+    ledger.record(_task_start(compiled))
+    ledger.record(compiled)
+    authority = TaskRuntimeControlAuthority(ledger)
+    authority.evaluate_timeout(
+        compiled_task=compiled,
+        observed_at="2026-10-02T09:00:30Z",
+        policy_revision="timeout-policy:v1",
+    )
+
+    with pytest.raises(ValueError, match="monotonic"):
+        authority.evaluate_timeout(
+            compiled_task=compiled,
+            observed_at="2026-10-02T09:00:20Z",
+            policy_revision="timeout-policy:v1",
+        )
+
+
 def test_retry_exhaustion_is_bounded_by_compiled_task_budget():
     compiled, catalog, environment_run = _admission_fixture(
         budgets=TaskBudgets(
