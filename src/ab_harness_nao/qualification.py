@@ -16,13 +16,16 @@ from ab_harness.domain_lifecycle import DomainLifecycleAdmission
 from ab_harness.environment import InProcessEnvironmentOwner
 from ab_harness.environment_ingress import EnvironmentIngress
 from ab_harness.environment_ingress import TaskIngressDecision
-from ab_harness.environment_ingress import TaskIngressPolicy
 from ab_harness.environment_runs import EnvironmentRun
 from ab_harness.gate import OutputGate
 from ab_harness.lifecycle import AcceptanceFact
 from ab_harness.lifecycle import LifecycleLedger
 from ab_harness.proposal_admission import ProposalNormalizer
 from ab_harness.proposal_admission import SemanticAdmission
+from ab_harness.schema_validation import ArgumentField
+from ab_harness.schema_validation import ArgumentSchemaValidator
+from ab_harness.schema_validation import InMemoryArgumentSchemaRegistry
+from ab_harness.schema_validation import ObjectArgumentSchema
 from ab_harness_nao.contracts import CHATBOT_ROLE, PLANNER_ROLE
 from ab_harness_nao.contracts import chatbot_output, nao_frame
 from ab_harness.projection import InteractionProjector
@@ -35,9 +38,24 @@ from ab_harness.task_compiler import TaskEffectRequest
 from ab_harness.task_compiler import TaskSpec
 from ab_harness.task_compiler import TaskSpecCompiler
 from ab_harness.task_registry import EnvironmentTaskRegistry
+from ab_harness.task_ingress_authority import TaskIngressAuthority
 
 
 _QUALIFICATION_TASK_TYPE = "recorded_nao_qualification"
+
+
+def nao_qualification_argument_validator() -> ArgumentSchemaValidator:
+    """Return the reviewed argument schema used by the recorded NAO fixture."""
+
+    return InMemoryArgumentSchemaRegistry(
+        (
+            ObjectArgumentSchema.issue(
+                schema_ref="schema://find_object/input/v1",
+                fields=(ArgumentField("label", "string"),),
+                required=("label",),
+            ),
+        )
+    )
 
 
 @dataclass(frozen=True)
@@ -84,6 +102,7 @@ class RecordedNaoQualificationHarness:
         environment: InProcessEnvironmentOwner,
         lifecycle_ledger: LifecycleLedger,
         domain_contract_pack: DomainContractPack,
+        schema_validator: ArgumentSchemaValidator,
     ) -> None:
         self._registry = registry
         self._catalog = catalog
@@ -91,6 +110,7 @@ class RecordedNaoQualificationHarness:
         self._environment = environment
         self._lifecycle_ledger = lifecycle_ledger
         self._domain_contract_pack = domain_contract_pack
+        self._schema_validator = schema_validator
         if domain_contract_pack.registry_version != registry.version:
             raise ValueError("qualification domain pack registry does not match")
         if domain_contract_pack.frame_id != nao_frame(registry).frame_id:
@@ -101,10 +121,10 @@ class RecordedNaoQualificationHarness:
         ):
             raise ValueError("qualification domain pack revision does not match run")
         self._task_registry = EnvironmentTaskRegistry(lifecycle_ledger)
-        self._ingress_policy = TaskIngressPolicy(
+        self._ingress_authority = TaskIngressAuthority(
             environment_profile_id=(environment_run.attestation.environment_profile_id),
             domain_contract_pack=domain_contract_pack,
-            task_registry=self._task_registry,
+            lifecycle_ledger=lifecycle_ledger,
         )
         self._projector = InteractionProjector(registry)
         self._gate = OutputGate()
@@ -120,7 +140,7 @@ class RecordedNaoQualificationHarness:
         runtime_mode: str,
     ) -> NaoQualificationResult:
         frame = nao_frame(self._registry)
-        ingress_decision = self._ingress_policy.classify(
+        ingress_decision = self._ingress_authority.admit(
             self._environment_run,
             ingress,
         )
@@ -230,6 +250,9 @@ class RecordedNaoQualificationHarness:
                 ),
             )
             if normalized.proposal is None:
+                if normalized.rejection is None:
+                    raise RuntimeError("proposal rejection artifact is missing")
+                self._lifecycle_ledger.record(normalized.rejection)
                 return NaoQualificationResult(
                     case_id=case.case_id,
                     passed=False,
@@ -243,8 +266,12 @@ class RecordedNaoQualificationHarness:
                 catalog=self._catalog,
                 environment_id=self._environment.environment_id,
                 runtime_mode=runtime_mode,
+                schema_validator=self._schema_validator,
             ).admit(compiled_task, normalized.proposal)
             if admitted.admitted_operation is None:
+                if admitted.rejection is None:
+                    raise RuntimeError("semantic rejection artifact is missing")
+                self._lifecycle_ledger.record(admitted.rejection)
                 return NaoQualificationResult(
                     case_id=case.case_id,
                     passed=False,
@@ -278,7 +305,7 @@ class RecordedNaoQualificationHarness:
         evidence: list[EffectEvidence] = []
         for lease in leases:
             try:
-                receipt = self._environment.execute(lease)
+                decision = self._environment.execute(lease)
             except Exception as exc:
                 if not self._lifecycle_ledger.has_operation_event(
                     trace_id=compiled_task.trace_id,
@@ -295,7 +322,19 @@ class RecordedNaoQualificationHarness:
                     evidence=tuple(evidence),
                     errors=(str(exc),),
                 )
-            evidence.append(receipt.evidence)
+            if decision.rejection is not None:
+                return NaoQualificationResult(
+                    case_id=case.case_id,
+                    passed=False,
+                    failure_stage="evidence",
+                    chatbot_gate=chatbot_gate,
+                    planner_admitted=True,
+                    evidence=tuple(evidence),
+                    errors=decision.rejection.reason_codes,
+                )
+            if decision.receipt is None:
+                raise RuntimeError("evidence decision receipt is missing")
+            evidence.append(decision.receipt.evidence)
 
         closed = tuple(
             dict.fromkeys(

@@ -20,7 +20,7 @@ path, and H2 planner parity remain incomplete
 The human selected NAO as the first parity/test environment and deferred the
 synthetic environment. The [consolidated handoff](../artifacts/reviews/2026-10-08_uah_consolidated_handoff.md)
 records four original scoped closures plus the extra approved raw O1 repair.
-Original STD-02, SPEC-02 and ARCH-02 remain open. The R1 report-hash discrepancy,
+At consolidation, original STD-02, SPEC-02 and ARCH-02 remained open. The R1 report-hash discrepancy,
 incomplete R4-FIX primary review, stopped dashboard blockers and three R5
 defects remain visible in their historical artifacts. R5 source is deferred
 and unapproved, including if the human commits it.
@@ -28,11 +28,67 @@ and unapproved, including if the human commits it.
 NAO-first changes implementation order, not H0/H1/H2 qualification. The
 masterplan's synthetic replay/failure-suite exit requirements remain unchanged
 until a release-contract coverage mapping is explicitly agreed. Ingress
-authority-bound command versus authenticated admitted proof remains pending;
-an explanatory diagram is not adoption. The next prerequisite is that human
-decision and reviewed core correction, then owner-reviewed NAO fixtures and
+authority-bound command versus authenticated admitted proof was pending at
+consolidation; an explanatory diagram was not adoption. The next prerequisite
+was that human decision and reviewed core correction, then owner-reviewed NAO fixtures and
 recorded/fake parity with O1 inspection. No source repair or live call is part
 of this consolidation. The accounts below retain earlier round verdicts.
+
+### 2026-10-08: Accepted task-start command boundary
+
+The human subsequently selected the authority-bound ledger command for SPEC-02.
+Callers request work through `TaskIngressAuthority`; they do not obtain task
+authority by constructing matching decision IDs or raw start facts. The ledger
+remains the sole public writer and replay owner. Its task registry is a
+read-only provenance consumer, and historical unmarked starts remain readable
+without authorizing fresh compilation. Ledger-file ownership remains part of
+the trusted runtime boundary.
+
+The [bounded ingress round](../artifacts/reviews/2026-10-08_uah_ingress_authority_repair.md)
+began from committed docs HEAD `06f5a29`, with dirty runtime bytes frozen
+separately. The candidate now rejects raw task-start writes, records command
+provenance and checks it before fresh compilation. Historical unmarked starts
+remain replayable without acquiring that authority. Exact implementation,
+independent verdicts and closure checks are tracked in the round receipt.
+Existing O1 example freshness drift was reproduced before repair.
+No provider invocation or H0/H1 release sign-off follows from the accepted
+decision. Subsequent scoped approval and the separately human-authorized
+`864c6d3` agent/dependency commit are recorded in the round receipt. Both fresh
+ingress reviews approve the restored seventeen-path target, not every supporting
+module in that fifty-one-path commit. ARCH-02 is a separate scope.
+
+The human subsequently clarified that this commit exceeded the selected-file
+boundary. DEV removed `864c6d3` from the branch without changing working-tree
+bytes. The ten screenshot selections and three explicitly named modules are
+staged; other implementation and test changes remain uncommitted for manual
+review. The exact partial snapshot fails import collection and is not qualified
+for a replacement commit. The ingress review remains scoped to its frozen bytes.
+
+### 2026-10-08: Accepted Observatory label restriction
+
+The human selected rejecting unsupported `measured` and `reviewed` requests
+through the current projector and renderer, including both source branches and
+empty inputs. The [ARCH-02 round](../artifacts/reviews/2026-10-08_uah_arch02_label_repair.md)
+starts from `864c6d3`; its source change and fresh gate remain separate from
+SPEC-02 approval and the broader committed modules awaiting human review.
+Supported recorded, synthetic and conceptual views retain their existing
+behavior. No evaluator/review issuer or new writable store is introduced.
+
+Two states must remain distinct: the unsupported-label defect's repair/review
+status, and the **not-implemented** evaluator/reviewer provenance interface.
+The latter is owned by evaluator/result and independent gate owners, with O1
+as read-only consumer. Reopen on a real result consumer plus an owner-reviewed
+contract binding complete frozen configuration, evaluator, source and exact
+result, independent gate, scope/freshness and mixed populations, with replay
+verification. The [owning contract](../architecture/observatory_contract.md#deferred-evaluator-and-review-provenance-interface)
+retains the target label definitions and reopening criteria. A passing temporary
+rejection gate cannot qualify measurement support or close H0/H1/O1.
+
+The commit-scope correction stopped the separate ARCH-02 gate before either
+fresh reviewer issued a verdict. Writer controls and isolated normal hooks
+pass, but the correction remains uncommitted and independently unapproved.
+The future evidence interface is still not implemented. No automatic new round
+or release closure follows from the passing tests.
 
 ### Independent review qualification
 
@@ -1351,8 +1407,8 @@ H2 is qualified only when the core rows and planner parity rows are green:
 
 ## Next discriminating probe
 
-Resolve the pending ingress-provenance choice before its separately reviewed
-source correction. Then freeze owner-reviewed NAO `v1.0.0` contract and fixture
+Complete the separately reviewed authority-bound ingress correction adopted
+on 2026-10-08. Then freeze owner-reviewed NAO `v1.0.0` contract and fixture
 coverage, including output-schema, stale-evidence and false-completion cases,
 and run the authorized recorded/fake parity through the existing public seams.
 Inspect explicit environment/task/actor lineage in O1. Synthetic environment

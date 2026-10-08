@@ -1,0 +1,11 @@
+--- docs/artifacts/reviews/2026-10-08_uah_arch02_label_repair_evidence/observatory.py.before	2026-10-08 21:09:44.226404352 +0200
++++ src/ab_harness/observatory.py	2026-10-08 21:09:56.191240805 +0200
+@@ -237,6 +237,8 @@
+         label = ObservatoryDataLabel(data_label or ObservatoryDataLabel.SYNTHETIC)
+         if label is ObservatoryDataLabel.RECORDED:
+             raise ValueError("recorded Observatory data requires a validated ledger")
++    if label in {ObservatoryDataLabel.MEASURED, ObservatoryDataLabel.REVIEWED}:
++        raise ValueError("Observatory O1 does not support measured or reviewed data labels")
+     if any(not isinstance(event, TraceEvent) for event in events):
+         raise TypeError("Observatory accepts TraceEvent values only")
+     events = tuple(TraceEvent(**asdict(event)) for event in events)

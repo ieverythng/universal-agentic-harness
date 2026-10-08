@@ -1,0 +1,206 @@
+--- docs/artifacts/reviews/2026-10-08_uah_ingress_authority_repair_evidence/before/test_two_stage_admission.py.before	2026-10-08 20:41:56.582190274 +0200
++++ tests/test_two_stage_admission.py	2026-10-08 20:43:48.649789550 +0200
+@@ -36,7 +36,6 @@
+ from ab_harness.acceptance import TaskAcceptanceEvaluator
+ from ab_harness.lifecycle import AcceptanceFact
+ from ab_harness.lifecycle import LifecycleLedger
+-from ab_harness.lifecycle import TaskStartedFact
+ from ab_harness.lifecycle import VerifiedTraceDigest
+ from ab_harness.operation_edges import OperationEdge
+ from ab_harness.runtime_controls import BudgetExhaustedError
+@@ -267,16 +266,35 @@
+     )
+
+
+-def _task_start(compiled):
+-    return TaskStartedFact(
++def _record_task_start(ledger, compiled):
++    domain = _domain_pack_for_compiled(compiled)
++    run = EnvironmentRun(EnvironmentRunAttestation(
+         environment_run_id=compiled.environment_run_id,
+-        task_id=compiled.task_id,
+-        trace_id=compiled.trace_id,
++        environment_profile_id="environment-profile:admission-fixture",
++        domain_contract_pack_revision=domain.revision,
++        native_runtime_revision="fixture:v1",
++        environment_owner_id="fixture.owner",
++        attestation_id="attestation:admission-fixture",
++        started_at="2026-09-28T09:00:00Z",
++        readiness_evidence_refs=("artifact:readiness:fixture",),
++    ))
++    ingress = EnvironmentIngress(
+         environment_ingress_id=compiled.environment_ingress_id,
+-        ingress_artifact_id="artifact:ingress:%s" % compiled.environment_ingress_id,
+-        decision_id="decision:start:%s" % compiled.environment_ingress_id,
+-        domain_contract_pack_revision=compiled.domain_contract_pack_revision,
++        environment_run_id=compiled.environment_run_id,
++        binding_id="binding:nao.request:v1",
++        ingress_type="user_request",
++        payload_artifact_id="artifact:ingress:%s" % compiled.environment_ingress_id,
++        native_lineage=(("goal_id", compiled.task_id),),
++        observed_at="2026-09-28T09:00:01Z",
+     )
++    decision = TaskIngressAuthority(
++        environment_profile_id=run.attestation.environment_profile_id,
++        domain_contract_pack=domain,
++        lifecycle_ledger=ledger,
++    ).admit(run, ingress)
++    assert decision.action == "start_task"
++    assert decision.trace_id == compiled.trace_id
++    return decision
+
+
+ def _alternate_compiled_task(compiled):
+@@ -359,7 +377,7 @@
+     operation_id,
+     evidence_ref,
+ ):
+-    ledger.record(_task_start(compiled))
++    _record_task_start(ledger, compiled)
+     ledger.record(compiled)
+     proposal = _proposal(compiled, operation_id=operation_id)
+     ledger.record(proposal)
+@@ -393,7 +411,7 @@
+
+ def _ledger_for_admission(compiled, proposal, admitted):
+     ledger = LifecycleLedger(clock=lambda: "2026-09-28T11:00:00Z")
+-    ledger.record(_task_start(compiled))
++    _record_task_start(ledger, compiled)
+     ledger.record(compiled)
+     ledger.record(proposal)
+     ledger.record(admitted)
+@@ -476,7 +494,7 @@
+     compiled, _catalog, _environment_run = _admission_fixture()
+     path = tmp_path / "proposal-rejection.jsonl"
+     ledger = LifecycleLedger(path, clock=lambda: "2026-10-02T09:10:00Z")
+-    ledger.record(_task_start(compiled))
++    _record_task_start(ledger, compiled)
+     ledger.record(compiled)
+     result = ProposalNormalizer().normalize(
+         compiled_task=compiled,
+@@ -660,7 +678,7 @@
+     )
+     path = tmp_path / "semantic-rejection.jsonl"
+     ledger = LifecycleLedger(path, clock=lambda: "2026-10-01T09:00:00Z")
+-    ledger.record(_task_start(compiled))
++    _record_task_start(ledger, compiled)
+     ledger.record(compiled)
+     ledger.record(proposal)
+
+@@ -826,7 +844,7 @@
+     assert semantic.admitted_operation is not None
+     path = tmp_path / "domain-rejection.jsonl"
+     ledger = LifecycleLedger(path, clock=lambda: "2026-10-01T09:05:00Z")
+-    ledger.record(_task_start(compiled))
++    _record_task_start(ledger, compiled)
+     ledger.record(compiled)
+     ledger.record(proposal)
+     ledger.record(semantic.admitted_operation)
+@@ -902,7 +920,7 @@
+     compiled, _catalog, _environment_run = _admission_fixture()
+     proposal = _proposal(compiled, operation_id="operation:ledger-reverification")
+     ledger = LifecycleLedger(clock=lambda: "2026-09-28T11:00:00Z")
+-    ledger.record(_task_start(compiled))
++    _record_task_start(ledger, compiled)
+     ledger.record(compiled)
+     object.__setattr__(proposal, "arguments_json", '{"label":"tampered"}')
+
+@@ -1141,7 +1159,7 @@
+     proposal = _proposal(compiled, operation_id="operation:cross-process-once")
+     semantic = _semantic_admission(catalog).admit(compiled, proposal)
+     assert semantic.admitted_operation is not None
+-    writer.record(_task_start(compiled))
++    _record_task_start(writer, compiled)
+     writer.record(compiled)
+     writer.record(proposal)
+     writer.record(semantic.admitted_operation)
+@@ -1448,7 +1466,7 @@
+     compiled, catalog, environment_run = _admission_fixture()
+     path = tmp_path / "terminal-counterexample.jsonl"
+     ledger = LifecycleLedger(path, clock=lambda: "2026-10-02T09:20:00Z")
+-    ledger.record(_task_start(compiled))
++    _record_task_start(ledger, compiled)
+     ledger.record(compiled)
+     proposal = _proposal(compiled, operation_id="operation:negative-result")
+     ledger.record(proposal)
+@@ -1545,7 +1563,7 @@
+ def test_common_ledger_records_pre_dispatch_suspension():
+     compiled, _catalog, _environment_run = _admission_fixture()
+     ledger = LifecycleLedger(clock=lambda: "2026-09-28T12:07:00Z")
+-    ledger.record(_task_start(compiled))
++    _record_task_start(ledger, compiled)
+     ledger.record(compiled)
+     acceptance = TaskAcceptanceEvaluator().evaluate(
+         compiled.effect_obligations,
+@@ -1663,7 +1681,7 @@
+ def test_common_ledger_rejects_a_second_compiled_task_for_one_trace():
+     compiled, _catalog, _environment_run = _admission_fixture()
+     ledger = LifecycleLedger(clock=lambda: "2026-09-28T12:20:00Z")
+-    ledger.record(_task_start(compiled))
++    _record_task_start(ledger, compiled)
+     ledger.record(compiled)
+
+     with pytest.raises(ValueError, match="already has a compiled task"):
+@@ -1674,7 +1692,7 @@
+     compiled, _catalog, _environment_run = _admission_fixture()
+     alternate = _alternate_compiled_task(compiled)
+     ledger = LifecycleLedger(clock=lambda: "2026-09-28T12:25:00Z")
+-    ledger.record(_task_start(compiled))
++    _record_task_start(ledger, compiled)
+     ledger.record(compiled)
+
+     with pytest.raises(ValueError, match="does not match recorded compiled task"):
+@@ -1696,7 +1714,7 @@
+     assert target_admission.admitted_operation is not None
+     path = tmp_path / "operation-edge.jsonl"
+     ledger = LifecycleLedger(path, clock=lambda: "2026-10-02T09:00:00Z")
+-    ledger.record(_task_start(compiled))
++    _record_task_start(ledger, compiled)
+     ledger.record(compiled)
+     for proposal, decision in (
+         (source, source_admission),
+@@ -1734,7 +1752,7 @@
+     assert source_admission.admitted_operation is not None
+     assert target_admission.admitted_operation is not None
+     ledger = LifecycleLedger()
+-    ledger.record(_task_start(compiled))
++    _record_task_start(ledger, compiled)
+     ledger.record(compiled)
+     ledger.record(source)
+     ledger.record(source_admission.admitted_operation)
+@@ -1824,7 +1842,7 @@
+         )
+     )
+     ledger = LifecycleLedger()
+-    ledger.record(_task_start(compiled))
++    _record_task_start(ledger, compiled)
+     ledger.record(compiled)
+     leases = []
+     for operation_id in ("operation:first", "operation:second"):
+@@ -1924,7 +1942,7 @@
+     compiled, _catalog, _environment_run = _admission_fixture()
+     path = tmp_path / "timeout.jsonl"
+     ledger = LifecycleLedger(path, clock=lambda: "2026-10-02T09:00:00Z")
+-    ledger.record(_task_start(compiled))
++    _record_task_start(ledger, compiled)
+     ledger.record(compiled)
+     authority = TaskRuntimeControlAuthority(ledger)
+
+@@ -1946,7 +1964,7 @@
+ def test_timeout_check_can_progress_from_within_budget_to_recorded_timeout():
+     compiled, _catalog, _environment_run = _admission_fixture()
+     ledger = LifecycleLedger(clock=lambda: "2026-10-02T09:00:00Z")
+-    ledger.record(_task_start(compiled))
++    _record_task_start(ledger, compiled)
+     ledger.record(compiled)
+     authority = TaskRuntimeControlAuthority(ledger)
+
+@@ -1969,7 +1987,7 @@
+ def test_timeout_observations_must_progress_monotonically():
+     compiled, _catalog, _environment_run = _admission_fixture()
+     ledger = LifecycleLedger(clock=lambda: "2026-10-02T09:00:00Z")
+-    ledger.record(_task_start(compiled))
++    _record_task_start(ledger, compiled)
+     ledger.record(compiled)
+     authority = TaskRuntimeControlAuthority(ledger)
+     authority.evaluate_timeout(

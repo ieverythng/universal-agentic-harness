@@ -1,0 +1,48 @@
+run:
+  id: "01M4EHYDDZ8MBE4PGBQ76SZMF2"
+  branch: codex/no-mistakes-pilot-20261008
+  status: failed
+  head: f85ae715
+  head_sha: f85ae715669379a428e063d0c965e42e78b3ae3f
+  verification_plan: none
+  findings: none
+  steps[9]{step,status,findings,duration_ms}:
+    intent,completed,0,9
+    rebase,skipped,0,0
+    review,failed,0,485084
+    test,pending,0,0
+    document,pending,0,0
+    lint,pending,0,0
+    push,pending,0,0
+    pr,pending,0,0
+    ci,pending,0,0
+branch_sync:
+  state: user_owned
+  changed: false
+  local:
+    branch: codex/no-mistakes-pilot-20261008
+    head: f85ae715669379a428e063d0c965e42e78b3ae3f
+    clean: true
+  pipeline:
+    run: "01M4EHYDDZ8MBE4PGBQ76SZMF2"
+    status: failed
+    phase: ""
+    submitted_head: f85ae715669379a428e063d0c965e42e78b3ae3f
+    current_head: f85ae715669379a428e063d0c965e42e78b3ae3f
+    pushed_head: ""
+    pushed_at: 0
+    push_generation: 0
+  target:
+    kind: ""
+    remote: origin
+    url: /tmp/uah-nm-pilot-01/origin.git
+    ref: ""
+  remote:
+    observed_head: ""
+    freshness: pipeline_push
+    observed_at: 0
+  relation: equal
+  safety: user_owned
+  pr_state: none
+outcome: failed
+error: "step review failed: agent review reached its invocation budget after 8m0s (silent budget; no still-working cap is set; ran 8m5s): agent last produced output 7s ago (28 observed); agent reported: codex parse events: read |0: file already closed"

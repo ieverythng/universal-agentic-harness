@@ -1,0 +1,41 @@
+Command: .venv/bin/python -m pytest tests/test_observatory.py tests/test_observatory_raw_identity.py tests/test_observatory_format.py -q
+Exit: 0
+    recoverable = projection.trace("trace:recoverable-rejection")
+    assert recoverable.status is ObservatoryTraceStatus.OPEN
+    assert recoverable.failure_stage == "semantic_admission"
+    assert projection.trace("trace:accepted").events == (
+        accepted_start,
+        accepted,
+    )
+
+
+@pytest.mark.parametrize(
+    "label",
+    [
+        ObservatoryDataLabel.SYNTHETIC,
+        ObservatoryDataLabel.CONCEPTUAL,
+    ],
+)
+def test_projection_preserves_the_declared_data_label(label):
+    projection = project_observatory(
+        (_event(1, "task_started", trace_id="trace:label"),),
+        data_label=label,
+    )
+
+    assert projection.data_label is label
+    assert projection.traces[0].data_label is label
+
+
+def test_recorded_label_requires_a_validated_lifecycle_ledger():
+    with pytest.raises(ValueError, match="requires a validated ledger"):
+        project_observatory(
+            (_event(1, "task_started", trace_id="trace:not-ledger-validated"),),
+            data_label=ObservatoryDataLabel.RECORDED,
+        )
+
+
+def test_projection_rejects_conflicting_trace_lineage():
+    events = (
+864c6d3d6eb7b978c426327f877059e956a9e882
+......................................                                   [100%]
+38 passed in 0.44s

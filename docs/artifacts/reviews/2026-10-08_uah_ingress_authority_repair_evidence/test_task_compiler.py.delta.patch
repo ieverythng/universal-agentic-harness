@@ -1,0 +1,140 @@
+--- docs/artifacts/reviews/2026-10-08_uah_ingress_authority_repair_evidence/before/test_task_compiler.py.before	2026-10-08 20:41:56.582058116 +0200
++++ tests/test_task_compiler.py	2026-10-08 20:45:48.772554269 +0200
+@@ -19,6 +19,7 @@
+ from ab_harness import TaskIngressRule
+ from ab_harness import TaskSpec
+ from ab_harness import TaskSpecCompiler
++from ab_harness.lifecycle import TaskStartedFact
+
+
+ @pytest.mark.parametrize("field", ("wall_time_seconds", "model_calls", "tool_calls", "retry_attempts"))
+@@ -30,7 +31,7 @@
+         TaskBudgets(**values)
+
+
+-def _compiler_inputs():
++def _compiler_inputs(lifecycle_ledger=None):
+     registry = RegistrySnapshot.from_json_file("tests/fixtures/ab_registry.json")
+     role = AgentRoleSpec(
+         role_id="planner",
+@@ -67,7 +68,7 @@
+         ),
+         prohibited_effects=("direct_kb_write",),
+     )
+-    ledger = LifecycleLedger()
++    ledger = lifecycle_ledger if lifecycle_ledger is not None else LifecycleLedger()
+     task_registry = EnvironmentTaskRegistry(ledger)
+     environment_run = EnvironmentRun(
+         EnvironmentRunAttestation(
+@@ -359,6 +360,111 @@
+         TaskSpecCompiler().compile(**inputs)
+
+
++def test_raw_task_start_cannot_authorize_a_matching_compiler_decision():
++    inputs = _compiler_inputs()
++    decision = inputs["task_ingress_decision"]
++    ledger = LifecycleLedger()
++    fact = TaskStartedFact(
++        environment_run_id=decision.environment_run_id,
++        task_id=decision.task_id,
++        trace_id=decision.trace_id,
++        environment_ingress_id=decision.environment_ingress_id,
++        ingress_artifact_id=decision.environment_ingress_artifact_id,
++        decision_id=decision.decision_id,
++        domain_contract_pack_revision=decision.domain_contract_pack_revision,
++    )
++    with pytest.raises(ValueError, match="authority-bound task-start command"):
++        ledger.record(fact)
++    assert ledger.events() == ()
++
++
++def test_genuine_admitted_start_compiles_and_records_after_ledger_restart(tmp_path):
++    path = tmp_path / "genuine-start.jsonl"
++    inputs = _compiler_inputs(LifecycleLedger(path))
++    expected = TaskSpecCompiler().compile(**inputs)
++    restarted = LifecycleLedger(path)
++    inputs["task_registry"] = EnvironmentTaskRegistry(restarted)
++
++    compiled = TaskSpecCompiler().compile(**inputs)
++    assert compiled == expected
++    restarted.record(compiled)
++    assert [event.event_type for event in LifecycleLedger(path).events()] == [
++        "task_started", "task_compiled",
++    ]
++
++
++def test_legacy_unmarked_start_replays_but_cannot_authorize_fresh_compilation(tmp_path):
++    import hashlib
++    import json
++
++    source = LifecycleLedger()
++    inputs = _compiler_inputs(source)
++    compiled = TaskSpecCompiler().compile(**inputs)
++    historical = source.events()[0].to_dict()
++    data = json.loads(historical["data_json"])
++    del data["task_start_authority"]
++    historical["data_json"] = json.dumps(data, sort_keys=True, separators=(",", ":"))
++    del historical["event_id"]
++    historical["event_id"] = "trace-event:sha256:" + hashlib.sha256(
++        json.dumps(historical, sort_keys=True, separators=(",", ":")).encode()
++    ).hexdigest()
++    path = tmp_path / "historical-start.jsonl"
++    path.write_text(json.dumps(historical) + "\n", encoding="utf-8")
++    ledger = LifecycleLedger(path)
++    assert ledger.replay(compiled.trace_id).terminal_status is None
++    inputs["task_registry"] = EnvironmentTaskRegistry(ledger)
++    assert inputs["task_registry"].lineage_for_task(
++        environment_run_id=compiled.environment_run_id, task_id=compiled.task_id,
++    ) is not None
++    with pytest.raises(ValueError, match="authoritative task-start provenance"):
++        TaskSpecCompiler().compile(**inputs)
++    with pytest.raises(ValueError, match="authoritative task-start provenance"):
++        ledger.record(compiled)
++    assert len(ledger.events()) == 1
++
++
++@pytest.mark.parametrize("export", ("event", "replay", "mapping", "iterable"))
++def test_replayed_starts_cannot_manufacture_fresh_authority(export):
++    source = LifecycleLedger()
++    inputs = _compiler_inputs(source)
++    event = source.events()[0]
++    value = {
++        "event": event,
++        "replay": source.replay(event.trace_id),
++        "mapping": event.to_dict(),
++        "iterable": iter(source.events()),
++    }[export]
++    target = LifecycleLedger()
++    with pytest.raises(TypeError):
++        target.record(value)
++    assert target.events() == ()
++    inputs["task_registry"] = EnvironmentTaskRegistry(target)
++    with pytest.raises(ValueError, match="not recorded in lifecycle ledger"):
++        TaskSpecCompiler().compile(**inputs)
++
++
++@pytest.mark.parametrize("field,value", (
++    ("environment_run_id", "environment-run:foreign"),
++    ("environment_ingress_id", "ingress:foreign"),
++    ("environment_ingress_artifact_id", "artifact:foreign"),
++    ("reason_code", "different-rule"),
++))
++def test_matching_hash_of_foreign_decision_does_not_authorize_compilation(field, value):
++    inputs = _compiler_inputs()
++    inputs["task_ingress_decision"] = replace(
++        inputs["task_ingress_decision"], **{field: value}
++    )
++    with pytest.raises(ValueError):
++        TaskSpecCompiler().compile(**inputs)
++
++
++def test_mutated_decision_is_rejected_before_compilation():
++    inputs = _compiler_inputs()
++    object.__setattr__(inputs["task_ingress_decision"], "task_id", "task:foreign")
++    with pytest.raises(ValueError, match="identity does not match content"):
++        TaskSpecCompiler().compile(**inputs)
++
++
+ def test_compiler_rejects_an_effect_that_the_task_also_prohibits():
+     inputs = _compiler_inputs()
+     task = inputs["task_spec"]

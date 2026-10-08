@@ -277,11 +277,14 @@ alone do not authorize compilation. `TaskSpecCompiler` also requires the
 matching task start to exist in the common lifecycle ledger through
 `EnvironmentTaskRegistry.require_start(...)`.
 The task-start event stores the ingress artifact ID, decision ID, and frozen
-domain-pack revision. The intended authority contract reserves task-start
-production to admitted ingress. Current public `LifecycleLedger.record` still
-accepts caller-constructed `TaskStartedFact` values, so matching registry fields
-do not establish that provenance. This is the open SPEC-02 finding, not a
-delivered raw-lineage authorization restriction.
+domain-pack revision. The independently reviewed SPEC-02 correction reserves
+new starts to a ledger-bound command issued by `TaskIngressAuthority`.
+`LifecycleLedger.record` rejects caller-created raw `TaskStartedFact` values;
+`require_start` checks durable admitted-start provenance before fresh
+compilation. Historical unmarked starts remain readable, without fresh
+compilation authority. The correction assumes trusted ownership of the ledger
+file; hashes alone are not issuer authentication. Its scoped approval does not
+establish H0/H1 release qualification.
 
 ### Environment task registry
 

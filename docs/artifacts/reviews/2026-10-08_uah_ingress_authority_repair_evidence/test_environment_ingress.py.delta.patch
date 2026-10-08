@@ -1,0 +1,92 @@
+--- docs/artifacts/reviews/2026-10-08_uah_ingress_authority_repair_evidence/before/test_environment_ingress.py.before	2026-10-08 20:46:23.155873371 +0200
++++ tests/test_environment_ingress.py	2026-10-08 20:46:33.284827639 +0200
+@@ -356,6 +356,89 @@
+     )
+
+
++@pytest.mark.parametrize("same_ingress", (True, False))
++def test_task_start_commands_remain_atomic_across_cooperating_writers(tmp_path, same_ingress):
++    from concurrent.futures import ThreadPoolExecutor
++    from threading import Barrier
++
++    run = _active_environment_run()
++    path = tmp_path / "atomic-starts.jsonl"
++    authorities = [TaskIngressAuthority(
++        environment_profile_id=run.attestation.environment_profile_id,
++        domain_contract_pack=DOMAIN_PACK,
++        lifecycle_ledger=LifecycleLedger(path),
++    ) for _ in range(2)]
++    barrier = Barrier(2)
++
++    def request(index):
++        suffix = "shared" if same_ingress else str(index)
++        ingress = EnvironmentIngress(
++            environment_ingress_id="ingress:atomic:" + suffix,
++            environment_run_id=run.environment_run_id,
++            binding_id="binding:synthetic.request:v1",
++            ingress_type="user_request",
++            payload_artifact_id="artifact:atomic:" + suffix,
++            native_lineage=(("goal_id", "task:atomic:" + suffix),),
++            observed_at="2026-10-08T18:00:00Z",
++        )
++        barrier.wait()
++        return authorities[index].admit(run, ingress)
++
++    with ThreadPoolExecutor(max_workers=2) as pool:
++        decisions = list(pool.map(request, range(2)))
++    events = LifecycleLedger(path).events()
++    assert sorted(decision.action for decision in decisions) == (
++        ["reject", "start_task"] if same_ingress else ["start_task", "start_task"]
++    )
++    assert len(events) == (1 if same_ingress else 2)
++    assert [event.sequence for event in events] == list(range(1, len(events) + 1))
++    for decision in decisions:
++        if decision.action == "start_task":
++            assert EnvironmentTaskRegistry(LifecycleLedger(path)).require_start(
++                environment_run_id=decision.environment_run_id,
++                environment_ingress_id=decision.environment_ingress_id,
++                ingress_artifact_id=decision.environment_ingress_artifact_id,
++                decision_id=decision.decision_id,
++                domain_contract_pack_revision=decision.domain_contract_pack_revision,
++                task_id=decision.task_id,
++                trace_id=decision.trace_id,
++            ).task_id == decision.task_id
++
++
++def test_rejected_or_mutated_start_ingress_records_no_authoritative_start():
++    run = _active_environment_run()
++    ledger = LifecycleLedger()
++    authority = TaskIngressAuthority(
++        environment_profile_id=run.attestation.environment_profile_id,
++        domain_contract_pack=DOMAIN_PACK,
++        lifecycle_ledger=ledger,
++    )
++    ingress = EnvironmentIngress(
++        environment_ingress_id="ingress:rejected-start",
++        environment_run_id=run.environment_run_id,
++        binding_id="binding:unreviewed-request",
++        ingress_type="user_request",
++        payload_artifact_id="artifact:rejected-start",
++        native_lineage=(("goal_id", "task:rejected-start"),),
++        observed_at="2026-10-08T18:00:00Z",
++    )
++    assert authority.admit(run, ingress).action == "reject"
++    object.__setattr__(ingress, "binding_id", "binding:synthetic.request:v1")
++    with pytest.raises(ValueError, match="identity does not match content"):
++        authority.admit(run, ingress)
++    assert ledger.events() == ()
++
++
++def test_task_ingress_authority_rejects_stale_domain_policy_before_freezing():
++    domain = _pack_with_rules(tuple(replace(rule) for rule in DOMAIN_PACK.ingress_rules))
++    object.__setattr__(domain.ingress_rules[1], "binding_id", "binding:unreviewed")
++    with pytest.raises(ValueError, match="revision does not match content"):
++        TaskIngressAuthority(
++            environment_profile_id="environment-profile:synthetic:v1",
++            domain_contract_pack=domain,
++        )
++
++
+ def test_second_start_for_a_registered_domain_task_is_rejected():
+     environment_run = _active_environment_run()
+     ledger = LifecycleLedger()

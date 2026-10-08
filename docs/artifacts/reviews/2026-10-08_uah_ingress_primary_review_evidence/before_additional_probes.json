@@ -1,0 +1,98 @@
+{
+  "execution_stage": "post-read supplementary",
+  "import_path": "/tmp/uah-ingress-before-checkout/src/ab_harness/__init__.py",
+  "probes": [
+    {
+      "case": "18-legacy-unmarked-start",
+      "result": "returned",
+      "value": {
+        "compiler": {
+          "identity": "compiled-task:sha256:b3021aced05fb0cb786ed093f67452f8c3e072fed6b7d1da312f5b6e9715e37d",
+          "result": "returned"
+        },
+        "event_count": 2,
+        "readable": true,
+        "record_compiled": {
+          "identity": null,
+          "result": "returned"
+        },
+        "terminal": null,
+        "visible": true
+      }
+    },
+    {
+      "case": "18-exported-event",
+      "result": "returned",
+      "value": {
+        "accepted": false,
+        "events": 0,
+        "exception": "TypeError",
+        "message": "unsupported lifecycle fact: TraceEvent"
+      }
+    },
+    {
+      "case": "18-exported-mapping",
+      "result": "returned",
+      "value": {
+        "accepted": false,
+        "events": 0,
+        "exception": "TypeError",
+        "message": "unsupported lifecycle fact: dict"
+      }
+    },
+    {
+      "case": "18-exported-iterable",
+      "result": "returned",
+      "value": {
+        "accepted": false,
+        "events": 0,
+        "exception": "TypeError",
+        "message": "unsupported lifecycle fact: tuple_iterator"
+      }
+    },
+    {
+      "case": "18-exported-replay",
+      "result": "returned",
+      "value": {
+        "accepted": false,
+        "events": 0,
+        "exception": "TypeError",
+        "message": "unsupported lifecycle fact: LifecycleReplay"
+      }
+    },
+    {
+      "case": "15-stale-domain-rule-before-authority-construction",
+      "result": "returned",
+      "value": "constructed"
+    },
+    {
+      "case": "08-task-spec-tamper-task_id",
+      "exception": "ValueError",
+      "message": "task spec lineage does not match ingress decision",
+      "result": "exception"
+    },
+    {
+      "case": "08-task-spec-tamper-trace_id",
+      "exception": "ValueError",
+      "message": "task spec lineage does not match ingress decision",
+      "result": "exception"
+    },
+    {
+      "case": "08-task-spec-tamper-domain_contract_pack_revision",
+      "exception": "ValueError",
+      "message": "task domain contract revision does not match",
+      "result": "exception"
+    },
+    {
+      "case": "02-genuine-start-compile-record-reload",
+      "result": "returned",
+      "value": {
+        "events": [
+          "task_started",
+          "task_compiled"
+        ],
+        "same_lineage": true
+      }
+    }
+  ]
+}

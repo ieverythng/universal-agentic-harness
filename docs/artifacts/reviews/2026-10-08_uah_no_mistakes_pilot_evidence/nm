@@ -1,0 +1,16 @@
+#!/bin/sh
+exec /usr/bin/env -i \
+  HOME=/tmp/uah-nm-pilot-01/home \
+  CODEX_HOME=/tmp/uah-nm-pilot-01/codex-home \
+  NM_HOME=/tmp/uah-nm-pilot-01/state \
+  XDG_CONFIG_HOME=/tmp/uah-nm-pilot-01/xdg-config \
+  XDG_STATE_HOME=/tmp/uah-nm-pilot-01/xdg-state \
+  XDG_CACHE_HOME=/tmp/uah-nm-pilot-01/xdg-cache \
+  SHELL=/tmp/uah-nm-pilot-01/bin/controlled-shell \
+  PATH=/tmp/uah-nm-pilot-01/bin:/usr/bin:/bin \
+  NO_MISTAKES_TELEMETRY=off NO_MISTAKES_NO_UPDATE_CHECK=1 \
+  UAH_PYTHON_BIN=/home/juanbeck/universal-agentic-harness/.venv/bin/python \
+  PYTHONPATH=src \
+  GIT_AUTHOR_NAME=UAH-Pilot GIT_AUTHOR_EMAIL=pilot@localhost \
+  GIT_COMMITTER_NAME=UAH-Pilot GIT_COMMITTER_EMAIL=pilot@localhost \
+  /tmp/uah-no-mistakes-preparation/artifact/no-mistakes "$@"

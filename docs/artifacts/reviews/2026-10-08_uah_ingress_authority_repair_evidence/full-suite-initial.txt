@@ -1,0 +1,44 @@
+Command: .venv/bin/python -m pytest -q
+Exit: 1
+Initial output: .................
+....................................................... [ 13%]
+.................................................F...................... [ 26%]
+........................................................................ [ 39%]
+........................................................................ [ 52%]
+............F........................................................... [ 65%]
+........................................................................ [ 78%]
+........................................................................ [ 91%]
+............................................                             [100%]
+=================================== FAILURES ===================================
+_ test_committed_synthetic_o1_runtime_example_is_current_and_explicitly_labeled _
+
+    def test_committed_synthetic_o1_runtime_example_is_current_and_explicitly_labeled():
+        rendered = expected_html()
+
+>       assert OUTPUT.read_text(encoding="utf-8") == rendered
+E       assert '<!doctype ht...y>\n</html>\n' == '<!doctype ht...y>\n</html>\n'
+E
+E         Skipping 4812 identical leading characters in diff, use -v to show
+E         - nt:sha256:868a7e977fbbda44624cb24cf53732395371c85f137d2c67ca3c0914521426a9">trace:sha256:dbe2d82e55db67be493fa5e2afee2d3f70f769678d4e0d058bb31e1794f1099a</a> <span class="badge open">open</span></li></ul></li></ul></section><section class="environment-index">Environment run <code>environment-run:synthetic-notes:beta</code><ul><li><a href="#actor-trace-event:sha256:d1463192f566b09ba478e84a8d4320169a663a0e95320b0b80c516f52e9fcf31">Agent run <code>agent-run:synthetic-notes:beta</code></a></li></ul></sectio...
+E
+E         ...Full output truncated (844 lines hidden), use '-vv' to show
+
+tests/test_agent_runtime_example.py:39: AssertionError
+____________ test_committed_o1_example_matches_recorded_nao_canary _____________
+
+    def test_committed_o1_example_matches_recorded_nao_canary():
+        rendered = expected_html()
+
+>       assert OUTPUT.read_text(encoding="utf-8") == rendered
+E       assert '<!doctype ht...y>\n</html>\n' == '<!doctype ht...y>\n</html>\n'
+E
+E         Skipping 4730 identical leading characters in diff, use -v to show
+E         - nt:sha256:a608c0d7cfd26a86686412894c3a5853f15b660b9e440f49bd4b7494ae688917">trace:sha256:e7b30a3dc4fab39b098dfb9a91c6b473edd0459d66d2269494a294acb97ab9c0</a> <span class="badge accepted">accepted</span></li></ul></li><li>Task <code>find_the_cup_rejected</code><ul><li><a href="#trace-trace-event:sha256:89dced44b0addeb8079a9bd3e8344951893740a812316f50b610c9276943d1a5">trace:sha256:871c1c1d533da872bfc74faba13b35bbeae126a07b32aa8d0bfb6ff1fa82db23</a> <span class="badge open">open</span></li></ul></li><li>Ta...
+E
+E         ...Full output truncated (1323 lines hidden), use '-vv' to show
+
+tests/test_observatory.py:490: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_agent_runtime_example.py::test_committed_synthetic_o1_runtime_example_is_current_and_explicitly_labeled
+FAILED tests/test_observatory.py::test_committed_o1_example_matches_recorded_nao_canary
+2 failed, 546 passed in 13.88s

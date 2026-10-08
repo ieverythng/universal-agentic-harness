@@ -1,0 +1,2 @@
+error: "--intent or --intent-file is required to start a run"
+help[1]: "Pass the user's goal with --intent TEXT, --intent-file PATH, or --intent - for stdin"

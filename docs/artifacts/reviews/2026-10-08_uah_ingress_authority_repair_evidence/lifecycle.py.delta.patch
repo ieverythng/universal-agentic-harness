@@ -1,0 +1,92 @@
+--- docs/artifacts/reviews/2026-10-08_uah_ingress_authority_repair_evidence/before/lifecycle.py.before	2026-10-08 20:41:56.581859402 +0200
++++ src/ab_harness/lifecycle.py	2026-10-08 20:47:44.599255898 +0200
+@@ -35,6 +35,7 @@
+     from ab_harness.runtime_controls import RetryDecision
+     from ab_harness.runtime_controls import TaskTimeoutDecision
+     from ab_harness.task_compiler import CompiledTask
++    from ab_harness.task_ingress_authority import _TaskStartCommand
+     from ab_harness.agent_lifecycle import (
+         AgentRunAttached,
+         AgentRunTermination,
+@@ -55,6 +56,7 @@
+ TRACE_EVENT_SCHEMA = "uah.trace_event/v1"
+ SCOPED_EVENT_SCHEMA = "uah.trace_event/v2"
+ VERIFIED_TRACE_DIGEST_SCHEMA = "uah.verified_trace_digest/v1"
++TASK_START_AUTHORITY = "uah.task_ingress_authority/v1"
+
+
+ def _canonical_json(payload: object) -> str:
+@@ -318,7 +320,7 @@
+
+ if TYPE_CHECKING:
+     LifecycleFact = (
+-        TaskStartedFact
++        _TaskStartCommand
+         | TaskIngressFact
+         | CompiledTask
+         | TypedProposal
+@@ -516,6 +518,7 @@
+     environment_ingress_artifact_id: str = ""
+     task_ingress_decision_id: str = ""
+     task_started_at: str = ""
++    authoritative_task_start: bool = False
+     compiled_task_id: str | None = None
+     domain_contract_pack_revision: str | None = None
+     role_id: str | None = None
+@@ -588,7 +591,15 @@
+                 and expected_sequence != self.next_sequence
+             ):
+                 raise LifecycleSequenceConflict("lifecycle ledger sequence conflict")
+-            specs = _event_specs(fact)
++            from ab_harness.task_ingress_authority import _TaskStartCommand
++
++            if isinstance(fact, TaskStartedFact):
++                raise ValueError("new starts require an authority-bound task-start command")
++            if type(fact) is _TaskStartCommand:
++                specs = _event_specs(fact.require_fact(self))
++                specs[0]["data"]["task_start_authority"] = TASK_START_AUTHORITY
++            else:
++                specs = _event_specs(fact)
+             if not specs:
+                 raise ValueError("lifecycle fact produced no events")
+             staged: list[TraceEvent] = []
+@@ -709,6 +720,19 @@
+             self._refresh_from_disk()
+             return tuple(replace(event) for event in self._events)
+
++    def require_authoritative_task_start(self, *, trace_id: str, decision_id: str) -> None:
++        """Require a persisted issuer-controlled start, not legacy hash agreement."""
++        with self._file_lock():
++            self._refresh_from_disk()
++            if not any(
++                event.trace_id == trace_id
++                and event.event_type == "task_started"
++                and event.data.get("decision_id") == decision_id
++                and event.data.get("task_start_authority") == TASK_START_AUTHORITY
++                for event in self._events
++            ):
++                raise ValueError("fresh compilation requires authoritative task-start provenance")
++
+     def has_operation_event(
+         self,
+         *,
+@@ -1591,6 +1615,10 @@
+                 environment_ingress_artifact_id=str(event.data["ingress_artifact_id"]),
+                 task_ingress_decision_id=str(event.data["decision_id"]),
+                 task_started_at=event.recorded_at,
++                authoritative_task_start=(
++                    event.data.get("task_start_authority")
++                    == TASK_START_AUTHORITY
++                ),
+                 domain_contract_pack_revision=str(
+                     event.data["domain_contract_pack_revision"]
+                 ),
+@@ -1653,6 +1681,8 @@
+
+
+ def _require_current_event_authority(state: _TraceState, event: TraceEvent) -> None:
++    if event.event_type == "task_compiled" and not state.authoritative_task_start:
++        raise ValueError("fresh compilation requires authoritative task-start provenance")
+     operation_id = event.operation_id
+     if event.event_type.startswith(("domain_admission_", "execution_", "evidence_")):
+         if operation_id not in state.current_admission_operation_ids:

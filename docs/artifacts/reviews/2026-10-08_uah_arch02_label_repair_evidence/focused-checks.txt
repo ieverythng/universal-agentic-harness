@@ -1,0 +1,12 @@
+Command: Focused213 tests; Ruff; both O1 freshness checks; canonical doc check; diff check; SHA-256
+Exit: 0
+........................................................................ [ 33%]
+........................................................................ [ 67%]
+.....................................................................    [100%]
+213 passed in 1.46s
+All checks passed!
+Checked 12 metadata records
+d63bcd3dd465019f04cc19ef0a8a84101e747491211426a6a159e484ad5ab13d  src/ab_harness/observatory.py
+d8211c637c8af63c4121fd4c78e8dc14e0814ea75180bd32f023e6be4ce905d7  tests/test_observatory_provenance.py
+ src/ab_harness/observatory.py | 2 ++
+ 1 file changed, 2 insertions(+)

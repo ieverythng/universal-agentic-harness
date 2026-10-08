@@ -1,0 +1,42 @@
+--- docs/artifacts/reviews/2026-10-08_uah_ingress_authority_repair_evidence/before/test_observatory_raw_identity.py.before	2026-10-08 20:41:56.582297185 +0200
++++ tests/test_observatory_raw_identity.py	2026-10-08 20:44:52.000198090 +0200
+@@ -1,6 +1,6 @@
+ import pytest
+
+-from ab_harness.lifecycle import LifecycleLedger, TaskStartedFact
++from ab_harness.lifecycle import LifecycleLedger
+ from ab_harness.observatory import (
+     ObservatoryDataLabel,
+     ObservatoryTraceStatus,
+@@ -10,18 +10,11 @@
+
+
+ def raw_events():
++    from test_two_stage_admission import _admission_fixture, _record_task_start
++
+     ledger = LifecycleLedger(clock=lambda: "2026-10-08T15:30:00Z")
+-    ledger.record(
+-        TaskStartedFact(
+-            environment_run_id="environment-run:raw-o1",
+-            task_id="task:raw-o1",
+-            trace_id="trace:raw-o1",
+-            environment_ingress_id="ingress:raw-o1",
+-            ingress_artifact_id="artifact:raw-o1",
+-            decision_id="decision:raw-o1",
+-            domain_contract_pack_revision="domain:raw-o1",
+-        )
+-    )
++    compiled, _, _ = _admission_fixture()
++    _record_task_start(ledger, compiled)
+     return ledger, ledger.events()
+
+
+@@ -109,7 +102,7 @@
+     actor_ledger, attached = _attached_actor_ledger(tmp_path / "actors.jsonl")
+     combined = (*task_events, *actor_ledger.events())
+     projected = project_observatory(iter(combined))
+-    assert projected.traces[0].trace_id == "trace:raw-o1"
++    assert projected.traces[0].trace_id == task_events[0].trace_id
+     assert projected.agent_run(attached.agent_run_id).events == actor_ledger.events()
+     assert projected.events != ()
+     assert project_observatory(actor_ledger).agent_runs == project_observatory(

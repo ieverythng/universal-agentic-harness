@@ -1619,8 +1619,10 @@ protocol is frozen and conformance-tested.
 
 ### Now: close H0-H1 for the H2 launch candidate
 
-**Work order:** Prepare the existing NAO domain first, after the pending human
-ingress-provenance choice and its reviewed correction. Synthetic environment
+**Work order:** Prepare the existing NAO domain first, after the human-selected
+authority-bound ingress command receives its scoped correction and review.
+The decision was accepted on 2026-10-08; the [separate ingress round](../artifacts/reviews/2026-10-08_uah_ingress_authority_repair.md)
+records implementation and review status without closing H0/H1. Synthetic environment
 integration is deferred, not deleted or qualified. The H0 synthetic lifecycle
 replay and H1 synthetic failure-suite exit requirements above remain unchanged;
 mapping NAO-first fixtures to those requirements needs an explicit agreement.
@@ -1680,6 +1682,14 @@ instead of starting a new R5 repair or treating a green canary as H2 parity.
 3. Add each rejection and failure family to O1 when its lifecycle contract
    becomes replay-stable.
 4. Require explicit labels for recorded, synthetic, and conceptual data.
+   The human's 2026-10-08 decision rejects unsupported `measured`/`reviewed`
+   requests until an evaluator/result and independent-gate provenance interface
+   is implemented. The [separate ARCH-02 correction](../artifacts/reviews/2026-10-08_uah_arch02_label_repair.md)
+   tracks its implementation gate, not full measurement support. Retain future
+   label definitions and the [deferred interface criteria](../architecture/observatory_contract.md#deferred-evaluator-and-review-provenance-interface).
+   O1 owns read-only consumption; evaluators and applicable independent gates
+   own result and review authority. Require frozen configuration, exact source
+   and result linkage, coverage/freshness and replay before reopening support.
 5. Use the static O1 renderer for H1 failure-suite and H2 NAO parity review;
    retain local search/status/event filters and leave interactive graphs,
    comparison, and annotation navigation to O2.

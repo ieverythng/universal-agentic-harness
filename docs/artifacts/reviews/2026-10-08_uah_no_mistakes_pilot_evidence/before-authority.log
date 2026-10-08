@@ -1,0 +1,34 @@
+{"accepted": true, "case": "compatible-budgets/wall_time_seconds/True", "value": "TaskBudgets(wall_time_seconds=True, model_calls=1, tool_calls=1)"}
+{"accepted": true, "case": "compatible-budgets/wall_time_seconds/1.5", "value": "TaskBudgets(wall_time_seconds=1.5, model_calls=1, tool_calls=1)"}
+{"accepted": true, "case": "compatible-budgets/wall_time_seconds/nan", "value": "TaskBudgets(wall_time_seconds=nan, model_calls=1, tool_calls=1)"}
+{"accepted": true, "case": "compatible-budgets/wall_time_seconds/inf", "value": "TaskBudgets(wall_time_seconds=inf, model_calls=1, tool_calls=1)"}
+{"accepted": false, "case": "compatible-budgets/wall_time_seconds/0", "message": "task wall-time budget must be positive", "type": "ValueError"}
+{"accepted": true, "case": "compatible-budgets/wall_time_seconds/1", "value": "TaskBudgets(wall_time_seconds=1, model_calls=1, tool_calls=1)"}
+{"accepted": true, "case": "compatible-budgets/model_calls/True", "value": "TaskBudgets(wall_time_seconds=1, model_calls=True, tool_calls=1)"}
+{"accepted": true, "case": "compatible-budgets/model_calls/1.5", "value": "TaskBudgets(wall_time_seconds=1, model_calls=1.5, tool_calls=1)"}
+{"accepted": true, "case": "compatible-budgets/model_calls/nan", "value": "TaskBudgets(wall_time_seconds=1, model_calls=nan, tool_calls=1)"}
+{"accepted": true, "case": "compatible-budgets/model_calls/inf", "value": "TaskBudgets(wall_time_seconds=1, model_calls=inf, tool_calls=1)"}
+{"accepted": true, "case": "compatible-budgets/model_calls/0", "value": "TaskBudgets(wall_time_seconds=1, model_calls=0, tool_calls=1)"}
+{"accepted": true, "case": "compatible-budgets/model_calls/1", "value": "TaskBudgets(wall_time_seconds=1, model_calls=1, tool_calls=1)"}
+{"accepted": true, "case": "compatible-budgets/tool_calls/True", "value": "TaskBudgets(wall_time_seconds=1, model_calls=1, tool_calls=True)"}
+{"accepted": true, "case": "compatible-budgets/tool_calls/1.5", "value": "TaskBudgets(wall_time_seconds=1, model_calls=1, tool_calls=1.5)"}
+{"accepted": true, "case": "compatible-budgets/tool_calls/nan", "value": "TaskBudgets(wall_time_seconds=1, model_calls=1, tool_calls=nan)"}
+{"accepted": true, "case": "compatible-budgets/tool_calls/inf", "value": "TaskBudgets(wall_time_seconds=1, model_calls=1, tool_calls=inf)"}
+{"accepted": true, "case": "compatible-budgets/tool_calls/0", "value": "TaskBudgets(wall_time_seconds=1, model_calls=1, tool_calls=0)"}
+{"accepted": true, "case": "compatible-budgets/tool_calls/1", "value": "TaskBudgets(wall_time_seconds=1, model_calls=1, tool_calls=1)"}
+{"accepted": true, "case": "raw-ingress/resume_task", "value": "{'event': 'task_resumed', 'registry_accepts': True, 'source_ingress_supplied': False}"}
+{"accepted": true, "case": "raw-ingress/notify_task", "value": "{'event': 'task_notified', 'registry_accepts': True, 'source_ingress_supplied': False}"}
+{"accepted": true, "case": "additional-policy/False", "value": "{'semantic_admitted': True, 'handler_arguments': [{'not_reviewed': 'payload', 'text': 'hello'}], 'return_type': 'ExecutionReceipt'}"}
+{"accepted": true, "case": "additional-policy/True", "value": "{'semantic_admitted': True, 'handler_arguments': [{'not_reviewed': 'payload', 'text': 'hello'}], 'return_type': 'ExecutionReceipt'}"}
+{"accepted": true, "case": "additional-policy/'false'", "value": "{'semantic_admitted': True, 'handler_arguments': [{'not_reviewed': 'payload', 'text': 'hello'}], 'return_type': 'ExecutionReceipt'}"}
+{"accepted": true, "case": "additional-policy/1", "value": "{'semantic_admitted': True, 'handler_arguments': [{'not_reviewed': 'payload', 'text': 'hello'}], 'return_type': 'ExecutionReceipt'}"}
+{"accepted": true, "case": "additional-policy/None", "value": "{'semantic_admitted': True, 'handler_arguments': [{'not_reviewed': 'payload', 'text': 'hello'}], 'return_type': 'ExecutionReceipt'}"}
+{"accepted": false, "case": "dispatch/cancel", "message": "'InProcessEnvironmentOwner' object has no attribute 'cancel'", "type": "AttributeError"}
+{"accepted": false, "case": "dispatch/timeout", "message": "module 'ab_harness' has no attribute 'TaskRuntimeControlAuthority'", "type": "AttributeError"}
+{"accepted": true, "case": "dispatch/nested_tamper", "value": "{'handler_calls': 0, 'error': 'ValueError: typed proposal identity does not match content', 'events': ['task_started', 'task_compiled', 'proposal_normalized', 'semantic_admission_accepted', 'domain_admission_leased']}"}
+{"accepted": true, "case": "dispatch/duplicate", "value": "{'handler_calls': 1, 'error': 'ValueError: execution lease already consumed', 'events': ['task_started', 'task_compiled', 'proposal_normalized', 'semantic_admission_accepted', 'domain_admission_leased', 'execution_started', 'execution_completed', 'evidence_issued']}"}
+{"accepted": true, "case": "dispatch/wrong_owner", "value": "{'handler_calls': 0, 'error': 'ValueError: execution lease identity does not match content', 'events': ['task_started', 'task_compiled', 'proposal_normalized', 'semantic_admission_accepted', 'domain_admission_leased']}"}
+{"accepted": false, "case": "budget-idempotent-units/True", "message": "module 'ab_harness' has no attribute 'TaskBudgetAuthority'", "type": "AttributeError"}
+{"accepted": false, "case": "budget-idempotent-units/1.0", "message": "module 'ab_harness' has no attribute 'TaskBudgetAuthority'", "type": "AttributeError"}
+{"accepted": false, "case": "budget-idempotent-units/1", "message": "module 'ab_harness' has no attribute 'TaskBudgetAuthority'", "type": "AttributeError"}
+{"accepted": false, "case": "budget-idempotent-units/2", "message": "module 'ab_harness' has no attribute 'TaskBudgetAuthority'", "type": "AttributeError"}

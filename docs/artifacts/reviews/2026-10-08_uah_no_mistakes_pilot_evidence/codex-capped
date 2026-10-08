@@ -1,0 +1,85 @@
+#!/usr/bin/python3
+"""Bound native top-level Codex launches for one isolated diagnostic run."""
+import datetime
+import fcntl
+import json
+import os
+from pathlib import Path
+import signal
+import subprocess
+import sys
+import time
+
+ROOT = Path('/tmp/uah-nm-pilot-01')
+REAL = '/home/juanbeck/.local/bin/codex'
+DEADLINE = datetime.datetime.fromisoformat('2026-10-08T20:21:10+00:00').timestamp()
+
+
+def reserve(counter: Path, limit: int = 3) -> int:
+    with counter.open('a+') as stream:
+        fcntl.flock(stream, fcntl.LOCK_EX)
+        stream.seek(0)
+        raw = stream.read().strip()
+        count = int(raw or '0')
+        if count >= limit:
+            raise RuntimeError('native top-level invocation cap exhausted')
+        count += 1
+        stream.seek(0)
+        stream.truncate()
+        stream.write(str(count) + '\n')
+        stream.flush()
+        os.fsync(stream.fileno())
+        return count
+
+
+args = sys.argv[1:]
+if args == ['--self-test']:
+    import tempfile
+    with tempfile.TemporaryDirectory(dir=ROOT) as directory:
+        counter = Path(directory) / 'counter'
+        assert [reserve(counter) for _ in range(3)] == [1, 2, 3]
+        try:
+            reserve(counter)
+        except RuntimeError:
+            pass
+        else:
+            raise AssertionError('fourth launch was not refused')
+    print('three-call consumer cap: PASS; no native agent launched')
+    raise SystemExit(0)
+
+if args and args[0] in ('--version', '-V', '--help', '-h', 'login'):
+    os.execv(REAL, [REAL, *args])
+
+if not args or args[0] != 'exec' or 'resume' in args or 'fork' in args:
+    raise SystemExit('only cold native exec sessions are permitted')
+if '--dangerously-bypass-approvals-and-sandbox' in args or '--yes' in args:
+    raise SystemExit('unrestricted or automatic mode forbidden')
+if '--sandbox' not in args or args[args.index('--sandbox') + 1] != 'workspace-write':
+    raise SystemExit('explicit workspace-write sandbox required')
+cwd = Path.cwd().resolve()
+allowed = (Path('/tmp/uah-no-mistakes-pilot-repo'), ROOT / 'state')
+if not any(cwd == path or path in cwd.parents for path in allowed):
+    raise SystemExit('native invocation outside isolated lane refused')
+remaining = DEADLINE - time.time()
+if remaining <= 0:
+    raise SystemExit('pilot execution deadline reached')
+number = reserve(ROOT / 'native-call-count')
+receipt = {'invocation': number, 'cwd': str(cwd), 'started_at': datetime.datetime.now(datetime.timezone.utc).isoformat(), 'sandbox': 'workspace-write', 'model': 'native configured/default selection; not guessed', 'deadline': '2026-10-08T20:21:10Z'}
+with (ROOT / 'native-calls.jsonl').open('a') as stream:
+    stream.write(json.dumps(receipt) + '\n')
+    stream.flush()
+    os.fsync(stream.fileno())
+process = subprocess.Popen([REAL, *args], start_new_session=True)
+try:
+    code = process.wait(timeout=min(remaining, 900))
+except subprocess.TimeoutExpired:
+    os.killpg(process.pid, signal.SIGTERM)
+    try:
+        process.wait(timeout=3)
+    except subprocess.TimeoutExpired:
+        os.killpg(process.pid, signal.SIGKILL)
+        process.wait()
+    code = 124
+with (ROOT / 'native-calls.jsonl').open('a') as stream:
+    stream.write(json.dumps({'invocation': number, 'finished_at': datetime.datetime.now(datetime.timezone.utc).isoformat(), 'exit_code': code}) + '\n')
+raise SystemExit(code)

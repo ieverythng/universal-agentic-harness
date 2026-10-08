@@ -1,0 +1,71 @@
+
+==================================== ERRORS ====================================
+___________________ ERROR collecting tests/test_cli_smoke.py ___________________
+ImportError while importing test module '/tmp/uah-checkpoint02/candidate/tests/test_cli_smoke.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/usr/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_cli_smoke.py:3: in <module>
+    from ab_harness_nao.cli import main
+src/ab_harness_nao/__init__.py:9: in <module>
+    from ab_harness_nao.qualification import NaoQualificationCase
+src/ab_harness_nao/qualification.py:19: in <module>
+    from ab_harness.environment_ingress import TaskIngressPolicy
+E   ImportError: cannot import name 'TaskIngressPolicy' from 'ab_harness.environment_ingress' (/tmp/uah-checkpoint02/candidate/src/ab_harness/environment_ingress.py). Did you mean: 'TaskIngressRule'?
+__________________ ERROR collecting tests/test_observatory.py __________________
+ImportError while importing test module '/tmp/uah-checkpoint02/candidate/tests/test_observatory.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/usr/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_observatory.py:6: in <module>
+    from scripts.render_observatory_example import OUTPUT
+scripts/render_observatory_example.py:10: in <module>
+    from ab_harness_nao.smoke import record_smoke_run
+src/ab_harness_nao/__init__.py:9: in <module>
+    from ab_harness_nao.qualification import NaoQualificationCase
+src/ab_harness_nao/qualification.py:19: in <module>
+    from ab_harness.environment_ingress import TaskIngressPolicy
+E   ImportError: cannot import name 'TaskIngressPolicy' from 'ab_harness.environment_ingress' (/tmp/uah-checkpoint02/candidate/src/ab_harness/environment_ingress.py). Did you mean: 'TaskIngressRule'?
+______________ ERROR collecting tests/test_observatory_format.py _______________
+ImportError while importing test module '/tmp/uah-checkpoint02/candidate/tests/test_observatory_format.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/usr/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_observatory_format.py:7: in <module>
+    from tests.test_observatory import _event
+tests/test_observatory.py:6: in <module>
+    from scripts.render_observatory_example import OUTPUT
+scripts/render_observatory_example.py:10: in <module>
+    from ab_harness_nao.smoke import record_smoke_run
+src/ab_harness_nao/__init__.py:9: in <module>
+    from ab_harness_nao.qualification import NaoQualificationCase
+src/ab_harness_nao/qualification.py:19: in <module>
+    from ab_harness.environment_ingress import TaskIngressPolicy
+E   ImportError: cannot import name 'TaskIngressPolicy' from 'ab_harness.environment_ingress' (/tmp/uah-checkpoint02/candidate/src/ab_harness/environment_ingress.py). Did you mean: 'TaskIngressRule'?
+__________ ERROR collecting tests/test_recorded_nao_qualification.py ___________
+ImportError while importing test module '/tmp/uah-checkpoint02/candidate/tests/test_recorded_nao_qualification.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/usr/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_recorded_nao_qualification.py:16: in <module>
+    from ab_harness_nao.qualification import NaoQualificationCase
+src/ab_harness_nao/__init__.py:9: in <module>
+    from ab_harness_nao.qualification import NaoQualificationCase
+src/ab_harness_nao/qualification.py:19: in <module>
+    from ab_harness.environment_ingress import TaskIngressPolicy
+E   ImportError: cannot import name 'TaskIngressPolicy' from 'ab_harness.environment_ingress' (/tmp/uah-checkpoint02/candidate/src/ab_harness/environment_ingress.py). Did you mean: 'TaskIngressRule'?
+=========================== short test summary info ============================
+ERROR tests/test_cli_smoke.py
+ERROR tests/test_observatory.py
+ERROR tests/test_observatory_format.py
+ERROR tests/test_recorded_nao_qualification.py
+!!!!!!!!!!!!!!!!!!! Interrupted: 4 errors during collection !!!!!!!!!!!!!!!!!!!!
+4 errors in 0.32s

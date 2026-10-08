@@ -1,0 +1,27 @@
+agent: codex
+agent_path_override:
+  codex: /tmp/uah-nm-pilot-01/bin/codex-capped
+agent_config:
+  codex:
+    effort: high
+agent_args_override:
+  codex:
+    - --sandbox
+    - workspace-write
+    - -c
+    - approval_policy="never"
+session_reuse: false
+agent_timeout: 8m
+review_agent_timeout: 8m
+test_agent_timeout: 8m
+auto_fix:
+  rebase: 0
+  review: 0
+  test: 0
+  document: 0
+  lint: 0
+  ci: 0
+test:
+  evidence:
+    store_in_repo: false
+    attach_media: false

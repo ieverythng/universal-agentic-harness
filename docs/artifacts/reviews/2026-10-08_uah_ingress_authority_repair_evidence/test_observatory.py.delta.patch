@@ -1,0 +1,42 @@
+--- docs/artifacts/reviews/2026-10-08_uah_ingress_authority_repair_evidence/before/test_observatory.py.before	2026-10-08 20:41:56.582245568 +0200
++++ tests/test_observatory.py	2026-10-08 20:45:08.144300279 +0200
+@@ -7,7 +7,6 @@
+ from scripts.render_observatory_example import expected_html
+
+ from ab_harness.lifecycle import LifecycleLedger
+-from ab_harness.lifecycle import TaskStartedFact
+ from ab_harness.lifecycle import TraceEvent
+ from ab_harness.observatory import ObservatoryDataLabel
+ from ab_harness.observatory import ObservatoryTraceStatus
+@@ -431,25 +430,18 @@
+
+
+ def test_observatory_consumes_events_from_the_lifecycle_ledger():
++    from test_two_stage_admission import _admission_fixture, _record_task_start
++
+     ledger = LifecycleLedger(clock=lambda: "2026-10-01T09:00:00Z")
+-    ledger.record(
+-        TaskStartedFact(
+-            environment_run_id="environment-run:observatory:ledger",
+-            task_id="task:observatory:ledger",
+-            trace_id="trace:observatory:ledger",
+-            environment_ingress_id="ingress:observatory:ledger",
+-            ingress_artifact_id="environment-ingress:sha256:observatory-ledger",
+-            decision_id="task-ingress-decision:sha256:observatory-ledger",
+-            domain_contract_pack_revision="sha256:observatory-domain-pack",
+-        )
+-    )
++    compiled, _, _ = _admission_fixture()
++    _record_task_start(ledger, compiled)
+
+     document = render_observatory(ledger)
+
+-    assert document.projection.trace_ids == ("trace:observatory:ledger",)
++    assert document.projection.trace_ids == (compiled.trace_id,)
+     assert document.projection.data_label is ObservatoryDataLabel.RECORDED
+     assert "task_started" in document.html
+-    assert "task:observatory:ledger" in document.html
++    assert compiled.task_id in document.html
+
+
+ def test_observatory_renders_explicit_operation_edges_without_inference():

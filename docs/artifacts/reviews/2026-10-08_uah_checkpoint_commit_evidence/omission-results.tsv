@@ -1,0 +1,9 @@
+src/ab_harness/prompt_compiler.py	2
+src/ab_harness/runtime_controls.py	2
+src/ab_harness/task_ingress_authority.py	2
+src/ab_harness/environment_ingress.py	2
+src/ab_harness/proposal_admission.py	2
+src/ab_harness/domain_lifecycle.py	2
+src/ab_harness/environment.py	2
+src/ab_harness_nao/qualification.py	2
+src/ab_harness_nao/smoke.py	2

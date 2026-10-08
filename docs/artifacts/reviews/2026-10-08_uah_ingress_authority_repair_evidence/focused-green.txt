@@ -1,0 +1,6 @@
+Command: .venv/bin/python -m pytest tests/test_task_compiler.py tests/test_environment_ingress.py tests/test_lifecycle_ledger.py tests/test_two_stage_admission.py tests/test_observatory_raw_identity.py tests/test_observatory.py -q -k 'not committed_o1_example'
+Exit: 0
+........................................................................ [ 38%]
+........................................................................ [ 76%]
+.............................................                            [100%]
+189 passed, 1 deselected in 1.99s

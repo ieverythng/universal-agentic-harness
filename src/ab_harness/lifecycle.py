@@ -5,11 +5,13 @@ from __future__ import annotations
 from dataclasses import asdict
 from dataclasses import dataclass
 from dataclasses import field
-from datetime import datetime, timezone
+from dataclasses import replace
+from datetime import datetime, timedelta, timezone
 import hashlib
 import json
 import os
 from pathlib import Path
+from types import MappingProxyType
 from types import TracebackType
 from typing import Callable, TYPE_CHECKING
 
@@ -18,15 +20,43 @@ from ab_harness.contracts import EffectEvidence
 from ab_harness.contracts import TaskAcceptance
 
 if TYPE_CHECKING:
+    from ab_harness.domain_lifecycle import DomainAdmissionRejection
     from ab_harness.domain_lifecycle import ExecutionLease
     from ab_harness.environment import ExecutionReceipt
+    from ab_harness.environment import EvidenceRejection
+    from ab_harness.operation_edges import OperationEdge
     from ab_harness.proposal_admission import AdmittedOperation
+    from ab_harness.proposal_admission import ProposalNormalizationRejection
+    from ab_harness.proposal_admission import SemanticAdmissionRejection
     from ab_harness.proposal_admission import TypedProposal
+    from ab_harness.runtime_controls import BudgetDecision
+    from ab_harness.runtime_controls import ExecutionCancellationDecision
+    from ab_harness.runtime_controls import ExecutionFailure
+    from ab_harness.runtime_controls import RetryDecision
+    from ab_harness.runtime_controls import TaskTimeoutDecision
     from ab_harness.task_compiler import CompiledTask
+    from ab_harness.task_ingress_authority import _TaskStartCommand
+    from ab_harness.agent_lifecycle import (
+        AgentRunAttached,
+        AgentRunTermination,
+        AgentRunReplay,
+    )
+    from ab_harness.model_allocator import (
+        ModelAllocationDecision,
+        StartupPreflight,
+        ModelLeaseRelease,
+    )
+    from ab_harness.model_invocation import (
+        ModelInvocationStarted,
+        RawModelOutput,
+        ModelInvocationFailure,
+    )
 
 
 TRACE_EVENT_SCHEMA = "uah.trace_event/v1"
+SCOPED_EVENT_SCHEMA = "uah.trace_event/v2"
 VERIFIED_TRACE_DIGEST_SCHEMA = "uah.verified_trace_digest/v1"
+TASK_START_AUTHORITY = "uah.task_ingress_authority/v1"
 
 
 def _canonical_json(payload: object) -> str:
@@ -64,17 +94,49 @@ class TraceEvent:
     recorded_at: str
     event_type: str
     environment_run_id: str
-    task_id: str
-    trace_id: str
+    task_id: str | None
+    trace_id: str | None
     operation_id: str | None
     parent_event_id: str | None
     artifact_refs: tuple[str, ...]
     data_json: str
     schema_version: str = TRACE_EVENT_SCHEMA
+    event_scope: str = "task"
+    agent_run_id: str | None = None
 
     def __post_init__(self) -> None:
-        if self.schema_version != TRACE_EVENT_SCHEMA:
+        if self.schema_version not in {TRACE_EVENT_SCHEMA, SCOPED_EVENT_SCHEMA}:
             raise ValueError("unsupported trace event schema: %s" % self.schema_version)
+        if self.schema_version == TRACE_EVENT_SCHEMA:
+            if self.event_scope != "task" or self.agent_run_id is not None:
+                raise ValueError("v1 events require task scope without actor identity")
+            if (
+                not isinstance(self.task_id, str)
+                or not self.task_id.strip()
+                or not isinstance(self.trace_id, str)
+                or not self.trace_id.strip()
+            ):
+                raise ValueError("v1 events require task and trace identities")
+        else:
+            if not isinstance(self.agent_run_id, str) or not self.agent_run_id.strip():
+                raise ValueError("v2 events require explicit actor identity")
+            if self.event_scope == "agent":
+                if (
+                    self.task_id is not None
+                    or self.trace_id is not None
+                    or self.operation_id is not None
+                ):
+                    raise ValueError("v2 agent scope cannot carry task lineage")
+            elif self.event_scope == "task":
+                if (
+                    not isinstance(self.task_id, str)
+                    or not self.task_id.strip()
+                    or not isinstance(self.trace_id, str)
+                    or not self.trace_id.strip()
+                ):
+                    raise ValueError("v2 task scope requires task and trace identities")
+            else:
+                raise ValueError("unsupported lifecycle event scope")
         if self.sequence < 1:
             raise ValueError("trace event sequence must be positive")
         if not 1 <= self.commit_index <= self.commit_size:
@@ -85,8 +147,6 @@ class TraceEvent:
             "recorded_at": self.recorded_at,
             "event_type": self.event_type,
             "environment_run_id": self.environment_run_id,
-            "task_id": self.task_id,
-            "trace_id": self.trace_id,
             "data_json": self.data_json,
         }
         missing = tuple(name for name, value in required.items() if not value.strip())
@@ -101,15 +161,19 @@ class TraceEvent:
         data = json.loads(self.data_json)
         if not isinstance(data, dict) or self.data_json != _canonical_json(data):
             raise ValueError("trace event data must be a canonical JSON object")
+        self.verify_identity()
+
+    def verify_identity(self) -> None:
         if self.event_id != _content_id("trace-event", self._identity_payload()):
             raise ValueError("trace event identity does not match content")
 
     @property
     def data(self) -> dict[str, object]:
+        self.verify_identity()
         return json.loads(self.data_json)
 
     def _identity_payload(self) -> dict[str, object]:
-        return {
+        payload = {
             "schema_version": self.schema_version,
             "sequence": self.sequence,
             "commit_id": self.commit_id,
@@ -125,8 +189,12 @@ class TraceEvent:
             "artifact_refs": self.artifact_refs,
             "data_json": self.data_json,
         }
+        if self.schema_version == SCOPED_EVENT_SCHEMA:
+            payload.update(event_scope=self.event_scope, agent_run_id=self.agent_run_id)
+        return payload
 
     def to_dict(self) -> dict[str, object]:
+        self.verify_identity()
         payload = self._identity_payload()
         payload["artifact_refs"] = list(self.artifact_refs)
         return {"event_id": self.event_id, **payload}
@@ -150,6 +218,8 @@ class TraceEvent:
             "artifact_refs",
             "data_json",
         }
+        if payload.get("schema_version") == SCOPED_EVENT_SCHEMA:
+            expected.update(("event_scope", "agent_run_id"))
         if set(payload) != expected:
             raise ValueError("invalid trace event fields")
         if any(
@@ -157,20 +227,26 @@ class TraceEvent:
             for name in ("sequence", "commit_index", "commit_size")
         ):
             raise ValueError("trace event sequence fields must be integers")
-        nullable = ("operation_id", "parent_event_id")
+        nullable = {"operation_id", "parent_event_id"}
+        if payload.get("schema_version") == SCOPED_EVENT_SCHEMA:
+            nullable.update(("task_id", "trace_id"))
         if any(
             payload[name] is not None and not isinstance(payload[name], str)
             for name in nullable
         ):
             raise ValueError("trace event optional identities must be strings or null")
-        string_fields = expected - {
-            "sequence",
-            "commit_index",
-            "commit_size",
-            "operation_id",
-            "parent_event_id",
-            "artifact_refs",
-        }
+        string_fields = (
+            expected
+            - nullable
+            - {
+                "sequence",
+                "commit_index",
+                "commit_size",
+                "operation_id",
+                "parent_event_id",
+                "artifact_refs",
+            }
+        )
         if any(not isinstance(payload[name], str) for name in string_fields):
             raise ValueError("trace event fields have invalid types")
         refs = payload["artifact_refs"]
@@ -196,6 +272,8 @@ class TraceEvent:
             artifact_refs=tuple(refs),
             data_json=payload["data_json"],
             schema_version=payload["schema_version"],
+            event_scope=payload.get("event_scope", "task"),
+            agent_run_id=payload.get("agent_run_id"),
         )
 
 
@@ -228,10 +306,9 @@ class ExecutionStartedFact:
 
 
 @dataclass(frozen=True)
-class ExecutionFailedFact:
+class ExecutionDispatchFact:
     lease: ExecutionLease
-    failure_ref: str
-    failure_type: str
+    budget_decision: BudgetDecision
 
 
 @dataclass(frozen=True)
@@ -243,16 +320,34 @@ class AcceptanceFact:
 
 if TYPE_CHECKING:
     LifecycleFact = (
-        TaskStartedFact
+        _TaskStartCommand
         | TaskIngressFact
         | CompiledTask
         | TypedProposal
+        | ProposalNormalizationRejection
+        | SemanticAdmissionRejection
         | AdmittedOperation
+        | DomainAdmissionRejection
         | ExecutionLease
         | ExecutionStartedFact
+        | ExecutionDispatchFact
         | ExecutionReceipt
-        | ExecutionFailedFact
+        | EvidenceRejection
+        | ExecutionFailure
+        | BudgetDecision
+        | ExecutionCancellationDecision
+        | TaskTimeoutDecision
+        | RetryDecision
+        | OperationEdge
         | AcceptanceFact
+        | AgentRunAttached
+        | AgentRunTermination
+        | ModelAllocationDecision
+        | StartupPreflight
+        | ModelLeaseRelease
+        | ModelInvocationStarted
+        | RawModelOutput
+        | ModelInvocationFailure
     )
 else:
     LifecycleFact = object
@@ -261,6 +356,10 @@ else:
 @dataclass(frozen=True)
 class LifecycleCommit:
     events: tuple[TraceEvent, ...]
+
+
+class LifecycleSequenceConflict(ValueError):
+    """Raised when a snapshot-bound append loses its sequence race."""
 
 
 @dataclass(frozen=True)
@@ -407,6 +506,7 @@ _DIGEST_FIELDS = {
 class LifecycleReplay:
     events: tuple[TraceEvent, ...]
     terminal_status: str | None
+    failure_stage: str | None
     verified_trace_digest: VerifiedTraceDigest | None
 
 
@@ -417,29 +517,50 @@ class _TraceState:
     trace_id: str
     environment_ingress_artifact_id: str = ""
     task_ingress_decision_id: str = ""
+    task_started_at: str = ""
+    authoritative_task_start: bool = False
     compiled_task_id: str | None = None
     domain_contract_pack_revision: str | None = None
     role_id: str | None = None
     frame_id: str | None = None
     registry_version: str | None = None
     terminal_status: str | None = None
+    failure_stage: str | None = None
     last_event_id: str | None = None
     event_types: list[str] = field(default_factory=list)
     leased_operation_ids: set[str] = field(default_factory=set)
     started_operation_ids: set[str] = field(default_factory=set)
     terminal_operation_ids: set[str] = field(default_factory=set)
     evidence_artifact_ids: set[str] = field(default_factory=set)
+    evidence_issued_operation_ids: set[str] = field(default_factory=set)
+    evidence_rejected_operation_ids: set[str] = field(default_factory=set)
     proposal_by_operation: dict[str, str] = field(default_factory=dict)
+    rejected_operation_ids: set[str] = field(default_factory=set)
     admission_by_operation: dict[str, str] = field(default_factory=dict)
+    current_admission_operation_ids: set[str] = field(default_factory=set)
     object_by_operation: dict[str, str] = field(default_factory=dict)
     binding_by_operation: dict[str, str] = field(default_factory=dict)
     owner_by_operation: dict[str, str] = field(default_factory=dict)
+    frame_by_operation: dict[str, str] = field(default_factory=dict)
     lease_by_operation: dict[str, str] = field(default_factory=dict)
+    lease_owner_by_operation: dict[str, str] = field(default_factory=dict)
     result_by_operation: dict[str, str] = field(default_factory=dict)
+    operation_edges: set[tuple[str, str, str]] = field(default_factory=set)
+    budget_limits: dict[str, int] = field(default_factory=dict)
+    budget_consumed: dict[str, int] = field(default_factory=dict)
+    budget_subjects: set[tuple[str, str]] = field(default_factory=set)
+    tool_budget_granted_operation_ids: set[str] = field(default_factory=set)
+    model_budget_granted_invocation_ids: set[str] = field(default_factory=set)
+    task_timed_out: bool = False
+    timeout_decision_ids: set[str] = field(default_factory=set)
+    last_timeout_observed_at: datetime | None = None
+    failure_by_operation: dict[str, tuple[str, str]] = field(default_factory=dict)
+    retry_decided_failure_ids: set[str] = field(default_factory=set)
+    retry_target_operation_ids: set[str] = field(default_factory=set)
 
 
 class LifecycleLedger:
-    """Single-writer lifecycle authority with replay-derived trace digests."""
+    """Append-only lifecycle authority with coordinated file-backed writers."""
 
     def __init__(
         self,
@@ -469,8 +590,16 @@ class LifecycleLedger:
                 expected_sequence is not None
                 and expected_sequence != self.next_sequence
             ):
-                raise ValueError("lifecycle ledger sequence conflict")
-            specs = _event_specs(fact)
+                raise LifecycleSequenceConflict("lifecycle ledger sequence conflict")
+            from ab_harness.task_ingress_authority import _TaskStartCommand
+
+            if isinstance(fact, TaskStartedFact):
+                raise ValueError("new starts require an authority-bound task-start command")
+            if type(fact) is _TaskStartCommand:
+                specs = _event_specs(fact.require_fact(self))
+                specs[0]["data"]["task_start_authority"] = TASK_START_AUTHORITY
+            else:
+                specs = _event_specs(fact)
             if not specs:
                 raise ValueError("lifecycle fact produced no events")
             staged: list[TraceEvent] = []
@@ -488,7 +617,16 @@ class LifecycleLedger:
                 trace_events = tuple(
                     event
                     for event in (*existing, *staged)
-                    if event.trace_id == spec["trace_id"]
+                    if (
+                        event.event_scope == "agent"
+                        and spec.get("event_scope") == "agent"
+                        and event.agent_run_id == spec["agent_run_id"]
+                    )
+                    or (
+                        event.event_scope == "task"
+                        and spec.get("event_scope", "task") == "task"
+                        and event.trace_id == spec["trace_id"]
+                    )
                 )
                 parent_event_id = trace_events[-1].event_id if trace_events else None
                 staged.append(
@@ -503,13 +641,54 @@ class LifecycleLedger:
                     )
                 )
             combined = (*existing, *staged)
-            _reduce_events(tuple(combined))
+            _reduce_events(tuple(combined), active_from_sequence=len(existing) + 1)
             self._append(staged)
             self._events.extend(staged)
-            return LifecycleCommit(events=tuple(staged))
+            return LifecycleCommit(events=tuple(replace(event) for event in staged))
 
     def start_execution(self, lease: ExecutionLease) -> LifecycleCommit:
-        return self.record(ExecutionStartedFact(lease))
+        from ab_harness.domain_lifecycle import ExecutionLease
+        from ab_harness.runtime_controls import BudgetExhaustedError
+        from ab_harness.runtime_controls import TaskBudgetAuthority
+
+        ExecutionLease.verify_identity(lease)
+        authority = TaskBudgetAuthority(self)
+        for attempt in range(2):
+            assessment = authority.assess(
+                trace_id=lease.admitted_operation.trace_id,
+                resource="tool_call",
+                subject_id=lease.operation_id,
+            )
+            decision = assessment.decision
+            if decision.outcome == "exhausted":
+                if not assessment.already_recorded:
+                    try:
+                        self.record(
+                            decision,
+                            expected_sequence=assessment.expected_sequence,
+                        )
+                    except LifecycleSequenceConflict:
+                        if not attempt:
+                            continue
+                        raise
+                raise BudgetExhaustedError(
+                    "tool_call budget exhausted for %s" % lease.operation_id
+                )
+            fact: LifecycleFact
+            if assessment.already_recorded:
+                fact = ExecutionStartedFact(lease)
+            else:
+                fact = ExecutionDispatchFact(lease, decision)
+            try:
+                return self.record(
+                    fact,
+                    expected_sequence=assessment.expected_sequence,
+                )
+            except LifecycleSequenceConflict:
+                if not attempt:
+                    continue
+                raise
+        raise RuntimeError("execution dispatch retry exhausted")
 
     def complete_execution(self, receipt: ExecutionReceipt) -> LifecycleCommit:
         return self.record(receipt)
@@ -524,18 +703,35 @@ class LifecycleLedger:
             "execution-failure",
             {"failure_type": failure_type, "message": str(error)},
         )
+        from ab_harness.runtime_controls import ExecutionFailure
+
         return self.record(
-            ExecutionFailedFact(
+            ExecutionFailure.issue(
                 lease=lease,
                 failure_ref=failure_ref,
-                failure_type=failure_type,
+                failure_code=failure_type,
+                failure_stage="native_execution",
+                retry_disposition="terminal",
             )
         )
 
     def events(self) -> tuple[TraceEvent, ...]:
         with self._file_lock():
             self._refresh_from_disk()
-            return tuple(self._events)
+            return tuple(replace(event) for event in self._events)
+
+    def require_authoritative_task_start(self, *, trace_id: str, decision_id: str) -> None:
+        """Require a persisted issuer-controlled start, not legacy hash agreement."""
+        with self._file_lock():
+            self._refresh_from_disk()
+            if not any(
+                event.trace_id == trace_id
+                and event.event_type == "task_started"
+                and event.data.get("decision_id") == decision_id
+                and event.data.get("task_start_authority") == TASK_START_AUTHORITY
+                for event in self._events
+            ):
+                raise ValueError("fresh compilation requires authoritative task-start provenance")
 
     def has_operation_event(
         self,
@@ -553,6 +749,55 @@ class LifecycleLedger:
                 for event in self._events
             )
 
+    def execution_lease_identity(
+        self,
+        *,
+        trace_id: str,
+        operation_id: str,
+    ) -> tuple[str, str] | None:
+        """Return the recorded admission and lease IDs for one operation."""
+
+        with self._file_lock():
+            self._refresh_from_disk()
+            event = next(
+                (
+                    event
+                    for event in reversed(self._events)
+                    if event.trace_id == trace_id
+                    and event.operation_id == operation_id
+                    and event.event_type == "domain_admission_leased"
+                ),
+                None,
+            )
+            if event is None:
+                return None
+            admission_id = event.data.get("admission_id")
+            execution_lease_id = event.data.get("execution_lease_id")
+            if not isinstance(admission_id, str) or not isinstance(
+                execution_lease_id, str
+            ):
+                raise ValueError("recorded execution lease identity is invalid")
+            return admission_id, execution_lease_id
+
+    def require_current_admission(self, admitted_operation: AdmittedOperation) -> None:
+        """Require the exact full semantic artifact recorded for active use."""
+        from ab_harness.proposal_admission import AdmittedOperation
+
+        admitted_operation = AdmittedOperation.verified_copy(admitted_operation)
+        with self._file_lock():
+            self._refresh_from_disk()
+            event = next((
+                event for event in reversed(self._events)
+                if event.trace_id == admitted_operation.trace_id
+                and event.operation_id == admitted_operation.operation_id
+                and event.event_type == "semantic_admission_accepted"
+            ), None)
+            if event is None or "admitted_operation" not in event.data:
+                raise ValueError("active execution requires current semantic provenance")
+            recorded = AdmittedOperation.from_dict(event.data["admitted_operation"])
+            if AdmittedOperation.to_dict(recorded) != AdmittedOperation.to_dict(admitted_operation):
+                raise ValueError("active execution requires the exact admitted operation in recorded semantic provenance")
+
     def replay(self, trace_id: str) -> LifecycleReplay:
         with self._file_lock():
             self._refresh_from_disk()
@@ -561,16 +806,30 @@ class LifecycleLedger:
             )
             if not events:
                 raise KeyError(trace_id)
-            states = _reduce_events(events, require_global_sequence=False)
+            states = _reduce_events(tuple(self._events))
             state = states[trace_id]
             digest = (
                 _digest(events, state) if state.terminal_status is not None else None
             )
             return LifecycleReplay(
-                events=events,
+                events=tuple(replace(event) for event in events),
                 terminal_status=state.terminal_status,
+                failure_stage=state.failure_stage,
                 verified_trace_digest=digest,
             )
+
+    def agent_runs(self) -> tuple[AgentRunReplay, ...]:
+        from ab_harness.agent_lifecycle import replay_agent_runs
+
+        with self._file_lock():
+            self._refresh_from_disk()
+            return replay_agent_runs(tuple(replace(event) for event in self._events))
+
+    def replay_agent_run(self, agent_run_id: str) -> AgentRunReplay:
+        for replay in self.agent_runs():
+            if replay.run.agent_run_id == agent_run_id:
+                return replay
+        raise KeyError(agent_run_id)
 
     def _file_lock(self) -> _LedgerFileLock | _NullLedgerLock:
         if self.path is None:
@@ -693,12 +952,14 @@ def _new_event(
     recorded_at: str,
     event_type: str,
     environment_run_id: str,
-    task_id: str,
-    trace_id: str,
+    task_id: str | None,
+    trace_id: str | None,
     operation_id: str | None,
     parent_event_id: str | None,
     artifact_refs: tuple[str, ...],
     data: dict[str, object],
+    event_scope: str = "task",
+    agent_run_id: str | None = None,
 ) -> TraceEvent:
     fields = {
         "schema_version": TRACE_EVENT_SCHEMA,
@@ -716,6 +977,12 @@ def _new_event(
         "artifact_refs": artifact_refs,
         "data_json": _canonical_json(data),
     }
+    if agent_run_id is not None:
+        fields.update(
+            schema_version=SCOPED_EVENT_SCHEMA,
+            event_scope=event_scope,
+            agent_run_id=agent_run_id,
+        )
     return TraceEvent(
         event_id=_content_id("trace-event", fields),
         **fields,
@@ -723,12 +990,57 @@ def _new_event(
 
 
 def _event_specs(fact: LifecycleFact) -> tuple[dict[str, object], ...]:
+    from ab_harness.agent_lifecycle import (
+        AgentRunAttached,
+        attachment_spec,
+        model_allocation_spec,
+        startup_specs,
+        release_spec,
+    )
+    from ab_harness.agent_lifecycle import AgentRunTermination, termination_specs
+    from ab_harness.model_allocator import (
+        ModelAllocationDecision,
+        StartupPreflight,
+        ModelLeaseRelease,
+    )
+    from ab_harness.domain_lifecycle import DomainAdmissionRejection
     from ab_harness.domain_lifecycle import ExecutionLease
     from ab_harness.environment import ExecutionReceipt
+    from ab_harness.environment import EvidenceRejection
+    from ab_harness.operation_edges import OperationEdge
     from ab_harness.proposal_admission import AdmittedOperation
+    from ab_harness.proposal_admission import ProposalNormalizationRejection
+    from ab_harness.proposal_admission import SemanticAdmissionRejection
     from ab_harness.proposal_admission import TypedProposal
+    from ab_harness.runtime_controls import BudgetDecision
+    from ab_harness.runtime_controls import ExecutionCancellationDecision
+    from ab_harness.runtime_controls import ExecutionFailure
+    from ab_harness.runtime_controls import RetryDecision
+    from ab_harness.runtime_controls import TaskTimeoutDecision
     from ab_harness.task_compiler import CompiledTask
+    from ab_harness.model_invocation import (
+        ModelInvocationStarted,
+        RawModelOutput,
+        ModelInvocationFailure,
+        invocation_spec,
+    )
 
+    if isinstance(fact, ModelInvocationStarted):
+        fact.validate()
+        return (*_event_specs(fact.budget_decision), invocation_spec(fact.request))
+    if isinstance(fact, (RawModelOutput, ModelInvocationFailure)):
+        fact.verify_identity()
+        return (invocation_spec(fact),)
+    if isinstance(fact, AgentRunAttached):
+        return (attachment_spec(fact),)
+    if isinstance(fact, AgentRunTermination):
+        return termination_specs(fact)
+    if isinstance(fact, ModelAllocationDecision):
+        return (model_allocation_spec(fact),)
+    if isinstance(fact, StartupPreflight):
+        return startup_specs(fact)
+    if isinstance(fact, ModelLeaseRelease):
+        return (release_spec(fact),)
     if isinstance(fact, TaskStartedFact):
         return (
             _spec(
@@ -778,6 +1090,17 @@ def _event_specs(fact: LifecycleFact) -> tuple[dict[str, object], ...]:
                 },
             ),
         )
+    if isinstance(fact, ExecutionDispatchFact):
+        if (
+            fact.budget_decision.resource != "tool_call"
+            or fact.budget_decision.subject_id != fact.lease.operation_id
+            or fact.budget_decision.outcome != "granted"
+        ):
+            raise ValueError("execution dispatch requires its granted tool-call budget")
+        return (
+            *_event_specs(fact.budget_decision),
+            *_event_specs(ExecutionStartedFact(fact.lease)),
+        )
     if isinstance(fact, CompiledTask):
         fact.verify_identity()
         return (
@@ -793,11 +1116,12 @@ def _event_specs(fact: LifecycleFact) -> tuple[dict[str, object], ...]:
                     "role_id": fact.interaction_module.role.role_id,
                     "frame_id": fact.interaction_module.frame.frame_id,
                     "registry_version": fact.interaction_module.frame.registry_version,
+                    "budgets": asdict(fact.budgets),
                 },
             ),
         )
     if isinstance(fact, TypedProposal):
-        fact.verify_identity()
+        fact = TypedProposal.verified_copy(fact)
         return (
             _operation_spec(
                 fact,
@@ -814,8 +1138,43 @@ def _event_specs(fact: LifecycleFact) -> tuple[dict[str, object], ...]:
                 },
             ),
         )
-    if isinstance(fact, AdmittedOperation):
+    if isinstance(fact, ProposalNormalizationRejection):
         fact.verify_identity()
+        artifact_refs = (fact.rejection_id, fact.compiled_task_id)
+        if fact.raw_output_artifact_id is not None:
+            artifact_refs = (*artifact_refs, fact.raw_output_artifact_id)
+        return (
+            _spec(
+                event_type="proposal_rejected",
+                environment_run_id=fact.environment_run_id,
+                task_id=fact.task_id,
+                trace_id=fact.trace_id,
+                operation_id=fact.operation_id,
+                artifact_refs=artifact_refs,
+                data=fact.to_dict(),
+            ),
+        )
+    if isinstance(fact, SemanticAdmissionRejection):
+        fact.verify_identity()
+        return (
+            _operation_spec(
+                fact.proposal,
+                event_type="semantic_admission_rejected",
+                artifact_refs=(
+                    fact.rejection_id,
+                    fact.proposal.proposal_id,
+                    fact.compiled_task_id,
+                ),
+                data={
+                    "rejection_id": fact.rejection_id,
+                    "proposal_id": fact.proposal.proposal_id,
+                    "compiled_task_id": fact.compiled_task_id,
+                    "reason_codes": fact.reason_codes,
+                },
+            ),
+        )
+    if isinstance(fact, AdmittedOperation):
+        fact = AdmittedOperation.verified_copy(fact)
         return (
             _operation_spec(
                 fact.proposal,
@@ -823,17 +1182,42 @@ def _event_specs(fact: LifecycleFact) -> tuple[dict[str, object], ...]:
                 artifact_refs=(fact.admission_id, fact.proposal_id),
                 data={
                     "admission_id": fact.admission_id,
+                    "schema_version": fact.schema_version,
+                    "object_snapshot": asdict(fact.object_snapshot),
+                    "admitted_operation": fact.to_dict(),
                     "proposal_id": fact.proposal_id,
                     "object_id": fact.object_id,
                     "binding_id": fact.binding_id,
                     "binding_owner": fact.binding_owner,
+                    "input_schema_id": fact.input_schema_id,
                     "ab_level": fact.ab_level,
                     "frame_id": fact.frame_id,
                 },
             ),
         )
+    if isinstance(fact, DomainAdmissionRejection):
+        DomainAdmissionRejection.verify_identity(fact)
+        admitted = fact.admitted_operation
+        return (
+            _operation_spec(
+                admitted.proposal,
+                event_type="domain_admission_rejected",
+                artifact_refs=(
+                    fact.rejection_id,
+                    admitted.admission_id,
+                    fact.environment_attestation_id,
+                ),
+                data={
+                    "rejection_id": fact.rejection_id,
+                    "admission_id": admitted.admission_id,
+                    "environment_attestation_id": fact.environment_attestation_id,
+                    "environment_id": fact.environment_id,
+                    "reason_codes": fact.reason_codes,
+                },
+            ),
+        )
     if isinstance(fact, ExecutionLease):
-        fact.verify_identity()
+        fact = ExecutionLease.verified_copy(fact)
         admitted = fact.admitted_operation
         return (
             _operation_spec(
@@ -855,7 +1239,7 @@ def _event_specs(fact: LifecycleFact) -> tuple[dict[str, object], ...]:
         )
     if isinstance(fact, ExecutionStartedFact):
         lease = fact.lease
-        lease.verify_identity()
+        ExecutionLease.verify_identity(lease)
         return (
             _operation_spec(
                 lease.admitted_operation.proposal,
@@ -904,18 +1288,167 @@ def _event_specs(fact: LifecycleFact) -> tuple[dict[str, object], ...]:
             **common,
         )
         return completed, evidence
-    if isinstance(fact, ExecutionFailedFact):
+    if isinstance(fact, EvidenceRejection):
+        fact.verify_identity()
         lease = fact.lease
-        lease.verify_identity()
+        common = {
+            "environment_run_id": fact.environment_run_id,
+            "task_id": fact.task_id,
+            "trace_id": fact.trace_id,
+            "operation_id": fact.operation_id,
+        }
+        completed = _spec(
+            event_type="execution_completed",
+            artifact_refs=(fact.execution_result_id, lease.execution_lease_id),
+            data={
+                "execution_result_id": fact.execution_result_id,
+                "execution_lease_id": lease.execution_lease_id,
+                "admission_id": lease.admission_id,
+                "object_id": lease.object_id,
+                "binding_id": lease.binding_id,
+                "owner": lease.admitted_operation.binding_owner,
+                "succeeded": fact.owner_result.succeeded,
+            },
+            **common,
+        )
+        rejected = _spec(
+            event_type="evidence_rejected",
+            artifact_refs=(fact.rejection_id, fact.execution_result_id),
+            data={
+                "rejection_id": fact.rejection_id,
+                "execution_result_id": fact.execution_result_id,
+                "execution_lease_id": lease.execution_lease_id,
+                "object_id": lease.object_id,
+                "binding_id": lease.binding_id,
+                "owner": lease.admitted_operation.binding_owner,
+                "native_evidence_ref": fact.owner_result.evidence_ref,
+                "reason_codes": fact.reason_codes,
+            },
+            **common,
+        )
+        return completed, rejected
+    if isinstance(fact, ExecutionFailure):
+        fact.verify_identity()
+        lease = fact.lease
         return (
             _operation_spec(
                 lease.admitted_operation.proposal,
                 event_type="execution_failed",
-                artifact_refs=(lease.execution_lease_id, fact.failure_ref),
+                artifact_refs=(
+                    lease.execution_lease_id,
+                    fact.failure_id,
+                    fact.failure_ref,
+                ),
                 data={
                     "execution_lease_id": lease.execution_lease_id,
+                    "failure_id": fact.failure_id,
                     "failure_ref": fact.failure_ref,
-                    "failure_type": fact.failure_type,
+                    "failure_code": fact.failure_code,
+                    "failure_stage": fact.failure_stage,
+                    "retry_disposition": fact.retry_disposition,
+                },
+            ),
+        )
+    if isinstance(fact, OperationEdge):
+        fact.verify_identity()
+        artifact_refs = (fact.edge_id,)
+        if fact.artifact_contract_ref is not None:
+            artifact_refs = (*artifact_refs, fact.artifact_contract_ref)
+        return (
+            _spec(
+                event_type="operation_edge_recorded",
+                environment_run_id=fact.environment_run_id,
+                task_id=fact.task_id,
+                trace_id=fact.trace_id,
+                operation_id=fact.source_operation_id,
+                artifact_refs=artifact_refs,
+                data=fact.to_dict(),
+            ),
+        )
+    if isinstance(fact, BudgetDecision):
+        fact.verify_identity()
+        return (
+            _spec(
+                event_type="budget_%s" % fact.outcome,
+                environment_run_id=fact.environment_run_id,
+                task_id=fact.task_id,
+                trace_id=fact.trace_id,
+                operation_id=(
+                    fact.subject_id if fact.resource == "tool_call" else None
+                ),
+                artifact_refs=(fact.decision_id, fact.compiled_task_id),
+                data=fact.to_dict(),
+            ),
+        )
+    if isinstance(fact, ExecutionCancellationDecision):
+        fact.verify_identity()
+        lease = fact.lease
+        return (
+            _operation_spec(
+                lease.admitted_operation.proposal,
+                event_type="execution_cancelled",
+                artifact_refs=(
+                    fact.decision_id,
+                    lease.execution_lease_id,
+                    fact.request_artifact_id,
+                ),
+                data={
+                    "decision_id": fact.decision_id,
+                    "execution_lease_id": lease.execution_lease_id,
+                    "requester_id": fact.requester_id,
+                    "request_artifact_id": fact.request_artifact_id,
+                    "deciding_owner_id": fact.deciding_owner_id,
+                    "phase": fact.phase,
+                    "outcome": fact.outcome,
+                    "reason_code": fact.reason_code,
+                },
+            ),
+        )
+    if isinstance(fact, TaskTimeoutDecision):
+        fact.verify_identity()
+        compiled = fact.compiled_task
+        return (
+            _spec(
+                event_type="task_timeout_recorded",
+                environment_run_id=compiled.environment_run_id,
+                task_id=compiled.task_id,
+                trace_id=compiled.trace_id,
+                artifact_refs=(fact.decision_id, compiled.compiled_task_id),
+                data={
+                    "decision_id": fact.decision_id,
+                    "compiled_task_id": compiled.compiled_task_id,
+                    "task_started_at": fact.task_started_at,
+                    "deadline_at": fact.deadline_at,
+                    "observed_at": fact.observed_at,
+                    "policy_revision": fact.policy_revision,
+                    "outcome": fact.outcome,
+                },
+            ),
+        )
+    if isinstance(fact, RetryDecision):
+        fact.verify_identity()
+        return (
+            _spec(
+                event_type="retry_%s" % fact.outcome,
+                environment_run_id=fact.environment_run_id,
+                task_id=fact.task_id,
+                trace_id=fact.trace_id,
+                operation_id=fact.source_operation_id,
+                artifact_refs=(
+                    fact.decision_id,
+                    fact.source_failure_id,
+                    fact.compiled_task_id,
+                ),
+                data={
+                    "decision_id": fact.decision_id,
+                    "compiled_task_id": fact.compiled_task_id,
+                    "source_failure_id": fact.source_failure_id,
+                    "source_operation_id": fact.source_operation_id,
+                    "target_operation_id": fact.target_operation_id,
+                    "attempt_ordinal": fact.attempt_ordinal,
+                    "retry_limit": fact.retry_limit,
+                    "policy_revision": fact.policy_revision,
+                    "outcome": fact.outcome,
                 },
             ),
         )
@@ -1037,12 +1570,17 @@ def _reduce_events(
     events: tuple[TraceEvent, ...],
     *,
     require_global_sequence: bool = True,
+    active_from_sequence: int | None = None,
 ) -> dict[str, _TraceState]:
     _validate_commit_frames(events)
+    from ab_harness.agent_lifecycle import apply_agent_event, apply_invocation_event
+
     states: dict[str, _TraceState] = {}
+    agent_states = {}
     known_event_ids: set[str] = set()
     known_task_ingress: set[tuple[str, str]] = set()
     for index, event in enumerate(events, start=1):
+        event.verify_identity()
         if require_global_sequence and event.sequence != index:
             raise ValueError("lifecycle event sequence is not contiguous")
         if event.event_id in known_event_ids:
@@ -1052,6 +1590,10 @@ def _reduce_events(
             and event.parent_event_id not in known_event_ids
         ):
             raise ValueError("lifecycle parent event is not available")
+        if event.event_scope == "agent":
+            apply_agent_event(agent_states, event)
+            known_event_ids.add(event.event_id)
+            continue
         if event.event_type in {"task_started", "task_resumed", "task_notified"}:
             ingress_id = event.data.get("environment_ingress_id")
             if not isinstance(ingress_id, str) or not ingress_id.strip():
@@ -1072,6 +1614,11 @@ def _reduce_events(
                 trace_id=event.trace_id,
                 environment_ingress_artifact_id=str(event.data["ingress_artifact_id"]),
                 task_ingress_decision_id=str(event.data["decision_id"]),
+                task_started_at=event.recorded_at,
+                authoritative_task_start=(
+                    event.data.get("task_start_authority")
+                    == TASK_START_AUTHORITY
+                ),
                 domain_contract_pack_revision=str(
                     event.data["domain_contract_pack_revision"]
                 ),
@@ -1089,10 +1636,63 @@ def _reduce_events(
                 raise ValueError("trace parent event does not match causal tail")
             if state.terminal_status is not None:
                 raise ValueError("lifecycle event occurs after terminal task judgment")
+        if (
+            event.event_type.startswith("model_invocation_")
+            and event.agent_run_id is None
+        ):
+            raise ValueError("model invocation requires explicit actor identity")
+        if event.event_type == "model_invocation_started":
+            previous = events[index - 2] if index > 1 else None
+            if (
+                previous is None
+                or previous.commit_id != event.commit_id
+                or previous.trace_id != event.trace_id
+                or previous.task_id != event.task_id
+                or previous.environment_run_id != event.environment_run_id
+                or previous.event_type != "budget_granted"
+                or previous.data.get("resource") != "model_call"
+                or previous.data.get("subject_id")
+                != event.data["request"]["invocation_id"]
+                or previous.data.get("units") != 1
+                or type(previous.data.get("units")) is not int
+            ):
+                raise ValueError(
+                    "model invocation requires an atomic model-call budget grant"
+                )
+        if (
+            event.event_type.startswith("terminal_task_")
+            or event.event_type == "task_suspended"
+        ):
+            if any(
+                actor.status == "invoking"
+                and actor.invocations[-1].trace_id == event.trace_id
+                for actor in agent_states.values()
+            ):
+                raise ValueError("task judgment requires settled model invocations")
+        if event.agent_run_id is not None:
+            _validate_model_task_event(state, event)
+            apply_invocation_event(agent_states, event)
+        if active_from_sequence is not None and event.sequence >= active_from_sequence:
+            _require_current_event_authority(state, event)
         _apply_event(state, event)
         state.last_event_id = event.event_id
         known_event_ids.add(event.event_id)
     return states
+
+
+def _require_current_event_authority(state: _TraceState, event: TraceEvent) -> None:
+    if event.event_type == "task_compiled" and not state.authoritative_task_start:
+        raise ValueError("fresh compilation requires authoritative task-start provenance")
+    operation_id = event.operation_id
+    if event.event_type.startswith(("domain_admission_", "execution_", "evidence_")):
+        if operation_id not in state.current_admission_operation_ids:
+            raise ValueError("new active fact requires current semantic provenance")
+    if event.event_type == "budget_granted" and event.data.get("resource") == "tool_call":
+        if event.data.get("subject_id") not in state.current_admission_operation_ids:
+            raise ValueError("tool dispatch requires current semantic provenance")
+    if event.event_type in {"terminal_task_accepted", "terminal_task_accepted_with_deficit"}:
+        if not state.evidence_issued_operation_ids <= state.current_admission_operation_ids:
+            raise ValueError("current task success requires current semantic provenance")
 
 
 def _validate_commit_frames(events: tuple[TraceEvent, ...]) -> None:
@@ -1115,75 +1715,90 @@ def _validate_commit_frames(events: tuple[TraceEvent, ...]) -> None:
         offset = end
 
 
-_SUPPORTED_EVENT_TYPES = {
-    "task_started",
-    "task_compiled",
-    "task_resumed",
-    "task_notified",
-    "proposal_normalized",
-    "semantic_admission_accepted",
-    "domain_admission_leased",
-    "execution_started",
-    "execution_completed",
-    "execution_failed",
-    "evidence_issued",
-    "effect_obligation_satisfied",
-    "effect_obligation_failed",
-    "effect_obligation_pending",
-    "terminal_task_accepted",
-    "terminal_task_accepted_with_deficit",
-    "terminal_task_rejected",
-    "task_suspended",
-}
-_EVENT_PREREQUISITES = {
-    "task_compiled": "task_started",
-    "task_resumed": "task_started",
-    "task_notified": "task_started",
-    "proposal_normalized": "task_compiled",
-    "semantic_admission_accepted": "proposal_normalized",
-    "domain_admission_leased": "semantic_admission_accepted",
-    "execution_started": "domain_admission_leased",
-    "execution_completed": "execution_started",
-    "execution_failed": "execution_started",
-    "evidence_issued": "execution_completed",
-    "effect_obligation_satisfied": "evidence_issued",
-    "effect_obligation_pending": "task_compiled",
-    "terminal_task_accepted": "effect_obligation_satisfied",
-    "terminal_task_accepted_with_deficit": "effect_obligation_failed",
-    "terminal_task_rejected": "effect_obligation_failed",
-    "task_suspended": "effect_obligation_pending",
-}
-_OPERATION_EVENT_TYPES = {
-    "proposal_normalized",
-    "semantic_admission_accepted",
-    "domain_admission_leased",
-    "execution_started",
-    "execution_completed",
-    "execution_failed",
-    "evidence_issued",
-}
+@dataclass(frozen=True)
+class _EventRule:
+    prerequisite: str | None = None
+    operation_scoped: bool = False
+
+
+_EVENT_RULES = MappingProxyType(
+    {
+        "task_started": _EventRule(),
+        "task_compiled": _EventRule("task_started"),
+        "model_invocation_started": _EventRule("task_compiled"),
+        "model_invocation_completed": _EventRule("model_invocation_started"),
+        "model_invocation_failed": _EventRule("model_invocation_started"),
+        "task_resumed": _EventRule("task_started"),
+        "task_notified": _EventRule("task_started"),
+        "proposal_normalized": _EventRule("task_compiled", True),
+        "proposal_rejected": _EventRule("task_compiled"),
+        "semantic_admission_accepted": _EventRule("proposal_normalized", True),
+        "semantic_admission_rejected": _EventRule("proposal_normalized", True),
+        "domain_admission_leased": _EventRule("semantic_admission_accepted", True),
+        "domain_admission_rejected": _EventRule("semantic_admission_accepted", True),
+        "execution_started": _EventRule("domain_admission_leased", True),
+        "execution_completed": _EventRule("execution_started", True),
+        "execution_failed": _EventRule("execution_started", True),
+        "execution_cancelled": _EventRule("domain_admission_leased", True),
+        "evidence_issued": _EventRule("execution_completed", True),
+        "evidence_rejected": _EventRule("execution_completed", True),
+        "operation_edge_recorded": _EventRule("proposal_normalized", True),
+        "budget_granted": _EventRule("task_compiled"),
+        "budget_exhausted": _EventRule("task_compiled"),
+        "task_timeout_recorded": _EventRule("task_compiled"),
+        "retry_approved": _EventRule("execution_failed", True),
+        "retry_not_retryable": _EventRule("execution_failed", True),
+        "retry_exhausted": _EventRule("execution_failed", True),
+        "effect_obligation_satisfied": _EventRule("evidence_issued"),
+        "effect_obligation_failed": _EventRule(),
+        "effect_obligation_pending": _EventRule("task_compiled"),
+        "terminal_task_accepted": _EventRule("effect_obligation_satisfied"),
+        "terminal_task_accepted_with_deficit": _EventRule("effect_obligation_failed"),
+        "terminal_task_rejected": _EventRule("effect_obligation_failed"),
+        "task_suspended": _EventRule("effect_obligation_pending"),
+    }
+)
 
 
 def _apply_event(state: _TraceState, event: TraceEvent) -> None:
-    if event.event_type not in _SUPPORTED_EVENT_TYPES:
+    rule = _EVENT_RULES.get(event.event_type)
+    if rule is None:
         raise ValueError("unsupported lifecycle event type: %s" % event.event_type)
     data = event.data
-    _validate_event_prerequisite(state, event.event_type, data)
-    operation_id = _event_operation_id(event)
+    _validate_event_prerequisite(state, event.event_type, data, rule)
+    operation_id = _event_operation_id(event, rule)
     if event.event_type == "task_compiled":
         _apply_compiled_task(state, data)
     elif event.event_type == "proposal_normalized":
         _apply_proposal(state, operation_id, data)
+    elif event.event_type == "proposal_rejected":
+        _apply_normalization_rejection(state, event.operation_id, data)
     elif event.event_type == "semantic_admission_accepted":
         _apply_semantic_admission(state, operation_id, data)
+    elif event.event_type == "semantic_admission_rejected":
+        _apply_semantic_rejection(state, operation_id, data)
     elif event.event_type == "domain_admission_leased":
         _apply_execution_lease(state, operation_id, data)
+    elif event.event_type == "domain_admission_rejected":
+        _apply_domain_rejection(state, operation_id, data)
     elif event.event_type == "execution_started":
         _apply_execution_start(state, operation_id, data)
     elif event.event_type in {"execution_completed", "execution_failed"}:
         _apply_execution_terminal(state, event.event_type, operation_id, data)
+    elif event.event_type == "execution_cancelled":
+        _apply_execution_cancellation(state, operation_id, data)
     elif event.event_type == "evidence_issued":
         _apply_evidence(state, operation_id, data)
+    elif event.event_type == "evidence_rejected":
+        _apply_evidence_rejection(state, operation_id, data)
+    elif event.event_type == "operation_edge_recorded":
+        _apply_operation_edge(state, operation_id, data)
+    elif event.event_type in {"budget_granted", "budget_exhausted"}:
+        _apply_budget_decision(state, event.event_type, data)
+    elif event.event_type == "task_timeout_recorded":
+        _apply_timeout_decision(state, data)
+    elif event.event_type.startswith("retry_"):
+        _apply_retry_decision(state, event.event_type, operation_id, data)
     if event.event_type.startswith("terminal_task_") or (
         event.event_type == "task_suspended"
     ):
@@ -1191,16 +1806,49 @@ def _apply_event(state: _TraceState, event: TraceEvent) -> None:
     state.event_types.append(event.event_type)
 
 
+def _validate_model_task_event(state: _TraceState, event: TraceEvent) -> None:
+    from ab_harness.model_invocation import ModelInvocationRequest
+
+    request_data = event.data["request"]
+    request = ModelInvocationRequest.from_dict(request_data)
+    prompt = request.compiled_prompt
+    if (
+        prompt.compiled_task_id,
+        prompt.environment_run_id,
+        prompt.role_id,
+        prompt.frame_id,
+        prompt.registry_version,
+        prompt.domain_contract_pack_revision,
+    ) != (
+        state.compiled_task_id,
+        state.environment_run_id,
+        state.role_id,
+        state.frame_id,
+        state.registry_version,
+        state.domain_contract_pack_revision,
+    ):
+        raise ValueError("model invocation does not match recorded compiled task")
+    if event.event_type == "model_invocation_started":
+        if (
+            request.invocation_id not in state.model_budget_granted_invocation_ids
+            or state.task_timed_out
+        ):
+            raise ValueError(
+                "model invocation requires a granted model-call budget for an active task"
+            )
+    if event.event_type == "model_invocation_failed":
+        state.failure_stage = "model_invocation"
+
+
 def _validate_event_prerequisite(
     state: _TraceState,
     event_type: str,
     data: dict[str, object],
+    rule: _EventRule,
 ) -> None:
-    prerequisite = _EVENT_PREREQUISITES.get(event_type)
+    prerequisite = rule.prerequisite
     if prerequisite is not None and prerequisite not in state.event_types:
-        raise ValueError(
-            "lifecycle event %s requires %s" % (event_type, prerequisite)
-        )
+        raise ValueError("lifecycle event %s requires %s" % (event_type, prerequisite))
     if event_type == "effect_obligation_failed":
         failure_prerequisite = {
             "deficit": "task_compiled",
@@ -1215,8 +1863,8 @@ def _validate_event_prerequisite(
             )
 
 
-def _event_operation_id(event: TraceEvent) -> str:
-    if event.event_type not in _OPERATION_EVENT_TYPES:
+def _event_operation_id(event: TraceEvent, rule: _EventRule) -> str:
+    if not rule.operation_scoped:
         return ""
     if event.operation_id is None or not event.operation_id.strip():
         raise ValueError("operation lifecycle event requires an operation id")
@@ -1232,6 +1880,24 @@ def _apply_compiled_task(state: _TraceState, data: dict[str, object]) -> None:
     state.role_id = str(data["role_id"])
     state.frame_id = str(data["frame_id"])
     state.registry_version = str(data["registry_version"])
+    budgets = data.get("budgets")
+    if not isinstance(budgets, dict):
+        raise ValueError("compiled task requires budget limits")
+    expected_budget_keys = {
+        "wall_time_seconds",
+        "model_calls",
+        "tool_calls",
+        "retry_attempts",
+    }
+    if set(budgets) != expected_budget_keys or any(
+        type(value) is not int for value in budgets.values()
+    ):
+        raise ValueError("compiled task budget limits are invalid")
+    state.budget_limits = {str(name): value for name, value in budgets.items()}
+    state.budget_consumed = {
+        "model_call": 0,
+        "tool_call": 0,
+    }
 
 
 def _apply_proposal(
@@ -1243,7 +1909,30 @@ def _apply_proposal(
         raise ValueError("proposal does not match recorded compiled task")
     if operation_id in state.proposal_by_operation:
         raise ValueError("operation already has a normalized proposal")
+    if operation_id in state.rejected_operation_ids:
+        raise ValueError("rejected operation id cannot be normalized")
     state.proposal_by_operation[operation_id] = str(data["proposal_id"])
+
+
+def _apply_normalization_rejection(
+    state: _TraceState,
+    operation_id: str | None,
+    data: dict[str, object],
+) -> None:
+    from ab_harness.proposal_admission import ProposalNormalizationRejection
+
+    rejection = ProposalNormalizationRejection.from_dict(data)
+    if rejection.compiled_task_id != state.compiled_task_id:
+        raise ValueError("proposal rejection does not match compiled task")
+    if operation_id != rejection.operation_id:
+        raise ValueError("proposal rejection event operation does not match artifact")
+    if operation_id is not None:
+        if operation_id in state.proposal_by_operation:
+            raise ValueError("normalized operation cannot later be rejected")
+        if operation_id in state.rejected_operation_ids:
+            raise ValueError("operation already has a proposal rejection")
+        state.rejected_operation_ids.add(operation_id)
+    state.failure_stage = "proposal_normalization"
 
 
 def _apply_semantic_admission(
@@ -1251,6 +1940,40 @@ def _apply_semantic_admission(
     operation_id: str,
     data: dict[str, object],
 ) -> None:
+    from ab_harness.proposal_admission import AdmittedOperation
+    from ab_harness.proposal_admission import ADMITTED_OPERATION_SCHEMA
+
+    if any(
+        name in data for name in ("admitted_operation", "object_snapshot", "schema_version")
+    ):
+        if data.get("schema_version") != ADMITTED_OPERATION_SCHEMA:
+            raise ValueError("unsupported recorded admitted operation schema")
+        admitted = AdmittedOperation.from_dict(data.get("admitted_operation"))
+        aliases = {
+            "admission_id": admitted.admission_id,
+            "proposal_id": admitted.proposal_id,
+            "object_id": admitted.object_id,
+            "binding_id": admitted.binding_id,
+            "binding_owner": admitted.binding_owner,
+            "input_schema_id": admitted.input_schema_id,
+            "ab_level": admitted.ab_level,
+            "frame_id": admitted.frame_id,
+            "object_snapshot": admitted.to_dict()["object_snapshot"],
+        }
+        if any(
+            _canonical_json(data.get(name)) != _canonical_json(value)
+            for name, value in aliases.items()
+        ):
+            raise ValueError("recorded snapshot does not match admitted operation")
+        if (
+            admitted.compiled_task_id != state.compiled_task_id
+            or admitted.environment_run_id != state.environment_run_id
+            or admitted.task_id != state.task_id
+            or admitted.trace_id != state.trace_id
+            or admitted.operation_id != operation_id
+        ):
+            raise ValueError("recorded admitted operation does not match trace lineage")
+        state.current_admission_operation_ids.add(operation_id)
     if data["proposal_id"] != state.proposal_by_operation.get(operation_id):
         raise ValueError("semantic admission does not match operation proposal")
     if operation_id in state.admission_by_operation:
@@ -1259,6 +1982,24 @@ def _apply_semantic_admission(
     state.object_by_operation[operation_id] = str(data["object_id"])
     state.binding_by_operation[operation_id] = str(data["binding_id"])
     state.owner_by_operation[operation_id] = str(data["binding_owner"])
+    state.frame_by_operation[operation_id] = str(data["frame_id"])
+
+
+def _apply_semantic_rejection(
+    state: _TraceState,
+    operation_id: str,
+    data: dict[str, object],
+) -> None:
+    if data["compiled_task_id"] != state.compiled_task_id:
+        raise ValueError("semantic rejection does not match compiled task")
+    if data["proposal_id"] != state.proposal_by_operation.get(operation_id):
+        raise ValueError("semantic rejection does not match operation proposal")
+    reason_codes = data["reason_codes"]
+    if not isinstance(reason_codes, list) or not reason_codes:
+        raise ValueError("semantic rejection requires reason codes")
+    if operation_id in state.admission_by_operation:
+        raise ValueError("accepted operation cannot be semantically rejected")
+    state.failure_stage = "semantic_admission"
 
 
 def _apply_execution_lease(
@@ -1272,6 +2013,22 @@ def _apply_execution_lease(
         raise ValueError("operation already has an execution lease")
     state.leased_operation_ids.add(operation_id)
     state.lease_by_operation[operation_id] = str(data["execution_lease_id"])
+    state.lease_owner_by_operation[operation_id] = str(data["lease_owner_id"])
+
+
+def _apply_domain_rejection(
+    state: _TraceState,
+    operation_id: str,
+    data: dict[str, object],
+) -> None:
+    if data["admission_id"] != state.admission_by_operation.get(operation_id):
+        raise ValueError("domain rejection does not match semantic admission")
+    reason_codes = data["reason_codes"]
+    if not isinstance(reason_codes, list) or not reason_codes:
+        raise ValueError("domain rejection requires reason codes")
+    if operation_id in state.leased_operation_ids:
+        raise ValueError("leased operation cannot later be domain rejected")
+    state.failure_stage = "domain_admission"
 
 
 def _apply_execution_start(
@@ -1283,8 +2040,14 @@ def _apply_execution_start(
         raise ValueError("execution started without a recorded lease")
     if data["execution_lease_id"] != state.lease_by_operation.get(operation_id):
         raise ValueError("execution start does not match operation lease")
+    if state.task_timed_out:
+        raise ValueError("execution cannot start after task timeout")
+    if operation_id not in state.tool_budget_granted_operation_ids:
+        raise ValueError("execution start requires a granted tool-call budget")
     if operation_id in state.started_operation_ids:
         raise ValueError("execution lease already consumed")
+    if operation_id in state.terminal_operation_ids:
+        raise ValueError("cancelled operation cannot start execution")
     state.started_operation_ids.add(operation_id)
 
 
@@ -1316,6 +2079,25 @@ def _apply_execution_terminal(
         if observed != expected:
             raise ValueError("execution receipt does not match admitted operation")
         state.result_by_operation[operation_id] = str(data["execution_result_id"])
+    else:
+        failure_id = data.get("failure_id")
+        retry_disposition = data.get("retry_disposition")
+        if not isinstance(failure_id, str) or not isinstance(
+            retry_disposition, str
+        ):
+            raise ValueError("execution failure contract is incomplete")
+        if retry_disposition not in {"retryable", "terminal"}:
+            raise ValueError("execution failure retry disposition is invalid")
+        if any(
+            not isinstance(data.get(name), str) or not str(data[name]).strip()
+            for name in ("failure_ref", "failure_code", "failure_stage")
+        ):
+            raise ValueError("execution failure details are invalid")
+        state.failure_by_operation[operation_id] = (
+            failure_id,
+            retry_disposition,
+        )
+        state.failure_stage = "execution"
     state.terminal_operation_ids.add(operation_id)
 
 
@@ -1338,7 +2120,306 @@ def _apply_evidence(
     observed_lineage = (data["object_id"], data["binding_id"], data["owner"])
     if observed_lineage != expected_lineage:
         raise ValueError("effect evidence does not match admitted operation")
+    if operation_id in state.evidence_rejected_operation_ids:
+        raise ValueError("rejected evidence cannot later be issued")
+    if operation_id in state.evidence_issued_operation_ids:
+        raise ValueError("operation already has issued evidence")
     state.evidence_artifact_ids.add(str(data["evidence_artifact_id"]))
+    state.evidence_issued_operation_ids.add(operation_id)
+
+
+def _apply_evidence_rejection(
+    state: _TraceState,
+    operation_id: str,
+    data: dict[str, object],
+) -> None:
+    if operation_id not in state.terminal_operation_ids:
+        raise ValueError("evidence rejected before execution completed")
+    if data["execution_lease_id"] != state.lease_by_operation.get(operation_id):
+        raise ValueError("evidence rejection does not match operation lease")
+    if data["execution_result_id"] != state.result_by_operation.get(operation_id):
+        raise ValueError("evidence rejection does not match execution result")
+    expected_lineage = (
+        state.object_by_operation.get(operation_id),
+        state.binding_by_operation.get(operation_id),
+        state.owner_by_operation.get(operation_id),
+    )
+    observed_lineage = (data["object_id"], data["binding_id"], data["owner"])
+    if observed_lineage != expected_lineage:
+        raise ValueError("evidence rejection does not match admitted operation")
+    reasons = data["reason_codes"]
+    if not isinstance(reasons, list) or not reasons:
+        raise ValueError("evidence rejection requires reason codes")
+    if operation_id in state.evidence_issued_operation_ids:
+        raise ValueError("issued evidence cannot later be rejected")
+    if operation_id in state.evidence_rejected_operation_ids:
+        raise ValueError("operation already has rejected evidence")
+    state.evidence_rejected_operation_ids.add(operation_id)
+    state.failure_stage = "evidence"
+
+
+def _apply_budget_decision(
+    state: _TraceState,
+    event_type: str,
+    data: dict[str, object],
+) -> None:
+    if data["compiled_task_id"] != state.compiled_task_id:
+        raise ValueError("budget decision does not match compiled task")
+    resource = data["resource"]
+    if resource not in {"model_call", "tool_call"}:
+        raise ValueError("budget decision resource is invalid")
+    subject_id = data["subject_id"]
+    if not isinstance(subject_id, str) or not subject_id.strip():
+        raise ValueError("budget decision subject is invalid")
+    subject_key = (str(resource), subject_id)
+    if subject_key in state.budget_subjects:
+        raise ValueError("budget subject already has a decision")
+    limit_key = {
+        "model_call": "model_calls",
+        "tool_call": "tool_calls",
+    }[str(resource)]
+    if data["limit"] != state.budget_limits.get(limit_key):
+        raise ValueError("budget decision limit does not match compiled task")
+    consumed = state.budget_consumed[str(resource)]
+    if data["consumed_before"] != consumed:
+        raise ValueError("budget decision consumption is stale")
+    units = data["units"]
+    if type(units) is not int or units <= 0:
+        raise ValueError("budget decision units are invalid")
+    outcome = data.get("outcome")
+    reason_code = data.get("reason_code")
+    if event_type != "budget_%s" % outcome:
+        raise ValueError("budget event does not match decision outcome")
+    if event_type == "budget_granted":
+        if reason_code != "within_budget" or consumed + units > data["limit"]:
+            raise ValueError("budget grant outcome is inconsistent")
+        if resource == "tool_call":
+            if subject_id not in state.leased_operation_ids:
+                raise ValueError("tool-call budget requires a recorded lease")
+            if state.task_timed_out:
+                raise ValueError("timed-out task cannot consume tool-call budget")
+            if (
+                subject_id in state.terminal_operation_ids
+                and subject_id not in state.started_operation_ids
+            ):
+                raise ValueError("cancelled operation cannot consume tool-call budget")
+        if data["consumed_after"] != consumed + units:
+            raise ValueError("budget grant consumption is invalid")
+        state.budget_consumed[str(resource)] = consumed + units
+        if resource == "tool_call":
+            state.tool_budget_granted_operation_ids.add(subject_id)
+        else:
+            state.model_budget_granted_invocation_ids.add(subject_id)
+    else:
+        if reason_code != "budget_exhausted" or consumed + units <= data["limit"]:
+            raise ValueError("budget exhaustion outcome is inconsistent")
+        if data["consumed_after"] != consumed:
+            raise ValueError("exhausted budget cannot consume units")
+        state.failure_stage = "budget"
+    state.budget_subjects.add(subject_key)
+
+
+def _apply_execution_cancellation(
+    state: _TraceState,
+    operation_id: str,
+    data: dict[str, object],
+) -> None:
+    if data["execution_lease_id"] != state.lease_by_operation.get(operation_id):
+        raise ValueError("cancellation does not match operation lease")
+    if operation_id in state.started_operation_ids:
+        raise ValueError("pre-dispatch cancellation cannot follow execution start")
+    if operation_id in state.terminal_operation_ids:
+        raise ValueError("operation already has a terminal result")
+    if data["phase"] != "pre_dispatch" or data["outcome"] != "accepted":
+        raise ValueError("unsupported cancellation decision")
+    if data["deciding_owner_id"] != state.lease_owner_by_operation.get(operation_id):
+        raise ValueError("cancellation decision owner does not own lease")
+    cancellation_fields = (
+        "decision_id",
+        "requester_id",
+        "request_artifact_id",
+        "reason_code",
+    )
+    if not all(
+        isinstance(data.get(name), str) and str(data[name]).strip()
+        for name in cancellation_fields
+    ):
+        raise ValueError("cancellation decision contract is incomplete")
+    state.terminal_operation_ids.add(operation_id)
+    state.failure_stage = "cancellation"
+
+
+def _apply_timeout_decision(
+    state: _TraceState,
+    data: dict[str, object],
+) -> None:
+    if data["compiled_task_id"] != state.compiled_task_id:
+        raise ValueError("timeout decision does not match compiled task")
+    decision_id = data.get("decision_id")
+    if not isinstance(decision_id, str) or not decision_id.strip():
+        raise ValueError("timeout decision identity is invalid")
+    if decision_id in state.timeout_decision_ids:
+        raise ValueError("timeout decision is duplicated")
+    if state.task_timed_out:
+        raise ValueError("task already has a terminal timeout decision")
+    outcome = data["outcome"]
+    if outcome not in {"within_budget", "timed_out"}:
+        raise ValueError("timeout decision outcome is invalid")
+    if data.get("task_started_at") != state.task_started_at:
+        raise ValueError("timeout decision start does not match recorded task start")
+    try:
+        started = datetime.fromisoformat(state.task_started_at.replace("Z", "+00:00"))
+        deadline = datetime.fromisoformat(
+            str(data["deadline_at"]).replace("Z", "+00:00")
+        )
+        observed = datetime.fromisoformat(
+            str(data["observed_at"]).replace("Z", "+00:00")
+        )
+    except (KeyError, ValueError) as exc:
+        raise ValueError("timeout decision timestamps are invalid") from exc
+    if any(value.tzinfo is None for value in (started, deadline, observed)):
+        raise ValueError("timeout decision timestamps require timezone")
+    if not isinstance(data.get("policy_revision"), str) or not str(
+        data["policy_revision"]
+    ).strip():
+        raise ValueError("timeout policy revision is invalid")
+    if deadline != started + timedelta(
+        seconds=state.budget_limits["wall_time_seconds"]
+    ):
+        raise ValueError("timeout deadline does not match compiled budget")
+    expected_outcome = "timed_out" if observed > deadline else "within_budget"
+    if outcome != expected_outcome:
+        raise ValueError("timeout outcome does not match recorded timestamps")
+    if (
+        state.last_timeout_observed_at is not None
+        and observed < state.last_timeout_observed_at
+    ):
+        raise ValueError("timeout observations must be monotonic")
+    state.timeout_decision_ids.add(decision_id)
+    state.last_timeout_observed_at = observed
+    if outcome == "timed_out":
+        state.task_timed_out = True
+        state.failure_stage = "timeout"
+
+
+def _apply_retry_decision(
+    state: _TraceState,
+    event_type: str,
+    operation_id: str,
+    data: dict[str, object],
+) -> None:
+    if data["compiled_task_id"] != state.compiled_task_id:
+        raise ValueError("retry decision does not match compiled task")
+    failure = state.failure_by_operation.get(operation_id)
+    if failure is None or data["source_failure_id"] != failure[0]:
+        raise ValueError("retry decision does not match execution failure")
+    if data["source_operation_id"] != operation_id:
+        raise ValueError("retry decision source operation is invalid")
+    if failure[0] in state.retry_decided_failure_ids:
+        raise ValueError("execution failure already has a retry decision")
+    target_operation_id = data["target_operation_id"]
+    if (
+        not isinstance(target_operation_id, str)
+        or not target_operation_id.strip()
+        or target_operation_id in state.retry_target_operation_ids
+    ):
+        raise ValueError("retry target operation is invalid or already reserved")
+    outcome = str(data["outcome"])
+    if event_type != "retry_%s" % outcome:
+        raise ValueError("retry event does not match decision outcome")
+    retry_limit = state.budget_limits["retry_attempts"]
+    if data["retry_limit"] != retry_limit:
+        raise ValueError("retry decision limit does not match compiled task")
+    prior_approved = sum(
+        event == "retry_approved" for event in state.event_types
+    )
+    expected_ordinal = prior_approved + 1
+    if data["attempt_ordinal"] != expected_ordinal:
+        raise ValueError("retry decision ordinal is invalid")
+    expected_outcome = (
+        "not_retryable"
+        if failure[1] != "retryable"
+        else "approved" if expected_ordinal <= retry_limit else "exhausted"
+    )
+    if outcome != expected_outcome:
+        raise ValueError("retry decision outcome is inconsistent")
+    if outcome in {"exhausted", "not_retryable"}:
+        state.failure_stage = "retry"
+    state.retry_decided_failure_ids.add(failure[0])
+    state.retry_target_operation_ids.add(target_operation_id)
+
+
+def _apply_operation_edge(
+    state: _TraceState,
+    operation_id: str,
+    data: dict[str, object],
+) -> None:
+    from ab_harness.operation_edges import OperationEdge
+
+    edge = OperationEdge.from_dict(data)
+    if operation_id != edge.source_operation_id:
+        raise ValueError("operation edge event does not match source operation")
+    if (
+        edge.environment_run_id != state.environment_run_id
+        or edge.task_id != state.task_id
+        or edge.trace_id != state.trace_id
+    ):
+        raise ValueError("operation edge lineage does not match trace")
+    if edge.source_operation_id not in state.proposal_by_operation:
+        raise ValueError("edge source operation is not recorded")
+    if edge.target_operation_id not in state.proposal_by_operation:
+        raise ValueError("edge target operation is not recorded")
+    source_frame = state.frame_by_operation.get(edge.source_operation_id)
+    target_frame = state.frame_by_operation.get(edge.target_operation_id)
+    if source_frame is None or target_frame is None:
+        raise ValueError("operation edge requires semantically admitted operations")
+    if source_frame != edge.source_frame_id or target_frame != edge.target_frame_id:
+        raise ValueError("operation edge frame does not match admitted operations")
+    if edge.relation == "delegates_to":
+        raise ValueError(
+            "cross-frame delegation requires a separately compiled target projection"
+        )
+    pair = (edge.source_operation_id, edge.target_operation_id)
+    if any(existing[:2] == pair for existing in state.operation_edges):
+        raise ValueError("operation edge pair already recorded")
+    if edge.relation == "decomposes_to" and any(
+        target == edge.target_operation_id
+        and relation in {"decomposes_to", "delegates_to"}
+        for _source, target, relation in state.operation_edges
+    ):
+        raise ValueError("operation already has a structural parent")
+    if _operation_path_exists(
+        state.operation_edges,
+        edge.target_operation_id,
+        edge.source_operation_id,
+    ):
+        raise ValueError("operation edge would create a cycle")
+    if edge.target_operation_id in state.leased_operation_ids:
+        raise ValueError("operation edge cannot be added after target lease")
+    state.operation_edges.add(
+        (edge.source_operation_id, edge.target_operation_id, edge.relation)
+    )
+
+
+def _operation_path_exists(
+    edges: set[tuple[str, str, str]],
+    source: str,
+    target: str,
+) -> bool:
+    adjacency: dict[str, set[str]] = {}
+    for edge_source, edge_target, _relation in edges:
+        adjacency.setdefault(edge_source, set()).add(edge_target)
+    pending = [source]
+    visited: set[str] = set()
+    while pending:
+        current = pending.pop()
+        if current == target:
+            return True
+        if current in visited:
+            continue
+        visited.add(current)
+        pending.extend(adjacency.get(current, ()))
+    return False
 
 
 def _apply_task_judgment(
@@ -1353,6 +2434,8 @@ def _apply_task_judgment(
         raise ValueError("task acceptance evidence set is incomplete or unrecorded")
     if event_type.startswith("terminal_task_"):
         state.terminal_status = str(data["status"])
+        if event_type == "terminal_task_rejected":
+            state.failure_stage = "task_acceptance"
 
 
 def _digest(events: tuple[TraceEvent, ...], state: _TraceState) -> VerifiedTraceDigest:
@@ -1404,7 +2487,7 @@ def _digest(events: tuple[TraceEvent, ...], state: _TraceState) -> VerifiedTrace
         "pending_obligation_ids": tuple(terminal["pending_obligation_ids"]),
         "failed_obligation_ids": tuple(terminal["failed_obligation_ids"]),
         "terminal_status": state.terminal_status or "",
-        "failure_stage": None,
+        "failure_stage": state.failure_stage,
     }
     return VerifiedTraceDigest(
         digest_id=_content_id("verified-trace-digest", fields),

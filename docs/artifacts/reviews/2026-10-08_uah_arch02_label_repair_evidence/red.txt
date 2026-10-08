@@ -1,0 +1,15 @@
+Command: .venv/bin/python -m pytest tests/test_observatory_provenance.py -q
+Exit: 1
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_______________ test_raw_events_cannot_claim_measured_provenance _______________
+
+    def test_raw_events_cannot_claim_measured_provenance():
+        events = (_event(1, "task_started", trace_id="trace:provenance"),)
+>       with pytest.raises(ValueError, match="does not support measured or reviewed"):
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_observatory_provenance.py:11: Failed
+=========================== short test summary info ============================
+FAILED tests/test_observatory_provenance.py::test_raw_events_cannot_claim_measured_provenance
+1 failed in 0.11s

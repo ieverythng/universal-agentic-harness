@@ -1,0 +1,11 @@
+launch_receipt:
+  run_id: "01M4EHYDDZ8MBE4PGBQ76SZMF2"
+  disposition: created
+  launch_nonce: NM-PILOT-01-20261008
+  validation_generation: frozen-51-f85ae715
+  branch: codex/no-mistakes-pilot-20261008
+  head_sha: f85ae715669379a428e063d0c965e42e78b3ae3f
+  submitted_head_sha: f85ae715669379a428e063d0c965e42e78b3ae3f
+  intent_digest: "08488a756d8e3c3c717fb474cd7bff0b4d5f61aa67767bd779f7323716b9cef7"
+error: wait of 45s elapsed while driving the run
+help[3]: This bounded hold ended; it is not a pipeline failure and does not mean the daemon is dead.,Run `no-mistakes axi status` to inspect progress,Re-run `no-mistakes axi run` to reattach for another 45s

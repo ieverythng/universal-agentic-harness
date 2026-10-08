@@ -15,6 +15,7 @@ from ab_harness import TaskEffectRequest
 from ab_harness.lifecycle import LifecycleLedger
 from ab_harness_nao.qualification import NaoQualificationCase
 from ab_harness_nao.qualification import RecordedNaoQualificationHarness
+from ab_harness_nao.qualification import nao_qualification_argument_validator
 from ab_harness_nao.qualification import nao_qualification_domain_contract_pack
 
 
@@ -139,6 +140,7 @@ def test_recorded_nao_case_closes_chatbot_planner_gate_and_owner_evidence():
         environment,
         ledger,
         domain_pack,
+        nao_qualification_argument_validator(),
     )
     case = _case()
 
@@ -175,6 +177,7 @@ def test_rejected_planner_proposal_never_reaches_environment_owner():
         environment,
         ledger,
         domain_pack,
+        nao_qualification_argument_validator(),
     )
     planner_payload = {
         "plan": {
@@ -200,6 +203,10 @@ def test_rejected_planner_proposal_never_reaches_environment_owner():
     )
     assert result.evidence == ()
     assert calls == []
+    replay = ledger.replay(ledger.events()[0].trace_id)
+    assert replay.failure_stage == "semantic_admission"
+    assert replay.events[-1].event_type == "semantic_admission_rejected"
+    assert replay.terminal_status is None
 
 
 def test_failed_owner_result_does_not_close_terminal_observable():
@@ -221,6 +228,7 @@ def test_failed_owner_result_does_not_close_terminal_observable():
         environment,
         ledger,
         domain_pack,
+        nao_qualification_argument_validator(),
     )
 
     case = _case()
@@ -255,6 +263,7 @@ def test_recorded_owner_evidence_produces_explicit_task_acceptance():
         environment,
         ledger,
         domain_pack,
+        nao_qualification_argument_validator(),
     )
     case = NaoQualificationCase(
         case_id="nao-find-cup-acceptance-001",
@@ -299,6 +308,7 @@ def test_malformed_planner_step_rejects_the_whole_plan_before_dispatch():
         environment,
         ledger,
         domain_pack,
+        nao_qualification_argument_validator(),
     )
     case = _case()
     malformed = {
@@ -342,6 +352,7 @@ def test_all_operations_are_semantically_admitted_before_any_dispatch():
         environment,
         ledger,
         domain_pack,
+        nao_qualification_argument_validator(),
     )
     case = _case()
     partially_valid = {
@@ -388,6 +399,7 @@ def test_unsupported_step_semantics_are_not_silently_flattened():
         environment,
         ledger,
         domain_pack,
+        nao_qualification_argument_validator(),
     )
     case = _case()
     step_with_hidden_dependency = {

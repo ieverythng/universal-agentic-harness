@@ -26,7 +26,7 @@ from ab_harness import RegistrySnapshot
 from ab_harness import SemanticAdmission
 from ab_harness import TaskBudgets
 from ab_harness import TaskEffectRequest
-from ab_harness import TaskIngressPolicy
+from ab_harness import TaskIngressAuthority
 from ab_harness import TaskIngressRule
 from ab_harness import TaskSpec
 from ab_harness import TaskSpecCompiler
@@ -36,13 +36,19 @@ from ab_harness.contracts import OwnerExecutionResult
 from ab_harness.acceptance import TaskAcceptanceEvaluator
 from ab_harness.lifecycle import AcceptanceFact
 from ab_harness.lifecycle import LifecycleLedger
-from ab_harness.lifecycle import TaskStartedFact
 from ab_harness.lifecycle import VerifiedTraceDigest
+from ab_harness.operation_edges import OperationEdge
+from ab_harness.runtime_controls import BudgetExhaustedError
+from ab_harness.runtime_controls import ExecutionFailure
+from ab_harness.runtime_controls import RetryAuthority
+from ab_harness.runtime_controls import TaskRuntimeControlAuthority
 from ab_harness.task_registry import EnvironmentTaskRegistry
-from ab_harness.task_registry import TaskTerminalError
+from ab_harness.schema_validation import ArgumentField
+from ab_harness.schema_validation import InMemoryArgumentSchemaRegistry
+from ab_harness.schema_validation import ObjectArgumentSchema
 
 
-def _admission_fixture(*, include_best_effort=False):
+def _admission_fixture(*, include_best_effort=False, budgets=None):
     registry = RegistrySnapshot.from_json_file("tests/fixtures/ab_registry.json")
     role = AgentRoleSpec(
         role_id="planner",
@@ -66,6 +72,12 @@ def _admission_fixture(*, include_best_effort=False):
                 binding_id="binding:nao.request:v1",
                 ingress_type="user_request",
                 action="start_task",
+                task_id_lineage_key="goal_id",
+            ),
+            TaskIngressRule(
+                binding_id="binding:nao.feedback:v1",
+                ingress_type="resume_request",
+                action="resume_task",
                 task_id_lineage_key="goal_id",
             ),
         ),
@@ -113,7 +125,8 @@ def _admission_fixture(*, include_best_effort=False):
             readiness_evidence_refs=("artifact:readiness:admission-001",),
         )
     )
-    task_registry = EnvironmentTaskRegistry()
+    ingress_ledger = LifecycleLedger()
+    task_registry = EnvironmentTaskRegistry(ingress_ledger)
     normalized_ingress = EnvironmentIngress(
         environment_ingress_id="environment-ingress:admission-001",
         environment_run_id=environment_run_id,
@@ -123,11 +136,11 @@ def _admission_fixture(*, include_best_effort=False):
         native_lineage=(("goal_id", "goal:find-cup:admission-001"),),
         observed_at="2026-09-28T09:00:01Z",
     )
-    ingress = TaskIngressPolicy(
+    ingress = TaskIngressAuthority(
         environment_profile_id=profile.environment_profile_id,
         domain_contract_pack=domain,
-        task_registry=task_registry,
-    ).classify(environment_run, normalized_ingress)
+        lifecycle_ledger=ingress_ledger,
+    ).admit(environment_run, normalized_ingress)
     task = TaskSpec(
         task_id="goal:find-cup:admission-001",
         trace_id=ingress.trace_id,
@@ -155,7 +168,8 @@ def _admission_fixture(*, include_best_effort=False):
             ),
         ),
         prohibited_effects=("direct_speech",),
-        budgets=TaskBudgets(
+        budgets=budgets
+        or TaskBudgets(
             wall_time_seconds=90,
             model_calls=3,
             tool_calls=12,
@@ -205,16 +219,82 @@ def _proposal(compiled, *, object_id="find_object", operation_id="operation:test
     return normalization.proposal
 
 
-def _task_start(compiled):
-    return TaskStartedFact(
-        environment_run_id=compiled.environment_run_id,
-        task_id=compiled.task_id,
-        trace_id=compiled.trace_id,
-        environment_ingress_id=compiled.environment_ingress_id,
-        ingress_artifact_id="artifact:ingress:%s" % compiled.environment_ingress_id,
-        decision_id="decision:start:%s" % compiled.environment_ingress_id,
-        domain_contract_pack_revision=compiled.domain_contract_pack_revision,
+def _semantic_admission(catalog):
+    schema = ObjectArgumentSchema.issue(
+        schema_ref="schema://find_object/input/v1",
+        fields=(ArgumentField("label", "string"),),
+        required=("label",),
     )
+    return SemanticAdmission(
+        catalog=catalog,
+        environment_id="nao_fake",
+        runtime_mode="fake",
+        schema_validator=InMemoryArgumentSchemaRegistry((schema,)),
+    )
+
+
+def _domain_pack_for_compiled(compiled):
+    return DomainContractPack.issue(
+        domain_contract_pack_id=compiled.domain_contract_pack_id,
+        frame_id=compiled.interaction_module.frame.frame_id,
+        registry_version=compiled.interaction_module.frame.registry_version,
+        allowed_role_ids=(compiled.interaction_module.role.role_id,),
+        supported_task_type_ids=(compiled.task_type_id,),
+        ingress_rules=(
+            TaskIngressRule(
+                binding_id="binding:nao.request:v1",
+                ingress_type="user_request",
+                action="start_task",
+                task_id_lineage_key="goal_id",
+            ),
+            TaskIngressRule(
+                binding_id="binding:nao.feedback:v1",
+                ingress_type="resume_request",
+                action="resume_task",
+                task_id_lineage_key="goal_id",
+            ),
+        ),
+        effect_rules=tuple(
+            DomainEffectRule(
+                effect_id=item.effect_id,
+                object_id=item.object_id,
+                evidence_owner=item.evidence_owner,
+                failure_policy=item.failure_policy,
+            )
+            for item in compiled.effect_obligations
+        ),
+    )
+
+
+def _record_task_start(ledger, compiled):
+    domain = _domain_pack_for_compiled(compiled)
+    run = EnvironmentRun(EnvironmentRunAttestation(
+        environment_run_id=compiled.environment_run_id,
+        environment_profile_id="environment-profile:admission-fixture",
+        domain_contract_pack_revision=domain.revision,
+        native_runtime_revision="fixture:v1",
+        environment_owner_id="fixture.owner",
+        attestation_id="attestation:admission-fixture",
+        started_at="2026-09-28T09:00:00Z",
+        readiness_evidence_refs=("artifact:readiness:fixture",),
+    ))
+    ingress = EnvironmentIngress(
+        environment_ingress_id=compiled.environment_ingress_id,
+        environment_run_id=compiled.environment_run_id,
+        binding_id="binding:nao.request:v1",
+        ingress_type="user_request",
+        payload_artifact_id="artifact:ingress:%s" % compiled.environment_ingress_id,
+        native_lineage=(("goal_id", compiled.task_id),),
+        observed_at="2026-09-28T09:00:01Z",
+    )
+    decision = TaskIngressAuthority(
+        environment_profile_id=run.attestation.environment_profile_id,
+        domain_contract_pack=domain,
+        lifecycle_ledger=ledger,
+    ).admit(run, ingress)
+    assert decision.action == "start_task"
+    assert decision.trace_id == compiled.trace_id
+    return decision
 
 
 def _alternate_compiled_task(compiled):
@@ -230,6 +310,12 @@ def _alternate_compiled_task(compiled):
                 binding_id="binding:nao.request:v1",
                 ingress_type="user_request",
                 action="start_task",
+                task_id_lineage_key="goal_id",
+            ),
+            TaskIngressRule(
+                binding_id="binding:nao.feedback:v1",
+                ingress_type="resume_request",
+                action="resume_task",
                 task_id_lineage_key="goal_id",
             ),
         ),
@@ -255,7 +341,8 @@ def _alternate_compiled_task(compiled):
             readiness_evidence_refs=("artifact:readiness:nao:alternate",),
         )
     )
-    task_registry = EnvironmentTaskRegistry()
+    ingress_ledger = LifecycleLedger()
+    task_registry = EnvironmentTaskRegistry(ingress_ledger)
     normalized_ingress = EnvironmentIngress(
         environment_ingress_id=compiled.environment_ingress_id,
         environment_run_id=compiled.environment_run_id,
@@ -265,11 +352,11 @@ def _alternate_compiled_task(compiled):
         native_lineage=(("goal_id", compiled.task_id),),
         observed_at="2026-09-28T09:00:01Z",
     )
-    ingress = TaskIngressPolicy(
+    ingress = TaskIngressAuthority(
         environment_profile_id=environment_run.attestation.environment_profile_id,
         domain_contract_pack=domain,
-        task_registry=task_registry,
-    ).classify(environment_run, normalized_ingress)
+        lifecycle_ledger=ingress_ledger,
+    ).admit(environment_run, normalized_ingress)
     return TaskSpecCompiler().compile(
         task_ingress_decision=ingress,
         task_spec=replace(compiled.task_spec, goal="a different frozen goal"),
@@ -290,15 +377,11 @@ def _record_successful_operation(
     operation_id,
     evidence_ref,
 ):
-    ledger.record(_task_start(compiled))
+    _record_task_start(ledger, compiled)
     ledger.record(compiled)
     proposal = _proposal(compiled, operation_id=operation_id)
     ledger.record(proposal)
-    semantic = SemanticAdmission(
-        catalog=catalog,
-        environment_id="nao_fake",
-        runtime_mode="fake",
-    ).admit(compiled, proposal)
+    semantic = _semantic_admission(catalog).admit(compiled, proposal)
     assert semantic.admitted_operation is not None
     ledger.record(semantic.admitted_operation)
     lease_decision = DomainLifecycleAdmission(
@@ -321,13 +404,14 @@ def _record_successful_operation(
             )
         },
     )
-    receipt = owner.execute(lease)
-    return lease, receipt
+    decision = owner.execute(lease)
+    assert decision.receipt is not None
+    return lease, decision.receipt
 
 
 def _ledger_for_admission(compiled, proposal, admitted):
     ledger = LifecycleLedger(clock=lambda: "2026-09-28T11:00:00Z")
-    ledger.record(_task_start(compiled))
+    _record_task_start(ledger, compiled)
     ledger.record(compiled)
     ledger.record(proposal)
     ledger.record(admitted)
@@ -355,11 +439,7 @@ def test_typed_proposal_requires_both_admission_stages_before_a_lease():
     assert proposal is not None
     assert proposal.arguments == {"label": "cup"}
 
-    semantic = SemanticAdmission(
-        catalog=catalog,
-        environment_id="nao_fake",
-        runtime_mode="fake",
-    ).admit(compiled, proposal)
+    semantic = _semantic_admission(catalog).admit(compiled, proposal)
 
     assert semantic.reason_codes == ()
     admitted = semantic.admitted_operation
@@ -410,6 +490,39 @@ def test_proposal_normalization_collects_model_contract_errors_before_admission(
     )
 
 
+def test_proposal_normalization_rejection_is_replayable_and_nonterminal(tmp_path):
+    compiled, _catalog, _environment_run = _admission_fixture()
+    path = tmp_path / "proposal-rejection.jsonl"
+    ledger = LifecycleLedger(path, clock=lambda: "2026-10-02T09:10:00Z")
+    _record_task_start(ledger, compiled)
+    ledger.record(compiled)
+    result = ProposalNormalizer().normalize(
+        compiled_task=compiled,
+        operation_id="",
+        raw_output_artifact_id="",
+        output=AgentOutput(
+            output_type="executable_plan",
+            payload={"invalid": True},
+        ),
+    )
+    assert result.rejection is not None
+    with pytest.raises(ValueError, match="identity does not match"):
+        replace(result.rejection, reason_codes=("tampered",))
+
+    commit = ledger.record(result.rejection)
+
+    assert commit.events[0].event_type == "proposal_rejected"
+    assert commit.events[0].operation_id is None
+    replay = LifecycleLedger(path).replay(compiled.trace_id)
+    assert replay.failure_stage == "proposal_normalization"
+    assert replay.terminal_status is None
+    assert replay.events[-1].data["reason_codes"] == [
+        "missing_operation_id",
+        "missing_raw_output_artifact_id",
+        "invalid_proposal_payload",
+    ]
+
+
 def test_proposal_normalization_rejects_non_string_output_type():
     compiled, _catalog, _environment_run = _admission_fixture()
 
@@ -454,24 +567,96 @@ def test_semantic_admission_rejects_an_incomplete_binding_contract():
     )
     assert normalization.proposal is not None
 
-    decision = SemanticAdmission(
-        catalog=incomplete_catalog,
-        environment_id="nao_fake",
-        runtime_mode="fake",
-    ).admit(compiled, normalization.proposal)
+    decision = _semantic_admission(incomplete_catalog).admit(
+        compiled, normalization.proposal
+    )
 
     assert decision.admitted_operation is None
     assert decision.reason_codes == ("binding_contract_incomplete",)
 
 
+def test_semantic_admission_rejects_catalog_effect_drift_before_a_lease(tmp_path):
+    compiled, catalog, environment_run = _admission_fixture()
+    object_view = catalog.object_for("find_object")
+    drifted_object = replace(
+        object_view,
+        expected_effects=(*object_view.expected_effects, "direct_speech"),
+        observable_success=(*object_view.observable_success, "direct_speech"),
+    )
+    drifted_catalog = BindingCatalog(
+        RegistrySnapshot(
+            (drifted_object,),
+            source="synthetic:changed-catalog",
+            version="changed-registry",
+        ),
+        catalog.bindings_for("find_object"),
+    )
+    proposal = _proposal(compiled)
+
+    decision = _semantic_admission(drifted_catalog).admit(compiled, proposal)
+
+    assert decision.admitted_operation is None
+    assert decision.reason_codes == ("catalog_object_mismatch",)
+    ledger = LifecycleLedger(tmp_path / "drift.jsonl")
+    TaskIngressAuthority(
+        environment_profile_id=environment_run.attestation.environment_profile_id,
+        domain_contract_pack=_domain_pack_for_compiled(compiled),
+        lifecycle_ledger=ledger,
+    ).admit(
+        environment_run,
+        EnvironmentIngress(
+            environment_ingress_id=compiled.environment_ingress_id,
+            environment_run_id=compiled.environment_run_id,
+            binding_id="binding:nao.request:v1",
+            ingress_type="user_request",
+            payload_artifact_id="artifact:request:admission-001",
+            native_lineage=(("goal_id", compiled.task_id),),
+            observed_at="2026-09-28T09:00:01Z",
+        ),
+    )
+    ledger.record(compiled)
+    ledger.record(proposal)
+    ledger.record(decision.rejection)
+    replay = LifecycleLedger(tmp_path / "drift.jsonl").replay(compiled.trace_id)
+    assert replay.failure_stage == "semantic_admission"
+    assert replay.terminal_status is None
+    assert not any(
+        event.event_type in {"domain_admission_leased", "execution_started"}
+        for event in replay.events
+    )
+
+
+def test_semantic_admission_allows_reviewed_binding_change_without_object_drift():
+    compiled, catalog, _environment_run = _admission_fixture()
+    binding = replace(
+        catalog.bindings_for("find_object")[0],
+        binding_id="nao_fake.find_object.v2",
+        source_revision="fixture-rev-2",
+        locator="fake_nao.skills_v2:find_object",
+    )
+    compatible_catalog = BindingCatalog(
+        RegistrySnapshot(
+            (catalog.object_for("find_object"),),
+            source="synthetic:reviewed-binding-change",
+            version="different-registry-label",
+        ),
+        (binding,),
+    )
+
+    decision = _semantic_admission(compatible_catalog).admit(
+        compiled, _proposal(compiled)
+    )
+
+    assert decision.reason_codes == ()
+    assert decision.admitted_operation is not None
+    assert decision.admitted_operation.binding_id == "nao_fake.find_object.v2"
+    assert decision.admitted_operation.binding_source_revision == "fixture-rev-2"
+
+
 def test_semantic_admission_rejects_inspection_only_decomposition():
     compiled, catalog, _environment_run = _admission_fixture()
 
-    decision = SemanticAdmission(
-        catalog=catalog,
-        environment_id="nao_fake",
-        runtime_mode="fake",
-    ).admit(
+    decision = _semantic_admission(catalog).admit(
         compiled,
         _proposal(compiled, object_id="resolve_target_reference"),
     )
@@ -484,6 +669,52 @@ def test_semantic_admission_rejects_inspection_only_decomposition():
     )
 
 
+def test_semantic_rejection_is_a_replayable_typed_fact(tmp_path):
+    compiled, catalog, _environment_run = _admission_fixture()
+    proposal = _proposal(
+        compiled,
+        object_id="resolve_target_reference",
+        operation_id="operation:semantic-rejected",
+    )
+    path = tmp_path / "semantic-rejection.jsonl"
+    ledger = LifecycleLedger(path, clock=lambda: "2026-10-01T09:00:00Z")
+    _record_task_start(ledger, compiled)
+    ledger.record(compiled)
+    ledger.record(proposal)
+
+    decision = _semantic_admission(catalog).admit(compiled, proposal)
+
+    assert decision.rejection is not None
+    with pytest.raises(ValueError, match="semantic rejection identity"):
+        replace(decision.rejection, reason_codes=("tampered_reason",))
+    commit = ledger.record(decision.rejection)
+    assert tuple(event.event_type for event in commit.events) == (
+        "semantic_admission_rejected",
+    )
+    assert commit.events[0].data["reason_codes"] == [
+        "object_inspection_only",
+        "object_not_runtime_callable",
+        "missing_effect_obligation",
+    ]
+    replay = LifecycleLedger(path).replay(compiled.trace_id)
+    assert replay.failure_stage == "semantic_admission"
+    assert replay.terminal_status is None
+    assert not any(
+        event.event_type == "domain_admission_leased" for event in replay.events
+    )
+
+
+def test_semantic_admission_rejects_cross_task_api_misuse_before_decision():
+    compiled, catalog, _environment_run = _admission_fixture()
+    other_compiled, _other_catalog, _other_run = _admission_fixture(
+        include_best_effort=True
+    )
+    proposal = _proposal(compiled, operation_id="operation:wrong-compiled-task")
+
+    with pytest.raises(ValueError, match="compiled task does not match proposal"):
+        _semantic_admission(catalog).admit(other_compiled, proposal)
+
+
 def test_semantic_admission_rejects_candidate_binding():
     compiled, catalog, _environment_run = _admission_fixture()
     binding = catalog.bindings_for("find_object")[0]
@@ -493,11 +724,9 @@ def test_semantic_admission_rejects_candidate_binding():
         (replace(binding, status="candidate"),),
     )
 
-    decision = SemanticAdmission(
-        catalog=candidate_catalog,
-        environment_id="nao_fake",
-        runtime_mode="fake",
-    ).admit(compiled, _proposal(compiled))
+    decision = _semantic_admission(candidate_catalog).admit(
+        compiled, _proposal(compiled)
+    )
 
     assert decision.admitted_operation is None
     assert decision.reason_codes == ("binding_unavailable",)
@@ -512,24 +741,18 @@ def test_semantic_admission_rejects_binding_owned_by_another_component():
         (replace(binding, implementation_owner="planner_llm"),),
     )
 
-    decision = SemanticAdmission(
-        catalog=wrong_owner_catalog,
-        environment_id="nao_fake",
-        runtime_mode="fake",
-    ).admit(compiled, _proposal(compiled))
+    decision = _semantic_admission(wrong_owner_catalog).admit(
+        compiled, _proposal(compiled)
+    )
 
     assert decision.admitted_operation is None
     assert decision.reason_codes == ("binding_owner_mismatch",)
 
 
-def test_domain_lifecycle_issues_only_one_lease_per_operation():
+def test_domain_lifecycle_replays_the_same_lease_idempotently():
     compiled, catalog, environment_run = _admission_fixture()
     proposal = _proposal(compiled)
-    semantic = SemanticAdmission(
-        catalog=catalog,
-        environment_id="nao_fake",
-        runtime_mode="fake",
-    ).admit(compiled, proposal)
+    semantic = _semantic_admission(catalog).admit(compiled, proposal)
     assert semantic.admitted_operation is not None
     ledger = _ledger_for_admission(compiled, proposal, semantic.admitted_operation)
     lifecycle = DomainLifecycleAdmission(
@@ -539,25 +762,58 @@ def test_domain_lifecycle_issues_only_one_lease_per_operation():
     )
 
     first = lifecycle.request_execution(semantic.admitted_operation)
-    replay = DomainLifecycleAdmission(
+    retry = DomainLifecycleAdmission(
         environment_run=environment_run,
         environment_id="nao_fake",
         lifecycle_ledger=ledger,
     ).request_execution(semantic.admitted_operation)
 
     assert first.execution_lease is not None
-    assert replay.execution_lease is None
-    assert replay.reason_codes == ("operation_already_leased",)
+    assert retry.execution_lease == first.execution_lease
+    assert retry.reason_codes == ()
+    replay = ledger.replay(compiled.trace_id)
+    assert replay.failure_stage is None
+    assert (
+        sum(event.event_type == "domain_admission_leased" for event in replay.events)
+        == 1
+    )
+
+
+def test_domain_lifecycle_rejects_a_different_admission_for_a_leased_operation():
+    compiled, catalog, environment_run = _admission_fixture()
+    proposal = _proposal(compiled)
+    semantic = _semantic_admission(catalog).admit(compiled, proposal)
+    assert semantic.admitted_operation is not None
+    ledger = _ledger_for_admission(compiled, proposal, semantic.admitted_operation)
+    lifecycle = DomainLifecycleAdmission(
+        environment_run=environment_run,
+        environment_id="nao_fake",
+        lifecycle_ledger=ledger,
+    )
+    lifecycle.request_execution(semantic.admitted_operation)
+    changed_binding = replace(
+        catalog.bindings_for("find_object")[0],
+        source_revision="fixture-rev-2",
+    )
+    changed_catalog = BindingCatalog(
+        RegistrySnapshot.from_json_file("tests/fixtures/ab_registry.json"),
+        (changed_binding,),
+    )
+    changed_semantic = _semantic_admission(changed_catalog).admit(compiled, proposal)
+    assert changed_semantic.admitted_operation is not None
+    assert (
+        changed_semantic.admitted_operation.admission_id
+        != semantic.admitted_operation.admission_id
+    )
+
+    with pytest.raises(ValueError, match="exact admitted operation"):
+        lifecycle.request_execution(changed_semantic.admitted_operation)
 
 
 def test_domain_lifecycle_rechecks_domain_revision_before_leasing():
     compiled, catalog, environment_run = _admission_fixture()
     proposal = _proposal(compiled)
-    semantic = SemanticAdmission(
-        catalog=catalog,
-        environment_id="nao_fake",
-        runtime_mode="fake",
-    ).admit(compiled, proposal)
+    semantic = _semantic_admission(catalog).admit(compiled, proposal)
     assert semantic.admitted_operation is not None
     changed_environment = replace(
         environment_run,
@@ -581,14 +837,49 @@ def test_domain_lifecycle_rechecks_domain_revision_before_leasing():
     assert decision.reason_codes == ("domain_contract_revision_mismatch",)
 
 
+def test_domain_rejection_is_recorded_and_replayed_by_its_owner(tmp_path):
+    compiled, catalog, environment_run = _admission_fixture()
+    proposal = _proposal(compiled, operation_id="operation:domain-rejected")
+    semantic = _semantic_admission(catalog).admit(compiled, proposal)
+    assert semantic.admitted_operation is not None
+    path = tmp_path / "domain-rejection.jsonl"
+    ledger = LifecycleLedger(path, clock=lambda: "2026-10-01T09:05:00Z")
+    _record_task_start(ledger, compiled)
+    ledger.record(compiled)
+    ledger.record(proposal)
+    ledger.record(semantic.admitted_operation)
+    changed_environment = replace(
+        environment_run,
+        attestation=replace(
+            environment_run.attestation,
+            domain_contract_pack_revision="sha256:changed-domain-pack",
+        ),
+    )
+
+    decision = DomainLifecycleAdmission(
+        environment_run=changed_environment,
+        environment_id="nao_fake",
+        lifecycle_ledger=ledger,
+    ).request_execution(semantic.admitted_operation)
+
+    assert decision.rejection is not None
+    with pytest.raises(ValueError, match="domain rejection identity"):
+        replace(decision.rejection, reason_codes=("tampered_reason",))
+    replay = LifecycleLedger(path).replay(compiled.trace_id)
+    assert replay.failure_stage == "domain_admission"
+    assert tuple(event.event_type for event in replay.events)[-1] == (
+        "domain_admission_rejected"
+    )
+    assert replay.events[-1].data["reason_codes"] == [
+        "domain_contract_revision_mismatch"
+    ]
+    assert not any(event.event_type == "execution_started" for event in replay.events)
+
+
 def test_authority_artifacts_reject_content_tampering():
     compiled, catalog, environment_run = _admission_fixture()
     proposal = _proposal(compiled)
-    semantic = SemanticAdmission(
-        catalog=catalog,
-        environment_id="nao_fake",
-        runtime_mode="fake",
-    ).admit(compiled, proposal)
+    semantic = _semantic_admission(catalog).admit(compiled, proposal)
     assert semantic.admitted_operation is not None
     ledger = _ledger_for_admission(
         compiled,
@@ -613,11 +904,7 @@ def test_authority_artifacts_reject_content_tampering():
 def test_semantic_admission_reverifies_its_content_addressed_inputs():
     compiled, catalog, _environment_run = _admission_fixture()
     proposal = _proposal(compiled, operation_id="operation:semantic-reverification")
-    admission = SemanticAdmission(
-        catalog=catalog,
-        environment_id="nao_fake",
-        runtime_mode="fake",
-    )
+    admission = _semantic_admission(catalog)
 
     object.__setattr__(proposal, "arguments_json", '{"label":"tampered"}')
     with pytest.raises(ValueError, match="proposal identity does not match"):
@@ -633,7 +920,7 @@ def test_lifecycle_ledger_reverifies_authority_artifacts_before_recording():
     compiled, _catalog, _environment_run = _admission_fixture()
     proposal = _proposal(compiled, operation_id="operation:ledger-reverification")
     ledger = LifecycleLedger(clock=lambda: "2026-09-28T11:00:00Z")
-    ledger.record(_task_start(compiled))
+    _record_task_start(ledger, compiled)
     ledger.record(compiled)
     object.__setattr__(proposal, "arguments_json", '{"label":"tampered"}')
 
@@ -649,11 +936,7 @@ def test_lifecycle_ledger_reverifies_authority_artifacts_before_recording():
 def test_environment_owner_executes_only_the_exact_operation_lease():
     compiled, catalog, environment_run = _admission_fixture()
     proposal = _proposal(compiled)
-    semantic = SemanticAdmission(
-        catalog=catalog,
-        environment_id="nao_fake",
-        runtime_mode="fake",
-    ).admit(compiled, proposal)
+    semantic = _semantic_admission(catalog).admit(compiled, proposal)
     assert semantic.admitted_operation is not None
     ledger = _ledger_for_admission(
         compiled,
@@ -681,7 +964,9 @@ def test_environment_owner_executes_only_the_exact_operation_lease():
         },
     )
 
-    receipt = owner.execute(lease_decision.execution_lease)
+    decision = owner.execute(lease_decision.execution_lease)
+    assert decision.receipt is not None
+    receipt = decision.receipt
 
     assert receipt.execution_lease_id == (
         lease_decision.execution_lease.execution_lease_id
@@ -702,14 +987,55 @@ def test_environment_owner_executes_only_the_exact_operation_lease():
         receipt.to_dict()
 
 
+def test_environment_owner_records_typed_evidence_rejection():
+    compiled, catalog, environment_run = _admission_fixture()
+    proposal = _proposal(compiled, operation_id="operation:evidence-rejected")
+    semantic = _semantic_admission(catalog).admit(compiled, proposal)
+    assert semantic.admitted_operation is not None
+    ledger = _ledger_for_admission(compiled, proposal, semantic.admitted_operation)
+    lease = DomainLifecycleAdmission(
+        environment_run=environment_run,
+        environment_id="nao_fake",
+        lifecycle_ledger=ledger,
+    ).request_execution(semantic.admitted_operation).execution_lease
+    assert lease is not None
+    owner = InProcessEnvironmentOwner(
+        environment_id="nao_fake",
+        environment_run=environment_run,
+        catalog=catalog,
+        lifecycle_ledger=ledger,
+        handlers={
+            "fake_nao.skills:find_object": lambda _arguments: OwnerExecutionResult(
+                evidence_ref="",
+                succeeded=True,
+                observed_effects=(),
+            )
+        },
+    )
+
+    decision = owner.execute(lease)
+
+    assert decision.receipt is None
+    assert decision.rejection is not None
+    assert decision.rejection.reason_codes == (
+        "missing_evidence_reference",
+        "successful_result_without_observable",
+    )
+    with pytest.raises(ValueError, match="identity does not match"):
+        replace(decision.rejection, reason_codes=("tampered",))
+    replay = ledger.replay(compiled.trace_id)
+    assert tuple(event.event_type for event in replay.events)[-2:] == (
+        "execution_completed",
+        "evidence_rejected",
+    )
+    assert replay.failure_stage == "evidence"
+    assert replay.terminal_status is None
+
+
 def test_environment_owner_rejects_a_proposal_changed_after_lease_issuance():
     compiled, catalog, environment_run = _admission_fixture()
     proposal = _proposal(compiled, operation_id="operation:tampered-after-lease")
-    semantic = SemanticAdmission(
-        catalog=catalog,
-        environment_id="nao_fake",
-        runtime_mode="fake",
-    ).admit(compiled, proposal)
+    semantic = _semantic_admission(catalog).admit(compiled, proposal)
     assert semantic.admitted_operation is not None
     ledger = _ledger_for_admission(compiled, proposal, semantic.admitted_operation)
     lease_decision = DomainLifecycleAdmission(
@@ -746,11 +1072,7 @@ def test_environment_owner_rejects_a_proposal_changed_after_lease_issuance():
 def test_environment_owner_consumes_a_lease_when_native_execution_fails():
     compiled, catalog, environment_run = _admission_fixture()
     proposal = _proposal(compiled, operation_id="operation:native-failure")
-    semantic = SemanticAdmission(
-        catalog=catalog,
-        environment_id="nao_fake",
-        runtime_mode="fake",
-    ).admit(compiled, proposal)
+    semantic = _semantic_admission(catalog).admit(compiled, proposal)
     assert semantic.admitted_operation is not None
     ledger = _ledger_for_admission(
         compiled,
@@ -794,18 +1116,18 @@ def test_environment_owner_consumes_a_lease_when_native_execution_fails():
 def test_environment_owner_records_receipt_validation_failure():
     compiled, catalog, environment_run = _admission_fixture()
     proposal = _proposal(compiled, operation_id="operation:invalid-receipt")
-    semantic = SemanticAdmission(
-        catalog=catalog,
-        environment_id="nao_fake",
-        runtime_mode="fake",
-    ).admit(compiled, proposal)
+    semantic = _semantic_admission(catalog).admit(compiled, proposal)
     assert semantic.admitted_operation is not None
     ledger = _ledger_for_admission(compiled, proposal, semantic.admitted_operation)
-    lease = DomainLifecycleAdmission(
-        environment_run=environment_run,
-        environment_id="nao_fake",
-        lifecycle_ledger=ledger,
-    ).request_execution(semantic.admitted_operation).execution_lease
+    lease = (
+        DomainLifecycleAdmission(
+            environment_run=environment_run,
+            environment_id="nao_fake",
+            lifecycle_ledger=ledger,
+        )
+        .request_execution(semantic.admitted_operation)
+        .execution_lease
+    )
     assert lease is not None
     owner = InProcessEnvironmentOwner(
         environment_id="nao_fake",
@@ -835,21 +1157,21 @@ def test_environment_owner_consumes_a_lease_once_across_ledger_instances(tmp_pat
     path = tmp_path / "contended-lifecycle.jsonl"
     writer = LifecycleLedger(path, clock=lambda: "2026-09-28T11:30:00Z")
     proposal = _proposal(compiled, operation_id="operation:cross-process-once")
-    semantic = SemanticAdmission(
-        catalog=catalog,
-        environment_id="nao_fake",
-        runtime_mode="fake",
-    ).admit(compiled, proposal)
+    semantic = _semantic_admission(catalog).admit(compiled, proposal)
     assert semantic.admitted_operation is not None
-    writer.record(_task_start(compiled))
+    _record_task_start(writer, compiled)
     writer.record(compiled)
     writer.record(proposal)
     writer.record(semantic.admitted_operation)
-    lease = DomainLifecycleAdmission(
-        environment_run=environment_run,
-        environment_id="nao_fake",
-        lifecycle_ledger=writer,
-    ).request_execution(semantic.admitted_operation).execution_lease
+    lease = (
+        DomainLifecycleAdmission(
+            environment_run=environment_run,
+            environment_id="nao_fake",
+            lifecycle_ledger=writer,
+        )
+        .request_execution(semantic.admitted_operation)
+        .execution_lease
+    )
     assert lease is not None
 
     first_ledger = LifecycleLedger(path, clock=lambda: "2026-09-28T11:30:01Z")
@@ -913,11 +1235,7 @@ def test_environment_owner_has_no_direct_object_dispatch_interface():
 def test_environment_owner_rejects_a_lease_from_a_stale_activation_attestation():
     compiled, catalog, environment_run = _admission_fixture()
     proposal = _proposal(compiled, operation_id="operation:stale-attestation")
-    semantic = SemanticAdmission(
-        catalog=catalog,
-        environment_id="nao_fake",
-        runtime_mode="fake",
-    ).admit(compiled, proposal)
+    semantic = _semantic_admission(catalog).admit(compiled, proposal)
     assert semantic.admitted_operation is not None
     ledger = _ledger_for_admission(compiled, proposal, semantic.admitted_operation)
     lease = (
@@ -952,11 +1270,7 @@ def test_environment_owner_rejects_a_lease_from_a_stale_activation_attestation()
 def test_environment_owner_rejects_a_lease_issued_by_another_owner():
     compiled, catalog, environment_run = _admission_fixture()
     proposal = _proposal(compiled, operation_id="operation:foreign-owner")
-    semantic = SemanticAdmission(
-        catalog=catalog,
-        environment_id="nao_fake",
-        runtime_mode="fake",
-    ).admit(compiled, proposal)
+    semantic = _semantic_admission(catalog).admit(compiled, proposal)
     assert semantic.admitted_operation is not None
     ledger = _ledger_for_admission(
         compiled,
@@ -990,11 +1304,7 @@ def test_environment_owner_rejects_a_lease_issued_by_another_owner():
 def test_environment_owner_rejects_binding_drift_under_the_same_revision():
     compiled, catalog, environment_run = _admission_fixture()
     proposal = _proposal(compiled, operation_id="operation:binding-drift")
-    semantic = SemanticAdmission(
-        catalog=catalog,
-        environment_id="nao_fake",
-        runtime_mode="fake",
-    ).admit(compiled, proposal)
+    semantic = _semantic_admission(catalog).admit(compiled, proposal)
     assert semantic.admitted_operation is not None
     ledger = _ledger_for_admission(
         compiled,
@@ -1028,11 +1338,7 @@ def test_environment_owner_rejects_binding_drift_under_the_same_revision():
 def test_lifecycle_ledger_rejects_a_self_consistent_receipt_with_forged_lineage():
     compiled, catalog, environment_run = _admission_fixture()
     proposal = _proposal(compiled, operation_id="operation:forged-receipt")
-    semantic = SemanticAdmission(
-        catalog=catalog,
-        environment_id="nao_fake",
-        runtime_mode="fake",
-    ).admit(compiled, proposal)
+    semantic = _semantic_admission(catalog).admit(compiled, proposal)
     assert semantic.admitted_operation is not None
     ledger = _ledger_for_admission(compiled, proposal, semantic.admitted_operation)
     lease = (
@@ -1111,10 +1417,11 @@ def test_common_ledger_replays_the_full_accepted_authority_chain(tmp_path):
     assert tuple(event.event_type for event in replayed.events) == (
         "task_started",
         "task_compiled",
-        "proposal_normalized",
-        "semantic_admission_accepted",
-        "domain_admission_leased",
-        "execution_started",
+            "proposal_normalized",
+            "semantic_admission_accepted",
+            "domain_admission_leased",
+            "budget_granted",
+            "execution_started",
         "execution_completed",
         "evidence_issued",
         "effect_obligation_satisfied",
@@ -1132,18 +1439,86 @@ def test_common_ledger_replays_the_full_accepted_authority_chain(tmp_path):
         VerifiedTraceDigest.from_dict(replayed.verified_trace_digest.to_dict())
         == replayed.verified_trace_digest
     )
-    restarted_registry = EnvironmentTaskRegistry(restarted_ledger)
-    with pytest.raises(TaskTerminalError, match="accepted"):
-        restarted_registry.register_existing_ingress(
-            environment_run_id=compiled.environment_run_id,
+    domain_pack = _domain_pack_for_compiled(compiled)
+    assert domain_pack.revision == compiled.domain_contract_pack_revision
+    decision = TaskIngressAuthority(
+        environment_profile_id=environment_run.attestation.environment_profile_id,
+        domain_contract_pack=domain_pack,
+        lifecycle_ledger=restarted_ledger,
+    ).admit(
+        environment_run,
+        EnvironmentIngress(
             environment_ingress_id="ingress:after-terminal-restart",
-            ingress_artifact_id="environment-ingress:sha256:after-terminal",
-            decision_id="task-ingress-decision:sha256:after-terminal",
-            domain_contract_pack_revision=compiled.domain_contract_pack_revision,
-            task_id=compiled.task_id,
-            trace_id=compiled.trace_id,
-            ingress_action="resume_task",
+            environment_run_id=compiled.environment_run_id,
+            binding_id="binding:nao.feedback:v1",
+            ingress_type="resume_request",
+            payload_artifact_id="artifact:feedback:after-terminal",
+            native_lineage=(("goal_id", compiled.task_id),),
+            observed_at="2026-10-01T10:00:00Z",
+        ),
+    )
+    assert decision.action == "reject"
+    assert decision.reason_code == "task_terminal"
+    assert decision.task_status == "accepted"
+
+
+def test_terminal_required_effect_failure_replays_as_counterexample_digest(tmp_path):
+    compiled, catalog, environment_run = _admission_fixture()
+    path = tmp_path / "terminal-counterexample.jsonl"
+    ledger = LifecycleLedger(path, clock=lambda: "2026-10-02T09:20:00Z")
+    _record_task_start(ledger, compiled)
+    ledger.record(compiled)
+    proposal = _proposal(compiled, operation_id="operation:negative-result")
+    ledger.record(proposal)
+    semantic = _semantic_admission(catalog).admit(compiled, proposal)
+    assert semantic.admitted_operation is not None
+    ledger.record(semantic.admitted_operation)
+    lease = DomainLifecycleAdmission(
+        environment_run=environment_run,
+        environment_id="nao_fake",
+        lifecycle_ledger=ledger,
+    ).request_execution(semantic.admitted_operation).execution_lease
+    assert lease is not None
+    owner = InProcessEnvironmentOwner(
+        environment_id="nao_fake",
+        environment_run=environment_run,
+        catalog=catalog,
+        lifecycle_ledger=ledger,
+        handlers={
+            "fake_nao.skills:find_object": lambda _arguments: OwnerExecutionResult(
+                evidence_ref="fake-nao://evidence/not-found",
+                succeeded=False,
+                observed_effects=(),
+                payload={"reason": "not_found"},
+            )
+        },
+    )
+    evidence_decision = owner.execute(lease)
+    assert evidence_decision.receipt is not None
+    acceptance = TaskAcceptanceEvaluator().evaluate(
+        compiled.effect_obligations,
+        (evidence_decision.receipt.evidence,),
+    )
+    ledger.record(
+        AcceptanceFact(
+            compiled_task=compiled,
+            evidence_set=(evidence_decision.receipt.evidence,),
+            acceptance=acceptance,
         )
+    )
+
+    replay = LifecycleLedger(path).replay(compiled.trace_id)
+
+    assert acceptance.status == "rejected"
+    assert replay.terminal_status == "rejected"
+    assert replay.failure_stage == "task_acceptance"
+    assert replay.verified_trace_digest is not None
+    assert replay.verified_trace_digest.failed_obligation_ids == (
+        "target_observed",
+    )
+    assert replay.verified_trace_digest.native_evidence_refs == (
+        "fake-nao://evidence/not-found",
+    )
 
 
 def test_common_ledger_replays_an_accepted_task_with_best_effort_deficit(tmp_path):
@@ -1188,7 +1563,7 @@ def test_common_ledger_replays_an_accepted_task_with_best_effort_deficit(tmp_pat
 def test_common_ledger_records_pre_dispatch_suspension():
     compiled, _catalog, _environment_run = _admission_fixture()
     ledger = LifecycleLedger(clock=lambda: "2026-09-28T12:07:00Z")
-    ledger.record(_task_start(compiled))
+    _record_task_start(ledger, compiled)
     ledger.record(compiled)
     acceptance = TaskAcceptanceEvaluator().evaluate(
         compiled.effect_obligations,
@@ -1306,7 +1681,7 @@ def test_common_ledger_rejects_acceptance_that_omits_recorded_evidence():
 def test_common_ledger_rejects_a_second_compiled_task_for_one_trace():
     compiled, _catalog, _environment_run = _admission_fixture()
     ledger = LifecycleLedger(clock=lambda: "2026-09-28T12:20:00Z")
-    ledger.record(_task_start(compiled))
+    _record_task_start(ledger, compiled)
     ledger.record(compiled)
 
     with pytest.raises(ValueError, match="already has a compiled task"):
@@ -1317,7 +1692,7 @@ def test_common_ledger_rejects_a_proposal_from_an_unrecorded_compiled_task():
     compiled, _catalog, _environment_run = _admission_fixture()
     alternate = _alternate_compiled_task(compiled)
     ledger = LifecycleLedger(clock=lambda: "2026-09-28T12:25:00Z")
-    ledger.record(_task_start(compiled))
+    _record_task_start(ledger, compiled)
     ledger.record(compiled)
 
     with pytest.raises(ValueError, match="does not match recorded compiled task"):
@@ -1327,3 +1702,345 @@ def test_common_ledger_rejects_a_proposal_from_an_unrecorded_compiled_task():
                 operation_id="operation:alternate-compiled-task",
             )
         )
+
+
+def test_operation_edge_replays_same_frame_decomposition(tmp_path):
+    compiled, catalog, _environment_run = _admission_fixture()
+    source = _proposal(compiled, operation_id="operation:deliver")
+    target = _proposal(compiled, operation_id="operation:find")
+    source_admission = _semantic_admission(catalog).admit(compiled, source)
+    target_admission = _semantic_admission(catalog).admit(compiled, target)
+    assert source_admission.admitted_operation is not None
+    assert target_admission.admitted_operation is not None
+    path = tmp_path / "operation-edge.jsonl"
+    ledger = LifecycleLedger(path, clock=lambda: "2026-10-02T09:00:00Z")
+    _record_task_start(ledger, compiled)
+    ledger.record(compiled)
+    for proposal, decision in (
+        (source, source_admission),
+        (target, target_admission),
+    ):
+        ledger.record(proposal)
+        ledger.record(decision.admitted_operation)
+    edge = OperationEdge.issue(
+        environment_run_id=compiled.environment_run_id,
+        task_id=compiled.task_id,
+        trace_id=compiled.trace_id,
+        source_operation_id=source.operation_id,
+        target_operation_id=target.operation_id,
+        relation="decomposes_to",
+        source_frame_id=compiled.interaction_module.frame.frame_id,
+        target_frame_id=compiled.interaction_module.frame.frame_id,
+    )
+    assert OperationEdge.from_dict(edge.to_dict()) == edge
+    with pytest.raises(ValueError, match="identity does not match"):
+        replace(edge, target_operation_id="operation:tampered")
+
+    commit = ledger.record(edge)
+
+    assert commit.events[0].event_type == "operation_edge_recorded"
+    replay = LifecycleLedger(path).replay(compiled.trace_id)
+    assert replay.events[-1].data == edge.to_dict()
+
+
+def test_operation_edge_requires_existing_operations_and_acyclic_graph():
+    compiled, catalog, _environment_run = _admission_fixture()
+    source = _proposal(compiled, operation_id="operation:source")
+    target = _proposal(compiled, operation_id="operation:target")
+    source_admission = _semantic_admission(catalog).admit(compiled, source)
+    target_admission = _semantic_admission(catalog).admit(compiled, target)
+    assert source_admission.admitted_operation is not None
+    assert target_admission.admitted_operation is not None
+    ledger = LifecycleLedger()
+    _record_task_start(ledger, compiled)
+    ledger.record(compiled)
+    ledger.record(source)
+    ledger.record(source_admission.admitted_operation)
+    unknown = OperationEdge.issue(
+        environment_run_id=compiled.environment_run_id,
+        task_id=compiled.task_id,
+        trace_id=compiled.trace_id,
+        source_operation_id=source.operation_id,
+        target_operation_id="operation:unknown",
+        relation="continues_with",
+        source_frame_id="nao_runtime",
+        target_frame_id="nao_runtime",
+    )
+
+    with pytest.raises(ValueError, match="edge target operation is not recorded"):
+        ledger.record(unknown)
+
+    ledger.record(target)
+    ledger.record(target_admission.admitted_operation)
+    ledger.record(
+        OperationEdge.issue(
+            environment_run_id=compiled.environment_run_id,
+            task_id=compiled.task_id,
+            trace_id=compiled.trace_id,
+            source_operation_id=source.operation_id,
+            target_operation_id=target.operation_id,
+            relation="decomposes_to",
+            source_frame_id="nao_runtime",
+            target_frame_id="nao_runtime",
+        )
+    )
+    with pytest.raises(ValueError, match="operation edge would create a cycle"):
+        ledger.record(
+            OperationEdge.issue(
+                environment_run_id=compiled.environment_run_id,
+                task_id=compiled.task_id,
+                trace_id=compiled.trace_id,
+                source_operation_id=target.operation_id,
+                target_operation_id=source.operation_id,
+                relation="decomposes_to",
+                source_frame_id="nao_runtime",
+                target_frame_id="nao_runtime",
+            )
+        )
+
+
+def test_operation_edge_relation_rules_are_frame_relative():
+    common = {
+        "environment_run_id": "environment-run:test",
+        "task_id": "task:test",
+        "trace_id": "trace:test",
+        "source_operation_id": "operation:source",
+        "target_operation_id": "operation:target",
+    }
+
+    with pytest.raises(ValueError, match="non-delegation edge must remain"):
+        OperationEdge.issue(
+            **common,
+            relation="decomposes_to",
+            source_frame_id="frame:one",
+            target_frame_id="frame:two",
+        )
+    with pytest.raises(ValueError, match="delegation must cross frames"):
+        OperationEdge.issue(
+            **common,
+            relation="delegates_to",
+            source_frame_id="frame:one",
+            target_frame_id="frame:one",
+            artifact_contract_ref="schema://delegation/v1",
+        )
+    with pytest.raises(ValueError, match="delegation requires an artifact contract"):
+        OperationEdge.issue(
+            **common,
+            relation="delegates_to",
+            source_frame_id="frame:one",
+            target_frame_id="frame:two",
+        )
+
+
+def test_tool_budget_exhaustion_is_recorded_before_second_dispatch():
+    compiled, catalog, environment_run = _admission_fixture(
+        budgets=TaskBudgets(
+            wall_time_seconds=90,
+            model_calls=1,
+            tool_calls=1,
+            retry_attempts=0,
+        )
+    )
+    ledger = LifecycleLedger()
+    _record_task_start(ledger, compiled)
+    ledger.record(compiled)
+    leases = []
+    for operation_id in ("operation:first", "operation:second"):
+        proposal = _proposal(compiled, operation_id=operation_id)
+        ledger.record(proposal)
+        semantic = _semantic_admission(catalog).admit(compiled, proposal)
+        assert semantic.admitted_operation is not None
+        ledger.record(semantic.admitted_operation)
+        lease = DomainLifecycleAdmission(
+            environment_run=environment_run,
+            environment_id="nao_fake",
+            lifecycle_ledger=ledger,
+        ).request_execution(semantic.admitted_operation).execution_lease
+        assert lease is not None
+        leases.append(lease)
+    calls = []
+    owner = InProcessEnvironmentOwner(
+        environment_id="nao_fake",
+        environment_run=environment_run,
+        catalog=catalog,
+        lifecycle_ledger=ledger,
+        handlers={
+            "fake_nao.skills:find_object": lambda arguments: (
+                calls.append(arguments)
+                or OwnerExecutionResult(
+                    evidence_ref="fake-nao://evidence/budget",
+                    succeeded=True,
+                    observed_effects=("fresh detector-backed result returned",),
+                )
+            )
+        },
+    )
+
+    assert owner.execute(leases[0]).accepted
+    with pytest.raises(BudgetExhaustedError, match="tool_call"):
+        owner.execute(leases[1])
+
+    assert calls == [{"label": "cup"}]
+    grant, started = tuple(
+        event
+        for event in ledger.events()
+        if event.operation_id == leases[0].operation_id
+        and event.event_type in {"budget_granted", "execution_started"}
+    )
+    assert (grant.commit_id, grant.commit_size, grant.commit_index) == (
+        started.commit_id,
+        2,
+        1,
+    )
+    assert started.commit_index == 2
+    replay = ledger.replay(compiled.trace_id)
+    assert replay.failure_stage == "budget"
+    assert replay.terminal_status is None
+    assert tuple(event.event_type for event in replay.events)[-1] == "budget_exhausted"
+
+
+def test_owner_authorized_pre_dispatch_cancellation_blocks_execution():
+    compiled, catalog, environment_run = _admission_fixture()
+    proposal = _proposal(compiled, operation_id="operation:cancelled")
+    semantic = _semantic_admission(catalog).admit(compiled, proposal)
+    assert semantic.admitted_operation is not None
+    ledger = _ledger_for_admission(compiled, proposal, semantic.admitted_operation)
+    lease = DomainLifecycleAdmission(
+        environment_run=environment_run,
+        environment_id="nao_fake",
+        lifecycle_ledger=ledger,
+    ).request_execution(semantic.admitted_operation).execution_lease
+    assert lease is not None
+    calls = []
+    owner = InProcessEnvironmentOwner(
+        environment_id="nao_fake",
+        environment_run=environment_run,
+        catalog=catalog,
+        lifecycle_ledger=ledger,
+        handlers={
+            "fake_nao.skills:find_object": lambda arguments: calls.append(arguments)
+        },
+    )
+
+    cancellation = owner.cancel(
+        lease,
+        requester_id="operator:test",
+        request_artifact_id="artifact:cancel:test",
+        reason_code="operator_cancelled",
+    )
+
+    assert cancellation.outcome == "accepted"
+    with pytest.raises(ValueError, match="cancelled"):
+        owner.execute(lease)
+    assert calls == []
+    replay = ledger.replay(compiled.trace_id)
+    assert replay.failure_stage == "cancellation"
+    assert replay.terminal_status is None
+
+
+def test_recorded_timeout_replays_without_consulting_current_clock(tmp_path):
+    compiled, _catalog, _environment_run = _admission_fixture()
+    path = tmp_path / "timeout.jsonl"
+    ledger = LifecycleLedger(path, clock=lambda: "2026-10-02T09:00:00Z")
+    _record_task_start(ledger, compiled)
+    ledger.record(compiled)
+    authority = TaskRuntimeControlAuthority(ledger)
+
+    decision = authority.evaluate_timeout(
+        compiled_task=compiled,
+        observed_at="2026-10-02T09:01:31Z",
+        policy_revision="timeout-policy:v1",
+    )
+
+    assert decision.outcome == "timed_out"
+    replay = LifecycleLedger(
+        path, clock=lambda: "2099-01-01T00:00:00Z"
+    ).replay(compiled.trace_id)
+    assert replay.failure_stage == "timeout"
+    assert replay.terminal_status is None
+    assert replay.events[-1].data["observed_at"] == "2026-10-02T09:01:31Z"
+
+
+def test_timeout_check_can_progress_from_within_budget_to_recorded_timeout():
+    compiled, _catalog, _environment_run = _admission_fixture()
+    ledger = LifecycleLedger(clock=lambda: "2026-10-02T09:00:00Z")
+    _record_task_start(ledger, compiled)
+    ledger.record(compiled)
+    authority = TaskRuntimeControlAuthority(ledger)
+
+    within = authority.evaluate_timeout(
+        compiled_task=compiled,
+        observed_at="2026-10-02T09:00:30Z",
+        policy_revision="timeout-policy:v1",
+    )
+    timed_out = authority.evaluate_timeout(
+        compiled_task=compiled,
+        observed_at="2026-10-02T09:01:31Z",
+        policy_revision="timeout-policy:v1",
+    )
+
+    assert within.outcome == "within_budget"
+    assert timed_out.outcome == "timed_out"
+    assert ledger.replay(compiled.trace_id).failure_stage == "timeout"
+
+
+def test_timeout_observations_must_progress_monotonically():
+    compiled, _catalog, _environment_run = _admission_fixture()
+    ledger = LifecycleLedger(clock=lambda: "2026-10-02T09:00:00Z")
+    _record_task_start(ledger, compiled)
+    ledger.record(compiled)
+    authority = TaskRuntimeControlAuthority(ledger)
+    authority.evaluate_timeout(
+        compiled_task=compiled,
+        observed_at="2026-10-02T09:00:30Z",
+        policy_revision="timeout-policy:v1",
+    )
+
+    with pytest.raises(ValueError, match="monotonic"):
+        authority.evaluate_timeout(
+            compiled_task=compiled,
+            observed_at="2026-10-02T09:00:20Z",
+            policy_revision="timeout-policy:v1",
+        )
+
+
+def test_retry_exhaustion_is_bounded_by_compiled_task_budget():
+    compiled, catalog, environment_run = _admission_fixture(
+        budgets=TaskBudgets(
+            wall_time_seconds=90,
+            model_calls=1,
+            tool_calls=2,
+            retry_attempts=0,
+        )
+    )
+    proposal = _proposal(compiled, operation_id="operation:failed")
+    semantic = _semantic_admission(catalog).admit(compiled, proposal)
+    assert semantic.admitted_operation is not None
+    ledger = _ledger_for_admission(compiled, proposal, semantic.admitted_operation)
+    lease = DomainLifecycleAdmission(
+        environment_run=environment_run,
+        environment_id="nao_fake",
+        lifecycle_ledger=ledger,
+    ).request_execution(semantic.admitted_operation).execution_lease
+    assert lease is not None
+    ledger.start_execution(lease)
+    failure = ExecutionFailure.issue(
+        lease=lease,
+        failure_ref="failure:native:retryable",
+        failure_code="temporary_unavailable",
+        failure_stage="native_execution",
+        retry_disposition="retryable",
+    )
+    ledger.record(failure)
+
+    retry = RetryAuthority(ledger).decide(
+        compiled_task=compiled,
+        source_failure=failure,
+        target_operation_id="operation:retry-1",
+        policy_revision="retry-policy:v1",
+    )
+
+    assert retry.outcome == "exhausted"
+    replay = ledger.replay(compiled.trace_id)
+    assert replay.failure_stage == "retry"
+    assert replay.terminal_status is None

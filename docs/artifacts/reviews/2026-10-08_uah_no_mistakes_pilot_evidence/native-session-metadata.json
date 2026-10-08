@@ -1,0 +1,176 @@
+{
+  "observed_session_files": 5,
+  "semantics": "runtime-reported cumulative counters; not billing attestation or a token cap; parent/child aggregation not independently established",
+  "sessions": [
+    {
+      "session_file": "rollout-2026-10-08T22-06-23-01a11d1f-c24a-7180-9835-0ba53c103785.jsonl",
+      "context": {
+        "model": "gpt-6.1-sol",
+        "effort": "high",
+        "approval_policy": "never",
+        "sandbox_policy": {
+          "type": "workspace-write",
+          "network_access": false,
+          "exclude_tmpdir_env_var": false,
+          "exclude_slash_tmp": false
+        },
+        "cwd": "/tmp/uah-nm-pilot-01/state/worktrees/0977bace57e8/01M4EHYDDZ8MBE4PGBQ76SZMF2"
+      },
+      "last_reported_usage": {
+        "total_token_usage": {
+          "input_tokens": 2162182,
+          "cached_input_tokens": 2054016,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 7761,
+          "reasoning_output_tokens": 3553,
+          "total_tokens": 2169943
+        },
+        "last_token_usage": {
+          "input_tokens": 128511,
+          "cached_input_tokens": 127616,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 868,
+          "reasoning_output_tokens": 19,
+          "total_tokens": 129379
+        },
+        "model_context_window": 258400
+      }
+    },
+    {
+      "session_file": "rollout-2026-10-08T22-06-33-01a11d1f-ea32-76c2-993e-bc284a8187ce.jsonl",
+      "context": {
+        "model": "gpt-6.1-sol",
+        "effort": "high",
+        "approval_policy": "never",
+        "sandbox_policy": {
+          "type": "workspace-write",
+          "network_access": false,
+          "exclude_tmpdir_env_var": false,
+          "exclude_slash_tmp": false
+        },
+        "cwd": "/tmp/uah-nm-pilot-01/state/worktrees/0977bace57e8/01M4EHYDDZ8MBE4PGBQ76SZMF2"
+      },
+      "last_reported_usage": {
+        "total_token_usage": {
+          "input_tokens": 2898418,
+          "cached_input_tokens": 2757504,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 9358,
+          "reasoning_output_tokens": 5089,
+          "total_tokens": 2907776
+        },
+        "last_token_usage": {
+          "input_tokens": 158975,
+          "cached_input_tokens": 155648,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 1753,
+          "reasoning_output_tokens": 857,
+          "total_tokens": 160728
+        },
+        "model_context_window": 258400
+      }
+    },
+    {
+      "session_file": "rollout-2026-10-08T22-12-04-01a11d24-f631-7ca2-95e6-8a7bbedd3533.jsonl",
+      "context": {
+        "model": "gpt-6-astra",
+        "effort": "max",
+        "approval_policy": "never",
+        "sandbox_policy": {
+          "type": "workspace-write",
+          "network_access": false,
+          "exclude_tmpdir_env_var": false,
+          "exclude_slash_tmp": false
+        },
+        "cwd": "/tmp/uah-nm-pilot-01/state/worktrees/0977bace57e8/01M4EHYDDZ8MBE4PGBQ76SZMF2"
+      },
+      "last_reported_usage": {
+        "total_token_usage": {
+          "input_tokens": 491490,
+          "cached_input_tokens": 413056,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 2957,
+          "reasoning_output_tokens": 906,
+          "total_tokens": 494447
+        },
+        "last_token_usage": {
+          "input_tokens": 84983,
+          "cached_input_tokens": 73472,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 840,
+          "reasoning_output_tokens": 516,
+          "total_tokens": 85823
+        },
+        "model_context_window": 258400
+      }
+    },
+    {
+      "session_file": "rollout-2026-10-08T22-06-42-01a11d20-0f32-7ac1-b13b-a8a39edf7d66.jsonl",
+      "context": {
+        "model": "gpt-6.1-sol",
+        "effort": "high",
+        "approval_policy": "never",
+        "sandbox_policy": {
+          "type": "workspace-write",
+          "network_access": false,
+          "exclude_tmpdir_env_var": false,
+          "exclude_slash_tmp": false
+        },
+        "cwd": "/tmp/uah-nm-pilot-01/state/worktrees/0977bace57e8/01M4EHYDDZ8MBE4PGBQ76SZMF2"
+      },
+      "last_reported_usage": {
+        "total_token_usage": {
+          "input_tokens": 1962868,
+          "cached_input_tokens": 1824256,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 7228,
+          "reasoning_output_tokens": 2670,
+          "total_tokens": 1970096
+        },
+        "last_token_usage": {
+          "input_tokens": 154729,
+          "cached_input_tokens": 153856,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 1345,
+          "reasoning_output_tokens": 277,
+          "total_tokens": 156074
+        },
+        "model_context_window": 258400
+      }
+    },
+    {
+      "session_file": "rollout-2026-10-08T22-05-48-01a11d1f-39da-72b2-bf44-e4fe0251588a.jsonl",
+      "context": {
+        "model": "gpt-6.1-sol",
+        "effort": "high",
+        "approval_policy": "never",
+        "sandbox_policy": {
+          "type": "workspace-write",
+          "network_access": false,
+          "exclude_tmpdir_env_var": false,
+          "exclude_slash_tmp": false
+        },
+        "cwd": "/tmp/uah-nm-pilot-01/state/worktrees/0977bace57e8/01M4EHYDDZ8MBE4PGBQ76SZMF2"
+      },
+      "last_reported_usage": {
+        "total_token_usage": {
+          "input_tokens": 3228833,
+          "cached_input_tokens": 3100672,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 8985,
+          "reasoning_output_tokens": 3477,
+          "total_tokens": 3237818
+        },
+        "last_token_usage": {
+          "input_tokens": 166750,
+          "cached_input_tokens": 161920,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 652,
+          "reasoning_output_tokens": 516,
+          "total_tokens": 167402
+        },
+        "model_context_window": 258400
+      }
+    }
+  ]
+}

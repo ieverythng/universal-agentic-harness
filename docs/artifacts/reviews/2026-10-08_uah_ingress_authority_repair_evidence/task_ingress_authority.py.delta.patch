@@ -1,0 +1,120 @@
+--- docs/artifacts/reviews/2026-10-08_uah_ingress_authority_repair_evidence/before/task_ingress_authority.py.before	2026-10-08 20:41:56.581741471 +0200
++++ src/ab_harness/task_ingress_authority.py	2026-10-08 20:47:44.597255886 +0200
+@@ -23,6 +23,38 @@
+
+
+ @dataclass(frozen=True)
++class _TaskStartCommand:
++    authority: TaskIngressAuthority
++    capability: object
++    environment_run: EnvironmentRun
++    ingress: EnvironmentIngress
++    decision: TaskIngressDecision
++
++    def require_fact(self, ledger: LifecycleLedger) -> TaskStartedFact:
++        authority = self.authority
++        if (
++            type(authority) is not TaskIngressAuthority
++            or authority._ledger is not ledger
++            or self.capability is not authority._start_capability
++        ):
++            raise ValueError("invalid authority-bound task-start command")
++        self.ingress.verify_identity()
++        self.decision.verify_identity()
++        expected = authority._start_decision(self.environment_run, self.ingress)
++        if expected != self.decision:
++            raise ValueError("task-start command does not match admitted ingress")
++        return TaskStartedFact(
++            environment_run_id=expected.environment_run_id,
++            task_id=expected.task_id,
++            trace_id=expected.trace_id,
++            environment_ingress_id=expected.environment_ingress_id,
++            ingress_artifact_id=expected.environment_ingress_artifact_id,
++            decision_id=expected.decision_id,
++            domain_contract_pack_revision=expected.domain_contract_pack_revision,
++        )
++
++
++@dataclass(frozen=True)
+ class _FrozenIngressRule:
+     binding_id: str
+     ingress_type: str
+@@ -62,10 +94,12 @@
+         domain_contract_pack: DomainContractPack,
+         lifecycle_ledger: LifecycleLedger | None = None,
+     ) -> None:
++        domain_contract_pack.verify_identity()
+         self._environment_profile_id = environment_profile_id
+         self._domain_contract_pack_revision = domain_contract_pack.revision
+         self._ledger = lifecycle_ledger or LifecycleLedger()
+         self._task_registry = EnvironmentTaskRegistry(self._ledger)
++        self._start_capability = object()
+         self._rules = MappingProxyType(
+             {
+                 (rule.binding_id, rule.ingress_type): _FrozenIngressRule.from_rule(rule)
+@@ -73,6 +107,31 @@
+             }
+         )
+
++    def _start_decision(
++        self, environment_run: EnvironmentRun, ingress: EnvironmentIngress
++    ) -> TaskIngressDecision:
++        """Recheck the issuer's frozen policy at the ledger trust crossing."""
++        rule = self._rules.get((ingress.binding_id, ingress.ingress_type))
++        if (
++            self._environment_profile_id
++            != environment_run.attestation.environment_profile_id
++            or self._domain_contract_pack_revision
++            != environment_run.attestation.domain_contract_pack_revision
++            or ingress.environment_run_id != environment_run.environment_run_id
++            or rule is None
++            or rule.action != "start_task"
++        ):
++            raise ValueError("task-start command does not match admitted ingress")
++        task_id = dict(ingress.native_lineage).get(rule.task_id_lineage_key or "")
++        if task_id is None:
++            raise ValueError("task-start command does not match admitted ingress")
++        return self._decision(
++            environment_run, ingress, "start_task", "matched_rule",
++            domain_contract_pack_revision=self._domain_contract_pack_revision,
++            task_id=task_id,
++            trace_id=_trace_id_for(environment_run.environment_run_id, task_id),
++        )
++
+     def admit(
+         self,
+         environment_run: EnvironmentRun,
+@@ -166,26 +225,15 @@
+                 "task_already_registered",
+                 registered,
+             )
+-        trace_id = _trace_id_for(environment_run.environment_run_id, task_id)
+-        decision = self._decision(
+-            environment_run,
+-            ingress,
+-            "start_task",
+-            "matched_rule",
+-            domain_contract_pack_revision=self._domain_contract_pack_revision,
+-            task_id=task_id,
+-            trace_id=trace_id,
+-        )
++        decision = self._start_decision(environment_run, ingress)
+         try:
+             self._ledger.record(
+-                TaskStartedFact(
+-                    environment_run_id=environment_run.environment_run_id,
+-                    task_id=task_id,
+-                    trace_id=trace_id,
+-                    environment_ingress_id=ingress.environment_ingress_id,
+-                    ingress_artifact_id=ingress.ingress_artifact_id,
+-                    decision_id=decision.decision_id,
+-                    domain_contract_pack_revision=self._domain_contract_pack_revision,
++                _TaskStartCommand(
++                    authority=self,
++                    capability=self._start_capability,
++                    environment_run=environment_run,
++                    ingress=ingress,
++                    decision=decision,
+                 )
+             )
+         except ValueError:

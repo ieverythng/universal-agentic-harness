@@ -2,7 +2,7 @@
 
 **Status:** O1 environment/task/trace index and explicit actor rendering implemented;
 complete configuration comparison and O2 deferred
-**Date:** 2026-10-04
+**Date:** 2026-10-08
 **Applies to:** UAH H0-H6 and NeuralWorkbench H3+
 
 ## 1. Decision
@@ -245,14 +245,16 @@ The implemented `uah.domain_contract_pack/v1` revision covers its role/task
 allowlists, ingress rules, effect-to-object and evidence-owner rules, failure
 policy, and prohibited effects. `uah.environment_ingress/v1` and
 `uah.task_ingress_decision/v1` are also content-addressed, and the decision
-binds the ingress artifact identity. Compilation requires matching task-start
-fields in the lifecycle ledger. SPEC-02 remains open because public raw facts
-can populate those fields without authentic admitted-ingress provenance. A
-content hash or matching fields alone cannot close that authority gap.
-The task-start event preserves the
-ingress artifact ID, decision ID, and domain-pack revision; the registry does
-not expose a raw task-start mutation method; the common ledger still accepts
-raw `TaskStartedFact` values, which is the separately tracked SPEC-02 gap.
+binds the ingress artifact identity. The independently approved
+[SPEC-02 correction](../artifacts/reviews/2026-10-08_uah_ingress_authority_repair.md)
+requires a ledger-bound command from `TaskIngressAuthority` for new starts.
+Raw `TaskStartedFact` writes are rejected. Fresh compilation checks durable
+command provenance as well as exact lineage; the registry remains read-only.
+Historical unmarked starts remain readable without fresh compilation rights.
+Ledger-file ownership is part of the trusted runtime boundary; matching hashes
+alone do not authenticate an issuer. The start event preserves ingress,
+decision and domain-pack identities. O1 reads these facts and does not grant
+the command capability or approve the complete H0/H1 release.
 
 The H0 `CompiledTask` is now a content-addressed artifact binding start-task
 ingress, task and trace lineage, role, frame, registry, DomainContractPack,
@@ -299,7 +301,8 @@ The earlier identity-only repair returned CHANGES because v1 actor/scope fields
 are excluded from its hash but prohibited by its constructor. Valid raw
 illustrative inputs remain distinct from validated ledger-origin records.
 Content identity alone proves neither causal prerequisites nor measured/reviewed
-provenance; ARCH-02 label conformance remains open. Both fresh independent
+provenance. ARCH-02 is tracked separately under the accepted label policy below.
+Both fresh independent
 reviews approve this bounded repair at its frozen source/dependency bytes,
 as recorded in the [O1 conformance receipt](../artifacts/reviews/2026-10-08_uah_o1_conformance_fix.md).
 Current integration also passes after inspection of the concurrent lifecycle
@@ -405,6 +408,37 @@ Metric values carry one of these labels:
 - `recorded`: replayed fixture or captured runtime data;
 - `measured`: evaluator-produced result under a frozen configuration;
 - `reviewed`: measured result accepted through the applicable gate.
+
+### Accepted temporary label policy (2026-10-08)
+
+The human selected rejection of requested `measured` and `reviewed` labels in
+the current projector and public renderer, for ledger and raw-event sources,
+including empty inputs. A validated ledger establishes recorded provenance,
+not an evaluator result or independent review. The API must report an
+unsupported request rather than silently downgrade it. The enum values and
+definitions above remain reserved for future evidence-backed support.
+
+The [separate ARCH-02 round](../artifacts/reviews/2026-10-08_uah_arch02_label_repair.md)
+tracks the candidate correction and fresh independent gate. Its defect status
+is separate from the deferred evidence interface and complete O1 exit.
+Recorded ledger views, explicitly synthetic or conceptual illustrations and
+the existing raw-recorded restriction remain supported. O1 remains read-only.
+
+### Deferred evaluator and review provenance interface
+
+**Status:** Not implemented. **Owners:** evaluator/result producer and the
+independent review gate; Observatory consumes their qualified evidence.
+
+Reopen this work when a real evaluation result and applicable independent gate
+have a concrete display consumer, an owner-reviewed contract and replay/holdout
+controls. Bind the complete frozen configuration, authorized evaluator, metric
+definition, exact result and source lineage. An independent review must cover
+that same result and configuration. Define coverage, revision, current-use
+freshness and historical display. Mixed populations may not inherit a global
+label from a qualified subset. Replay must verify those bindings without
+reinvoking a model, evaluator or execution owner or creating another trace store.
+Hash equality and caller-supplied issuer names do not establish provenance.
+No receipt schema or evidence resolver is adopted by the temporary rejection.
 
 Conceptual NeuralWorkbench capability-space, energy-landscape, entropy, and AB
 maturity figures are design references. Observatory may reproduce their visual

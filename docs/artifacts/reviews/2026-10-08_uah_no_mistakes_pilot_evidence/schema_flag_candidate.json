@@ -1,0 +1,22 @@
+[
+  {
+    "case": "schema-additional-flag-False",
+    "exception": "ValueError",
+    "message": "public semantic rejection: ('proposal_arguments_schema_invalid',)"
+  },
+  {
+    "case": "schema-additional-flag-'false'",
+    "result": {
+      "schema_flag": "false",
+      "admitted": "admission:sha256:3ba095a52df787f04db40596c66008afdf2ea1ae90ec171b4082f5a80bb7e5b0",
+      "handler_calls": 1,
+      "handler_arguments": [
+        {
+          "review_extra": "unreviewed",
+          "value": "review"
+        }
+      ],
+      "receipt": true
+    }
+  }
+]

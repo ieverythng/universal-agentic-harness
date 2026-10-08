@@ -1,0 +1,418 @@
+{
+  "implementation_not_read": true,
+  "import_path": "/tmp/uah-ingress-candidate-frozen/src/ab_harness/__init__.py",
+  "probes": [
+    {
+      "case": "01-valid-admit-compile",
+      "result": "returned",
+      "value": {
+        "action": "start_task",
+        "compiled": "compiled-task:sha256:b3021aced05fb0cb786ed093f67452f8c3e072fed6b7d1da312f5b6e9715e37d",
+        "events": 1,
+        "reason": "matched_rule",
+        "task": "review-task-alpha",
+        "trace": "trace:sha256:054707feacaeb4b6ddf8de2d8927bfe21610db791cff9dbe4e90678a7946e9aa"
+      }
+    },
+    {
+      "case": "02-restart-compile",
+      "result": "returned",
+      "value": {
+        "action": "reject",
+        "equal": true,
+        "events": 1
+      }
+    },
+    {
+      "case": "03-public-raw-start",
+      "exception": "ValueError",
+      "message": "new starts require an authority-bound task-start command",
+      "result": "exception"
+    },
+    {
+      "case": "04-alternative-public-append-surface",
+      "result": "returned",
+      "value": {
+        "alternate_bulk": [],
+        "ledger": [
+          "agent_runs",
+          "complete_execution",
+          "events",
+          "execution_lease_identity",
+          "fail_execution",
+          "has_operation_event",
+          "record",
+          "replay",
+          "replay_agent_run",
+          "require_authoritative_task_start",
+          "require_current_admission",
+          "start_execution"
+        ],
+        "registry": [
+          "lineage_for_ingress",
+          "lineage_for_task",
+          "require_start",
+          "terminal_status"
+        ]
+      }
+    },
+    {
+      "case": "05-forged-decision-without-start",
+      "exception": "ValueError",
+      "message": "task-start ingress is not recorded in lifecycle ledger",
+      "result": "exception"
+    },
+    {
+      "case": "06-public-raw-start-then-compile",
+      "exception": "ValueError",
+      "message": "new starts require an authority-bound task-start command",
+      "result": "exception"
+    },
+    {
+      "case": "08-decision-tamper-environment_run_id",
+      "exception": "ValueError",
+      "message": "task-start ingress is not recorded in lifecycle ledger",
+      "result": "exception"
+    },
+    {
+      "case": "08-decision-tamper-environment_ingress_artifact_id",
+      "exception": "ValueError",
+      "message": "recorded task-start ingress artifact does not match",
+      "result": "exception"
+    },
+    {
+      "case": "08-decision-tamper-environment_ingress_id",
+      "exception": "ValueError",
+      "message": "task-start ingress is not recorded in lifecycle ledger",
+      "result": "exception"
+    },
+    {
+      "case": "08-decision-tamper-trace_id",
+      "exception": "ValueError",
+      "message": "recorded task-start decision does not match",
+      "result": "exception"
+    },
+    {
+      "case": "08-decision-tamper-task_id",
+      "exception": "ValueError",
+      "message": "recorded task-start decision does not match",
+      "result": "exception"
+    },
+    {
+      "case": "08-decision-tamper-domain_contract_pack_revision",
+      "exception": "ValueError",
+      "message": "ingress domain contract revision does not match",
+      "result": "exception"
+    },
+    {
+      "case": "09-duplicates-forward",
+      "result": "returned",
+      "value": {
+        "decisions": [
+          [
+            "start_task",
+            "matched_rule"
+          ],
+          [
+            "reject",
+            "task_already_registered"
+          ],
+          [
+            "reject",
+            "duplicate_environment_ingress"
+          ]
+        ],
+        "events": 1
+      }
+    },
+    {
+      "case": "09-duplicates-reverse",
+      "result": "returned",
+      "value": {
+        "decisions": [
+          [
+            "start_task",
+            "matched_rule"
+          ],
+          [
+            "reject",
+            "task_already_registered"
+          ],
+          [
+            "reject",
+            "duplicate_environment_ingress"
+          ]
+        ],
+        "events": 1
+      }
+    },
+    {
+      "case": "10-two-tasks-forward",
+      "result": "returned",
+      "value": [
+        [
+          "start_task",
+          "review-task-alpha",
+          "trace:sha256:054707feacaeb4b6ddf8de2d8927bfe21610db791cff9dbe4e90678a7946e9aa"
+        ],
+        [
+          "start_task",
+          "review-task-beta",
+          "trace:sha256:df6a2f42ed5c5781f87679fa31c199bd8b933432b0fa76c529445b62d46e965d"
+        ],
+        [
+          "start_task",
+          "review-task-alpha",
+          "trace:sha256:cf58cbc2c1b58d0b3c345a8bd9a2ec208ffb44fcf87121e1258a06917df40818"
+        ]
+      ]
+    },
+    {
+      "case": "10-two-tasks-reverse",
+      "result": "returned",
+      "value": [
+        [
+          "start_task",
+          "review-task-beta",
+          "trace:sha256:df6a2f42ed5c5781f87679fa31c199bd8b933432b0fa76c529445b62d46e965d"
+        ],
+        [
+          "start_task",
+          "review-task-alpha",
+          "trace:sha256:054707feacaeb4b6ddf8de2d8927bfe21610db791cff9dbe4e90678a7946e9aa"
+        ],
+        [
+          "start_task",
+          "review-task-alpha",
+          "trace:sha256:cf58cbc2c1b58d0b3c345a8bd9a2ec208ffb44fcf87121e1258a06917df40818"
+        ]
+      ]
+    },
+    {
+      "case": "11-12-resume-present",
+      "result": "returned",
+      "value": {
+        "action": "resume_task",
+        "events": 2,
+        "reason": "matched_registered_task",
+        "same_trace": true
+      }
+    },
+    {
+      "case": "11-12-resume-absent",
+      "result": "returned",
+      "value": {
+        "action": "reject",
+        "events": 0,
+        "reason": "unknown_task_identity",
+        "same_trace": false
+      }
+    },
+    {
+      "case": "11-12-resume-wrong-run",
+      "result": "returned",
+      "value": {
+        "action": "reject",
+        "events": 1,
+        "reason": "environment_run_mismatch",
+        "same_trace": false
+      }
+    },
+    {
+      "case": "11-12-resume-foreign",
+      "result": "returned",
+      "value": {
+        "action": "reject",
+        "events": 1,
+        "reason": "unknown_task_identity",
+        "same_trace": false
+      }
+    },
+    {
+      "case": "13-resume-after-rejected",
+      "exception": "ValueError",
+      "message": "task acceptance does not match obligations and evidence",
+      "result": "exception"
+    },
+    {
+      "case": "13-resume-after-suspended",
+      "result": "returned",
+      "value": {
+        "action": "resume_task",
+        "reason": "matched_registered_task"
+      }
+    },
+    {
+      "case": "11-12-notify-present",
+      "result": "returned",
+      "value": {
+        "action": "notify_task",
+        "events": 2,
+        "reason": "matched_registered_task",
+        "same_trace": true
+      }
+    },
+    {
+      "case": "11-12-notify-absent",
+      "result": "returned",
+      "value": {
+        "action": "reject",
+        "events": 0,
+        "reason": "unknown_task_identity",
+        "same_trace": false
+      }
+    },
+    {
+      "case": "11-12-notify-wrong-run",
+      "result": "returned",
+      "value": {
+        "action": "reject",
+        "events": 1,
+        "reason": "environment_run_mismatch",
+        "same_trace": false
+      }
+    },
+    {
+      "case": "11-12-notify-foreign",
+      "result": "returned",
+      "value": {
+        "action": "reject",
+        "events": 1,
+        "reason": "unknown_task_identity",
+        "same_trace": false
+      }
+    },
+    {
+      "case": "13-notify-after-rejected",
+      "exception": "ValueError",
+      "message": "task acceptance does not match obligations and evidence",
+      "result": "exception"
+    },
+    {
+      "case": "13-notify-after-suspended",
+      "result": "returned",
+      "value": {
+        "action": "notify_task",
+        "reason": "matched_registered_task"
+      }
+    },
+    {
+      "case": "14-lineage-omitted",
+      "result": "returned",
+      "value": {
+        "action": "reject",
+        "events": 0,
+        "reason": "missing_task_identity",
+        "task": null
+      }
+    },
+    {
+      "case": "14-lineage-null",
+      "exception": "AttributeError",
+      "message": "'NoneType' object has no attribute 'strip'",
+      "result": "exception"
+    },
+    {
+      "case": "14-lineage-empty",
+      "exception": "ValueError",
+      "message": "native lineage fields must not be empty",
+      "result": "exception"
+    },
+    {
+      "case": "14-lineage-whitespace",
+      "exception": "ValueError",
+      "message": "native lineage fields must not be empty",
+      "result": "exception"
+    },
+    {
+      "case": "14-lineage-integer",
+      "exception": "AttributeError",
+      "message": "'int' object has no attribute 'strip'",
+      "result": "exception"
+    },
+    {
+      "case": "14-lineage-wrong-key",
+      "result": "returned",
+      "value": {
+        "action": "reject",
+        "events": 0,
+        "reason": "missing_task_identity",
+        "task": null
+      }
+    },
+    {
+      "case": "15-unknown-binding",
+      "result": "returned",
+      "value": {
+        "action": "reject",
+        "events": 0,
+        "reason": "unsupported_ingress_binding"
+      }
+    },
+    {
+      "case": "15-unknown-kind",
+      "result": "returned",
+      "value": {
+        "action": "reject",
+        "events": 0,
+        "reason": "unsupported_ingress_type"
+      }
+    },
+    {
+      "case": "15-domain-content-mutation",
+      "result": "returned",
+      "value": {
+        "action": "start_task",
+        "reason": "matched_rule"
+      }
+    },
+    {
+      "case": "17-two-writer-contention",
+      "result": "returned",
+      "value": {
+        "outcomes": [
+          {
+            "action": "reject",
+            "reason": "duplicate_environment_ingress"
+          },
+          {
+            "action": "start_task",
+            "reason": "matched_rule"
+          }
+        ],
+        "sequences": [
+          1
+        ],
+        "starts": 1
+      }
+    },
+    {
+      "case": "timestamp-equivalent-offset",
+      "result": "returned",
+      "value": {
+        "action": "start_task",
+        "events": 1,
+        "reason": "matched_rule",
+        "task": "review-task-alpha"
+      }
+    },
+    {
+      "case": "raw-ingress-fact-resume_task",
+      "exception": "ValueError",
+      "message": "trace lifecycle must begin with task_started",
+      "result": "exception"
+    },
+    {
+      "case": "raw-ingress-fact-notify_task",
+      "exception": "ValueError",
+      "message": "trace lifecycle must begin with task_started",
+      "result": "exception"
+    },
+    {
+      "case": "raw-ingress-fact-start_task",
+      "exception": "ValueError",
+      "message": "unsupported existing-task ingress action",
+      "result": "exception"
+    }
+  ]
+}

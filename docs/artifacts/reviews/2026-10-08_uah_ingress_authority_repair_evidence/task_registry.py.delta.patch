@@ -1,0 +1,12 @@
+--- docs/artifacts/reviews/2026-10-08_uah_ingress_authority_repair_evidence/before/task_registry.py.before	2026-10-08 20:41:56.582000567 +0200
++++ src/ab_harness/task_registry.py	2026-10-08 20:42:47.439382315 +0200
+@@ -103,6 +103,9 @@
+             raise ValueError("recorded task-start contract revision does not match")
+         if lineage.task_id != task_id or lineage.trace_id != trace_id:
+             raise ValueError("task-start ingress lineage does not match decision")
++        self._ledger.require_authoritative_task_start(
++            trace_id=trace_id, decision_id=decision_id
++        )
+         return lineage
+
+     def _refresh_projection(self) -> None:

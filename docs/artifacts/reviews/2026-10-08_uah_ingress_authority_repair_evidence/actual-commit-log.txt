@@ -1,0 +1,42 @@
+Command: GIT_DIR=/home/juanbeck/universal-agentic-harness/.git GIT_WORK_TREE=/tmp/uah-selected-commit-eEh1hf/tree UAH_PYTHON_BIN=/tmp/uah-selected-commit-eEh1hf/tree/.venv/bin/python git commit -F /tmp/uah-selected-commit-eEh1hf/commit-message.txt
+Exit: 0
+check for merge conflicts................................................Passed
+check yaml...........................................(no files to check)Skipped
+fix end of files.........................................................Passed
+trim trailing whitespace.................................................Passed
+ruff.....................................................................Passed
+source-aware test suite..................................................Passed
+generated documentation is synchronized..................................Passed
+[feat/pre-commit-queue 864c6d3] feat(Agent roles): Model agnostic agent role config, registration preflight
+ 51 files changed, 14927 insertions(+), 1029 deletions(-)
+ create mode 100644 docs/artifacts/research/2026-10-08_uah_arch02_and_nao_first_seam_handoff.md
+ create mode 100644 scripts/render_agent_runtime_example.py
+ create mode 100644 scripts/render_observatory_example.py
+ create mode 100644 scripts/render_research_dashboard.py
+ create mode 100644 src/ab_harness/agent_configuration.py
+ create mode 100644 src/ab_harness/agent_identity.py
+ create mode 100644 src/ab_harness/agent_lifecycle.py
+ create mode 100644 src/ab_harness/model_allocator.py
+ create mode 100644 src/ab_harness/model_invocation.py
+ create mode 100644 src/ab_harness/observatory.py
+ create mode 100644 src/ab_harness/operation_edges.py
+ create mode 100644 src/ab_harness/prompt_compiler.py
+ create mode 100644 src/ab_harness/runtime_controls.py
+ create mode 100644 src/ab_harness/schema_validation.py
+ create mode 100644 src/ab_harness/task_ingress_authority.py
+ create mode 100644 tests/test_admission_active_provenance.py
+ create mode 100644 tests/test_admitted_object_snapshot.py
+ create mode 100644 tests/test_agent_configuration.py
+ create mode 100644 tests/test_agent_identity.py
+ create mode 100644 tests/test_agent_runtime.py
+ create mode 100644 tests/test_agent_runtime_example.py
+ create mode 100644 tests/test_argument_schema_validation.py
+ create mode 100644 tests/test_content_identity_compatibility.py
+ create mode 100644 tests/test_model_invocation.py
+ create mode 100644 tests/test_nested_admission_owner.py
+ create mode 100644 tests/test_observatory.py
+ create mode 100644 tests/test_observatory_format.py
+ create mode 100644 tests/test_observatory_raw_identity.py
+ create mode 100644 tests/test_prompt_compiler.py
+ create mode 100644 tests/test_research_dashboard.py
+ create mode 100644 tests/test_runtime_budget_contracts.py

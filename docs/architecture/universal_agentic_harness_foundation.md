@@ -827,9 +827,27 @@ replay are implemented. Cooperating writers use an OS advisory lock and reload
 the stream before transition validation and append. The complete
 cancellation/failure grammar remains open.
 Each decision has a content-derived identity that includes the ingress artifact
-identity. Compilation also requires the exact start lineage to be present in
-the ledger, so constructing a matching decision value outside the ingress
-authority cannot grant task authority.
+identity. Matching decision and start-lineage fields alone do not authenticate
+the task-start producer (SPEC-02). On 2026-10-08 the human selected an
+authority-bound ledger command: `TaskIngressAuthority` admits a request and the
+ledger writes the resulting authoritative start. The read-only task registry
+must require that provenance before fresh compilation. Caller-created raw facts
+and exported events do not grant command authority. Historical unmarked starts
+remain readable without fresh compilation rights. The bounded repair and fresh
+review are tracked in the [ingress round](../artifacts/reviews/2026-10-08_uah_ingress_authority_repair.md);
+this accepted boundary is not H0/H1 release sign-off. It relies on trusted
+runtime ownership of the ledger file, not resistance to an attacker rewriting
+the entire file and recomputing its hashes.
+
+```mermaid
+%% uah-render: Figure 9. Task-start ownership and the read-only compiler check
+flowchart LR
+    Caller["Caller requests task start"] --> Authority["TaskIngressAuthority<br/>verified ingress + frozen policy"]
+    Authority --> Command["Authority-bound command<br/>exact ledger affinity"]
+    Command --> Ledger["LifecycleLedger<br/>atomic start + replay"]
+    Ledger --> Registry["Task registry<br/>read-only provenance check"]
+    Registry --> Compiler["TaskSpecCompiler<br/>fresh compilation"]
+```
 
 ### AgentRoleConfiguration
 

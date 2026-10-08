@@ -1,0 +1,124 @@
+--- docs/artifacts/reviews/2026-10-08_uah_ingress_authority_repair_evidence/before/test_lifecycle_ledger.py.before	2026-10-08 20:41:56.582107308 +0200
++++ tests/test_lifecycle_ledger.py	2026-10-08 20:45:08.144300279 +0200
+@@ -6,40 +6,49 @@
+ from ab_harness.lifecycle import LifecycleLedger
+ from ab_harness.lifecycle import LifecycleSequenceConflict
+ from ab_harness.lifecycle import TaskIngressFact
+-from ab_harness.lifecycle import TaskStartedFact
+ from ab_harness.lifecycle import TraceEvent
+ from ab_harness.observatory import project_observatory
+ from ab_harness.observatory import render_observatory
+ from ab_harness.task_registry import EnvironmentTaskRegistry
+
+
+-INGRESS_ARTIFACT_ID = "environment-ingress:sha256:ledger-start"
+-DECISION_ID = "task-ingress-decision:sha256:ledger-start"
+-DOMAIN_REVISION = "sha256:ledger-domain-pack"
++INGRESS_ARTIFACT_ID = "environment-ingress:sha256:8f47a0e41c10ef678add0842429b05018bfe4144d0fe1ebe424a53160d11dc3b"
++DECISION_ID = "task-ingress-decision:sha256:eea014719cba0f6034378376423e5538d07c0bbb739bbeb9cfe33bb24cfe5cf1"
++DOMAIN_REVISION = "sha256:dadb666ec64ed9fe37fab31d201a32dcd45e60d103b411b42e2205aafaacb731"
++TRACE_ID = "trace:sha256:2c443758d1b81e09308e6fc742e2f1456418ea5618cba40708c5ae2290ff0e43"
+
+
+ def _ledger(path):
++    from ab_harness import EnvironmentIngress, TaskIngressAuthority
++    from test_environment_ingress import DOMAIN_PACK, _active_environment_run
++
+     ledger = LifecycleLedger(path, clock=lambda: "2026-09-28T13:00:00Z")
+-    ledger.record(
+-        TaskStartedFact(
+-            environment_run_id="environment-run:ledger:001",
+-            task_id="task:ledger:001",
+-            trace_id="trace:ledger:001",
++    run = _active_environment_run("environment-run:ledger:001")
++    decision = TaskIngressAuthority(
++        environment_profile_id=run.attestation.environment_profile_id,
++        domain_contract_pack=DOMAIN_PACK,
++        lifecycle_ledger=ledger,
++    ).admit(
++        run,
++        EnvironmentIngress(
+             environment_ingress_id="ingress:ledger:start",
+-            ingress_artifact_id=INGRESS_ARTIFACT_ID,
+-            decision_id=DECISION_ID,
+-            domain_contract_pack_revision=DOMAIN_REVISION,
++            environment_run_id=run.environment_run_id,
++            binding_id="binding:synthetic.request:v1",
++            ingress_type="user_request",
++            payload_artifact_id="artifact:ledger:start",
++            native_lineage=(("goal_id", "task:ledger:001"),),
++            observed_at="2026-09-28T13:00:00Z",
+         )
+     )
+     ledger.record(
+         TaskIngressFact(
+             environment_run_id="environment-run:ledger:001",
+             task_id="task:ledger:001",
+-            trace_id="trace:ledger:001",
++            trace_id=decision.trace_id,
+             environment_ingress_id="ingress:ledger:resume",
+             ingress_artifact_id="environment-ingress:sha256:ledger-resume",
+             decision_id="task-ingress-decision:sha256:ledger-resume",
+-            domain_contract_pack_revision=DOMAIN_REVISION,
++            domain_contract_pack_revision=decision.domain_contract_pack_revision,
+             action="resume_task",
+         )
+     )
+@@ -61,7 +70,7 @@
+         decision_id=DECISION_ID,
+         domain_contract_pack_revision=DOMAIN_REVISION,
+         task_id="task:ledger:001",
+-        trace_id="trace:ledger:001",
++        trace_id=TRACE_ID,
+     )
+     assert lineage.starting_decision_id == DECISION_ID
+
+@@ -81,13 +90,13 @@
+     if source == "events":
+         exported = ledger.events()[-1]
+     elif source == "replay":
+-        exported = ledger.replay("trace:ledger:001").events[-1]
++        exported = ledger.replay(TRACE_ID).events[-1]
+     else:
+         exported = ledger.record(
+             TaskIngressFact(
+                 environment_run_id="environment-run:ledger:001",
+                 task_id="task:ledger:001",
+-                trace_id="trace:ledger:001",
++                trace_id=TRACE_ID,
+                 environment_ingress_id="ingress:ledger:notify",
+                 ingress_artifact_id="environment-ingress:sha256:ledger-notify",
+                 decision_id="task-ingress-decision:sha256:ledger-notify",
+@@ -99,7 +108,7 @@
+     object.__setattr__(exported, "event_type", "terminal_task_accepted")
+
+     assert tuple(event.to_dict() for event in ledger.events()) == original
+-    assert ledger.replay("trace:ledger:001").terminal_status is None
++    assert ledger.replay(TRACE_ID).terminal_status is None
+     assert project_observatory(ledger).traces[0].status.value == "open"
+
+
+@@ -125,12 +134,12 @@
+     tmp_path, file_backed, source
+ ):
+     from test_two_stage_admission import _admission_fixture
+-    from test_two_stage_admission import _task_start
++    from test_two_stage_admission import _record_task_start
+     from ab_harness.runtime_controls import TaskBudgetAuthority
+
+     compiled, _, _ = _admission_fixture()
+     ledger = LifecycleLedger(tmp_path / "budget.jsonl" if file_backed else None)
+-    ledger.record(_task_start(compiled))
++    _record_task_start(ledger, compiled)
+     commit = ledger.record(compiled)
+     authority = TaskBudgetAuthority(ledger)
+     for index in range(3):
+@@ -269,7 +278,7 @@
+     fact = TaskIngressFact(
+         environment_run_id="environment-run:ledger:001",
+         task_id="task:ledger:001",
+-        trace_id="trace:ledger:001",
++        trace_id=TRACE_ID,
+         environment_ingress_id="ingress:ledger:contended",
+         ingress_artifact_id="environment-ingress:sha256:ledger-contended",
+         decision_id="task-ingress-decision:sha256:ledger-contended",

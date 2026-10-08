@@ -1,0 +1,15 @@
+agent: codex
+commands:
+  test: PYTHONPATH=src ./scripts/run_repo_python.sh -m pytest -q
+  lint: PYTHONPATH=src ./scripts/run_repo_python.sh -m ruff check src tests scripts
+auto_fix:
+  rebase: 0
+  review: 0
+  test: 0
+  document: 0
+  lint: 0
+  ci: 0
+test:
+  evidence:
+    store_in_repo: false
+    attach_media: false
