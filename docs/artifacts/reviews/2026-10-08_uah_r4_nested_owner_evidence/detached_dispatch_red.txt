@@ -1,0 +1,190 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+__ test_dispatch_and_receipt_use_detached_authority_when_caller_fields_change __
+
+self = <ab_harness.environment.InProcessEnvironmentOwner object at 0x7a24b6e39ac0>
+lease = ExecutionLease(execution_lease_id='execution-lease:sha256:adf7d38172ad7fa5068a9ce62702454f71b17a72830480511b524d5b5000...ent_attestation_id='environment-attestation:admission-001', scope='operation', schema_version='uah.execution_lease/v1')
+
+    def execute(self, lease: ExecutionLease) -> EvidenceDecision:
+        admitted = self._validate_lease(lease)
+        if self._catalog.object_for(admitted.object_id) != admitted.object_snapshot:
+            raise ValueError("execution lease object semantics no longer match the catalog")
+
+        item, binding, handler = _resolve_handler(
+            environment_id=self.environment_id,
+            catalog=self._catalog,
+            handlers=self._handlers,
+            object_id=admitted.object_id,
+            runtime_mode=admitted.runtime_mode,
+        )
+        if (
+            binding.binding_id != admitted.binding_id
+            or binding.source_revision != admitted.binding_source_revision
+            or binding_fingerprint(binding) != admitted.binding_fingerprint
+        ):
+            raise ValueError("execution lease binding no longer matches the catalog")
+
+        self._lifecycle_ledger.start_execution(lease)
+        try:
+            owner_result, evidence, rejection_reasons = _execute_handler(
+                environment_id=self.environment_id,
+                item=replace(admitted.object_snapshot),
+                binding=binding,
+                handler=handler,
+                arguments=admitted.arguments,
+            )
+            if rejection_reasons:
+                rejection = EvidenceRejection.issue(
+                    lease=lease,
+                    owner_result=owner_result,
+                    reason_codes=rejection_reasons,
+                )
+                self._lifecycle_ledger.record(rejection)
+                return EvidenceDecision(rejection=rejection)
+>           receipt = ExecutionReceipt.issue(
+                lease=lease,
+                owner_result=owner_result,
+                evidence=evidence,
+            )
+
+src/ab_harness/environment.py:519:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+src/ab_harness/environment.py:124: in issue
+    ExecutionLease.verify_identity(lease)
+src/ab_harness/domain_lifecycle.py:71: in verify_identity
+    AdmittedOperation.verify_identity(self.admitted_operation)
+src/ab_harness/proposal_admission.py:502: in verify_identity
+    TypedProposal.verify_identity(self.proposal)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = TypedProposal(proposal_id='proposal:sha256:0e6cbf45c33e75e5d6df9bc0a3c592da18f9dddb3d3c0b6cddedcfc12acced77', compiled...e='executable_plan', object_id='find_object', arguments_json='{"label":"mug"}', schema_version='uah.typed_proposal/v1')
+
+    def verify_identity(self) -> None:
+        _required_strings(
+            {
+                "proposal_id": self.proposal_id,
+                "compiled_task_id": self.compiled_task_id,
+                "environment_run_id": self.environment_run_id,
+                "task_id": self.task_id,
+                "trace_id": self.trace_id,
+                "operation_id": self.operation_id,
+                "raw_output_artifact_id": self.raw_output_artifact_id,
+                "output_type": self.output_type,
+                "object_id": self.object_id,
+                "arguments_json": self.arguments_json,
+            },
+            "typed proposal",
+        )
+        if self.schema_version != TYPED_PROPOSAL_SCHEMA:
+            raise ValueError(
+                "unsupported typed proposal schema: %s" % self.schema_version
+            )
+        try:
+            arguments = json.loads(self.arguments_json)
+        except json.JSONDecodeError as exc:
+            raise ValueError("typed proposal arguments are not valid JSON") from exc
+        if not isinstance(arguments, dict):
+            raise ValueError("typed proposal arguments must be a JSON object")
+        if self.arguments_json != _canonical_arguments(arguments):
+            raise ValueError("typed proposal arguments are not canonical JSON")
+        payload = _proposal_payload(
+            compiled_task_id=self.compiled_task_id,
+            environment_run_id=self.environment_run_id,
+            task_id=self.task_id,
+            trace_id=self.trace_id,
+            operation_id=self.operation_id,
+            raw_output_artifact_id=self.raw_output_artifact_id,
+            output_type=self.output_type,
+            object_id=self.object_id,
+            arguments_json=self.arguments_json,
+        )
+        if self.proposal_id != _content_id("proposal", payload):
+>           raise ValueError("typed proposal identity does not match content")
+E           ValueError: typed proposal identity does not match content
+
+src/ab_harness/proposal_admission.py:141: ValueError
+
+During handling of the above exception, another exception occurred:
+
+tmp_path = PosixPath('/tmp/pytest-of-juanbeck/pytest-186/test_dispatch_and_receipt_use_0')
+
+    def test_dispatch_and_receipt_use_detached_authority_when_caller_fields_change(tmp_path):
+        _, catalog, environment, ledger, admitted, lease = authority_fixture(tmp_path)
+        original_admission = admitted.admission_id
+        calls = []
+        def handler(arguments):
+            calls.append(arguments)
+            object.__setattr__(admitted.proposal, "arguments_json", '{"label":"mug"}')
+            return OwnerExecutionResult("native:detached", True, (FRESH_EFFECT,))
+>       decision = owner_for(catalog, environment, ledger, handler).execute(lease)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_nested_admission_owner.py:46:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+src/ab_harness/environment.py:525: in execute
+    self._lifecycle_ledger.fail_execution(lease, exc)
+src/ab_harness/lifecycle.py:698: in fail_execution
+    ExecutionFailure.issue(
+src/ab_harness/runtime_controls.py:417: in issue
+    payload = _failure_payload(**fields)  # type: ignore[arg-type]
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/ab_harness/runtime_controls.py:392: in _failure_payload
+    "lease": lease.to_dict(),
+             ^^^^^^^^^^^^^^^
+src/ab_harness/domain_lifecycle.py:115: in to_dict
+    self.verify_identity()
+src/ab_harness/domain_lifecycle.py:71: in verify_identity
+    AdmittedOperation.verify_identity(self.admitted_operation)
+src/ab_harness/proposal_admission.py:502: in verify_identity
+    TypedProposal.verify_identity(self.proposal)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = TypedProposal(proposal_id='proposal:sha256:0e6cbf45c33e75e5d6df9bc0a3c592da18f9dddb3d3c0b6cddedcfc12acced77', compiled...e='executable_plan', object_id='find_object', arguments_json='{"label":"mug"}', schema_version='uah.typed_proposal/v1')
+
+    def verify_identity(self) -> None:
+        _required_strings(
+            {
+                "proposal_id": self.proposal_id,
+                "compiled_task_id": self.compiled_task_id,
+                "environment_run_id": self.environment_run_id,
+                "task_id": self.task_id,
+                "trace_id": self.trace_id,
+                "operation_id": self.operation_id,
+                "raw_output_artifact_id": self.raw_output_artifact_id,
+                "output_type": self.output_type,
+                "object_id": self.object_id,
+                "arguments_json": self.arguments_json,
+            },
+            "typed proposal",
+        )
+        if self.schema_version != TYPED_PROPOSAL_SCHEMA:
+            raise ValueError(
+                "unsupported typed proposal schema: %s" % self.schema_version
+            )
+        try:
+            arguments = json.loads(self.arguments_json)
+        except json.JSONDecodeError as exc:
+            raise ValueError("typed proposal arguments are not valid JSON") from exc
+        if not isinstance(arguments, dict):
+            raise ValueError("typed proposal arguments must be a JSON object")
+        if self.arguments_json != _canonical_arguments(arguments):
+            raise ValueError("typed proposal arguments are not canonical JSON")
+        payload = _proposal_payload(
+            compiled_task_id=self.compiled_task_id,
+            environment_run_id=self.environment_run_id,
+            task_id=self.task_id,
+            trace_id=self.trace_id,
+            operation_id=self.operation_id,
+            raw_output_artifact_id=self.raw_output_artifact_id,
+            output_type=self.output_type,
+            object_id=self.object_id,
+            arguments_json=self.arguments_json,
+        )
+        if self.proposal_id != _content_id("proposal", payload):
+>           raise ValueError("typed proposal identity does not match content")
+E           ValueError: typed proposal identity does not match content
+
+src/ab_harness/proposal_admission.py:141: ValueError
+=========================== short test summary info ============================
+FAILED tests/test_nested_admission_owner.py::test_dispatch_and_receipt_use_detached_authority_when_caller_fields_change
+1 failed, 1 deselected in 0.24s

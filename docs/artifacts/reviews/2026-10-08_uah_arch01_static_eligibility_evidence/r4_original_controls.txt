@@ -1,0 +1,22 @@
+Command: PYTHONPATH=src:tests .venv/bin/python docs/artifacts/reviews/2026-10-08_uah_r4_admitted_object_snapshot_evidence/second_review_probes.py current
+Exit: 0
+
+{"case": "valid", "native_calls": 1, "reasons": [], "receipt": true, "replay_failure": null}
+{"case": "pre_drift", "error": "execution lease object semantics no longer match the catalog", "native_calls": 0}
+{"case": "mid_drift", "native_calls": 1, "reasons": ["undeclared_observed_effect"], "receipt": false, "replay_failure": "evidence"}
+{"accepted": true, "case": "revised_binding", "reasons": []}
+{"accepted": false, "case": "active_missing_object_snapshot", "error": "invalid admitted operation fields"}
+{"accepted": false, "case": "active_missing_schema_version", "error": "invalid admitted operation fields"}
+{"case": "missing_admitted_operation", "error": "invalid admitted operation fields", "loaded": false, "type": "ValueError"}
+{"case": "missing_object_snapshot", "error": "recorded snapshot does not match admitted operation", "loaded": false, "type": "ValueError"}
+{"case": "missing_schema_version", "error": "unsupported recorded admitted operation schema", "loaded": false, "type": "ValueError"}
+{"case": "snapshot_empty", "error": "invalid admitted object snapshot fields", "loaded": false, "type": "ValueError"}
+{"case": "active_v2", "error": "unsupported admitted operation schema", "loaded": false, "type": "ValueError"}
+{"case": "nested_rehash_stale_outer", "error": "admitted operation identity does not match content", "loaded": false, "type": "ValueError"}
+{"case": "alias_frame_id", "error": "recorded snapshot does not match admitted operation", "loaded": false, "type": "ValueError"}
+{"case": "alias_object_id", "error": "recorded snapshot does not match admitted operation", "loaded": false, "type": "ValueError"}
+{"case": "alias_input_schema_id", "error": "recorded snapshot does not match admitted operation", "loaded": false, "type": "ValueError"}
+{"case": "alias_ab_level", "error": "recorded snapshot does not match admitted operation", "loaded": false, "type": "ValueError"}
+{"case": "strip_all", "error": "active execution requires current semantic provenance", "loaded": false, "type": "ValueError"}
+{"case": "strip_all_wrong_frame", "error": "active execution requires current semantic provenance", "loaded": false, "type": "ValueError"}
+{"case": "genuine_historical_read", "events": 5, "snapshot_present": false}

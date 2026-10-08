@@ -1,0 +1,35 @@
+--- docs/artifacts/reviews/2026-10-08_uah_r4_fix_evidence/environment.py.before	2026-10-08 17:29:32.318115380 +0200
++++ src/ab_harness/environment.py	2026-10-08 17:32:56.929749533 +0200
+@@ -121,7 +121,7 @@
+         owner_result: OwnerExecutionResult,
+         evidence: EffectEvidence,
+     ) -> ExecutionReceipt:
+-        lease.verify_identity()
++        ExecutionLease.verify_identity(lease)
+         admitted = lease.admitted_operation
+         mismatched = []
+         if evidence.object_id != admitted.object_id:
+@@ -313,7 +313,7 @@
+         )
+
+     def verify_identity(self) -> None:
+-        self.lease.verify_identity()
++        ExecutionLease.verify_identity(self.lease)
+         if self.schema_version != EVIDENCE_REJECTION_SCHEMA:
+             raise ValueError("unsupported evidence rejection schema")
+         if not self.reason_codes or any(
+@@ -551,7 +551,7 @@
+     def _validate_lease(self, lease: ExecutionLease) -> AdmittedOperation:
+         if not isinstance(lease, ExecutionLease):
+             raise TypeError("lease-bound owner requires an ExecutionLease")
+-        lease.verify_identity()
++        ExecutionLease.verify_identity(lease)
+         if lease.environment_run_id != self.environment_run.environment_run_id:
+             raise ValueError("execution lease belongs to another environment run")
+         if (
+@@ -567,4 +567,5 @@
+         admitted = lease.admitted_operation
+         if admitted.environment_id != self.environment_id:
+             raise ValueError("execution lease belongs to another environment")
++        self._lifecycle_ledger.require_current_admission(admitted)
+         return admitted

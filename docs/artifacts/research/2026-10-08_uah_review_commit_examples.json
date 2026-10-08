@@ -1,0 +1,150 @@
+{
+  "schema_status": "research_proposal_only",
+  "date": "2026-10-08",
+  "observed_head": "28fab5e7f2c244d86a64c371f2118017999b2387",
+  "units": [
+    {
+      "unit_id": "UAH-R4-NESTED-OWNER",
+      "comparison": {
+        "kind": "exact_dirty_before",
+        "before_manifest": "../reviews/2026-10-08_uah_r4_nested_owner_evidence/inputs.sha256",
+        "candidate_manifest": "../reviews/2026-10-08_uah_r4_nested_owner_evidence/source_frozen.sha256"
+      },
+      "reviews": [
+        {
+          "report": "../reviews/2026-10-08_uah_r4_nested_owner_primary_review.md",
+          "requested_model": "gpt-6.1-sol",
+          "requested_effort": "max",
+          "observed_backend": null,
+          "run_state": "complete",
+          "overall_verdict": "APPROVE",
+          "axes": {
+            "standards": {
+              "assessment": "see_original_report"
+            },
+            "spec": {
+              "assessment": "see_original_report"
+            }
+          }
+        },
+        {
+          "report": "../reviews/2026-10-08_uah_r4_nested_owner_second_review.md",
+          "requested_model": "gpt-6-astra",
+          "requested_effort": "max",
+          "observed_backend": null,
+          "run_state": "complete",
+          "overall_verdict": "APPROVE",
+          "axes": {
+            "standards": {
+              "assessment": "see_original_report"
+            },
+            "spec": {
+              "assessment": "see_original_report"
+            }
+          }
+        }
+      ],
+      "later_reviewed_delta": "../reviews/2026-10-08_uah_arch01_static_eligibility.md",
+      "commit": {
+        "state": "not_observed",
+        "actor": null,
+        "resulting_sha": null,
+        "reviewed_body_equivalence": "not_checked"
+      },
+      "release": {
+        "state": "not_qualified"
+      }
+    },
+    {
+      "unit_id": "UAH-R5-NATIVE",
+      "comparison": {
+        "kind": "exact_dirty_before_absent_package",
+        "candidate_manifest": "../reviews/2026-10-08_uah_r5_owner_local_evidence/source_frozen.sha256",
+        "before_native_behavior": "unavailable"
+      },
+      "reviews": [
+        {
+          "report": "../reviews/2026-10-08_uah_r5_native_primary_review.md",
+          "requested_model": "gpt-6.1-sol",
+          "observed_backend": null,
+          "run_state": "complete",
+          "overall_verdict": "CHANGES",
+          "axes": {
+            "standards": {
+              "original_finding_refs": [
+                "primary finding 1"
+              ],
+              "count": 1
+            },
+            "spec": {
+              "original_finding_refs": [
+                "primary finding 2"
+              ],
+              "count": 1
+            }
+          }
+        },
+        {
+          "report": "../reviews/2026-10-08_uah_r5_native_second_review.md",
+          "requested_model": "gpt-6-astra",
+          "observed_backend": null,
+          "run_state": "complete",
+          "overall_verdict": "CHANGES",
+          "axes": {
+            "standards": {
+              "assessment": "encapsulation violations corroborate Spec; no extra Standards-only finding"
+            },
+            "spec": {
+              "original_finding_refs": [
+                "R5-N2-01",
+                "R5-N2-02"
+              ],
+              "count": 2
+            }
+          }
+        }
+      ],
+      "aggregate_mechanisms": [
+        {
+          "proposed_id": "R5-FENCE",
+          "original_refs": [
+            "primary Standards finding 1",
+            "R5-N2-01"
+          ],
+          "state": "open"
+        },
+        {
+          "proposed_id": "R5-NESTED-IDENTITY",
+          "original_refs": [
+            "primary Spec finding 2"
+          ],
+          "state": "open"
+        },
+        {
+          "proposed_id": "R5-HARDLINK",
+          "original_refs": [
+            "R5-N2-02"
+          ],
+          "state": "open"
+        }
+      ],
+      "commit": {
+        "state": "requested_human_manual",
+        "intended_actor": "human",
+        "observed_actor": null,
+        "resulting_sha": null,
+        "committed_tree": null,
+        "reviewed_body_equivalence": "not_checked"
+      },
+      "release": {
+        "state": "deferred_unapproved"
+      }
+    }
+  ],
+  "limits": [
+    "Not an implemented record schema",
+    "Per-axis verdicts must remain grounded in original reports",
+    "Git actor metadata does not authenticate operator",
+    "Actual commits and affected dependency manifests require fresh observation"
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "current_artifact_against_old_authority": {
+    "error": "ValueError",
+    "message": "active execution requires current semantic provenance",
+    "outcome": "rejected"
+  },
+  "current_deserialize_old": {
+    "error": "ValueError",
+    "message": "invalid admitted operation fields",
+    "outcome": "rejected"
+  },
+  "exact_old_object_lease_request": {
+    "error": "ValueError",
+    "message": "current admission requires the supported concrete artifact",
+    "outcome": "rejected"
+  },
+  "historical_read": {
+    "outcome": "accepted",
+    "value": {
+      "events": 4,
+      "stage": null
+    }
+  }
+}

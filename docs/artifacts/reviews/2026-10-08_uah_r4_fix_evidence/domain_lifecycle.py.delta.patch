@@ -1,0 +1,32 @@
+--- docs/artifacts/reviews/2026-10-08_uah_r4_fix_evidence/domain_lifecycle.py.before	2026-10-08 17:29:32.317870441 +0200
++++ src/ab_harness/domain_lifecycle.py	2026-10-08 17:32:56.928749528 +0200
+@@ -66,7 +66,9 @@
+         self.verify_identity()
+
+     def verify_identity(self) -> None:
+-        self.admitted_operation.verify_identity()
++        if type(self) is not ExecutionLease:
++            raise ValueError("current execution requires the supported concrete lease")
++        AdmittedOperation.verify_identity(self.admitted_operation)
+         if self.schema_version != EXECUTION_LEASE_SCHEMA:
+             raise ValueError(
+                 "unsupported execution lease schema: %s" % self.schema_version
+@@ -174,7 +176,7 @@
+         self.verify_identity()
+
+     def verify_identity(self) -> None:
+-        self.admitted_operation.verify_identity()
++        AdmittedOperation.verify_identity(self.admitted_operation)
+         if self.schema_version != DOMAIN_ADMISSION_REJECTION_SCHEMA:
+             raise ValueError(
+                 "unsupported domain rejection schema: %s" % self.schema_version
+@@ -284,7 +286,8 @@
+         self,
+         admitted_operation: AdmittedOperation,
+     ) -> ExecutionLeaseDecision:
+-        admitted_operation.verify_identity()
++        AdmittedOperation.verify_identity(admitted_operation)
++        self._lifecycle_ledger.require_current_admission(admitted_operation)
+         recorded_lease = self._lifecycle_ledger.execution_lease_identity(
+             trace_id=admitted_operation.trace_id,
+             operation_id=admitted_operation.operation_id,

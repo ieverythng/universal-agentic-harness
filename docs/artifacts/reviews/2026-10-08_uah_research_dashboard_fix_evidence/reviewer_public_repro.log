@@ -1,0 +1,343 @@
+{
+  "work": "/tmp/uah-dashboard-second-wyyq1uux",
+  "results": [
+    {
+      "name": "canonical",
+      "expected_exit": 0,
+      "actual_exit": 0,
+      "stderr": "",
+      "rejection_preserves_outputs": null
+    },
+    {
+      "name": "extra_metric_record",
+      "expected_exit": 1,
+      "actual_exit": 1,
+      "stderr": "Research catalog error: record requires exactly these fields: ['date', 'h_series_dependencies', 'id', 'kind', 'references', 'source', 'summary', 'title']",
+      "rejection_preserves_outputs": true
+    },
+    {
+      "name": "extra_status",
+      "expected_exit": 1,
+      "actual_exit": 1,
+      "stderr": "Research catalog error: record requires exactly these fields: ['date', 'h_series_dependencies', 'id', 'kind', 'references', 'source', 'summary', 'title']",
+      "rejection_preserves_outputs": true
+    },
+    {
+      "name": "extra_metric_root",
+      "expected_exit": 1,
+      "actual_exit": 1,
+      "stderr": "Research catalog error: registry requires exactly these fields: ['reconciled_at', 'records', 'schema_version']",
+      "rejection_preserves_outputs": true
+    },
+    {
+      "name": "duplicate_ids",
+      "expected_exit": 1,
+      "actual_exit": 1,
+      "stderr": "Research catalog error: duplicate record id: alpha",
+      "rejection_preserves_outputs": true
+    },
+    {
+      "name": "unknown_kind",
+      "expected_exit": 1,
+      "actual_exit": 1,
+      "stderr": "Research catalog error: unknown record kind",
+      "rejection_preserves_outputs": true
+    },
+    {
+      "name": "uppercase_kind",
+      "expected_exit": 1,
+      "actual_exit": 1,
+      "stderr": "Research catalog error: unknown record kind",
+      "rejection_preserves_outputs": true
+    },
+    {
+      "name": "combined_future_bad_hash",
+      "expected_exit": 1,
+      "actual_exit": 1,
+      "stderr": "Research catalog error: catalog date cannot be later than the as-of date",
+      "rejection_preserves_outputs": true
+    },
+    {
+      "name": "nonleap_day",
+      "expected_exit": 1,
+      "actual_exit": 1,
+      "stderr": "Research catalog error: day is out of range for month",
+      "rejection_preserves_outputs": true
+    },
+    {
+      "name": "datetime_zone",
+      "expected_exit": 1,
+      "actual_exit": 1,
+      "stderr": "Research catalog error: catalog date must be YYYY-MM-DD",
+      "rejection_preserves_outputs": true
+    },
+    {
+      "name": "date_no_unit",
+      "expected_exit": 1,
+      "actual_exit": 1,
+      "stderr": "Research catalog error: catalog date must be YYYY-MM-DD",
+      "rejection_preserves_outputs": true
+    },
+    {
+      "name": "future_reconcile",
+      "expected_exit": 1,
+      "actual_exit": 1,
+      "stderr": "Research catalog error: catalog date cannot be later than the as-of date",
+      "rejection_preserves_outputs": true
+    },
+    {
+      "name": "record_after_reconcile",
+      "expected_exit": 1,
+      "actual_exit": 1,
+      "stderr": "Research catalog error: record date cannot be later than reconciliation",
+      "rejection_preserves_outputs": true
+    },
+    {
+      "name": "missing_source",
+      "expected_exit": 1,
+      "actual_exit": 1,
+      "stderr": "Research catalog error: source/reference missing or outside repository: docs/absent.md",
+      "rejection_preserves_outputs": true
+    },
+    {
+      "name": "traversal_source",
+      "expected_exit": 1,
+      "actual_exit": 1,
+      "stderr": "Research catalog error: source/reference must be a local Markdown or HTML document",
+      "rejection_preserves_outputs": true
+    },
+    {
+      "name": "absolute_source",
+      "expected_exit": 1,
+      "actual_exit": 1,
+      "stderr": "Research catalog error: source/reference must be a repository-relative docs path",
+      "rejection_preserves_outputs": true
+    },
+    {
+      "name": "wrong_hash",
+      "expected_exit": 1,
+      "actual_exit": 1,
+      "stderr": "Research catalog error: source hash mismatch: docs/source.md",
+      "rejection_preserves_outputs": true
+    },
+    {
+      "name": "uppercase_hash",
+      "expected_exit": 1,
+      "actual_exit": 1,
+      "stderr": "Research catalog error: dated research and receipts require a lowercase SHA-256",
+      "rejection_preserves_outputs": true
+    },
+    {
+      "name": "missing_hash",
+      "expected_exit": 1,
+      "actual_exit": 1,
+      "stderr": "Research catalog error: dated research and receipts require a lowercase SHA-256",
+      "rejection_preserves_outputs": true
+    },
+    {
+      "name": "duplicate_dependencies",
+      "expected_exit": 1,
+      "actual_exit": 1,
+      "stderr": "Research catalog error: dependencies must be distinct H0-H6 metadata labels",
+      "rejection_preserves_outputs": true
+    },
+    {
+      "name": "nested_nonstring_dependency",
+      "expected_exit": 1,
+      "actual_exit": 1,
+      "stderr": "Research catalog error: dependencies must be distinct H0-H6 metadata labels",
+      "rejection_preserves_outputs": true
+    },
+    {
+      "name": "missing_reference",
+      "expected_exit": 1,
+      "actual_exit": 1,
+      "stderr": "Research catalog error: source/reference missing or outside repository: docs/missing.md",
+      "rejection_preserves_outputs": true
+    },
+    {
+      "name": "duplicate_json_key",
+      "expected_exit": 1,
+      "actual_exit": 1,
+      "stderr": "Research catalog error: duplicate JSON key: schema_version",
+      "rejection_preserves_outputs": true
+    },
+    {
+      "name": "symlink_outside",
+      "expected_exit": 1,
+      "actual_exit": 1,
+      "stderr": "Research catalog error: source/reference missing or outside repository: docs/escape.md",
+      "rejection_preserves_outputs": true
+    },
+    {
+      "name": "kind_investigation",
+      "expected_exit": 0,
+      "actual_exit": 0,
+      "stderr": "",
+      "rejection_preserves_outputs": null
+    },
+    {
+      "name": "kind_proposed_experiment",
+      "expected_exit": 0,
+      "actual_exit": 0,
+      "stderr": "",
+      "rejection_preserves_outputs": null
+    },
+    {
+      "name": "kind_executed_probe",
+      "expected_exit": 0,
+      "actual_exit": 0,
+      "stderr": "",
+      "rejection_preserves_outputs": null
+    },
+    {
+      "name": "kind_reviewed_outcome",
+      "expected_exit": 0,
+      "actual_exit": 0,
+      "stderr": "",
+      "rejection_preserves_outputs": null
+    },
+    {
+      "name": "kind_h_series_dependency",
+      "expected_exit": 0,
+      "actual_exit": 0,
+      "stderr": "",
+      "rejection_preserves_outputs": null
+    },
+    {
+      "name": "valid_date_2024-02-29",
+      "expected_exit": 0,
+      "actual_exit": 0,
+      "stderr": "",
+      "rejection_preserves_outputs": null
+    },
+    {
+      "name": "valid_date_2025-12-31",
+      "expected_exit": 0,
+      "actual_exit": 0,
+      "stderr": "",
+      "rejection_preserves_outputs": null
+    },
+    {
+      "name": "valid_date_2026-01-01",
+      "expected_exit": 0,
+      "actual_exit": 0,
+      "stderr": "",
+      "rejection_preserves_outputs": null
+    },
+    {
+      "name": "valid_date_None",
+      "expected_exit": 0,
+      "actual_exit": 0,
+      "stderr": "",
+      "rejection_preserves_outputs": null
+    },
+    {
+      "name": "count_0",
+      "expected_exit": 0,
+      "actual_exit": 0,
+      "stderr": "",
+      "rejection_preserves_outputs": null
+    },
+    {
+      "name": "count_2",
+      "expected_exit": 0,
+      "actual_exit": 0,
+      "stderr": "",
+      "rejection_preserves_outputs": null
+    },
+    {
+      "name": "two_reverse_order",
+      "expected_exit": 0,
+      "actual_exit": 0,
+      "stderr": "",
+      "rejection_preserves_outputs": null
+    },
+    {
+      "name": "count_20",
+      "expected_exit": 0,
+      "actual_exit": 0,
+      "stderr": "",
+      "rejection_preserves_outputs": null
+    },
+    {
+      "name": "equals_cli",
+      "expected_exit": 0,
+      "actual_exit": 0,
+      "stderr": "",
+      "rejection_preserves_outputs": null
+    },
+    {
+      "name": "reconciliation_prepare",
+      "expected_exit": 0,
+      "actual_exit": 0,
+      "stderr": "",
+      "rejection_preserves_outputs": null
+    },
+    {
+      "name": "changed_reconciliation",
+      "command": [
+        "/home/juanbeck/universal-agentic-harness/.venv/bin/python",
+        "/home/juanbeck/universal-agentic-harness/scripts/render_research_dashboard.py",
+        "--repo-root",
+        "/tmp/uah-dashboard-second-wyyq1uux",
+        "--registry",
+        "/tmp/uah-dashboard-second-wyyq1uux/registry.json",
+        "--markdown",
+        "/tmp/uah-dashboard-second-wyyq1uux/docs/research/dashboard.md",
+        "--as-of",
+        "2026-10-09",
+        "--check"
+      ],
+      "expected": "check detects stale Reconciled label",
+      "actual_exit": 1,
+      "visible_header": "Reconciled: 2026-10-08.",
+      "registry_reconciled_at": "2026-10-09"
+    },
+    {
+      "name": "escaping",
+      "expected_exit": 0,
+      "actual_exit": 0,
+      "stderr": "",
+      "rejection_preserves_outputs": null
+    },
+    {
+      "name": "literal_title",
+      "expected_title": "A [bracket] *star* `tick` | pipe </script>",
+      "title_preserved": true,
+      "encoded_bracket_visible": false,
+      "active_payload": []
+    },
+    {
+      "name": "actual_catalog_counts",
+      "records": 12,
+      "not_scored_cells": 12,
+      "source_links": 12,
+      "summary_ids": 12
+    },
+    {
+      "name": "exact_before_generic_check",
+      "exit": 0
+    },
+    {
+      "name": "base_api_exists",
+      "path": "scripts/render_research_dashboard.py",
+      "exit": 128
+    },
+    {
+      "name": "base_api_exists",
+      "path": "tests/test_research_dashboard.py",
+      "exit": 128
+    },
+    {
+      "name": "base_api_exists",
+      "path": "docs/research/experiment_registry.json",
+      "exit": 128
+    }
+  ]
+}
+{"separator": "0x2028", "expected_table_cells": 6, "actual_table_cells": [6], "html": "/tmp/uah-dashboard-second-wyyq1uux/docs/research/dashboard.html"}
+{"separator": "0x2029", "expected_table_cells": 6, "actual_table_cells": [6], "html": "/tmp/uah-dashboard-second-wyyq1uux/docs/research/dashboard.html"}
+{"separator": "0x85", "expected_table_cells": 6, "actual_table_cells": [6], "html": "/tmp/uah-dashboard-second-wyyq1uux/docs/research/dashboard.html"}
+{"separator": "0xb", "expected_table_cells": 6, "actual_table_cells": [6], "html": "/tmp/uah-dashboard-second-wyyq1uux/docs/research/dashboard.html"}
+{"separator": "0xc", "expected_table_cells": 6, "actual_table_cells": [6], "html": "/tmp/uah-dashboard-second-wyyq1uux/docs/research/dashboard.html"}

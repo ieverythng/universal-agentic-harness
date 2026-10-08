@@ -1,0 +1,9 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_ test_catalog_semantic_widening_after_admission_rejects_before_native_effect __
+tests/test_admitted_object_snapshot.py:80: in test_catalog_semantic_widening_after_admission_rejects_before_native_effect
+    with pytest.raises(ValueError, match="object semantics"):
+E   Failed: DID NOT RAISE ValueError
+=========================== short test summary info ============================
+FAILED tests/test_admitted_object_snapshot.py::test_catalog_semantic_widening_after_admission_rejects_before_native_effect
+1 failed in 0.16s

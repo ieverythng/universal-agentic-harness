@@ -1,6 +1,6 @@
 # UAH and NeuralWorkbench Investor Handoff
 
-**Prepared:** 2026-09-28
+**Prepared:** 2026-10-04
 
 **Audience:** prospective investors, design partners, strategic operators, and
 technical diligence teams
@@ -22,7 +22,9 @@ as one product thesis with separate authority boundaries:
   proposes reusable structures without receiving execution authority.
 - **Observatory** is the read-only evidence surface. It renders model output,
   admission, execution, evidence, acceptance, and Workbench provenance without
-  becoming another source of truth.
+  becoming another source of truth. The current implementation is an initial
+  static environment/task/trace index with explicit actor views; the broader
+  comparison and interactive product views remain roadmap work.
 
 The package separates implemented behavior from the roadmap. Commercial and
 market statements are hypotheses for validation unless identified as
@@ -70,20 +72,27 @@ the handoff when the recipient requests technical depth:
 
 ## Current evidence in one page
 
-As of 2026-09-28:
+As of 2026-10-04:
 
-- the portable kernel and NAO compatibility package pass **146 tests**, and the
-  latest Ruff validation passes; the complete pre-commit, document-render, and
-  clean-wheel gates are rerun before distributing a refreshed package;
+- the portable kernel and NAO compatibility package have focused and full-suite
+  validation recorded in the canonical development log; complete pre-commit,
+  document-render, and clean-wheel gates are rerun before package distribution;
 - H0 implements task projection, deterministic gates, binding quarantine,
   content-addressed domain rules, normalized ingress, and classification
   decisions, ledger-authorized task starts, environment registration, task and
-  trace lineage, TaskSpec compilation, two-stage operation admission, exact
-  lease-only execution, task
-  acceptance, atomic commit-framed restart replay, and verified trace digests;
+  trace lineage, TaskSpec compilation, bounded input-schema validation,
+  two-stage operation admission, explicit operation edges, typed rejection
+  replay, atomic tool-budget dispatch, pre-dispatch cancellation, recorded
+  timeout and retry policy, exact lease-only execution, task acceptance,
+  advisory-lock-coordinated restart replay, and verified trace digests;
 - the deterministic NAO adapter canary covers accepted lease execution,
-  semantic no-dispatch rejection, restart replay, and verified digest output;
-- H1 does not yet provide a complete live model and agent lifecycle;
+  recorded semantic no-dispatch rejection, terminal required-effect
+  counterexample, restart replay, and verified digest output;
+- H1 implements role/model declarations, non-reserving registration preflight,
+  durable actor attachment/termination, fixed leases, bounded owner readiness,
+  standby, deterministic prompt compilation, and fake-provider invocation with
+  atomic model accounting; O1 indexes real environments, tasks, traces, and
+  explicit actors. Live provider integration and durable context remain open;
 - H2 NAO planner parity has not yet been demonstrated;
 - the Watson/Bonsai model comparison has not started;
 - NeuralWorkbench is an optional H3 companion, and its intended repository

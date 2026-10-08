@@ -1,0 +1,16 @@
+{"path":"/tmp/uah-dashboard-second-wyyq1uux/docs/research/dashboard.html","initial":"1 catalog records"}
+{"kind":"all","count":"1 catalog records"}
+{"kind":"investigation","count":"1 catalog records"}
+{"kind":"proposed_experiment","count":"No matching catalog records."}
+{"kind":"executed_probe","count":"No matching catalog records."}
+{"kind":"reviewed_outcome","count":"No matching catalog records."}
+{"kind":"h_series_dependency","count":"No matching catalog records."}
+{"gate":"H0","count":"1 catalog records"}
+{"gate":"H1","count":"No matching catalog records."}
+{"gate":"H2","count":"No matching catalog records."}
+{"gate":"H3","count":"No matching catalog records."}
+{"gate":"H4","count":"No matching catalog records."}
+{"gate":"H5","count":"No matching catalog records."}
+{"gate":"H6","count":"No matching catalog records."}
+{"query":"no-match-unreal-string","count":"No matching catalog records."}
+{"query":"Vendor claims","count":"No matching catalog records.","summaryExists":false}

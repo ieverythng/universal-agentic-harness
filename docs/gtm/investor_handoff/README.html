@@ -196,7 +196,7 @@
   <main class="doc">
 
 <h1>UAH and NeuralWorkbench Investor Handoff</h1>
-<p><strong>Prepared:</strong> 2026-09-28</p>
+<p><strong>Prepared:</strong> 2026-10-04</p>
 <p><strong>Audience:</strong> prospective investors, design partners, strategic operators, and technical diligence teams</p>
 <p><strong>Status:</strong> external diligence draft, not an offering memorandum</p>
 <p><strong>Evidence boundary:</strong> implementation claims refer to the repository state and validation ledger current on the preparation date</p>
@@ -205,7 +205,7 @@
 <ul>
 <li><strong>UAH</strong> is the portable control kernel. It compiles task scope, constrains model proposals, preserves domain ownership, and records evidence.</li>
 <li><strong>NeuralWorkbench</strong> is the H3+ adaptive engine. It retrieves prior experience, constructs and compares candidate interaction structures, and proposes reusable structures without receiving execution authority.</li>
-<li><strong>Observatory</strong> is the read-only evidence surface. It renders model output, admission, execution, evidence, acceptance, and Workbench provenance without becoming another source of truth.</li>
+<li><strong>Observatory</strong> is the read-only evidence surface. It renders model output, admission, execution, evidence, acceptance, and Workbench provenance without becoming another source of truth. The current implementation is an initial static environment/task/trace index with explicit actor views; the broader comparison and interactive product views remain roadmap work.</li>
 </ul>
 <p>The package separates implemented behavior from the roadmap. Commercial and market statements are hypotheses for validation unless identified as repository evidence.</p>
 <h2>Reading order</h2>
@@ -268,12 +268,12 @@
 </tr>
 </tbody></table>
 <h2>Current evidence in one page</h2>
-<p>As of 2026-09-28:</p>
+<p>As of 2026-10-04:</p>
 <ul>
-<li>the portable kernel and NAO compatibility package pass <strong>146 tests</strong>, and the latest Ruff validation passes; the complete pre-commit, document-render, and clean-wheel gates are rerun before distributing a refreshed package;</li>
-<li>H0 implements task projection, deterministic gates, binding quarantine, content-addressed domain rules, normalized ingress, and classification decisions, ledger-authorized task starts, environment registration, task and trace lineage, TaskSpec compilation, two-stage operation admission, exact lease-only execution, task acceptance, atomic commit-framed restart replay, and verified trace digests;</li>
-<li>the deterministic NAO adapter canary covers accepted lease execution, semantic no-dispatch rejection, restart replay, and verified digest output;</li>
-<li>H1 does not yet provide a complete live model and agent lifecycle;</li>
+<li>the portable kernel and NAO compatibility package have focused and full-suite validation recorded in the canonical development log; complete pre-commit, document-render, and clean-wheel gates are rerun before package distribution;</li>
+<li>H0 implements task projection, deterministic gates, binding quarantine, content-addressed domain rules, normalized ingress, and classification decisions, ledger-authorized task starts, environment registration, task and trace lineage, TaskSpec compilation, bounded input-schema validation, two-stage operation admission, explicit operation edges, typed rejection replay, atomic tool-budget dispatch, pre-dispatch cancellation, recorded timeout and retry policy, exact lease-only execution, task acceptance, advisory-lock-coordinated restart replay, and verified trace digests;</li>
+<li>the deterministic NAO adapter canary covers accepted lease execution, recorded semantic no-dispatch rejection, terminal required-effect counterexample, restart replay, and verified digest output;</li>
+<li>H1 implements role/model declarations, non-reserving registration preflight, durable actor attachment/termination, fixed leases, bounded owner readiness, standby, deterministic prompt compilation, and fake-provider invocation with atomic model accounting; O1 indexes real environments, tasks, traces, and explicit actors. Live provider integration and durable context remain open;</li>
 <li>H2 NAO planner parity has not yet been demonstrated;</li>
 <li>the Watson/Bonsai model comparison has not started;</li>
 <li>NeuralWorkbench is an optional H3 companion, and its intended repository revision is documented but the gitlink is not currently mounted in this repository;</li>

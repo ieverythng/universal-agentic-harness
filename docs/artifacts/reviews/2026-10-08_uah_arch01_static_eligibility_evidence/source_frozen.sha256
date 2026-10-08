@@ -1,0 +1,3 @@
+033ba785928c9019b76711ed27c603b6f3f30a2e3110443875bdfea6af019888  src/ab_harness/proposal_admission.py
+9caaf597a1d08983f53f27672e425ba7971cc2b47e9ce0b099f0fa9ba5121ae1  src/ab_harness/prompt_compiler.py
+c04db4be3abc125e43ace67d4416a412f18c2288da8a30362ae85c199c63774b  tests/test_prompt_compiler.py

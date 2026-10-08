@@ -1,0 +1,263 @@
+#!/usr/bin/env python3
+"""Generate metadata-only research navigation; never read or score run metrics."""
+
+from __future__ import annotations
+
+import argparse
+from datetime import date
+import html
+import hashlib
+import json
+import os
+from pathlib import Path
+import re
+import sys
+from urllib.parse import quote
+
+from render_markdown_html import build_html, render_markdown
+
+
+ROOT = Path(__file__).resolve().parents[1]
+START = "<!-- research-records:start -->"
+END = "<!-- research-records:end -->"
+KINDS = (
+    "investigation", "proposed_experiment", "executed_probe",
+    "reviewed_outcome", "h_series_dependency",
+)
+
+CONTROLS = '''<div class="research-controls" aria-label="Research catalog filters">
+<div id="research-tabs" aria-label="Record kind filters">__TABS__</div>
+<label>Search <input id="research-search" type="search" /></label>
+<label>Dependency <select id="research-gate"><option value="all">All H-series</option>
+__GATES__</select></label><p id="research-count" aria-live="polite"></p></div>'''
+
+STYLE = '''<style>
+.doc code { overflow-wrap: anywhere; }
+.research-controls { margin: 1rem 0; padding: 1rem; border: 1px solid var(--line);
+  border-radius: 18px; background: var(--card); }
+.research-controls button, .research-controls input, .research-controls select {
+  color: var(--ink); background: var(--paper); border: 1px solid var(--line);
+  border-radius: 8px; padding: .55rem .7rem; margin: .2rem; font: inherit; }
+.research-controls button { cursor: pointer; }
+.research-controls button[aria-pressed="true"] { background: var(--blue); color: white; }
+.research-controls label { display: inline-block; margin-top: .7rem; }
+@media print { .research-controls { display: none; } [hidden] { display: table-row; } }
+</style>'''
+
+SCRIPT = '''<script>
+(() => {
+  const table = [...document.querySelectorAll('table')].find(
+    item => item.querySelector('th')?.textContent === 'Research record');
+  if (!table) return;
+  const controls = document.getElementById('research-tabs');
+  const search = document.getElementById('research-search');
+  const gate = document.getElementById('research-gate');
+  const count = document.getElementById('research-count');
+  const rows = [...table.querySelectorAll('tbody tr')];
+  let selected = 'all';
+  function apply() {
+    const query = search.value.trim().toLowerCase();
+    let visible = 0;
+    rows.forEach(row => {
+      const cells = row.querySelectorAll('td');
+      const kind = cells[1].textContent.trim();
+      const dependencies = cells[3].textContent.split(',').map(item => item.trim());
+      const matches = (selected === 'all' || kind === selected)
+        && (gate.value === 'all' || dependencies.includes(gate.value))
+        && row.textContent.toLowerCase().includes(query);
+      row.hidden = !matches;
+      if (matches) visible += 1;
+    });
+    count.textContent = visible ? `${visible} catalog records` : 'No matching catalog records.';
+  }
+  controls.querySelectorAll('button').forEach(button => {
+    button.addEventListener('click', () => {
+      selected = button.dataset.kind;
+      controls.querySelectorAll('button').forEach(other =>
+        other.setAttribute('aria-pressed', String(other === button)));
+      apply();
+    });
+  });
+  search.addEventListener('input', apply);
+  gate.addEventListener('change', apply);
+  apply();
+})();
+</script>'''
+
+
+def closed_object(value: object, fields: set[str], context: str) -> dict:
+    if not isinstance(value, dict) or set(value) != fields:
+        raise ValueError(f"{context} requires exactly these fields: {sorted(fields)}")
+    return value
+
+
+def local_document(value: object, root: Path) -> Path:
+    if not isinstance(value, str) or not value.startswith("docs/"):
+        raise ValueError("source/reference must be a repository-relative docs path")
+    path = root / value
+    if path.suffix not in (".md", ".html") or ".." in Path(value).parts:
+        raise ValueError("source/reference must be a local Markdown or HTML document")
+    if not path.resolve().is_relative_to(root) or not path.is_file():
+        raise ValueError(f"source/reference missing or outside repository: {value}")
+    return path
+
+
+def catalog_date(value: object, as_of: date) -> None:
+    if not isinstance(value, str) or not re.fullmatch(r"\d{4}-\d{2}-\d{2}", value):
+        raise ValueError("catalog date must be YYYY-MM-DD")
+    if date.fromisoformat(value) > as_of:
+        raise ValueError("catalog date cannot be later than the as-of date")
+
+
+def load_registry(path: Path, root: Path, as_of: date) -> dict:
+    def pairs(items):
+        result = {}
+        for key, value in items:
+            if key in result:
+                raise ValueError(f"duplicate JSON key: {key}")
+            result[key] = value
+        return result
+
+    def invalid_number(token):
+        raise ValueError(f"non-finite JSON number: {token}")
+
+    registry = json.loads(
+        path.read_text(encoding="utf-8"), object_pairs_hook=pairs,
+        parse_constant=invalid_number,
+    )
+    closed_object(registry, {"schema_version", "reconciled_at", "records"}, "registry")
+    if type(registry["schema_version"]) is not int or registry["schema_version"] != 1:
+        raise ValueError("unsupported catalog schema_version")
+    catalog_date(registry["reconciled_at"], as_of)
+    if not isinstance(registry["records"], list):
+        raise ValueError("records must be a list")
+    seen = set()
+    for entry in registry["records"]:
+        closed_object(entry, {
+            "id", "title", "kind", "date", "summary", "h_series_dependencies",
+            "source", "references",
+        }, "record")
+        for field in ("id", "title", "kind", "summary"):
+            if not isinstance(entry[field], str) or not entry[field].strip():
+                raise ValueError(f"record requires non-empty {field}")
+        if not re.fullmatch(r"[a-z0-9]+(?:-[a-z0-9]+)*", entry["id"]):
+            raise ValueError("record id must be a lowercase hyphenated identifier")
+        if entry["id"] in seen:
+            raise ValueError(f"duplicate record id: {entry['id']}")
+        seen.add(entry["id"])
+        if entry["kind"] not in KINDS:
+            raise ValueError("unknown record kind")
+        if entry["date"] is not None:
+            catalog_date(entry["date"], as_of)
+            if entry["date"] > registry["reconciled_at"]:
+                raise ValueError("record date cannot be later than reconciliation")
+        dependencies = entry["h_series_dependencies"]
+        if not isinstance(dependencies, list) or any(
+            not isinstance(item, str) or item not in {f"H{i}" for i in range(7)}
+            for item in dependencies
+        ) or len(dependencies) != len(set(dependencies)):
+            raise ValueError("dependencies must be distinct H0-H6 metadata labels")
+        source = closed_object(entry["source"], {"path", "sha256"}, "source")
+        document = local_document(source["path"], root)
+        digest = source["sha256"]
+        if digest is None and entry["kind"] == "h_series_dependency":
+            pass
+        elif not isinstance(digest, str) or not re.fullmatch(r"[0-9a-f]{64}", digest):
+            raise ValueError("dated research and receipts require a lowercase SHA-256")
+        elif hashlib.sha256(document.read_bytes()).hexdigest() != digest:
+            raise ValueError(f"source hash mismatch: {source['path']}")
+        if not isinstance(entry["references"], list):
+            raise ValueError("references must be a list")
+        for reference in entry["references"]:
+            local_document(reference, root)
+    return registry
+
+
+def metadata_text(value: str) -> str:
+    """Prevent metadata from becoming Markdown-authored links or formatting."""
+    for character in "[]`*|":
+        value = value.replace(character, f"&#{ord(character)};")
+    return value.replace("\n", " ").replace("\r", " ")
+
+
+def render_records(records: list[dict], markdown_path: Path, root: Path) -> str:
+    lines = [
+        "| Research record | Kind | Date | H-series dependency | Scoring | Source |",
+        "| --- | --- | --- | --- | --- | --- |",
+    ]
+    for record in records:
+        path = root / record["source"]["path"]
+        link = quote(Path(os.path.relpath(path, markdown_path.parent)).as_posix())
+        lines.append(
+            f"| {metadata_text(record['title'])} | {record['kind']} | "
+            f"{record['date'] or 'unknown'} | "
+            f"{', '.join(record['h_series_dependencies']) or 'unknown'} | "
+            f"not_scored | [Read source]({link}) |"
+        )
+    for record in records:
+        lines.extend([
+            "", f"### {metadata_text(record['title'])}", "",
+            metadata_text(record["summary"]), "",
+            f"Catalog ID: `{record['id']}`. Source snapshot SHA-256: "
+            f"`{record['source']['sha256'] or 'unpinned dependency link'}`.",
+        ])
+        for reference in record["references"]:
+            link = quote(Path(os.path.relpath(root / reference, markdown_path.parent)).as_posix())
+            lines.extend(["", f"Reference: [Open document]({link})."])
+    return "\n".join(lines)
+
+
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--repo-root", type=Path, default=ROOT)
+    parser.add_argument("--registry", type=Path)
+    parser.add_argument("--markdown", type=Path)
+    parser.add_argument("--as-of", type=date.fromisoformat, default=date.today())
+    parser.add_argument("--check", action="store_true")
+    args = parser.parse_args(argv)
+    root = args.repo_root.resolve()
+    registry_path = args.registry or root / "docs/research/experiment_registry.json"
+    markdown_path = args.markdown or root / "docs/research/uah_research_dashboard.md"
+    output = markdown_path.with_suffix(".html")
+    try:
+        registry = load_registry(registry_path, root, args.as_of)
+        original = markdown_path.read_text(encoding="utf-8")
+        if original.count(START) != 1 or original.count(END) != 1:
+            raise ValueError("dashboard must contain one ordered generated record region")
+        before, region = original.split(START)
+        _, after = region.split(END)
+        expected_md = before + START + "\n" + render_records(
+            registry["records"], markdown_path, root
+        ) + "\n" + END + after
+        title, body = render_markdown(expected_md.replace(START, "").replace(END, ""))
+        assets = Path(os.path.relpath(root / "docs/assets", output.parent)).as_posix()
+        expected_html = build_html(title, body)
+        tabs = '<button type="button" data-kind="all" aria-pressed="true">All records</button>'
+        tabs += "".join(
+            f'<button type="button" data-kind="{kind}" aria-pressed="false">'
+            f'{html.escape(kind.replace("_", " ").capitalize())}</button>' for kind in KINDS
+        )
+        gates = "".join(f'<option value="H{i}">H{i}</option>' for i in range(7))
+        controls = CONTROLS.replace("__TABS__", tabs).replace("__GATES__", gates)
+        expected_html = expected_html.replace(
+            "</head>", f'<link rel="stylesheet" href="{assets}/harness-theme.css" />\n'
+            f'<script defer src="{assets}/harness-theme.js"></script>\n{STYLE}</head>'
+        ).replace("<table>", controls + "<table>", 1)
+        expected_html = expected_html.replace("</body>", SCRIPT + "</body>")
+        if args.check:
+            if original != expected_md or not output.is_file() or output.read_text(
+                encoding="utf-8"
+            ) != expected_html:
+                raise ValueError("research dashboard generated content is out of sync")
+        else:
+            markdown_path.write_text(expected_md, encoding="utf-8")
+            output.write_text(expected_html, encoding="utf-8")
+    except (OSError, ValueError, KeyError, TypeError) as exc:
+        print(f"Research catalog error: {exc}", file=sys.stderr)
+        return 1
+    print(f"{'Checked' if args.check else 'Rendered'} {len(registry['records'])} metadata records")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

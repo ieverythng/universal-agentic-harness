@@ -1,0 +1,13 @@
+Command: PYTHONPATH=src:tests .venv/bin/python -c 'import runpy; probe = runpy.run_path("docs/artifacts/reviews/2026-10-05_uah_review_repros/spec_probes.py"); probe["semantic_catalog_drift"]()'
+Exit: 1
+
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+  File "docs/artifacts/reviews/2026-10-05_uah_review_repros/spec_probes.py", line 143, in semantic_catalog_drift
+    ledger.record(admitted)
+  File "/home/juanbeck/universal-agentic-harness/src/ab_harness/lifecycle.py", line 591, in record
+    specs = _event_specs(fact)
+            ^^^^^^^^^^^^^^^^^^
+  File "/home/juanbeck/universal-agentic-harness/src/ab_harness/lifecycle.py", line 1434, in _event_specs
+    raise TypeError("unsupported lifecycle fact: %s" % type(fact).__name__)
+TypeError: unsupported lifecycle fact: NoneType

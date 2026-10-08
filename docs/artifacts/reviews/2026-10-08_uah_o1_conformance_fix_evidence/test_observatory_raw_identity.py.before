@@ -1,0 +1,73 @@
+import pytest
+
+from ab_harness.lifecycle import LifecycleLedger, TaskStartedFact
+from ab_harness.observatory import (
+    ObservatoryDataLabel,
+    ObservatoryTraceStatus,
+    project_observatory,
+)
+
+
+def raw_events():
+    ledger = LifecycleLedger(clock=lambda: "2026-10-08T15:30:00Z")
+    ledger.record(
+        TaskStartedFact(
+            environment_run_id="environment-run:raw-o1",
+            task_id="task:raw-o1",
+            trace_id="trace:raw-o1",
+            environment_ingress_id="ingress:raw-o1",
+            ingress_artifact_id="artifact:raw-o1",
+            decision_id="decision:raw-o1",
+            domain_contract_pack_revision="domain:raw-o1",
+        )
+    )
+    return ledger, ledger.events()
+
+
+def test_raw_stale_terminal_kind_rejects_before_deriving_accepted_status():
+    ledger, events = raw_events()
+    assert project_observatory(events).traces[0].status is ObservatoryTraceStatus.OPEN
+    original_id = events[0].event_id
+    object.__setattr__(events[0], "event_type", "terminal_task_accepted")
+
+    with pytest.raises(ValueError, match="identity does not match"):
+        project_observatory(events)
+
+    assert events[0].event_id == original_id
+    assert project_observatory(ledger).traces[0].status is ObservatoryTraceStatus.OPEN
+    assert project_observatory(ledger).data_label is ObservatoryDataLabel.RECORDED
+
+
+@pytest.mark.parametrize(
+    "field,value",
+    (
+        ("environment_run_id", "environment-run:foreign"),
+        ("trace_id", "trace:foreign"),
+        ("sequence", 999),
+        ("recorded_at", "2026-10-09T00:00:00Z"),
+        ("artifact_refs", ("artifact:foreign",)),
+    ),
+)
+def test_raw_identity_validation_precedes_grouping_and_ordering(field, value):
+    _, events = raw_events()
+    object.__setattr__(events[0], field, value)
+    with pytest.raises(ValueError, match="identity does not match"):
+        project_observatory(iter(events))
+
+
+def test_valid_generator_and_ledger_views_preserve_the_same_read_only_lineage():
+    ledger, events = raw_events()
+    raw = project_observatory(event for event in events)
+    recorded = project_observatory(ledger)
+    assert raw.data_label is ObservatoryDataLabel.SYNTHETIC
+    assert raw.traces[0].status is recorded.traces[0].status is ObservatoryTraceStatus.OPEN
+    assert raw.traces[0].events == recorded.traces[0].events == events
+    assert ledger.events() == events
+
+
+def test_duplicate_valid_events_and_foreign_values_remain_rejected():
+    _, events = raw_events()
+    with pytest.raises(ValueError, match="identities must be unique"):
+        project_observatory((*events, *events))
+    with pytest.raises(TypeError, match="TraceEvent values only"):
+        project_observatory((object(),))

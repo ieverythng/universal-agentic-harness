@@ -1,0 +1,15 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+____ test_v1_actor_field_excluded_from_its_hash_cannot_invent_an_actor_view ____
+
+    def test_v1_actor_field_excluded_from_its_hash_cannot_invent_an_actor_view():
+        _, events = raw_events()
+        object.__setattr__(events[0], "agent_run_id", "agent-run:forged")
+        events[0].verify_identity()
+>       with pytest.raises(ValueError, match="v1 events require task scope without actor identity"):
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_observatory_raw_identity.py:80: Failed
+=========================== short test summary info ============================
+FAILED tests/test_observatory_raw_identity.py::test_v1_actor_field_excluded_from_its_hash_cannot_invent_an_actor_view
+1 failed, 8 deselected in 0.11s

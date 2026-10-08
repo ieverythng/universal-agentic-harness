@@ -6,9 +6,12 @@ documentation, evaluations, and environment adapters.
 Terms describe the target architecture unless an entry explicitly names an
 implemented schema or source seam. The current code distinguishes environment,
 ingress, task, trace, operation, proposal, admission, lease, result, evidence,
-and lifecycle-event identities. General role-configuration, agent, handle,
-agent-run, model-instance, model-lease, model-invocation, and PromptCompiler
-registries remain H1/H2 work.
+and lifecycle-event identities. Content-addressed role and model configurations,
+agent manifests, and initial handle revisions have in-memory registries.
+Attached agent runs, fixed-instance allocation, owner-issued startup preflight,
+standby, and explicit termination replay through the common lifecycle ledger.
+Deterministic prompt compilation and a provider-neutral invocation port now have
+fake-provider fixtures. Dynamic provider pools and scheduling remain H3 work.
 
 ## Core terms
 
@@ -85,14 +88,14 @@ controllable AB objects presented to a model or worker.
 
 ### Task spec
 
-A frozen `uah.task_spec/v1` intent created for one accepted task start. It pins
+A frozen `uah.task_spec/v2` intent created for one accepted task start. It pins
 task and trace lineage, task type, role, frame, DomainContractPack revision,
 requested effects, prohibited effects, and finite budgets. Resume and notify
 ingress reuse the compiled task rather than compiling a replacement.
 
 ### Compiled task
 
-The content-addressed `uah.compiled_task/v1` artifact produced once from an
+The content-addressed `uah.compiled_task/v2` artifact produced once from an
 accepted start-task decision, TaskSpec, role, frame, registry, and
 DomainContractPack. It is the shared source of the interaction module, effect
 obligations, prohibited effects, and budgets for prompt compilation, semantic
@@ -104,10 +107,20 @@ An immutable, reusable definition that fixes an agent role, domain, abstraction
 frame, projected AB objects, binding policy, control band, budgets, and
 authority policy. It does not select a model, prompt pack, or harness build.
 
+The implemented `uah.agent_role_configuration/v1` subset pins one typed role,
+primary frame, DomainContractPack identity and revision, object allowlist, and
+declared model capability, context, and provider requirements. General
+additional-frame and capability-pack packaging remains target architecture.
+
 ### Model configuration
 
 An immutable definition of the model artifact, provider runtime, decoding
 parameters, and declared protocol capabilities used by an agent.
+
+`uah.model_configuration/v1` is implemented with an opaque endpoint reference,
+model artifact and revision, finite decoding settings, capabilities, and
+declared context limit. Provider credentials and endpoint URLs stay outside the
+artifact. Registration does not inspect the actual endpoint.
 
 ### Model admission profile
 
@@ -131,11 +144,21 @@ an agent.
 A bounded reservation of one model instance for an agent run, task, or model
 invocation under declared resource and isolation constraints.
 
+The current `uah.model_lease/v1` is an exclusive fixed-instance actor
+reservation. Allocation validates fresh owner capacity and the exact model;
+dynamic scope scheduling and global hardware control are not implemented.
+
 ### Model invocation
 
 One identified prompt-to-output call made by an agent run using a model lease.
 It records the exact model instance and artifacts used but does not own agent
 state.
+
+`ModelInvocationAuthority` joins the exact ready actor, unexpired lease,
+compiled prompt, and ledger-recorded task. Model-call grant and start are atomic.
+Typed raw output or failure settles the call; completed IDs replay without a
+second provider request. An outstanding call cannot retry automatically or
+permit terminal task acceptance. The port has fake-provider fixtures only.
 
 ### Registration preflight
 
@@ -143,11 +166,21 @@ A non-reserving validation that an agent manifest, role, provider policy, and
 declared resource requirements are compatible. It never loads or invokes a
 model.
 
+The implemented `RegistrationPreflight` checks declared role/model references,
+capability names, allowed provider kind, and minimum context. Its result proves
+declaration compatibility, not measured hardware capacity or task capability.
+
 ### Startup preflight
 
 A readiness evaluation performed after a model lease is acquired and before an
 agent run accepts work. It may use bounded liveness and role-shaped probes but
 does not establish task capability.
+
+The fixed-instance implementation evaluates a readiness-owner report bound to
+the exact lease, model configuration, and instance. It requires evidence no
+older than 30 seconds and at most two probe attempts over ten seconds. The
+allocator evaluates and records the report; it does not execute provider
+probes. Failure and lease release form one atomic commit.
 
 ### Agent
 
@@ -160,7 +193,9 @@ _Avoid_: Agent instance; runtime instance
 
 A stable human-facing or deployment-facing identity that resolves through an
 immutable revision to one active agent. Rebinding preserves the role contract
-but requires fidelity evidence and rollback lineage.
+but requires fidelity evaluation and rollback lineage. The current H1 slice
+registers only the initial revision and refuses rebinding. H3 owns qualified
+revision promotion.
 
 ### Agent registration
 
@@ -174,6 +209,14 @@ It owns activation-scoped state and may span several domain tasks, model
 leases, and model invocations until shutdown, failure, or replacement ends the
 activation.
 _Avoid_: Agent embodiment; model invocation; turn
+
+The current `AgentRunRegistry` projects ledger-backed roster attachment and
+termination. Attachment pins the manifest, handle revision, environment profile,
+and attestation. Fixed allocation transitions through `leased`, `ready`, and
+`standby`; explicit termination releases an idle lease and records termination
+atomically, while an outstanding invocation blocks termination. Model capacity release
+preserves the agent-run identity. Durable conversation/context state and dynamic
+replacement remain open.
 
 ### Agent standby
 
@@ -208,12 +251,15 @@ Ingress is not automatically a task, trace, model invocation, or execution
 authority.
 _Avoid_: Prompt; task
 
-### Task ingress policy
+### Task ingress authority
 
-The deterministic, environment-scoped policy that associates environment
-ingress with state updates, new tasks, resumed tasks, notifications, or
-rejection. A model may interpret admitted content but cannot rewrite its task
-or trace lineage.
+The deterministic `TaskIngressAuthority.admit(environment_run, ingress)` module
+that associates environment ingress with state updates, new tasks, resumed
+tasks, notifications, or rejection. It owns rule matching, deterministic task
+and trace identities, duplicate fencing, and ledger append for accepted
+task-bearing ingress. State updates, ignored items, and rejected items do not
+yet have environment-scoped ledger facts. A model may interpret admitted
+content but cannot rewrite its task or trace lineage.
 
 A new task preserves the domain-owned task identifier selected from a named
 native-lineage field in the reviewed ingress rule. The task identity is scoped
@@ -231,43 +277,62 @@ alone do not authorize compilation. `TaskSpecCompiler` also requires the
 matching task start to exist in the common lifecycle ledger through
 `EnvironmentTaskRegistry.require_start(...)`.
 The task-start event stores the ingress artifact ID, decision ID, and frozen
-domain-pack revision. The raw task-start fact is internal to the ledger
-projection; callers cannot authorize compilation through a public raw-lineage
-registration method.
+domain-pack revision. The intended authority contract reserves task-start
+production to admitted ingress. Current public `LifecycleLedger.record` still
+accepts caller-constructed `TaskStartedFact` values, so matching registry fields
+do not establish that provenance. This is the open SPEC-02 finding, not a
+delivered raw-lineage authorization restriction.
 
 ### Environment task registry
 
-The environment-scoped registry of immutable task and trace lineage. It
-rejects replayed task-bearing ingress and a second start for the same domain
-task within one environment run. Resume and notify ingress may reuse a lineage
-only when the task is registered under that exact environment activation.
-Acceptance-derived terminal states reject later ingress. A suspended
-acceptance remains resumable. Registration does not prove native effects.
+The read-only environment-scoped projection of immutable task and trace lineage
+from the common ledger. `TaskIngressAuthority` rejects replayed task-bearing
+ingress and a second start for the same domain task within one environment run.
+Resume and notify ingress may reuse a lineage only when the task is registered
+under that exact environment activation. Acceptance-derived terminal states
+reject later ingress. A suspended acceptance remains resumable. The registry
+has no task-ingress write interface and does not prove native effects.
 
 ### Trace event
 
-A content-addressed `uah.trace_event/v1` fact in the globally sequenced common
-lifecycle ledger. It carries environment, task, trace, optional operation and
+A content-addressed, versioned fact in the globally sequenced common lifecycle
+ledger. It carries environment, scope-appropriate task, trace, optional operation and
 causal-parent identities, immutable artifact references, a timestamp, and a
 minimal canonical replay projection. Each event also carries `commit_id`,
 `commit_index`, and `commit_size`, so strict reload rejects an incomplete or
 noncontiguous multi-event fact. Task start, resume, notification,
-compilation, proposal, admission, lease, execution, evidence, obligation, and
-terminal-acceptance events currently use this envelope. Cross-process locking,
-environment cancellation, retry, timeout, and rejection branches remain open.
+compilation, proposal, admission, operation edge, lease, budget, execution,
+evidence, cancellation, timeout, retry, obligation, and terminal-acceptance or
+rejection events currently use this envelope. Cooperating writers use
+cross-process advisory locking. Proposal, semantic, domain, and evidence
+rejection facts are implemented. Scoped actor events and fixed model-runtime
+contracts now replay in the same ledger. Stale-effect-evidence and
+false-completion policy, and live provider integration remain open.
+
+The original `uah.trace_event/v1` task envelope retains its serialized identity.
+`uah.trace_event/v2` adds explicit `event_scope` and `agent_run_id`. Agent scope
+uses null task and trace identities rather than invented tasks. New task-scoped
+model-invocation events carry an explicit actor; earlier v1 task events do not
+acquire inferred actor membership.
 
 ### Prompt compiler
 
-The planned deterministic assembler of the universal UAH protocol, role
-contract, versioned domain policy, task-scoped AB projection, and current task
-context. It will produce model-facing context but grant no execution authority.
-No executable PromptCompiler exists in the current H0/H1 slice.
+The implemented deterministic assembler of the universal UAH protocol, frozen
+role/domain prompt wording, task-scoped AB projection, reviewed argument schemas,
+task lineage, obligations, and budgets. `uah.compiled_prompt/v1` pins the agent,
+compiled task, prompt pack, and binding/schema source identities. The initial
+compiler supports one direct typed operation and grants no execution authority.
+Dynamic context/memory assembly and cross-frame delegated output remain open.
 
 ### Prompt pack
 
 An immutable, versioned wording and output-format artifact selected by an agent
 manifest. Changing the prompt pack creates a different agent identity even when
 the agent role configuration is unchanged.
+
+`uah.prompt_pack/v1` pins the protocol version, role/domain wording, and
+constrained operation examples. `PromptCompiler` omits task-inapplicable examples
+and rejects examples or scope that exceed the frozen role or reviewed schema.
 
 ### Skill artifact
 
@@ -303,10 +368,23 @@ rejected during normalization.
 
 ### Admitted operation
 
-An immutable, content-addressed `uah.admitted_operation/v1` proving that a typed
+An immutable, content-addressed `uah.admitted_operation/v2` proving that a typed
 proposal passed UAH semantic admission for one compiled task, role, frame, AB
-object, approved binding revision, argument set, runtime mode, and evidence
-obligation set. It still has no domain execution authority.
+object, approved binding revision, validated input-schema identity, argument
+set, runtime mode, and evidence obligation set. It still has no domain
+execution authority.
+
+### Admission rejection
+
+`uah.semantic_admission_rejection/v1` and
+`uah.domain_admission_rejection/v1` are content-addressed operation-scoped
+facts with ordered stable reason codes. Semantic rejection proves that no
+`AdmittedOperation` was issued for that decision. Domain rejection proves that
+the environment owner did not issue an execution lease for that request. Domain
+admission records its own rejection. Semantic rejection becomes replayable
+when the coordinating caller appends the returned artifact. O1 exposes both as
+nonterminal failure stages and does not relabel either as terminal task
+rejection.
 
 ### Execution lease
 
@@ -396,13 +474,17 @@ checks, atomic commit framing, transition validation, cross-process advisory
 writer locking, and replay-derived `VerifiedTraceDigest` artifacts. Each
 cooperating writer reloads and validates the stream while holding the lock
 before it appends and flushes a fact. The ledger records authority decisions
-but does not make them. The complete failure/cancellation grammar remains open.
+but does not make them. Initial pre-dispatch cancellation, recorded timeout,
+retry, and runtime-budget facts are present; in-flight interruption and
+task-level closure policy for those facts remain open.
 
-Observatory O1 begins alongside the final H0 lifecycle slices. It consumes
-replay-stable ledger events through read-only projections and a static renderer.
-O1 never appends lifecycle facts, issues evidence, or changes admission. This
-parallel track is required for H1/H2 review, but it does not become a second
-authority writer for H0.
+Observatory O1 now consumes replay-stable ledger events through immutable
+environment-run, task, trace, and explicit actor projections and a self-contained
+static HTML renderer. Environments with actor events remain visible before any
+task exists. It distinguishes
+terminal task status from recoverable admission or execution failures and
+labels recorded, synthetic, conceptual, measured, or reviewed data. O1 never
+appends lifecycle facts, issues evidence, or changes admission.
 
 ### Recorded qualification
 

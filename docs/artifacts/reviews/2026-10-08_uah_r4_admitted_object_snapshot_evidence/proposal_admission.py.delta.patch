@@ -1,0 +1,187 @@
+--- docs/artifacts/reviews/2026-10-08_uah_r4_admitted_object_snapshot_evidence/proposal_admission.py.before	2026-10-08 17:03:05.006261435 +0200
++++ src/ab_harness/proposal_admission.py	2026-10-08 17:13:24.009017966 +0200
+@@ -2,7 +2,7 @@
+
+ from __future__ import annotations
+
+-from dataclasses import dataclass
++from dataclasses import asdict, dataclass, fields, replace
+ import hashlib
+ import json
+ from typing import Any
+@@ -10,6 +10,7 @@
+ from ab_harness.bindings import BindingCatalog
+ from ab_harness.bindings import binding_fingerprint
+ from ab_harness.contracts import AgentOutput
++from ab_harness.contracts import ABObjectView
+ from ab_harness.schema_validation import ArgumentSchemaValidator
+ from ab_harness.task_compiler import CompiledTask
+
+@@ -18,7 +19,7 @@
+ PROPOSAL_NORMALIZATION_REJECTION_SCHEMA = (
+     "uah.proposal_normalization_rejection/v1"
+ )
+-ADMITTED_OPERATION_SCHEMA = "uah.admitted_operation/v2"
++ADMITTED_OPERATION_SCHEMA = "uah.admitted_operation/v3"
+ SEMANTIC_ADMISSION_REJECTION_SCHEMA = "uah.semantic_admission_rejection/v1"
+
+
+@@ -432,6 +433,7 @@
+ def _admitted_operation_payload(
+     *,
+     proposal: TypedProposal,
++    object_snapshot: ABObjectView,
+     frame_id: str,
+     ab_level: int,
+     binding_id: str,
+@@ -450,6 +452,7 @@
+     return {
+         "schema_version": ADMITTED_OPERATION_SCHEMA,
+         "proposal": proposal.to_dict(),
++        "object_snapshot": asdict(object_snapshot),
+         "frame_id": frame_id,
+         "ab_level": ab_level,
+         "binding_id": binding_id,
+@@ -473,6 +476,7 @@
+
+     admission_id: str
+     proposal: TypedProposal
++    object_snapshot: ABObjectView
+     frame_id: str
+     ab_level: int
+     binding_id: str
+@@ -494,6 +498,34 @@
+
+     def verify_identity(self) -> None:
+         self.proposal.verify_identity()
++        if not isinstance(self.object_snapshot, ABObjectView):
++            raise ValueError("admitted operation requires an AB object snapshot")
++        snapshot = self.object_snapshot
++        if (
++            type(snapshot.ab_level) is not int
++            or type(self.ab_level) is not int
++            or type(snapshot.runtime_callable) is not bool
++            or any(
++                not isinstance(getattr(snapshot, name), str)
++                for name in ("object_id", "kind", "category", "owner_package")
++            )
++        ):
++            raise ValueError("admitted object snapshot fields have invalid types")
++        if (
++            snapshot.object_id != self.object_id
++            or snapshot.ab_level != self.ab_level
++            or snapshot.owner_package != self.binding_owner
++        ):
++            raise ValueError("admitted object snapshot does not match operation lineage")
++        for values in (
++            snapshot.expected_effects,
++            snapshot.observable_success,
++            snapshot.decomposes_to,
++        ):
++            if not isinstance(values, tuple) or any(
++                not isinstance(value, str) for value in values
++            ):
++                raise ValueError("admitted object snapshot collections must be string tuples")
+         if not isinstance(self.effect_obligation_ids, tuple):
+             raise TypeError("admitted operation obligations must be a tuple")
+         _required_strings(
+@@ -522,6 +554,7 @@
+             raise ValueError("admitted operation requires an effect obligation")
+         payload = _admitted_operation_payload(
+             proposal=self.proposal,
++            object_snapshot=self.object_snapshot,
+             frame_id=self.frame_id,
+             ab_level=self.ab_level,
+             binding_id=self.binding_id,
+@@ -574,10 +607,11 @@
+
+     def to_dict(self) -> dict[str, object]:
+         self.verify_identity()
+-        return {
++        payload = {
+             "admission_id": self.admission_id,
+             **_admitted_operation_payload(
+                 proposal=self.proposal,
++                object_snapshot=self.object_snapshot,
+                 frame_id=self.frame_id,
+                 ab_level=self.ab_level,
+                 binding_id=self.binding_id,
+@@ -594,11 +628,62 @@
+                 effect_obligation_ids=self.effect_obligation_ids,
+             ),
+         }
++        payload["effect_obligation_ids"] = list(self.effect_obligation_ids)
++        snapshot = payload["object_snapshot"]
++        for name in ("expected_effects", "observable_success", "decomposes_to"):
++            snapshot[name] = list(snapshot[name])
++        return payload
++
++    @classmethod
++    def from_dict(cls, payload: dict[str, object]) -> AdmittedOperation:
++        expected = {field.name for field in fields(cls)}
++        if not isinstance(payload, dict) or set(payload) != expected:
++            raise ValueError("invalid admitted operation fields")
++        if payload["schema_version"] != ADMITTED_OPERATION_SCHEMA:
++            raise ValueError("unsupported admitted operation schema")
++        scalars = expected - {
++            "proposal", "object_snapshot", "ab_level", "effect_obligation_ids"
++        }
++        if any(not isinstance(payload[name], str) for name in scalars) or type(
++            payload["ab_level"]
++        ) is not int:
++            raise ValueError("admitted operation fields have invalid types")
++        proposal = payload["proposal"]
++        if (
++            not isinstance(proposal, dict)
++            or set(proposal) != {field.name for field in fields(TypedProposal)}
++            or any(not isinstance(value, str) for value in proposal.values())
++        ):
++            raise ValueError("invalid admitted operation proposal")
++        snapshot = payload["object_snapshot"]
++        if not isinstance(snapshot, dict) or set(snapshot) != {
++            field.name for field in fields(ABObjectView)
++        }:
++            raise ValueError("invalid admitted object snapshot fields")
++        snapshot_values = dict(snapshot)
++        for name in ("expected_effects", "observable_success", "decomposes_to"):
++            values = snapshot[name]
++            if not isinstance(values, list) or any(
++                not isinstance(value, str) for value in values
++            ):
++                raise ValueError("invalid admitted object snapshot collection")
++            snapshot_values[name] = tuple(values)
++        obligations = payload["effect_obligation_ids"]
++        if not isinstance(obligations, list) or any(
++            not isinstance(value, str) for value in obligations
++        ):
++            raise ValueError("invalid admitted operation obligations")
++        values = dict(payload)
++        values["proposal"] = TypedProposal(**proposal)
++        values["object_snapshot"] = ABObjectView(**snapshot_values)
++        values["effect_obligation_ids"] = tuple(obligations)
++        return cls(**values)
+
+
+ def _new_admitted_operation(
+     *,
+     proposal: TypedProposal,
++    object_snapshot: ABObjectView,
+     frame_id: str,
+     ab_level: int,
+     binding_id: str,
+@@ -616,6 +701,7 @@
+ ) -> AdmittedOperation:
+     fields = {
+         "proposal": proposal,
++        "object_snapshot": object_snapshot,
+         "frame_id": frame_id,
+         "ab_level": ab_level,
+         "binding_id": binding_id,
+@@ -858,6 +944,7 @@
+             return reject(("proposal_arguments_schema_invalid",))
+         admitted = _new_admitted_operation(
+             proposal=proposal,
++            object_snapshot=replace(object_view),
+             frame_id=compiled_task.interaction_module.frame.frame_id,
+             ab_level=object_view.ab_level,
+             binding_id=binding.binding_id,

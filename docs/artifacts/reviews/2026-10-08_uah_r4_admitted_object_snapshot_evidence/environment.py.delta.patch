@@ -1,0 +1,28 @@
+--- docs/artifacts/reviews/2026-10-08_uah_r4_admitted_object_snapshot_evidence/environment.py.before	2026-10-08 17:03:05.006448436 +0200
++++ src/ab_harness/environment.py	2026-10-08 17:04:29.120002620 +0200
+@@ -5,6 +5,7 @@
+ from collections.abc import Callable, Mapping
+ from dataclasses import asdict
+ from dataclasses import dataclass
++from dataclasses import replace
+ import hashlib
+ import json
+ from typing import Any, TYPE_CHECKING
+@@ -481,6 +482,8 @@
+
+     def execute(self, lease: ExecutionLease) -> EvidenceDecision:
+         admitted = self._validate_lease(lease)
++        if self._catalog.object_for(admitted.object_id) != admitted.object_snapshot:
++            raise ValueError("execution lease object semantics no longer match the catalog")
+
+         item, binding, handler = _resolve_handler(
+             environment_id=self.environment_id,
+@@ -500,7 +503,7 @@
+         try:
+             owner_result, evidence, rejection_reasons = _execute_handler(
+                 environment_id=self.environment_id,
+-                item=item,
++                item=replace(admitted.object_snapshot),
+                 binding=binding,
+                 handler=handler,
+                 arguments=admitted.arguments,

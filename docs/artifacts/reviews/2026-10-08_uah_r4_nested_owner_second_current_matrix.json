@@ -1,0 +1,75 @@
+{
+  "failed": 0,
+  "failures": [],
+  "matrix": {
+    "admitted": [
+      "admission_id",
+      "frame_id",
+      "ab_level",
+      "binding_id",
+      "binding_source_revision",
+      "binding_fingerprint",
+      "binding_owner",
+      "input_schema_ref",
+      "input_schema_id",
+      "output_schema_ref",
+      "evidence_adapter",
+      "environment_id",
+      "runtime_mode",
+      "domain_contract_pack_revision",
+      "effect_obligation_ids",
+      "schema_version"
+    ],
+    "lease": [
+      "execution_lease_id",
+      "lease_owner_id",
+      "environment_attestation_id",
+      "scope",
+      "schema_version"
+    ],
+    "proposal": [
+      "proposal_id",
+      "compiled_task_id",
+      "environment_run_id",
+      "task_id",
+      "trace_id",
+      "operation_id",
+      "raw_output_artifact_id",
+      "output_type",
+      "object_id",
+      "arguments_json",
+      "schema_version"
+    ],
+    "snapshot": [
+      "object_id",
+      "ab_level",
+      "kind",
+      "category",
+      "owner_package",
+      "expected_effects",
+      "observable_success",
+      "decomposes_to",
+      "runtime_callable"
+    ]
+  },
+  "passed": 809,
+  "rejection_messages": {
+    "'AdmittedOperation' object has no attribute 'object_snapshot'": 2,
+    "active execution requires current semantic provenance": 3,
+    "admitted object snapshot does not match operation lineage": 99,
+    "admitted operation identity does not match content": 387,
+    "admitted operation requires an effect obligation": 6,
+    "current admission requires complete supported proposal and snapshot artifacts": 4,
+    "current admission requires the supported concrete artifact": 1,
+    "current execution requires the supported concrete lease": 2,
+    "execution lease identity does not match content": 30,
+    "execution lease scope must be operation": 10,
+    "tool dispatch requires current semantic provenance": 1,
+    "typed proposal arguments are not valid JSON": 20,
+    "typed proposal identity does not match content": 186,
+    "unsupported admitted operation schema: uah.admitted_operation/v3:changed": 18,
+    "unsupported execution lease schema: uah.execution_lease/v1:changed": 10,
+    "unsupported typed proposal schema: uah.typed_proposal/v1:changed": 20
+  },
+  "total": 809
+}

@@ -1,0 +1,21 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_____________ test_proposal_record_ignores_instance_noop_verifier ______________
+
+tmp_path = PosixPath('/tmp/pytest-of-juanbeck/pytest-190/test_proposal_record_ignores_i0')
+
+    def test_proposal_record_ignores_instance_noop_verifier(tmp_path):
+        _, _, _, ledger, admitted, _ = authority_fixture(tmp_path)
+        ledger.path.write_text("\n".join(ledger.path.read_text().splitlines()[:2]) + "\n")
+        ledger = LifecycleLedger(ledger.path)
+        proposal = admitted.proposal
+        object.__setattr__(proposal, "arguments_json", '{"label":"mug"}')
+        object.__setattr__(proposal, "verify_identity", lambda: None)
+        before = ledger.path.read_bytes()
+>       with pytest.raises(ValueError, match="identity"):
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_nested_admission_owner.py:62: Failed
+=========================== short test summary info ============================
+FAILED tests/test_nested_admission_owner.py::test_proposal_record_ignores_instance_noop_verifier
+1 failed, 2 deselected in 0.16s

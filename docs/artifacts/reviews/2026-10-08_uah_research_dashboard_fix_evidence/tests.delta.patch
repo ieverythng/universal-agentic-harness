@@ -1,0 +1,94 @@
+--- docs/artifacts/reviews/2026-10-08_uah_research_dashboard_fix_evidence/test_research_dashboard.py.before	2026-10-08 16:53:24.113534220 +0200
++++ tests/test_research_dashboard.py	2026-10-08 16:54:28.538843785 +0200
+@@ -1,6 +1,7 @@
+ """Exercise research navigation through its public generation command."""
+
+ import hashlib
++from html.parser import HTMLParser
+ import json
+ from pathlib import Path
+ import subprocess
+@@ -187,6 +188,83 @@
+     assert "unpinned dependency link" in markdown.read_text(encoding="utf-8")
+
+
++def test_registry_owns_reconciliation_date_in_both_outputs(tmp_path):
++    registry, registry_path, markdown, _ = fixture(tmp_path)
++    markdown.write_text(
++        markdown.read_text().replace("## Catalog", "Reconciled: 2026-10-07.\n\n## Catalog")
++    )
++    assert run(tmp_path, registry_path, markdown).returncode == 0
++    assert "Reconciled: 2026-10-08." in markdown.read_text()
++    assert "Reconciled: 2026-10-08." in markdown.with_suffix(".html").read_text()
++    registry["reconciled_at"] = "2026-10-09"
++    registry_path.write_text(json.dumps(registry))
++    args = ("--as-of", "2026-10-09")
++    assert run(tmp_path, registry_path, markdown, *args, "--check").returncode == 1
++    assert run(tmp_path, registry_path, markdown, *args).returncode == 0
++    assert "Reconciled: 2026-10-09." in markdown.read_text()
++    assert "Reconciled: 2026-10-09." in markdown.with_suffix(".html").read_text()
++    assert run(tmp_path, registry_path, markdown, *args, "--check").returncode == 0
++
++
++@pytest.mark.parametrize("literal", [
++    "<!-- research-records:start -->", "<!-- research-records:end -->",
++    '<img src=x onerror=alert(1)>',
++    'A [literal] *title* `value` | separator & &#91; </script>',
++    '# Heading _emphasis_ [click](javascript:alert(1))',
++])
++def test_metadata_remains_literal_in_both_presentations(tmp_path, literal):
++    registry, registry_path, markdown, source = fixture(tmp_path)
++    registry["records"][0].update(title=literal, summary=literal)
++    registry_path.write_text(json.dumps(registry))
++    before_source = source.read_bytes()
++    assert run(tmp_path, registry_path, markdown).returncode == 0
++    generated = markdown.read_text()
++    page = markdown.with_suffix(".html").read_text()
++    assert generated.count("<!-- research-records:start -->") == 1
++    assert generated.count("<!-- research-records:end -->") == 1
++    assert '<img src=x' not in generated
++    assert 'href="javascript:' not in page
++
++    class Text(HTMLParser):
++        def __init__(self):
++            super().__init__()
++            self.text = []
++            self.tags = []
++
++        def handle_data(self, data):
++            self.text.append(data)
++
++        def handle_starttag(self, tag, attrs):
++            self.tags.append(tag)
++
++    parsed = Text()
++    parsed.feed(page)
++    assert literal in "".join(parsed.text)
++    assert "img" not in parsed.tags
++    assert run(tmp_path, registry_path, markdown, "--check").returncode == 0
++    assert run(tmp_path, registry_path, markdown).returncode == 0
++    assert markdown.read_text() == generated
++    assert markdown.with_suffix(".html").read_text() == page
++    assert source.read_bytes() == before_source
++
++
++@pytest.mark.parametrize("separator", ["\u2028", "\u2029", "\u0085", "\v", "\f", "\x1c", "\x1d", "\x1e", "\r\n"])
++def test_metadata_separators_preserve_every_catalog_row(tmp_path, separator):
++    registry, registry_path, markdown, _ = fixture(tmp_path)
++    first = registry["records"][0]
++    first.update(title="First" + separator + "Second", summary="One" + separator + "Two")
++    registry["records"].append(dict(first, id="second", title="Control"))
++    registry_path.write_text(json.dumps(registry))
++    assert run(tmp_path, registry_path, markdown).returncode == 0
++    page = markdown.with_suffix(".html").read_text()
++    assert page.count("<td>") == 12
++    assert page.count("<td>not_scored</td>") == 2
++    assert page.count(">Read source</a>") == 2
++    assert page.count("Catalog ID:") == 2
++    assert "First Second" in page and "One Two" in page
++    assert run(tmp_path, registry_path, markdown, "--check").returncode == 0
++
++
+ def test_symlink_cannot_escape_the_repository(tmp_path):
+     registry, registry_path, markdown, _ = fixture(tmp_path)
+     (tmp_path / "docs/escape.md").symlink_to(Path(__file__))

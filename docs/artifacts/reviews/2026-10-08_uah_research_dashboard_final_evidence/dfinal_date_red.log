@@ -1,0 +1,20 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+____________ test_reconciliation_preserves_authored_fenced_history _____________
+
+tmp_path = PosixPath('/tmp/pytest-of-juanbeck/pytest-115/test_reconciliation_preserves_0')
+
+    def test_reconciliation_preserves_authored_fenced_history(tmp_path):
+        _, registry_path, markdown, _ = fixture(tmp_path)
+        historical = "```text\nReconciled: 2024-02-29.\n```\n\n"
+        markdown.write_text(markdown.read_text().replace("## Catalog", historical + "## Catalog"))
+        assert run(tmp_path, registry_path, markdown).returncode == 0
+>       assert historical in markdown.read_text()
+E       AssertionError: assert '```text\nReconciled: 2024-02-29.\n```\n\n' in '# Research dashboard\n\nReconciled: 2026-10-08.\n\n```text\nReconciled: 2026-10-08.\n```\n\n## Catalog\n\n<!-- resear...snapshot SHA-256: `e5f82fe88597cb751d622285efc0588ee1ee582255333f2aa9f90e6371e3bd6d`.\n<!-- research-records:end -->\n'
+E        +  where '# Research dashboard\n\nReconciled: 2026-10-08.\n\n```text\nReconciled: 2026-10-08.\n```\n\n## Catalog\n\n<!-- resear...snapshot SHA-256: `e5f82fe88597cb751d622285efc0588ee1ee582255333f2aa9f90e6371e3bd6d`.\n<!-- research-records:end -->\n' = read_text()
+E        +    where read_text = PosixPath('/tmp/pytest-of-juanbeck/pytest-115/test_reconciliation_preserves_0/docs/research/dashboard.md').read_text
+
+tests/test_research_dashboard.py:214: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_research_dashboard.py::test_reconciliation_preserves_authored_fenced_history
+1 failed, 38 deselected in 0.12s

@@ -1,0 +1,1235 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>UAH Observatory O1: Recorded NAO Canary</title>
+  <style>
+    :root { --bg:#f4f7fb; --ink:#182536; --muted:#5d6d7e; --line:#cbd6e2;
+      --panel:#fff; --accepted:#147d64; --rejected:#b33b45; --open:#75632c; }
+    * { box-sizing:border-box; }
+    body { margin:0; background:var(--bg); color:var(--ink);
+      font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif; }
+    main { max-width:1180px; margin:0 auto; padding:28px 18px 56px; }
+    h1 { margin:0 0 8px; }
+    .summary { color:var(--muted); margin:0 0 18px; }
+    .controls { display:grid; grid-template-columns:2fr 1fr 1fr; gap:10px;
+      padding:12px; border:1px solid var(--line); border-radius:12px;
+      background:var(--panel); position:sticky; top:0; z-index:1; }
+    label { display:flex; flex-direction:column; gap:4px; font-size:.85rem; }
+    input,select { font:inherit; border:1px solid var(--line); border-radius:7px;
+      padding:7px 9px; background:#fff; color:var(--ink); }
+    .trace,.agent-run { margin-top:16px; padding:14px; border:1px solid var(--line);
+      border-radius:12px; background:var(--panel); }
+    .trace > header { display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+    .trace h2 { margin:0 auto 0 0; font-size:1.05rem; }
+    .badge { border-radius:999px; padding:3px 8px; color:#fff; font-size:.75rem; }
+    .accepted { background:var(--accepted); } .rejected { background:var(--rejected); }
+    .open { background:var(--open); }
+    .event { border-top:1px solid var(--line); margin-top:12px; padding-top:12px; }
+    .event header { display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+    .event p { color:var(--muted); margin:6px 0; }
+    code { background:#e8eef5; border-radius:4px; padding:.1rem .25rem; }
+    pre { margin:8px 0 0; padding:10px; overflow:auto; border-radius:8px;
+      background:#142033; color:#ecf3fb; }
+    details > summary { cursor:pointer; } .hidden { display:none; }
+    .operation-graph { margin:12px 0; padding:10px; border-radius:8px;
+      background:#edf3f8; }
+    .operation-edge { display:grid; grid-template-columns:1fr auto 1fr; gap:8px;
+      align-items:center; padding:7px 0; border-top:1px solid var(--line); }
+    nav { margin:18px 0; padding:12px; border:1px solid var(--line);
+      border-radius:12px; background:var(--panel); }
+    nav h2 { margin:0 0 10px; font-size:1.05rem; }
+    .environment-index + .environment-index { border-top:1px solid var(--line);
+      margin-top:12px; padding-top:12px; }
+    nav ul { margin:8px 0; padding-left:24px; }
+    nav li { margin:6px 0; } nav a { color:#235d91; }
+    .trace { scroll-margin-top:110px; }
+    @media (max-width:700px) { .controls { grid-template-columns:1fr; position:static; } }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>UAH Observatory O1: Recorded NAO Canary</h1>
+    <p class="summary">Label: <strong>recorded</strong> · Traces: 3 ·
+      Accepted: 1 · Rejected: 1 · Open: 1</p>
+    <section class="controls" aria-label="Trace filters">
+      <label>Search<input id="query" type="search" placeholder="task, trace, event, payload"></label>
+      <label>Status<select id="status"><option value="">All</option>
+        <option value="accepted">Accepted</option><option value="rejected">Rejected</option>
+        <option value="open">Open</option></select></label>
+      <label>Event type<select id="event-type"><option value="">All</option><option value="budget_granted">budget_granted</option><option value="domain_admission_leased">domain_admission_leased</option><option value="effect_obligation_failed">effect_obligation_failed</option><option value="effect_obligation_satisfied">effect_obligation_satisfied</option><option value="evidence_issued">evidence_issued</option><option value="execution_completed">execution_completed</option><option value="execution_started">execution_started</option><option value="proposal_normalized">proposal_normalized</option><option value="semantic_admission_accepted">semantic_admission_accepted</option><option value="semantic_admission_rejected">semantic_admission_rejected</option><option value="task_compiled">task_compiled</option><option value="task_started">task_started</option><option value="terminal_task_accepted">terminal_task_accepted</option><option value="terminal_task_rejected">terminal_task_rejected</option></select></label>
+    </section>
+    <nav aria-label="Environment run, task and trace index"><h2>Environment runs</h2><section class="environment-index">Environment run <code>environment-run:nao-smoke:001</code><ul><li>Task <code>find_the_cup</code><ul><li><a href="#trace-trace-event:sha256:6f04e34994504f41a503201387962bcb7974f0fdc5288cb68d66d6a9bd79d1f4">trace:sha256:e7b30a3dc4fab39b098dfb9a91c6b473edd0459d66d2269494a294acb97ab9c0</a> <span class="badge accepted">accepted</span></li></ul></li><li>Task <code>find_the_cup_rejected</code><ul><li><a href="#trace-trace-event:sha256:050c78a56261a31a9fd690db789b2953d78625647e3156fd9f8ab14d69498c2a">trace:sha256:871c1c1d533da872bfc74faba13b35bbeae126a07b32aa8d0bfb6ff1fa82db23</a> <span class="badge open">open</span></li></ul></li><li>Task <code>find_the_bottle_counterexample</code><ul><li><a href="#trace-trace-event:sha256:21ef20e022a908b06608892dcf45a0c1c295ac9844b7013238378fadf2399f29">trace:sha256:24944c17eadbd21a4e6330a6098acd4a091bc1caee3e95ddaa24b155450aa731</a> <span class="badge rejected">rejected</span></li></ul></li></ul></section></nav>
+    <section id="agent-runs"></section>
+    <section id="traces"><article class="trace" id="trace-trace-event:sha256:6f04e34994504f41a503201387962bcb7974f0fdc5288cb68d66d6a9bd79d1f4" data-status="accepted" data-event-types="budget_granted domain_admission_leased effect_obligation_satisfied evidence_issued execution_completed execution_started proposal_normalized semantic_admission_accepted task_compiled task_started terminal_task_accepted"
+      data-searchable="trace:sha256:e7b30a3dc4fab39b098dfb9a91c6b473edd0459d66d2269494a294acb97ab9c0 find_the_cup environment-run:nao-smoke:001 task_started task_compiled proposal_normalized semantic_admission_accepted domain_admission_leased budget_granted execution_started execution_completed evidence_issued effect_obligation_satisfied terminal_task_accepted {
+  &quot;artifact_refs&quot;: [
+    &quot;environment-ingress:sha256:b14a66af406a77f528f95b65c6374c898ca373dd67f9090b9d9cdf8bc404f5cf&quot;,
+    &quot;task-ingress-decision:sha256:adbc1edbf4062739e35b65270579b05de5dd1826743d7ea77b4bf41c94f2efc0&quot;,
+    &quot;sha256:b4032b7b64c4c65c481cd45c84d8c31bd89af7d0a9fb7b70be1e6a93291caf5e&quot;
+  ],
+  &quot;commit_id&quot;: &quot;lifecycle-commit:sha256:1840afca4b4b5d89a57b44a29db9a6f7f197f58de0557b26b1f2e4514a3e3036&quot;,
+  &quot;commit_index&quot;: 1,
+  &quot;commit_size&quot;: 1,
+  &quot;data_json&quot;: &quot;{\&quot;decision_id\&quot;:\&quot;task-ingress-decision:sha256:adbc1edbf4062739e35b65270579b05de5dd1826743d7ea77b4bf41c94f2efc0\&quot;,\&quot;domain_contract_pack_revision\&quot;:\&quot;sha256:b4032b7b64c4c65c481cd45c84d8c31bd89af7d0a9fb7b70be1e6a93291caf5e\&quot;,\&quot;environment_ingress_id\&quot;:\&quot;ingress:recorded:uah-smoke-find-cup\&quot;,\&quot;ingress_artifact_id\&quot;:\&quot;environment-ingress:sha256:b14a66af406a77f528f95b65c6374c898ca373dd67f9090b9d9cdf8bc404f5cf\&quot;}&quot;,
+  &quot;environment_run_id&quot;: &quot;environment-run:nao-smoke:001&quot;,
+  &quot;event_id&quot;: &quot;trace-event:sha256:6f04e34994504f41a503201387962bcb7974f0fdc5288cb68d66d6a9bd79d1f4&quot;,
+  &quot;event_type&quot;: &quot;task_started&quot;,
+  &quot;operation_id&quot;: null,
+  &quot;parent_event_id&quot;: null,
+  &quot;recorded_at&quot;: &quot;2026-09-28t10:00:01z&quot;,
+  &quot;schema_version&quot;: &quot;uah.trace_event/v1&quot;,
+  &quot;sequence&quot;: 1,
+  &quot;task_id&quot;: &quot;find_the_cup&quot;,
+  &quot;trace_id&quot;: &quot;trace:sha256:e7b30a3dc4fab39b098dfb9a91c6b473edd0459d66d2269494a294acb97ab9c0&quot;
+} {
+  &quot;artifact_refs&quot;: [
+    &quot;compiled-task:sha256:678452c347e29beeb2e5e6592d142c27f99d7ff2b38b7a69deff0de912239919&quot;
+  ],
+  &quot;commit_id&quot;: &quot;lifecycle-commit:sha256:495237550ac079f3d7c33aaa4d669c768bc167f746121462cb6f58111d6ba570&quot;,
+  &quot;commit_index&quot;: 1,
+  &quot;commit_size&quot;: 1,
+  &quot;data_json&quot;: &quot;{\&quot;budgets\&quot;:{\&quot;model_calls\&quot;:0,\&quot;retry_attempts\&quot;:0,\&quot;tool_calls\&quot;:4,\&quot;wall_time_seconds\&quot;:60},\&quot;compiled_task_id\&quot;:\&quot;compiled-task:sha256:678452c347e29beeb2e5e6592d142c27f99d7ff2b38b7a69deff0de912239919\&quot;,\&quot;domain_contract_pack_revision\&quot;:\&quot;sha256:b4032b7b64c4c65c481cd45c84d8c31bd89af7d0a9fb7b70be1e6a93291caf5e\&quot;,\&quot;frame_id\&quot;:\&quot;nao_ros4hri\&quot;,\&quot;registry_version\&quot;:\&quot;sha256:fb7f9ffaceed518ab0ea4045fbe2618196f358cba941b910b51b663ca6097ae3\&quot;,\&quot;role_id\&quot;:\&quot;planner_llm\&quot;}&quot;,
+  &quot;environment_run_id&quot;: &quot;environment-run:nao-smoke:001&quot;,
+  &quot;event_id&quot;: &quot;trace-event:sha256:34e4dc9a7c3082c86f422078b7b938e70148363c028e5860cc1567b9dd330d91&quot;,
+  &quot;event_type&quot;: &quot;task_compiled&quot;,
+  &quot;operation_id&quot;: null,
+  &quot;parent_event_id&quot;: &quot;trace-event:sha256:6f04e34994504f41a503201387962bcb7974f0fdc5288cb68d66d6a9bd79d1f4&quot;,
+  &quot;recorded_at&quot;: &quot;2026-09-28t10:00:01z&quot;,
+  &quot;schema_version&quot;: &quot;uah.trace_event/v1&quot;,
+  &quot;sequence&quot;: 2,
+  &quot;task_id&quot;: &quot;find_the_cup&quot;,
+  &quot;trace_id&quot;: &quot;trace:sha256:e7b30a3dc4fab39b098dfb9a91c6b473edd0459d66d2269494a294acb97ab9c0&quot;
+} {
+  &quot;artifact_refs&quot;: [
+    &quot;proposal:sha256:0190e798b695cc16973fffac2875ba27751c353f932af4f7b947b4c3df30c54e&quot;,
+    &quot;compiled-task:sha256:678452c347e29beeb2e5e6592d142c27f99d7ff2b38b7a69deff0de912239919&quot;,
+    &quot;model-output:sha256:689cbc3a6bf19bb5201de7d4c8de6af7935ad85553ebe88c986432dec81262a9&quot;
+  ],
+  &quot;commit_id&quot;: &quot;lifecycle-commit:sha256:c1d5f6abb5980862c65576a48069ebef8dccc46e9fff98a9c4848d32459b7b6d&quot;,
+  &quot;commit_index&quot;: 1,
+  &quot;commit_size&quot;: 1,
+  &quot;data_json&quot;: &quot;{\&quot;compiled_task_id\&quot;:\&quot;compiled-task:sha256:678452c347e29beeb2e5e6592d142c27f99d7ff2b38b7a69deff0de912239919\&quot;,\&quot;object_id\&quot;:\&quot;find_object\&quot;,\&quot;proposal_id\&quot;:\&quot;proposal:sha256:0190e798b695cc16973fffac2875ba27751c353f932af4f7b947b4c3df30c54e\&quot;}&quot;,
+  &quot;environment_run_id&quot;: &quot;environment-run:nao-smoke:001&quot;,
+  &quot;event_id&quot;: &quot;trace-event:sha256:fc34f0baac4866337a53a36222071f51fe2fcc2f13e4a350c63025a72bac4bfb&quot;,
+  &quot;event_type&quot;: &quot;proposal_normalized&quot;,
+  &quot;operation_id&quot;: &quot;uah-smoke-find-cup:operation:step_1&quot;,
+  &quot;parent_event_id&quot;: &quot;trace-event:sha256:34e4dc9a7c3082c86f422078b7b938e70148363c028e5860cc1567b9dd330d91&quot;,
+  &quot;recorded_at&quot;: &quot;2026-09-28t10:00:01z&quot;,
+  &quot;schema_version&quot;: &quot;uah.trace_event/v1&quot;,
+  &quot;sequence&quot;: 3,
+  &quot;task_id&quot;: &quot;find_the_cup&quot;,
+  &quot;trace_id&quot;: &quot;trace:sha256:e7b30a3dc4fab39b098dfb9a91c6b473edd0459d66d2269494a294acb97ab9c0&quot;
+} {
+  &quot;artifact_refs&quot;: [
+    &quot;admission:sha256:d447f94edb37c42ba18e31868b4de86afee18a324934fdc917bfff14538fa5c1&quot;,
+    &quot;proposal:sha256:0190e798b695cc16973fffac2875ba27751c353f932af4f7b947b4c3df30c54e&quot;
+  ],
+  &quot;commit_id&quot;: &quot;lifecycle-commit:sha256:6ad4fe012a1cab793dd6ad2de8346e66e5d8fdef5c1b1b0b872945dc7e87727f&quot;,
+  &quot;commit_index&quot;: 1,
+  &quot;commit_size&quot;: 1,
+  &quot;data_json&quot;: &quot;{\&quot;ab_level\&quot;:1,\&quot;admission_id\&quot;:\&quot;admission:sha256:d447f94edb37c42ba18e31868b4de86afee18a324934fdc917bfff14538fa5c1\&quot;,\&quot;admitted_operation\&quot;:{\&quot;ab_level\&quot;:1,\&quot;admission_id\&quot;:\&quot;admission:sha256:d447f94edb37c42ba18e31868b4de86afee18a324934fdc917bfff14538fa5c1\&quot;,\&quot;binding_fingerprint\&quot;:\&quot;binding:sha256:e140de7336a910c33c013bd6addd9211618f23c174a662662d68888c2c322294\&quot;,\&quot;binding_id\&quot;:\&quot;nao_fake.find_object.v1\&quot;,\&quot;binding_owner\&quot;:\&quot;object_finder\&quot;,\&quot;binding_source_revision\&quot;:\&quot;uah-smoke-v1\&quot;,\&quot;domain_contract_pack_revision\&quot;:\&quot;sha256:b4032b7b64c4c65c481cd45c84d8c31bd89af7d0a9fb7b70be1e6a93291caf5e\&quot;,\&quot;effect_obligation_ids\&quot;:[\&quot;target_observed\&quot;],\&quot;environment_id\&quot;:\&quot;nao_fake\&quot;,\&quot;evidence_adapter\&quot;:\&quot;ab_harness_nao.smoke:fresh_detection\&quot;,\&quot;frame_id\&quot;:\&quot;nao_ros4hri\&quot;,\&quot;input_schema_id\&quot;:\&quot;input-schema:sha256:5b9e04eb5d392aad4f5e4cdfc8f722963f228a99b60437b88f5a48b46e467ccc\&quot;,\&quot;input_schema_ref\&quot;:\&quot;schema://find_object/input/v1\&quot;,\&quot;object_snapshot\&quot;:{\&quot;ab_level\&quot;:1,\&quot;category\&quot;:\&quot;perception\&quot;,\&quot;decomposes_to\&quot;:[\&quot;resolve_target_reference\&quot;],\&quot;expected_effects\&quot;:[\&quot;requested object localized\&quot;],\&quot;kind\&quot;:\&quot;skill\&quot;,\&quot;object_id\&quot;:\&quot;find_object\&quot;,\&quot;observable_success\&quot;:[\&quot;fresh detector-backed result returned\&quot;],\&quot;owner_package\&quot;:\&quot;object_finder\&quot;,\&quot;runtime_callable\&quot;:true},\&quot;output_schema_ref\&quot;:\&quot;schema://find_object/result/v1\&quot;,\&quot;proposal\&quot;:{\&quot;arguments_json\&quot;:\&quot;{\\\&quot;label\\\&quot;:\\\&quot;cup\\\&quot;}\&quot;,\&quot;compiled_task_id\&quot;:\&quot;compiled-task:sha256:678452c347e29beeb2e5e6592d142c27f99d7ff2b38b7a69deff0de912239919\&quot;,\&quot;environment_run_id\&quot;:\&quot;environment-run:nao-smoke:001\&quot;,\&quot;object_id\&quot;:\&quot;find_object\&quot;,\&quot;operation_id\&quot;:\&quot;uah-smoke-find-cup:operation:step_1\&quot;,\&quot;output_type\&quot;:\&quot;executable_plan\&quot;,\&quot;proposal_id\&quot;:\&quot;proposal:sha256:0190e798b695cc16973fffac2875ba27751c353f932af4f7b947b4c3df30c54e\&quot;,\&quot;raw_output_artifact_id\&quot;:\&quot;model-output:sha256:689cbc3a6bf19bb5201de7d4c8de6af7935ad85553ebe88c986432dec81262a9\&quot;,\&quot;schema_version\&quot;:\&quot;uah.typed_proposal/v1\&quot;,\&quot;task_id\&quot;:\&quot;find_the_cup\&quot;,\&quot;trace_id\&quot;:\&quot;trace:sha256:e7b30a3dc4fab39b098dfb9a91c6b473edd0459d66d2269494a294acb97ab9c0\&quot;},\&quot;runtime_mode\&quot;:\&quot;smoke\&quot;,\&quot;schema_version\&quot;:\&quot;uah.admitted_operation/v3\&quot;},\&quot;binding_id\&quot;:\&quot;nao_fake.find_object.v1\&quot;,\&quot;binding_owner\&quot;:\&quot;object_finder\&quot;,\&quot;frame_id\&quot;:\&quot;nao_ros4hri\&quot;,\&quot;input_schema_id\&quot;:\&quot;input-schema:sha256:5b9e04eb5d392aad4f5e4cdfc8f722963f228a99b60437b88f5a48b46e467ccc\&quot;,\&quot;object_id\&quot;:\&quot;find_object\&quot;,\&quot;object_snapshot\&quot;:{\&quot;ab_level\&quot;:1,\&quot;category\&quot;:\&quot;perception\&quot;,\&quot;decomposes_to\&quot;:[\&quot;resolve_target_reference\&quot;],\&quot;expected_effects\&quot;:[\&quot;requested object localized\&quot;],\&quot;kind\&quot;:\&quot;skill\&quot;,\&quot;object_id\&quot;:\&quot;find_object\&quot;,\&quot;observable_success\&quot;:[\&quot;fresh detector-backed result returned\&quot;],\&quot;owner_package\&quot;:\&quot;object_finder\&quot;,\&quot;runtime_callable\&quot;:true},\&quot;proposal_id\&quot;:\&quot;proposal:sha256:0190e798b695cc16973fffac2875ba27751c353f932af4f7b947b4c3df30c54e\&quot;,\&quot;schema_version\&quot;:\&quot;uah.admitted_operation/v3\&quot;}&quot;,
+  &quot;environment_run_id&quot;: &quot;environment-run:nao-smoke:001&quot;,
+  &quot;event_id&quot;: &quot;trace-event:sha256:9bcfe4f505d069c1cfc914ca0311339e7f3ef4d89b07da1b7da43beb82738898&quot;,
+  &quot;event_type&quot;: &quot;semantic_admission_accepted&quot;,
+  &quot;operation_id&quot;: &quot;uah-smoke-find-cup:operation:step_1&quot;,
+  &quot;parent_event_id&quot;: &quot;trace-event:sha256:fc34f0baac4866337a53a36222071f51fe2fcc2f13e4a350c63025a72bac4bfb&quot;,
+  &quot;recorded_at&quot;: &quot;2026-09-28t10:00:01z&quot;,
+  &quot;schema_version&quot;: &quot;uah.trace_event/v1&quot;,
+  &quot;sequence&quot;: 4,
+  &quot;task_id&quot;: &quot;find_the_cup&quot;,
+  &quot;trace_id&quot;: &quot;trace:sha256:e7b30a3dc4fab39b098dfb9a91c6b473edd0459d66d2269494a294acb97ab9c0&quot;
+} {
+  &quot;artifact_refs&quot;: [
+    &quot;execution-lease:sha256:7352fe5fc78c21c1ae5611a3ef40f04881f3bac53ea480052f716fe9ae3d4870&quot;,
+    &quot;admission:sha256:d447f94edb37c42ba18e31868b4de86afee18a324934fdc917bfff14538fa5c1&quot;,
+    &quot;environment-attestation:nao-smoke:001&quot;
+  ],
+  &quot;commit_id&quot;: &quot;lifecycle-commit:sha256:39b29a507a6bfdaf0fc2f2165cdc65b38840bd863d255bf57c7d314445a064c1&quot;,
+  &quot;commit_index&quot;: 1,
+  &quot;commit_size&quot;: 1,
+  &quot;data_json&quot;: &quot;{\&quot;admission_id\&quot;:\&quot;admission:sha256:d447f94edb37c42ba18e31868b4de86afee18a324934fdc917bfff14538fa5c1\&quot;,\&quot;binding_id\&quot;:\&quot;nao_fake.find_object.v1\&quot;,\&quot;execution_lease_id\&quot;:\&quot;execution-lease:sha256:7352fe5fc78c21c1ae5611a3ef40f04881f3bac53ea480052f716fe9ae3d4870\&quot;,\&quot;lease_owner_id\&quot;:\&quot;nao_fake.lifecycle_owner\&quot;,\&quot;object_id\&quot;:\&quot;find_object\&quot;}&quot;,
+  &quot;environment_run_id&quot;: &quot;environment-run:nao-smoke:001&quot;,
+  &quot;event_id&quot;: &quot;trace-event:sha256:ceb8a23a527aa3a79d2ee80201713644f2117dd1e87374ba0cba28e61bddd2dd&quot;,
+  &quot;event_type&quot;: &quot;domain_admission_leased&quot;,
+  &quot;operation_id&quot;: &quot;uah-smoke-find-cup:operation:step_1&quot;,
+  &quot;parent_event_id&quot;: &quot;trace-event:sha256:9bcfe4f505d069c1cfc914ca0311339e7f3ef4d89b07da1b7da43beb82738898&quot;,
+  &quot;recorded_at&quot;: &quot;2026-09-28t10:00:01z&quot;,
+  &quot;schema_version&quot;: &quot;uah.trace_event/v1&quot;,
+  &quot;sequence&quot;: 5,
+  &quot;task_id&quot;: &quot;find_the_cup&quot;,
+  &quot;trace_id&quot;: &quot;trace:sha256:e7b30a3dc4fab39b098dfb9a91c6b473edd0459d66d2269494a294acb97ab9c0&quot;
+} {
+  &quot;artifact_refs&quot;: [
+    &quot;budget-decision:sha256:10bb5c123bf30416d6dc9965bef0bcacd57637d5feb61bfe66c842bb6fdc1150&quot;,
+    &quot;compiled-task:sha256:678452c347e29beeb2e5e6592d142c27f99d7ff2b38b7a69deff0de912239919&quot;
+  ],
+  &quot;commit_id&quot;: &quot;lifecycle-commit:sha256:e17c5564a3b3291367c85c20509671d05f472fc7364c34e1f3a71a358d7ca152&quot;,
+  &quot;commit_index&quot;: 1,
+  &quot;commit_size&quot;: 2,
+  &quot;data_json&quot;: &quot;{\&quot;compiled_task_id\&quot;:\&quot;compiled-task:sha256:678452c347e29beeb2e5e6592d142c27f99d7ff2b38b7a69deff0de912239919\&quot;,\&quot;consumed_after\&quot;:1,\&quot;consumed_before\&quot;:0,\&quot;decision_id\&quot;:\&quot;budget-decision:sha256:10bb5c123bf30416d6dc9965bef0bcacd57637d5feb61bfe66c842bb6fdc1150\&quot;,\&quot;environment_run_id\&quot;:\&quot;environment-run:nao-smoke:001\&quot;,\&quot;limit\&quot;:4,\&quot;outcome\&quot;:\&quot;granted\&quot;,\&quot;reason_code\&quot;:\&quot;within_budget\&quot;,\&quot;resource\&quot;:\&quot;tool_call\&quot;,\&quot;schema_version\&quot;:\&quot;uah.budget_decision/v1\&quot;,\&quot;subject_id\&quot;:\&quot;uah-smoke-find-cup:operation:step_1\&quot;,\&quot;task_id\&quot;:\&quot;find_the_cup\&quot;,\&quot;trace_id\&quot;:\&quot;trace:sha256:e7b30a3dc4fab39b098dfb9a91c6b473edd0459d66d2269494a294acb97ab9c0\&quot;,\&quot;units\&quot;:1}&quot;,
+  &quot;environment_run_id&quot;: &quot;environment-run:nao-smoke:001&quot;,
+  &quot;event_id&quot;: &quot;trace-event:sha256:0c828820f33d71e25d2fd01c7b765e4a5deebde94bab1271bf3d5c6bf8b11a7b&quot;,
+  &quot;event_type&quot;: &quot;budget_granted&quot;,
+  &quot;operation_id&quot;: &quot;uah-smoke-find-cup:operation:step_1&quot;,
+  &quot;parent_event_id&quot;: &quot;trace-event:sha256:ceb8a23a527aa3a79d2ee80201713644f2117dd1e87374ba0cba28e61bddd2dd&quot;,
+  &quot;recorded_at&quot;: &quot;2026-09-28t10:00:01z&quot;,
+  &quot;schema_version&quot;: &quot;uah.trace_event/v1&quot;,
+  &quot;sequence&quot;: 6,
+  &quot;task_id&quot;: &quot;find_the_cup&quot;,
+  &quot;trace_id&quot;: &quot;trace:sha256:e7b30a3dc4fab39b098dfb9a91c6b473edd0459d66d2269494a294acb97ab9c0&quot;
+} {
+  &quot;artifact_refs&quot;: [
+    &quot;execution-lease:sha256:7352fe5fc78c21c1ae5611a3ef40f04881f3bac53ea480052f716fe9ae3d4870&quot;
+  ],
+  &quot;commit_id&quot;: &quot;lifecycle-commit:sha256:e17c5564a3b3291367c85c20509671d05f472fc7364c34e1f3a71a358d7ca152&quot;,
+  &quot;commit_index&quot;: 2,
+  &quot;commit_size&quot;: 2,
+  &quot;data_json&quot;: &quot;{\&quot;execution_lease_id\&quot;:\&quot;execution-lease:sha256:7352fe5fc78c21c1ae5611a3ef40f04881f3bac53ea480052f716fe9ae3d4870\&quot;}&quot;,
+  &quot;environment_run_id&quot;: &quot;environment-run:nao-smoke:001&quot;,
+  &quot;event_id&quot;: &quot;trace-event:sha256:c2048c6ad4e2f0a2e05a86bbf9014812a49f1c17bc93e42e33b365471f96a37f&quot;,
+  &quot;event_type&quot;: &quot;execution_started&quot;,
+  &quot;operation_id&quot;: &quot;uah-smoke-find-cup:operation:step_1&quot;,
+  &quot;parent_event_id&quot;: &quot;trace-event:sha256:0c828820f33d71e25d2fd01c7b765e4a5deebde94bab1271bf3d5c6bf8b11a7b&quot;,
+  &quot;recorded_at&quot;: &quot;2026-09-28t10:00:01z&quot;,
+  &quot;schema_version&quot;: &quot;uah.trace_event/v1&quot;,
+  &quot;sequence&quot;: 7,
+  &quot;task_id&quot;: &quot;find_the_cup&quot;,
+  &quot;trace_id&quot;: &quot;trace:sha256:e7b30a3dc4fab39b098dfb9a91c6b473edd0459d66d2269494a294acb97ab9c0&quot;
+} {
+  &quot;artifact_refs&quot;: [
+    &quot;execution-receipt:sha256:beba1a632ac63a3cb5a41ff3f4e2b53143222b38bad48eb782677b9b6a34c641&quot;,
+    &quot;execution-lease:sha256:7352fe5fc78c21c1ae5611a3ef40f04881f3bac53ea480052f716fe9ae3d4870&quot;
+  ],
+  &quot;commit_id&quot;: &quot;lifecycle-commit:sha256:8ff4cc5989fc52b80d0b75de57f0126d4f03f3ad8ea9b7784f2351ff3fff98c0&quot;,
+  &quot;commit_index&quot;: 1,
+  &quot;commit_size&quot;: 2,
+  &quot;data_json&quot;: &quot;{\&quot;admission_id\&quot;:\&quot;admission:sha256:d447f94edb37c42ba18e31868b4de86afee18a324934fdc917bfff14538fa5c1\&quot;,\&quot;binding_id\&quot;:\&quot;nao_fake.find_object.v1\&quot;,\&quot;execution_lease_id\&quot;:\&quot;execution-lease:sha256:7352fe5fc78c21c1ae5611a3ef40f04881f3bac53ea480052f716fe9ae3d4870\&quot;,\&quot;execution_result_id\&quot;:\&quot;execution-receipt:sha256:beba1a632ac63a3cb5a41ff3f4e2b53143222b38bad48eb782677b9b6a34c641\&quot;,\&quot;object_id\&quot;:\&quot;find_object\&quot;,\&quot;owner\&quot;:\&quot;object_finder\&quot;,\&quot;succeeded\&quot;:true}&quot;,
+  &quot;environment_run_id&quot;: &quot;environment-run:nao-smoke:001&quot;,
+  &quot;event_id&quot;: &quot;trace-event:sha256:822f13072c5f5ddbd7f14eac585a5d8cd79aa11e3cf1c0c8fa8c08c0f2a4d1ca&quot;,
+  &quot;event_type&quot;: &quot;execution_completed&quot;,
+  &quot;operation_id&quot;: &quot;uah-smoke-find-cup:operation:step_1&quot;,
+  &quot;parent_event_id&quot;: &quot;trace-event:sha256:c2048c6ad4e2f0a2e05a86bbf9014812a49f1c17bc93e42e33b365471f96a37f&quot;,
+  &quot;recorded_at&quot;: &quot;2026-09-28t10:00:01z&quot;,
+  &quot;schema_version&quot;: &quot;uah.trace_event/v1&quot;,
+  &quot;sequence&quot;: 8,
+  &quot;task_id&quot;: &quot;find_the_cup&quot;,
+  &quot;trace_id&quot;: &quot;trace:sha256:e7b30a3dc4fab39b098dfb9a91c6b473edd0459d66d2269494a294acb97ab9c0&quot;
+} {
+  &quot;artifact_refs&quot;: [
+    &quot;effect-evidence:sha256:0b9bc69fdcaf286fd056d48ff42072fed6fe5556f9dd3f62beb53846ad2790b5&quot;,
+    &quot;execution-receipt:sha256:beba1a632ac63a3cb5a41ff3f4e2b53143222b38bad48eb782677b9b6a34c641&quot;
+  ],
+  &quot;commit_id&quot;: &quot;lifecycle-commit:sha256:8ff4cc5989fc52b80d0b75de57f0126d4f03f3ad8ea9b7784f2351ff3fff98c0&quot;,
+  &quot;commit_index&quot;: 2,
+  &quot;commit_size&quot;: 2,
+  &quot;data_json&quot;: &quot;{\&quot;binding_id\&quot;:\&quot;nao_fake.find_object.v1\&quot;,\&quot;evidence_artifact_id\&quot;:\&quot;effect-evidence:sha256:0b9bc69fdcaf286fd056d48ff42072fed6fe5556f9dd3f62beb53846ad2790b5\&quot;,\&quot;execution_lease_id\&quot;:\&quot;execution-lease:sha256:7352fe5fc78c21c1ae5611a3ef40f04881f3bac53ea480052f716fe9ae3d4870\&quot;,\&quot;execution_result_id\&quot;:\&quot;execution-receipt:sha256:beba1a632ac63a3cb5a41ff3f4e2b53143222b38bad48eb782677b9b6a34c641\&quot;,\&quot;native_evidence_ref\&quot;:\&quot;builtin://uah-smoke/detection-cup\&quot;,\&quot;object_id\&quot;:\&quot;find_object\&quot;,\&quot;observed_effects\&quot;:[\&quot;fresh detector-backed result returned\&quot;],\&quot;owner\&quot;:\&quot;object_finder\&quot;,\&quot;succeeded\&quot;:true}&quot;,
+  &quot;environment_run_id&quot;: &quot;environment-run:nao-smoke:001&quot;,
+  &quot;event_id&quot;: &quot;trace-event:sha256:1cc7971e709297bad88d80d17ad3362a8a167b9b8918e435a3f823eb0d00d8e2&quot;,
+  &quot;event_type&quot;: &quot;evidence_issued&quot;,
+  &quot;operation_id&quot;: &quot;uah-smoke-find-cup:operation:step_1&quot;,
+  &quot;parent_event_id&quot;: &quot;trace-event:sha256:822f13072c5f5ddbd7f14eac585a5d8cd79aa11e3cf1c0c8fa8c08c0f2a4d1ca&quot;,
+  &quot;recorded_at&quot;: &quot;2026-09-28t10:00:01z&quot;,
+  &quot;schema_version&quot;: &quot;uah.trace_event/v1&quot;,
+  &quot;sequence&quot;: 9,
+  &quot;task_id&quot;: &quot;find_the_cup&quot;,
+  &quot;trace_id&quot;: &quot;trace:sha256:e7b30a3dc4fab39b098dfb9a91c6b473edd0459d66d2269494a294acb97ab9c0&quot;
+} {
+  &quot;artifact_refs&quot;: [
+    &quot;task-acceptance:sha256:4439808e05f522c011abb507913382147ef5ed29b24d4eee6e412370de323c7e&quot;
+  ],
+  &quot;commit_id&quot;: &quot;lifecycle-commit:sha256:988acab66b5732a2aadc9fe638e66359c2fcc012580047a5a496a80332263f7a&quot;,
+  &quot;commit_index&quot;: 1,
+  &quot;commit_size&quot;: 2,
+  &quot;data_json&quot;: &quot;{\&quot;effect_id\&quot;:\&quot;fresh detector-backed result returned\&quot;,\&quot;obligation_id\&quot;:\&quot;target_observed\&quot;,\&quot;outcome\&quot;:\&quot;satisfied\&quot;,\&quot;requirement\&quot;:\&quot;required\&quot;}&quot;,
+  &quot;environment_run_id&quot;: &quot;environment-run:nao-smoke:001&quot;,
+  &quot;event_id&quot;: &quot;trace-event:sha256:26996e65493fb8893476a3f76514b6f25af73c282dd0d66202f9774cab50745e&quot;,
+  &quot;event_type&quot;: &quot;effect_obligation_satisfied&quot;,
+  &quot;operation_id&quot;: null,
+  &quot;parent_event_id&quot;: &quot;trace-event:sha256:1cc7971e709297bad88d80d17ad3362a8a167b9b8918e435a3f823eb0d00d8e2&quot;,
+  &quot;recorded_at&quot;: &quot;2026-09-28t10:00:01z&quot;,
+  &quot;schema_version&quot;: &quot;uah.trace_event/v1&quot;,
+  &quot;sequence&quot;: 10,
+  &quot;task_id&quot;: &quot;find_the_cup&quot;,
+  &quot;trace_id&quot;: &quot;trace:sha256:e7b30a3dc4fab39b098dfb9a91c6b473edd0459d66d2269494a294acb97ab9c0&quot;
+} {
+  &quot;artifact_refs&quot;: [
+    &quot;task-acceptance:sha256:4439808e05f522c011abb507913382147ef5ed29b24d4eee6e412370de323c7e&quot;,
+    &quot;compiled-task:sha256:678452c347e29beeb2e5e6592d142c27f99d7ff2b38b7a69deff0de912239919&quot;,
+    &quot;effect-evidence:sha256:0b9bc69fdcaf286fd056d48ff42072fed6fe5556f9dd3f62beb53846ad2790b5&quot;
+  ],
+  &quot;commit_id&quot;: &quot;lifecycle-commit:sha256:988acab66b5732a2aadc9fe638e66359c2fcc012580047a5a496a80332263f7a&quot;,
+  &quot;commit_index&quot;: 2,
+  &quot;commit_size&quot;: 2,
+  &quot;data_json&quot;: &quot;{\&quot;acceptance_id\&quot;:\&quot;task-acceptance:sha256:4439808e05f522c011abb507913382147ef5ed29b24d4eee6e412370de323c7e\&quot;,\&quot;compiled_task_id\&quot;:\&quot;compiled-task:sha256:678452c347e29beeb2e5e6592d142c27f99d7ff2b38b7a69deff0de912239919\&quot;,\&quot;deficit_obligation_ids\&quot;:[],\&quot;evidence_artifact_ids\&quot;:[\&quot;effect-evidence:sha256:0b9bc69fdcaf286fd056d48ff42072fed6fe5556f9dd3f62beb53846ad2790b5\&quot;],\&quot;evidence_refs\&quot;:[\&quot;builtin://uah-smoke/detection-cup\&quot;],\&quot;failed_obligation_ids\&quot;:[],\&quot;pending_obligation_ids\&quot;:[],\&quot;satisfied_obligation_ids\&quot;:[\&quot;target_observed\&quot;],\&quot;status\&quot;:\&quot;accepted\&quot;}&quot;,
+  &quot;environment_run_id&quot;: &quot;environment-run:nao-smoke:001&quot;,
+  &quot;event_id&quot;: &quot;trace-event:sha256:1ca9ecf7d2699445522ab2f5b7553e77b71a34ba4f2cd972d413852bd3d377bd&quot;,
+  &quot;event_type&quot;: &quot;terminal_task_accepted&quot;,
+  &quot;operation_id&quot;: null,
+  &quot;parent_event_id&quot;: &quot;trace-event:sha256:26996e65493fb8893476a3f76514b6f25af73c282dd0d66202f9774cab50745e&quot;,
+  &quot;recorded_at&quot;: &quot;2026-09-28t10:00:01z&quot;,
+  &quot;schema_version&quot;: &quot;uah.trace_event/v1&quot;,
+  &quot;sequence&quot;: 11,
+  &quot;task_id&quot;: &quot;find_the_cup&quot;,
+  &quot;trace_id&quot;: &quot;trace:sha256:e7b30a3dc4fab39b098dfb9a91c6b473edd0459d66d2269494a294acb97ab9c0&quot;
+}">
+      <header><h2>trace:sha256:e7b30a3dc4fab39b098dfb9a91c6b473edd0459d66d2269494a294acb97ab9c0</h2><span class="badge accepted">accepted</span>
+        <span class="badge open">recorded</span></header>
+      <p>Task <code>find_the_cup</code> · Environment <code>environment-run:nao-smoke:001</code></p>
+
+      <section class="event">
+      <header><strong>task_started</strong><code>#1</code></header>
+      <p>Recorded 2026-09-28T10:00:01Z</p>
+      <details><summary>Raw immutable event</summary><pre>{
+  &quot;artifact_refs&quot;: [
+    &quot;environment-ingress:sha256:b14a66af406a77f528f95b65c6374c898ca373dd67f9090b9d9cdf8bc404f5cf&quot;,
+    &quot;task-ingress-decision:sha256:adbc1edbf4062739e35b65270579b05de5dd1826743d7ea77b4bf41c94f2efc0&quot;,
+    &quot;sha256:b4032b7b64c4c65c481cd45c84d8c31bd89af7d0a9fb7b70be1e6a93291caf5e&quot;
+  ],
+  &quot;commit_id&quot;: &quot;lifecycle-commit:sha256:1840afca4b4b5d89a57b44a29db9a6f7f197f58de0557b26b1f2e4514a3e3036&quot;,
+  &quot;commit_index&quot;: 1,
+  &quot;commit_size&quot;: 1,
+  &quot;data_json&quot;: &quot;{\&quot;decision_id\&quot;:\&quot;task-ingress-decision:sha256:adbc1edbf4062739e35b65270579b05de5dd1826743d7ea77b4bf41c94f2efc0\&quot;,\&quot;domain_contract_pack_revision\&quot;:\&quot;sha256:b4032b7b64c4c65c481cd45c84d8c31bd89af7d0a9fb7b70be1e6a93291caf5e\&quot;,\&quot;environment_ingress_id\&quot;:\&quot;ingress:recorded:uah-smoke-find-cup\&quot;,\&quot;ingress_artifact_id\&quot;:\&quot;environment-ingress:sha256:b14a66af406a77f528f95b65c6374c898ca373dd67f9090b9d9cdf8bc404f5cf\&quot;}&quot;,
+  &quot;environment_run_id&quot;: &quot;environment-run:nao-smoke:001&quot;,
+  &quot;event_id&quot;: &quot;trace-event:sha256:6f04e34994504f41a503201387962bcb7974f0fdc5288cb68d66d6a9bd79d1f4&quot;,
+  &quot;event_type&quot;: &quot;task_started&quot;,
+  &quot;operation_id&quot;: null,
+  &quot;parent_event_id&quot;: null,
+  &quot;recorded_at&quot;: &quot;2026-09-28T10:00:01Z&quot;,
+  &quot;schema_version&quot;: &quot;uah.trace_event/v1&quot;,
+  &quot;sequence&quot;: 1,
+  &quot;task_id&quot;: &quot;find_the_cup&quot;,
+  &quot;trace_id&quot;: &quot;trace:sha256:e7b30a3dc4fab39b098dfb9a91c6b473edd0459d66d2269494a294acb97ab9c0&quot;
+}</pre></details>
+    </section>
+<section class="event">
+      <header><strong>task_compiled</strong><code>#2</code></header>
+      <p>Recorded 2026-09-28T10:00:01Z</p>
+      <details><summary>Raw immutable event</summary><pre>{
+  &quot;artifact_refs&quot;: [
+    &quot;compiled-task:sha256:678452c347e29beeb2e5e6592d142c27f99d7ff2b38b7a69deff0de912239919&quot;
+  ],
+  &quot;commit_id&quot;: &quot;lifecycle-commit:sha256:495237550ac079f3d7c33aaa4d669c768bc167f746121462cb6f58111d6ba570&quot;,
+  &quot;commit_index&quot;: 1,
+  &quot;commit_size&quot;: 1,
+  &quot;data_json&quot;: &quot;{\&quot;budgets\&quot;:{\&quot;model_calls\&quot;:0,\&quot;retry_attempts\&quot;:0,\&quot;tool_calls\&quot;:4,\&quot;wall_time_seconds\&quot;:60},\&quot;compiled_task_id\&quot;:\&quot;compiled-task:sha256:678452c347e29beeb2e5e6592d142c27f99d7ff2b38b7a69deff0de912239919\&quot;,\&quot;domain_contract_pack_revision\&quot;:\&quot;sha256:b4032b7b64c4c65c481cd45c84d8c31bd89af7d0a9fb7b70be1e6a93291caf5e\&quot;,\&quot;frame_id\&quot;:\&quot;nao_ros4hri\&quot;,\&quot;registry_version\&quot;:\&quot;sha256:fb7f9ffaceed518ab0ea4045fbe2618196f358cba941b910b51b663ca6097ae3\&quot;,\&quot;role_id\&quot;:\&quot;planner_llm\&quot;}&quot;,
+  &quot;environment_run_id&quot;: &quot;environment-run:nao-smoke:001&quot;,
+  &quot;event_id&quot;: &quot;trace-event:sha256:34e4dc9a7c3082c86f422078b7b938e70148363c028e5860cc1567b9dd330d91&quot;,
+  &quot;event_type&quot;: &quot;task_compiled&quot;,
+  &quot;operation_id&quot;: null,
+  &quot;parent_event_id&quot;: &quot;trace-event:sha256:6f04e34994504f41a503201387962bcb7974f0fdc5288cb68d66d6a9bd79d1f4&quot;,
+  &quot;recorded_at&quot;: &quot;2026-09-28T10:00:01Z&quot;,
+  &quot;schema_version&quot;: &quot;uah.trace_event/v1&quot;,
+  &quot;sequence&quot;: 2,
+  &quot;task_id&quot;: &quot;find_the_cup&quot;,
+  &quot;trace_id&quot;: &quot;trace:sha256:e7b30a3dc4fab39b098dfb9a91c6b473edd0459d66d2269494a294acb97ab9c0&quot;
+}</pre></details>
+    </section>
+<section class="event">
+      <header><strong>proposal_normalized</strong><code>#3</code></header>
+      <p>Recorded 2026-09-28T10:00:01Z · Operation <code>uah-smoke-find-cup:operation:step_1</code></p>
+      <details><summary>Raw immutable event</summary><pre>{
+  &quot;artifact_refs&quot;: [
+    &quot;proposal:sha256:0190e798b695cc16973fffac2875ba27751c353f932af4f7b947b4c3df30c54e&quot;,
+    &quot;compiled-task:sha256:678452c347e29beeb2e5e6592d142c27f99d7ff2b38b7a69deff0de912239919&quot;,
+    &quot;model-output:sha256:689cbc3a6bf19bb5201de7d4c8de6af7935ad85553ebe88c986432dec81262a9&quot;
+  ],
+  &quot;commit_id&quot;: &quot;lifecycle-commit:sha256:c1d5f6abb5980862c65576a48069ebef8dccc46e9fff98a9c4848d32459b7b6d&quot;,
+  &quot;commit_index&quot;: 1,
+  &quot;commit_size&quot;: 1,
+  &quot;data_json&quot;: &quot;{\&quot;compiled_task_id\&quot;:\&quot;compiled-task:sha256:678452c347e29beeb2e5e6592d142c27f99d7ff2b38b7a69deff0de912239919\&quot;,\&quot;object_id\&quot;:\&quot;find_object\&quot;,\&quot;proposal_id\&quot;:\&quot;proposal:sha256:0190e798b695cc16973fffac2875ba27751c353f932af4f7b947b4c3df30c54e\&quot;}&quot;,
+  &quot;environment_run_id&quot;: &quot;environment-run:nao-smoke:001&quot;,
+  &quot;event_id&quot;: &quot;trace-event:sha256:fc34f0baac4866337a53a36222071f51fe2fcc2f13e4a350c63025a72bac4bfb&quot;,
+  &quot;event_type&quot;: &quot;proposal_normalized&quot;,
+  &quot;operation_id&quot;: &quot;uah-smoke-find-cup:operation:step_1&quot;,
+  &quot;parent_event_id&quot;: &quot;trace-event:sha256:34e4dc9a7c3082c86f422078b7b938e70148363c028e5860cc1567b9dd330d91&quot;,
+  &quot;recorded_at&quot;: &quot;2026-09-28T10:00:01Z&quot;,
+  &quot;schema_version&quot;: &quot;uah.trace_event/v1&quot;,
+  &quot;sequence&quot;: 3,
+  &quot;task_id&quot;: &quot;find_the_cup&quot;,
+  &quot;trace_id&quot;: &quot;trace:sha256:e7b30a3dc4fab39b098dfb9a91c6b473edd0459d66d2269494a294acb97ab9c0&quot;
+}</pre></details>
+    </section>
+<section class="event">
+      <header><strong>semantic_admission_accepted</strong><code>#4</code></header>
+      <p>Recorded 2026-09-28T10:00:01Z · Operation <code>uah-smoke-find-cup:operation:step_1</code></p>
+      <details><summary>Raw immutable event</summary><pre>{
+  &quot;artifact_refs&quot;: [
+    &quot;admission:sha256:d447f94edb37c42ba18e31868b4de86afee18a324934fdc917bfff14538fa5c1&quot;,
+    &quot;proposal:sha256:0190e798b695cc16973fffac2875ba27751c353f932af4f7b947b4c3df30c54e&quot;
+  ],
+  &quot;commit_id&quot;: &quot;lifecycle-commit:sha256:6ad4fe012a1cab793dd6ad2de8346e66e5d8fdef5c1b1b0b872945dc7e87727f&quot;,
+  &quot;commit_index&quot;: 1,
+  &quot;commit_size&quot;: 1,
+  &quot;data_json&quot;: &quot;{\&quot;ab_level\&quot;:1,\&quot;admission_id\&quot;:\&quot;admission:sha256:d447f94edb37c42ba18e31868b4de86afee18a324934fdc917bfff14538fa5c1\&quot;,\&quot;admitted_operation\&quot;:{\&quot;ab_level\&quot;:1,\&quot;admission_id\&quot;:\&quot;admission:sha256:d447f94edb37c42ba18e31868b4de86afee18a324934fdc917bfff14538fa5c1\&quot;,\&quot;binding_fingerprint\&quot;:\&quot;binding:sha256:e140de7336a910c33c013bd6addd9211618f23c174a662662d68888c2c322294\&quot;,\&quot;binding_id\&quot;:\&quot;nao_fake.find_object.v1\&quot;,\&quot;binding_owner\&quot;:\&quot;object_finder\&quot;,\&quot;binding_source_revision\&quot;:\&quot;uah-smoke-v1\&quot;,\&quot;domain_contract_pack_revision\&quot;:\&quot;sha256:b4032b7b64c4c65c481cd45c84d8c31bd89af7d0a9fb7b70be1e6a93291caf5e\&quot;,\&quot;effect_obligation_ids\&quot;:[\&quot;target_observed\&quot;],\&quot;environment_id\&quot;:\&quot;nao_fake\&quot;,\&quot;evidence_adapter\&quot;:\&quot;ab_harness_nao.smoke:fresh_detection\&quot;,\&quot;frame_id\&quot;:\&quot;nao_ros4hri\&quot;,\&quot;input_schema_id\&quot;:\&quot;input-schema:sha256:5b9e04eb5d392aad4f5e4cdfc8f722963f228a99b60437b88f5a48b46e467ccc\&quot;,\&quot;input_schema_ref\&quot;:\&quot;schema://find_object/input/v1\&quot;,\&quot;object_snapshot\&quot;:{\&quot;ab_level\&quot;:1,\&quot;category\&quot;:\&quot;perception\&quot;,\&quot;decomposes_to\&quot;:[\&quot;resolve_target_reference\&quot;],\&quot;expected_effects\&quot;:[\&quot;requested object localized\&quot;],\&quot;kind\&quot;:\&quot;skill\&quot;,\&quot;object_id\&quot;:\&quot;find_object\&quot;,\&quot;observable_success\&quot;:[\&quot;fresh detector-backed result returned\&quot;],\&quot;owner_package\&quot;:\&quot;object_finder\&quot;,\&quot;runtime_callable\&quot;:true},\&quot;output_schema_ref\&quot;:\&quot;schema://find_object/result/v1\&quot;,\&quot;proposal\&quot;:{\&quot;arguments_json\&quot;:\&quot;{\\\&quot;label\\\&quot;:\\\&quot;cup\\\&quot;}\&quot;,\&quot;compiled_task_id\&quot;:\&quot;compiled-task:sha256:678452c347e29beeb2e5e6592d142c27f99d7ff2b38b7a69deff0de912239919\&quot;,\&quot;environment_run_id\&quot;:\&quot;environment-run:nao-smoke:001\&quot;,\&quot;object_id\&quot;:\&quot;find_object\&quot;,\&quot;operation_id\&quot;:\&quot;uah-smoke-find-cup:operation:step_1\&quot;,\&quot;output_type\&quot;:\&quot;executable_plan\&quot;,\&quot;proposal_id\&quot;:\&quot;proposal:sha256:0190e798b695cc16973fffac2875ba27751c353f932af4f7b947b4c3df30c54e\&quot;,\&quot;raw_output_artifact_id\&quot;:\&quot;model-output:sha256:689cbc3a6bf19bb5201de7d4c8de6af7935ad85553ebe88c986432dec81262a9\&quot;,\&quot;schema_version\&quot;:\&quot;uah.typed_proposal/v1\&quot;,\&quot;task_id\&quot;:\&quot;find_the_cup\&quot;,\&quot;trace_id\&quot;:\&quot;trace:sha256:e7b30a3dc4fab39b098dfb9a91c6b473edd0459d66d2269494a294acb97ab9c0\&quot;},\&quot;runtime_mode\&quot;:\&quot;smoke\&quot;,\&quot;schema_version\&quot;:\&quot;uah.admitted_operation/v3\&quot;},\&quot;binding_id\&quot;:\&quot;nao_fake.find_object.v1\&quot;,\&quot;binding_owner\&quot;:\&quot;object_finder\&quot;,\&quot;frame_id\&quot;:\&quot;nao_ros4hri\&quot;,\&quot;input_schema_id\&quot;:\&quot;input-schema:sha256:5b9e04eb5d392aad4f5e4cdfc8f722963f228a99b60437b88f5a48b46e467ccc\&quot;,\&quot;object_id\&quot;:\&quot;find_object\&quot;,\&quot;object_snapshot\&quot;:{\&quot;ab_level\&quot;:1,\&quot;category\&quot;:\&quot;perception\&quot;,\&quot;decomposes_to\&quot;:[\&quot;resolve_target_reference\&quot;],\&quot;expected_effects\&quot;:[\&quot;requested object localized\&quot;],\&quot;kind\&quot;:\&quot;skill\&quot;,\&quot;object_id\&quot;:\&quot;find_object\&quot;,\&quot;observable_success\&quot;:[\&quot;fresh detector-backed result returned\&quot;],\&quot;owner_package\&quot;:\&quot;object_finder\&quot;,\&quot;runtime_callable\&quot;:true},\&quot;proposal_id\&quot;:\&quot;proposal:sha256:0190e798b695cc16973fffac2875ba27751c353f932af4f7b947b4c3df30c54e\&quot;,\&quot;schema_version\&quot;:\&quot;uah.admitted_operation/v3\&quot;}&quot;,
+  &quot;environment_run_id&quot;: &quot;environment-run:nao-smoke:001&quot;,
+  &quot;event_id&quot;: &quot;trace-event:sha256:9bcfe4f505d069c1cfc914ca0311339e7f3ef4d89b07da1b7da43beb82738898&quot;,
+  &quot;event_type&quot;: &quot;semantic_admission_accepted&quot;,
+  &quot;operation_id&quot;: &quot;uah-smoke-find-cup:operation:step_1&quot;,
+  &quot;parent_event_id&quot;: &quot;trace-event:sha256:fc34f0baac4866337a53a36222071f51fe2fcc2f13e4a350c63025a72bac4bfb&quot;,
+  &quot;recorded_at&quot;: &quot;2026-09-28T10:00:01Z&quot;,
+  &quot;schema_version&quot;: &quot;uah.trace_event/v1&quot;,
+  &quot;sequence&quot;: 4,
+  &quot;task_id&quot;: &quot;find_the_cup&quot;,
+  &quot;trace_id&quot;: &quot;trace:sha256:e7b30a3dc4fab39b098dfb9a91c6b473edd0459d66d2269494a294acb97ab9c0&quot;
+}</pre></details>
+    </section>
+<section class="event">
+      <header><strong>domain_admission_leased</strong><code>#5</code></header>
+      <p>Recorded 2026-09-28T10:00:01Z · Operation <code>uah-smoke-find-cup:operation:step_1</code></p>
+      <details><summary>Raw immutable event</summary><pre>{
+  &quot;artifact_refs&quot;: [
+    &quot;execution-lease:sha256:7352fe5fc78c21c1ae5611a3ef40f04881f3bac53ea480052f716fe9ae3d4870&quot;,
+    &quot;admission:sha256:d447f94edb37c42ba18e31868b4de86afee18a324934fdc917bfff14538fa5c1&quot;,
+    &quot;environment-attestation:nao-smoke:001&quot;
+  ],
+  &quot;commit_id&quot;: &quot;lifecycle-commit:sha256:39b29a507a6bfdaf0fc2f2165cdc65b38840bd863d255bf57c7d314445a064c1&quot;,
+  &quot;commit_index&quot;: 1,
+  &quot;commit_size&quot;: 1,
+  &quot;data_json&quot;: &quot;{\&quot;admission_id\&quot;:\&quot;admission:sha256:d447f94edb37c42ba18e31868b4de86afee18a324934fdc917bfff14538fa5c1\&quot;,\&quot;binding_id\&quot;:\&quot;nao_fake.find_object.v1\&quot;,\&quot;execution_lease_id\&quot;:\&quot;execution-lease:sha256:7352fe5fc78c21c1ae5611a3ef40f04881f3bac53ea480052f716fe9ae3d4870\&quot;,\&quot;lease_owner_id\&quot;:\&quot;nao_fake.lifecycle_owner\&quot;,\&quot;object_id\&quot;:\&quot;find_object\&quot;}&quot;,
+  &quot;environment_run_id&quot;: &quot;environment-run:nao-smoke:001&quot;,
+  &quot;event_id&quot;: &quot;trace-event:sha256:ceb8a23a527aa3a79d2ee80201713644f2117dd1e87374ba0cba28e61bddd2dd&quot;,
+  &quot;event_type&quot;: &quot;domain_admission_leased&quot;,
+  &quot;operation_id&quot;: &quot;uah-smoke-find-cup:operation:step_1&quot;,
+  &quot;parent_event_id&quot;: &quot;trace-event:sha256:9bcfe4f505d069c1cfc914ca0311339e7f3ef4d89b07da1b7da43beb82738898&quot;,
+  &quot;recorded_at&quot;: &quot;2026-09-28T10:00:01Z&quot;,
+  &quot;schema_version&quot;: &quot;uah.trace_event/v1&quot;,
+  &quot;sequence&quot;: 5,
+  &quot;task_id&quot;: &quot;find_the_cup&quot;,
+  &quot;trace_id&quot;: &quot;trace:sha256:e7b30a3dc4fab39b098dfb9a91c6b473edd0459d66d2269494a294acb97ab9c0&quot;
+}</pre></details>
+    </section>
+<section class="event">
+      <header><strong>budget_granted</strong><code>#6</code></header>
+      <p>Recorded 2026-09-28T10:00:01Z · Operation <code>uah-smoke-find-cup:operation:step_1</code></p>
+      <details><summary>Raw immutable event</summary><pre>{
+  &quot;artifact_refs&quot;: [
+    &quot;budget-decision:sha256:10bb5c123bf30416d6dc9965bef0bcacd57637d5feb61bfe66c842bb6fdc1150&quot;,
+    &quot;compiled-task:sha256:678452c347e29beeb2e5e6592d142c27f99d7ff2b38b7a69deff0de912239919&quot;
+  ],
+  &quot;commit_id&quot;: &quot;lifecycle-commit:sha256:e17c5564a3b3291367c85c20509671d05f472fc7364c34e1f3a71a358d7ca152&quot;,
+  &quot;commit_index&quot;: 1,
+  &quot;commit_size&quot;: 2,
+  &quot;data_json&quot;: &quot;{\&quot;compiled_task_id\&quot;:\&quot;compiled-task:sha256:678452c347e29beeb2e5e6592d142c27f99d7ff2b38b7a69deff0de912239919\&quot;,\&quot;consumed_after\&quot;:1,\&quot;consumed_before\&quot;:0,\&quot;decision_id\&quot;:\&quot;budget-decision:sha256:10bb5c123bf30416d6dc9965bef0bcacd57637d5feb61bfe66c842bb6fdc1150\&quot;,\&quot;environment_run_id\&quot;:\&quot;environment-run:nao-smoke:001\&quot;,\&quot;limit\&quot;:4,\&quot;outcome\&quot;:\&quot;granted\&quot;,\&quot;reason_code\&quot;:\&quot;within_budget\&quot;,\&quot;resource\&quot;:\&quot;tool_call\&quot;,\&quot;schema_version\&quot;:\&quot;uah.budget_decision/v1\&quot;,\&quot;subject_id\&quot;:\&quot;uah-smoke-find-cup:operation:step_1\&quot;,\&quot;task_id\&quot;:\&quot;find_the_cup\&quot;,\&quot;trace_id\&quot;:\&quot;trace:sha256:e7b30a3dc4fab39b098dfb9a91c6b473edd0459d66d2269494a294acb97ab9c0\&quot;,\&quot;units\&quot;:1}&quot;,
+  &quot;environment_run_id&quot;: &quot;environment-run:nao-smoke:001&quot;,
+  &quot;event_id&quot;: &quot;trace-event:sha256:0c828820f33d71e25d2fd01c7b765e4a5deebde94bab1271bf3d5c6bf8b11a7b&quot;,
+  &quot;event_type&quot;: &quot;budget_granted&quot;,
+  &quot;operation_id&quot;: &quot;uah-smoke-find-cup:operation:step_1&quot;,
+  &quot;parent_event_id&quot;: &quot;trace-event:sha256:ceb8a23a527aa3a79d2ee80201713644f2117dd1e87374ba0cba28e61bddd2dd&quot;,
+  &quot;recorded_at&quot;: &quot;2026-09-28T10:00:01Z&quot;,
+  &quot;schema_version&quot;: &quot;uah.trace_event/v1&quot;,
+  &quot;sequence&quot;: 6,
+  &quot;task_id&quot;: &quot;find_the_cup&quot;,
+  &quot;trace_id&quot;: &quot;trace:sha256:e7b30a3dc4fab39b098dfb9a91c6b473edd0459d66d2269494a294acb97ab9c0&quot;
+}</pre></details>
+    </section>
+<section class="event">
+      <header><strong>execution_started</strong><code>#7</code></header>
+      <p>Recorded 2026-09-28T10:00:01Z · Operation <code>uah-smoke-find-cup:operation:step_1</code></p>
+      <details><summary>Raw immutable event</summary><pre>{
+  &quot;artifact_refs&quot;: [
+    &quot;execution-lease:sha256:7352fe5fc78c21c1ae5611a3ef40f04881f3bac53ea480052f716fe9ae3d4870&quot;
+  ],
+  &quot;commit_id&quot;: &quot;lifecycle-commit:sha256:e17c5564a3b3291367c85c20509671d05f472fc7364c34e1f3a71a358d7ca152&quot;,
+  &quot;commit_index&quot;: 2,
+  &quot;commit_size&quot;: 2,
+  &quot;data_json&quot;: &quot;{\&quot;execution_lease_id\&quot;:\&quot;execution-lease:sha256:7352fe5fc78c21c1ae5611a3ef40f04881f3bac53ea480052f716fe9ae3d4870\&quot;}&quot;,
+  &quot;environment_run_id&quot;: &quot;environment-run:nao-smoke:001&quot;,
+  &quot;event_id&quot;: &quot;trace-event:sha256:c2048c6ad4e2f0a2e05a86bbf9014812a49f1c17bc93e42e33b365471f96a37f&quot;,
+  &quot;event_type&quot;: &quot;execution_started&quot;,
+  &quot;operation_id&quot;: &quot;uah-smoke-find-cup:operation:step_1&quot;,
+  &quot;parent_event_id&quot;: &quot;trace-event:sha256:0c828820f33d71e25d2fd01c7b765e4a5deebde94bab1271bf3d5c6bf8b11a7b&quot;,
+  &quot;recorded_at&quot;: &quot;2026-09-28T10:00:01Z&quot;,
+  &quot;schema_version&quot;: &quot;uah.trace_event/v1&quot;,
+  &quot;sequence&quot;: 7,
+  &quot;task_id&quot;: &quot;find_the_cup&quot;,
+  &quot;trace_id&quot;: &quot;trace:sha256:e7b30a3dc4fab39b098dfb9a91c6b473edd0459d66d2269494a294acb97ab9c0&quot;
+}</pre></details>
+    </section>
+<section class="event">
+      <header><strong>execution_completed</strong><code>#8</code></header>
+      <p>Recorded 2026-09-28T10:00:01Z · Operation <code>uah-smoke-find-cup:operation:step_1</code></p>
+      <details><summary>Raw immutable event</summary><pre>{
+  &quot;artifact_refs&quot;: [
+    &quot;execution-receipt:sha256:beba1a632ac63a3cb5a41ff3f4e2b53143222b38bad48eb782677b9b6a34c641&quot;,
+    &quot;execution-lease:sha256:7352fe5fc78c21c1ae5611a3ef40f04881f3bac53ea480052f716fe9ae3d4870&quot;
+  ],
+  &quot;commit_id&quot;: &quot;lifecycle-commit:sha256:8ff4cc5989fc52b80d0b75de57f0126d4f03f3ad8ea9b7784f2351ff3fff98c0&quot;,
+  &quot;commit_index&quot;: 1,
+  &quot;commit_size&quot;: 2,
+  &quot;data_json&quot;: &quot;{\&quot;admission_id\&quot;:\&quot;admission:sha256:d447f94edb37c42ba18e31868b4de86afee18a324934fdc917bfff14538fa5c1\&quot;,\&quot;binding_id\&quot;:\&quot;nao_fake.find_object.v1\&quot;,\&quot;execution_lease_id\&quot;:\&quot;execution-lease:sha256:7352fe5fc78c21c1ae5611a3ef40f04881f3bac53ea480052f716fe9ae3d4870\&quot;,\&quot;execution_result_id\&quot;:\&quot;execution-receipt:sha256:beba1a632ac63a3cb5a41ff3f4e2b53143222b38bad48eb782677b9b6a34c641\&quot;,\&quot;object_id\&quot;:\&quot;find_object\&quot;,\&quot;owner\&quot;:\&quot;object_finder\&quot;,\&quot;succeeded\&quot;:true}&quot;,
+  &quot;environment_run_id&quot;: &quot;environment-run:nao-smoke:001&quot;,
+  &quot;event_id&quot;: &quot;trace-event:sha256:822f13072c5f5ddbd7f14eac585a5d8cd79aa11e3cf1c0c8fa8c08c0f2a4d1ca&quot;,
+  &quot;event_type&quot;: &quot;execution_completed&quot;,
+  &quot;operation_id&quot;: &quot;uah-smoke-find-cup:operation:step_1&quot;,
+  &quot;parent_event_id&quot;: &quot;trace-event:sha256:c2048c6ad4e2f0a2e05a86bbf9014812a49f1c17bc93e42e33b365471f96a37f&quot;,
+  &quot;recorded_at&quot;: &quot;2026-09-28T10:00:01Z&quot;,
+  &quot;schema_version&quot;: &quot;uah.trace_event/v1&quot;,
+  &quot;sequence&quot;: 8,
+  &quot;task_id&quot;: &quot;find_the_cup&quot;,
+  &quot;trace_id&quot;: &quot;trace:sha256:e7b30a3dc4fab39b098dfb9a91c6b473edd0459d66d2269494a294acb97ab9c0&quot;
+}</pre></details>
+    </section>
+<section class="event">
+      <header><strong>evidence_issued</strong><code>#9</code></header>
+      <p>Recorded 2026-09-28T10:00:01Z · Operation <code>uah-smoke-find-cup:operation:step_1</code></p>
+      <details><summary>Raw immutable event</summary><pre>{
+  &quot;artifact_refs&quot;: [
+    &quot;effect-evidence:sha256:0b9bc69fdcaf286fd056d48ff42072fed6fe5556f9dd3f62beb53846ad2790b5&quot;,
+    &quot;execution-receipt:sha256:beba1a632ac63a3cb5a41ff3f4e2b53143222b38bad48eb782677b9b6a34c641&quot;
+  ],
+  &quot;commit_id&quot;: &quot;lifecycle-commit:sha256:8ff4cc5989fc52b80d0b75de57f0126d4f03f3ad8ea9b7784f2351ff3fff98c0&quot;,
+  &quot;commit_index&quot;: 2,
+  &quot;commit_size&quot;: 2,
+  &quot;data_json&quot;: &quot;{\&quot;binding_id\&quot;:\&quot;nao_fake.find_object.v1\&quot;,\&quot;evidence_artifact_id\&quot;:\&quot;effect-evidence:sha256:0b9bc69fdcaf286fd056d48ff42072fed6fe5556f9dd3f62beb53846ad2790b5\&quot;,\&quot;execution_lease_id\&quot;:\&quot;execution-lease:sha256:7352fe5fc78c21c1ae5611a3ef40f04881f3bac53ea480052f716fe9ae3d4870\&quot;,\&quot;execution_result_id\&quot;:\&quot;execution-receipt:sha256:beba1a632ac63a3cb5a41ff3f4e2b53143222b38bad48eb782677b9b6a34c641\&quot;,\&quot;native_evidence_ref\&quot;:\&quot;builtin://uah-smoke/detection-cup\&quot;,\&quot;object_id\&quot;:\&quot;find_object\&quot;,\&quot;observed_effects\&quot;:[\&quot;fresh detector-backed result returned\&quot;],\&quot;owner\&quot;:\&quot;object_finder\&quot;,\&quot;succeeded\&quot;:true}&quot;,
+  &quot;environment_run_id&quot;: &quot;environment-run:nao-smoke:001&quot;,
+  &quot;event_id&quot;: &quot;trace-event:sha256:1cc7971e709297bad88d80d17ad3362a8a167b9b8918e435a3f823eb0d00d8e2&quot;,
+  &quot;event_type&quot;: &quot;evidence_issued&quot;,
+  &quot;operation_id&quot;: &quot;uah-smoke-find-cup:operation:step_1&quot;,
+  &quot;parent_event_id&quot;: &quot;trace-event:sha256:822f13072c5f5ddbd7f14eac585a5d8cd79aa11e3cf1c0c8fa8c08c0f2a4d1ca&quot;,
+  &quot;recorded_at&quot;: &quot;2026-09-28T10:00:01Z&quot;,
+  &quot;schema_version&quot;: &quot;uah.trace_event/v1&quot;,
+  &quot;sequence&quot;: 9,
+  &quot;task_id&quot;: &quot;find_the_cup&quot;,
+  &quot;trace_id&quot;: &quot;trace:sha256:e7b30a3dc4fab39b098dfb9a91c6b473edd0459d66d2269494a294acb97ab9c0&quot;
+}</pre></details>
+    </section>
+<section class="event">
+      <header><strong>effect_obligation_satisfied</strong><code>#10</code></header>
+      <p>Recorded 2026-09-28T10:00:01Z</p>
+      <details><summary>Raw immutable event</summary><pre>{
+  &quot;artifact_refs&quot;: [
+    &quot;task-acceptance:sha256:4439808e05f522c011abb507913382147ef5ed29b24d4eee6e412370de323c7e&quot;
+  ],
+  &quot;commit_id&quot;: &quot;lifecycle-commit:sha256:988acab66b5732a2aadc9fe638e66359c2fcc012580047a5a496a80332263f7a&quot;,
+  &quot;commit_index&quot;: 1,
+  &quot;commit_size&quot;: 2,
+  &quot;data_json&quot;: &quot;{\&quot;effect_id\&quot;:\&quot;fresh detector-backed result returned\&quot;,\&quot;obligation_id\&quot;:\&quot;target_observed\&quot;,\&quot;outcome\&quot;:\&quot;satisfied\&quot;,\&quot;requirement\&quot;:\&quot;required\&quot;}&quot;,
+  &quot;environment_run_id&quot;: &quot;environment-run:nao-smoke:001&quot;,
+  &quot;event_id&quot;: &quot;trace-event:sha256:26996e65493fb8893476a3f76514b6f25af73c282dd0d66202f9774cab50745e&quot;,
+  &quot;event_type&quot;: &quot;effect_obligation_satisfied&quot;,
+  &quot;operation_id&quot;: null,
+  &quot;parent_event_id&quot;: &quot;trace-event:sha256:1cc7971e709297bad88d80d17ad3362a8a167b9b8918e435a3f823eb0d00d8e2&quot;,
+  &quot;recorded_at&quot;: &quot;2026-09-28T10:00:01Z&quot;,
+  &quot;schema_version&quot;: &quot;uah.trace_event/v1&quot;,
+  &quot;sequence&quot;: 10,
+  &quot;task_id&quot;: &quot;find_the_cup&quot;,
+  &quot;trace_id&quot;: &quot;trace:sha256:e7b30a3dc4fab39b098dfb9a91c6b473edd0459d66d2269494a294acb97ab9c0&quot;
+}</pre></details>
+    </section>
+<section class="event">
+      <header><strong>terminal_task_accepted</strong><code>#11</code></header>
+      <p>Recorded 2026-09-28T10:00:01Z</p>
+      <details><summary>Raw immutable event</summary><pre>{
+  &quot;artifact_refs&quot;: [
+    &quot;task-acceptance:sha256:4439808e05f522c011abb507913382147ef5ed29b24d4eee6e412370de323c7e&quot;,
+    &quot;compiled-task:sha256:678452c347e29beeb2e5e6592d142c27f99d7ff2b38b7a69deff0de912239919&quot;,
+    &quot;effect-evidence:sha256:0b9bc69fdcaf286fd056d48ff42072fed6fe5556f9dd3f62beb53846ad2790b5&quot;
+  ],
+  &quot;commit_id&quot;: &quot;lifecycle-commit:sha256:988acab66b5732a2aadc9fe638e66359c2fcc012580047a5a496a80332263f7a&quot;,
+  &quot;commit_index&quot;: 2,
+  &quot;commit_size&quot;: 2,
+  &quot;data_json&quot;: &quot;{\&quot;acceptance_id\&quot;:\&quot;task-acceptance:sha256:4439808e05f522c011abb507913382147ef5ed29b24d4eee6e412370de323c7e\&quot;,\&quot;compiled_task_id\&quot;:\&quot;compiled-task:sha256:678452c347e29beeb2e5e6592d142c27f99d7ff2b38b7a69deff0de912239919\&quot;,\&quot;deficit_obligation_ids\&quot;:[],\&quot;evidence_artifact_ids\&quot;:[\&quot;effect-evidence:sha256:0b9bc69fdcaf286fd056d48ff42072fed6fe5556f9dd3f62beb53846ad2790b5\&quot;],\&quot;evidence_refs\&quot;:[\&quot;builtin://uah-smoke/detection-cup\&quot;],\&quot;failed_obligation_ids\&quot;:[],\&quot;pending_obligation_ids\&quot;:[],\&quot;satisfied_obligation_ids\&quot;:[\&quot;target_observed\&quot;],\&quot;status\&quot;:\&quot;accepted\&quot;}&quot;,
+  &quot;environment_run_id&quot;: &quot;environment-run:nao-smoke:001&quot;,
+  &quot;event_id&quot;: &quot;trace-event:sha256:1ca9ecf7d2699445522ab2f5b7553e77b71a34ba4f2cd972d413852bd3d377bd&quot;,
+  &quot;event_type&quot;: &quot;terminal_task_accepted&quot;,
+  &quot;operation_id&quot;: null,
+  &quot;parent_event_id&quot;: &quot;trace-event:sha256:26996e65493fb8893476a3f76514b6f25af73c282dd0d66202f9774cab50745e&quot;,
+  &quot;recorded_at&quot;: &quot;2026-09-28T10:00:01Z&quot;,
+  &quot;schema_version&quot;: &quot;uah.trace_event/v1&quot;,
+  &quot;sequence&quot;: 11,
+  &quot;task_id&quot;: &quot;find_the_cup&quot;,
+  &quot;trace_id&quot;: &quot;trace:sha256:e7b30a3dc4fab39b098dfb9a91c6b473edd0459d66d2269494a294acb97ab9c0&quot;
+}</pre></details>
+    </section>
+    </article>
+<article class="trace" id="trace-trace-event:sha256:050c78a56261a31a9fd690db789b2953d78625647e3156fd9f8ab14d69498c2a" data-status="open" data-event-types="proposal_normalized semantic_admission_rejected task_compiled task_started"
+      data-searchable="trace:sha256:871c1c1d533da872bfc74faba13b35bbeae126a07b32aa8d0bfb6ff1fa82db23 find_the_cup_rejected environment-run:nao-smoke:001 task_started task_compiled proposal_normalized semantic_admission_rejected {
+  &quot;artifact_refs&quot;: [
+    &quot;environment-ingress:sha256:85cef77db804c3bf58a48aa3bb997ec760389d9de1013ff7e1b419ebbac7431f&quot;,
+    &quot;task-ingress-decision:sha256:9858cfa8832ccc951b7c013dd7cd37d832d519e7e06d817701f89e7e3b7525c9&quot;,
+    &quot;sha256:b4032b7b64c4c65c481cd45c84d8c31bd89af7d0a9fb7b70be1e6a93291caf5e&quot;
+  ],
+  &quot;commit_id&quot;: &quot;lifecycle-commit:sha256:7da27fb8f4327942577d8e7508c13ee4d06f7bae585c8848d17454b9f2b457e0&quot;,
+  &quot;commit_index&quot;: 1,
+  &quot;commit_size&quot;: 1,
+  &quot;data_json&quot;: &quot;{\&quot;decision_id\&quot;:\&quot;task-ingress-decision:sha256:9858cfa8832ccc951b7c013dd7cd37d832d519e7e06d817701f89e7e3b7525c9\&quot;,\&quot;domain_contract_pack_revision\&quot;:\&quot;sha256:b4032b7b64c4c65c481cd45c84d8c31bd89af7d0a9fb7b70be1e6a93291caf5e\&quot;,\&quot;environment_ingress_id\&quot;:\&quot;ingress:recorded:uah-smoke-find-cup-rejected\&quot;,\&quot;ingress_artifact_id\&quot;:\&quot;environment-ingress:sha256:85cef77db804c3bf58a48aa3bb997ec760389d9de1013ff7e1b419ebbac7431f\&quot;}&quot;,
+  &quot;environment_run_id&quot;: &quot;environment-run:nao-smoke:001&quot;,
+  &quot;event_id&quot;: &quot;trace-event:sha256:050c78a56261a31a9fd690db789b2953d78625647e3156fd9f8ab14d69498c2a&quot;,
+  &quot;event_type&quot;: &quot;task_started&quot;,
+  &quot;operation_id&quot;: null,
+  &quot;parent_event_id&quot;: null,
+  &quot;recorded_at&quot;: &quot;2026-09-28t10:00:01z&quot;,
+  &quot;schema_version&quot;: &quot;uah.trace_event/v1&quot;,
+  &quot;sequence&quot;: 12,
+  &quot;task_id&quot;: &quot;find_the_cup_rejected&quot;,
+  &quot;trace_id&quot;: &quot;trace:sha256:871c1c1d533da872bfc74faba13b35bbeae126a07b32aa8d0bfb6ff1fa82db23&quot;
+} {
+  &quot;artifact_refs&quot;: [
+    &quot;compiled-task:sha256:28c5066d1b8bde6520192b9973b062db372640c20541124e3c422fe3ce67ef03&quot;
+  ],
+  &quot;commit_id&quot;: &quot;lifecycle-commit:sha256:848296a29068f7a4aece33dc904665aa78f7666b3eeb93827887330072edb17e&quot;,
+  &quot;commit_index&quot;: 1,
+  &quot;commit_size&quot;: 1,
+  &quot;data_json&quot;: &quot;{\&quot;budgets\&quot;:{\&quot;model_calls\&quot;:0,\&quot;retry_attempts\&quot;:0,\&quot;tool_calls\&quot;:4,\&quot;wall_time_seconds\&quot;:60},\&quot;compiled_task_id\&quot;:\&quot;compiled-task:sha256:28c5066d1b8bde6520192b9973b062db372640c20541124e3c422fe3ce67ef03\&quot;,\&quot;domain_contract_pack_revision\&quot;:\&quot;sha256:b4032b7b64c4c65c481cd45c84d8c31bd89af7d0a9fb7b70be1e6a93291caf5e\&quot;,\&quot;frame_id\&quot;:\&quot;nao_ros4hri\&quot;,\&quot;registry_version\&quot;:\&quot;sha256:fb7f9ffaceed518ab0ea4045fbe2618196f358cba941b910b51b663ca6097ae3\&quot;,\&quot;role_id\&quot;:\&quot;planner_llm\&quot;}&quot;,
+  &quot;environment_run_id&quot;: &quot;environment-run:nao-smoke:001&quot;,
+  &quot;event_id&quot;: &quot;trace-event:sha256:8d77eb96972495f64e7d402cdbd3511799770c76317bca6b77fbbabade13883d&quot;,
+  &quot;event_type&quot;: &quot;task_compiled&quot;,
+  &quot;operation_id&quot;: null,
+  &quot;parent_event_id&quot;: &quot;trace-event:sha256:050c78a56261a31a9fd690db789b2953d78625647e3156fd9f8ab14d69498c2a&quot;,
+  &quot;recorded_at&quot;: &quot;2026-09-28t10:00:01z&quot;,
+  &quot;schema_version&quot;: &quot;uah.trace_event/v1&quot;,
+  &quot;sequence&quot;: 13,
+  &quot;task_id&quot;: &quot;find_the_cup_rejected&quot;,
+  &quot;trace_id&quot;: &quot;trace:sha256:871c1c1d533da872bfc74faba13b35bbeae126a07b32aa8d0bfb6ff1fa82db23&quot;
+} {
+  &quot;artifact_refs&quot;: [
+    &quot;proposal:sha256:45aa2ecfd3e38ce7b110e4c4266120d82d0c2301f8d4ac8039feafa1ec25a489&quot;,
+    &quot;compiled-task:sha256:28c5066d1b8bde6520192b9973b062db372640c20541124e3c422fe3ce67ef03&quot;,
+    &quot;model-output:sha256:068a7ef287b76183e8f514a09d620fe317cca1459601a7d3074ace99e2b9464b&quot;
+  ],
+  &quot;commit_id&quot;: &quot;lifecycle-commit:sha256:fbbb147a49ea3c9963c221556e8f6b2245a0e110f6cd6e6d7b0853f906f0bff0&quot;,
+  &quot;commit_index&quot;: 1,
+  &quot;commit_size&quot;: 1,
+  &quot;data_json&quot;: &quot;{\&quot;compiled_task_id\&quot;:\&quot;compiled-task:sha256:28c5066d1b8bde6520192b9973b062db372640c20541124e3c422fe3ce67ef03\&quot;,\&quot;object_id\&quot;:\&quot;walk_to\&quot;,\&quot;proposal_id\&quot;:\&quot;proposal:sha256:45aa2ecfd3e38ce7b110e4c4266120d82d0c2301f8d4ac8039feafa1ec25a489\&quot;}&quot;,
+  &quot;environment_run_id&quot;: &quot;environment-run:nao-smoke:001&quot;,
+  &quot;event_id&quot;: &quot;trace-event:sha256:ce9b51158f5b1ab36e7077f99a50ebdb8826cd1c39e8af64c6ca49463dc8bdac&quot;,
+  &quot;event_type&quot;: &quot;proposal_normalized&quot;,
+  &quot;operation_id&quot;: &quot;uah-smoke-find-cup-rejected:operation:step_1&quot;,
+  &quot;parent_event_id&quot;: &quot;trace-event:sha256:8d77eb96972495f64e7d402cdbd3511799770c76317bca6b77fbbabade13883d&quot;,
+  &quot;recorded_at&quot;: &quot;2026-09-28t10:00:01z&quot;,
+  &quot;schema_version&quot;: &quot;uah.trace_event/v1&quot;,
+  &quot;sequence&quot;: 14,
+  &quot;task_id&quot;: &quot;find_the_cup_rejected&quot;,
+  &quot;trace_id&quot;: &quot;trace:sha256:871c1c1d533da872bfc74faba13b35bbeae126a07b32aa8d0bfb6ff1fa82db23&quot;
+} {
+  &quot;artifact_refs&quot;: [
+    &quot;semantic-rejection:sha256:32f72a1fd3f1aa5b07cfac423d9d4887658ffc1716a0d07b6e49a062ccdca2c1&quot;,
+    &quot;proposal:sha256:45aa2ecfd3e38ce7b110e4c4266120d82d0c2301f8d4ac8039feafa1ec25a489&quot;,
+    &quot;compiled-task:sha256:28c5066d1b8bde6520192b9973b062db372640c20541124e3c422fe3ce67ef03&quot;
+  ],
+  &quot;commit_id&quot;: &quot;lifecycle-commit:sha256:477405e7691616e2bb24dad99337663d8be0e1c0ea50becc386962fadd94fda6&quot;,
+  &quot;commit_index&quot;: 1,
+  &quot;commit_size&quot;: 1,
+  &quot;data_json&quot;: &quot;{\&quot;compiled_task_id\&quot;:\&quot;compiled-task:sha256:28c5066d1b8bde6520192b9973b062db372640c20541124e3c422fe3ce67ef03\&quot;,\&quot;proposal_id\&quot;:\&quot;proposal:sha256:45aa2ecfd3e38ce7b110e4c4266120d82d0c2301f8d4ac8039feafa1ec25a489\&quot;,\&quot;reason_codes\&quot;:[\&quot;object_outside_projection\&quot;,\&quot;missing_effect_obligation\&quot;],\&quot;rejection_id\&quot;:\&quot;semantic-rejection:sha256:32f72a1fd3f1aa5b07cfac423d9d4887658ffc1716a0d07b6e49a062ccdca2c1\&quot;}&quot;,
+  &quot;environment_run_id&quot;: &quot;environment-run:nao-smoke:001&quot;,
+  &quot;event_id&quot;: &quot;trace-event:sha256:e5ea4c871f3c5f06afddf98559dfc441c2a21311833afe4a449aaaa709d1985a&quot;,
+  &quot;event_type&quot;: &quot;semantic_admission_rejected&quot;,
+  &quot;operation_id&quot;: &quot;uah-smoke-find-cup-rejected:operation:step_1&quot;,
+  &quot;parent_event_id&quot;: &quot;trace-event:sha256:ce9b51158f5b1ab36e7077f99a50ebdb8826cd1c39e8af64c6ca49463dc8bdac&quot;,
+  &quot;recorded_at&quot;: &quot;2026-09-28t10:00:01z&quot;,
+  &quot;schema_version&quot;: &quot;uah.trace_event/v1&quot;,
+  &quot;sequence&quot;: 15,
+  &quot;task_id&quot;: &quot;find_the_cup_rejected&quot;,
+  &quot;trace_id&quot;: &quot;trace:sha256:871c1c1d533da872bfc74faba13b35bbeae126a07b32aa8d0bfb6ff1fa82db23&quot;
+}">
+      <header><h2>trace:sha256:871c1c1d533da872bfc74faba13b35bbeae126a07b32aa8d0bfb6ff1fa82db23</h2><span class="badge open">open</span>
+        <span class="badge open">recorded</span></header>
+      <p>Task <code>find_the_cup_rejected</code> · Environment <code>environment-run:nao-smoke:001</code> · Failure stage: <code>semantic_admission</code></p>
+
+      <section class="event">
+      <header><strong>task_started</strong><code>#12</code></header>
+      <p>Recorded 2026-09-28T10:00:01Z</p>
+      <details><summary>Raw immutable event</summary><pre>{
+  &quot;artifact_refs&quot;: [
+    &quot;environment-ingress:sha256:85cef77db804c3bf58a48aa3bb997ec760389d9de1013ff7e1b419ebbac7431f&quot;,
+    &quot;task-ingress-decision:sha256:9858cfa8832ccc951b7c013dd7cd37d832d519e7e06d817701f89e7e3b7525c9&quot;,
+    &quot;sha256:b4032b7b64c4c65c481cd45c84d8c31bd89af7d0a9fb7b70be1e6a93291caf5e&quot;
+  ],
+  &quot;commit_id&quot;: &quot;lifecycle-commit:sha256:7da27fb8f4327942577d8e7508c13ee4d06f7bae585c8848d17454b9f2b457e0&quot;,
+  &quot;commit_index&quot;: 1,
+  &quot;commit_size&quot;: 1,
+  &quot;data_json&quot;: &quot;{\&quot;decision_id\&quot;:\&quot;task-ingress-decision:sha256:9858cfa8832ccc951b7c013dd7cd37d832d519e7e06d817701f89e7e3b7525c9\&quot;,\&quot;domain_contract_pack_revision\&quot;:\&quot;sha256:b4032b7b64c4c65c481cd45c84d8c31bd89af7d0a9fb7b70be1e6a93291caf5e\&quot;,\&quot;environment_ingress_id\&quot;:\&quot;ingress:recorded:uah-smoke-find-cup-rejected\&quot;,\&quot;ingress_artifact_id\&quot;:\&quot;environment-ingress:sha256:85cef77db804c3bf58a48aa3bb997ec760389d9de1013ff7e1b419ebbac7431f\&quot;}&quot;,
+  &quot;environment_run_id&quot;: &quot;environment-run:nao-smoke:001&quot;,
+  &quot;event_id&quot;: &quot;trace-event:sha256:050c78a56261a31a9fd690db789b2953d78625647e3156fd9f8ab14d69498c2a&quot;,
+  &quot;event_type&quot;: &quot;task_started&quot;,
+  &quot;operation_id&quot;: null,
+  &quot;parent_event_id&quot;: null,
+  &quot;recorded_at&quot;: &quot;2026-09-28T10:00:01Z&quot;,
+  &quot;schema_version&quot;: &quot;uah.trace_event/v1&quot;,
+  &quot;sequence&quot;: 12,
+  &quot;task_id&quot;: &quot;find_the_cup_rejected&quot;,
+  &quot;trace_id&quot;: &quot;trace:sha256:871c1c1d533da872bfc74faba13b35bbeae126a07b32aa8d0bfb6ff1fa82db23&quot;
+}</pre></details>
+    </section>
+<section class="event">
+      <header><strong>task_compiled</strong><code>#13</code></header>
+      <p>Recorded 2026-09-28T10:00:01Z</p>
+      <details><summary>Raw immutable event</summary><pre>{
+  &quot;artifact_refs&quot;: [
+    &quot;compiled-task:sha256:28c5066d1b8bde6520192b9973b062db372640c20541124e3c422fe3ce67ef03&quot;
+  ],
+  &quot;commit_id&quot;: &quot;lifecycle-commit:sha256:848296a29068f7a4aece33dc904665aa78f7666b3eeb93827887330072edb17e&quot;,
+  &quot;commit_index&quot;: 1,
+  &quot;commit_size&quot;: 1,
+  &quot;data_json&quot;: &quot;{\&quot;budgets\&quot;:{\&quot;model_calls\&quot;:0,\&quot;retry_attempts\&quot;:0,\&quot;tool_calls\&quot;:4,\&quot;wall_time_seconds\&quot;:60},\&quot;compiled_task_id\&quot;:\&quot;compiled-task:sha256:28c5066d1b8bde6520192b9973b062db372640c20541124e3c422fe3ce67ef03\&quot;,\&quot;domain_contract_pack_revision\&quot;:\&quot;sha256:b4032b7b64c4c65c481cd45c84d8c31bd89af7d0a9fb7b70be1e6a93291caf5e\&quot;,\&quot;frame_id\&quot;:\&quot;nao_ros4hri\&quot;,\&quot;registry_version\&quot;:\&quot;sha256:fb7f9ffaceed518ab0ea4045fbe2618196f358cba941b910b51b663ca6097ae3\&quot;,\&quot;role_id\&quot;:\&quot;planner_llm\&quot;}&quot;,
+  &quot;environment_run_id&quot;: &quot;environment-run:nao-smoke:001&quot;,
+  &quot;event_id&quot;: &quot;trace-event:sha256:8d77eb96972495f64e7d402cdbd3511799770c76317bca6b77fbbabade13883d&quot;,
+  &quot;event_type&quot;: &quot;task_compiled&quot;,
+  &quot;operation_id&quot;: null,
+  &quot;parent_event_id&quot;: &quot;trace-event:sha256:050c78a56261a31a9fd690db789b2953d78625647e3156fd9f8ab14d69498c2a&quot;,
+  &quot;recorded_at&quot;: &quot;2026-09-28T10:00:01Z&quot;,
+  &quot;schema_version&quot;: &quot;uah.trace_event/v1&quot;,
+  &quot;sequence&quot;: 13,
+  &quot;task_id&quot;: &quot;find_the_cup_rejected&quot;,
+  &quot;trace_id&quot;: &quot;trace:sha256:871c1c1d533da872bfc74faba13b35bbeae126a07b32aa8d0bfb6ff1fa82db23&quot;
+}</pre></details>
+    </section>
+<section class="event">
+      <header><strong>proposal_normalized</strong><code>#14</code></header>
+      <p>Recorded 2026-09-28T10:00:01Z · Operation <code>uah-smoke-find-cup-rejected:operation:step_1</code></p>
+      <details><summary>Raw immutable event</summary><pre>{
+  &quot;artifact_refs&quot;: [
+    &quot;proposal:sha256:45aa2ecfd3e38ce7b110e4c4266120d82d0c2301f8d4ac8039feafa1ec25a489&quot;,
+    &quot;compiled-task:sha256:28c5066d1b8bde6520192b9973b062db372640c20541124e3c422fe3ce67ef03&quot;,
+    &quot;model-output:sha256:068a7ef287b76183e8f514a09d620fe317cca1459601a7d3074ace99e2b9464b&quot;
+  ],
+  &quot;commit_id&quot;: &quot;lifecycle-commit:sha256:fbbb147a49ea3c9963c221556e8f6b2245a0e110f6cd6e6d7b0853f906f0bff0&quot;,
+  &quot;commit_index&quot;: 1,
+  &quot;commit_size&quot;: 1,
+  &quot;data_json&quot;: &quot;{\&quot;compiled_task_id\&quot;:\&quot;compiled-task:sha256:28c5066d1b8bde6520192b9973b062db372640c20541124e3c422fe3ce67ef03\&quot;,\&quot;object_id\&quot;:\&quot;walk_to\&quot;,\&quot;proposal_id\&quot;:\&quot;proposal:sha256:45aa2ecfd3e38ce7b110e4c4266120d82d0c2301f8d4ac8039feafa1ec25a489\&quot;}&quot;,
+  &quot;environment_run_id&quot;: &quot;environment-run:nao-smoke:001&quot;,
+  &quot;event_id&quot;: &quot;trace-event:sha256:ce9b51158f5b1ab36e7077f99a50ebdb8826cd1c39e8af64c6ca49463dc8bdac&quot;,
+  &quot;event_type&quot;: &quot;proposal_normalized&quot;,
+  &quot;operation_id&quot;: &quot;uah-smoke-find-cup-rejected:operation:step_1&quot;,
+  &quot;parent_event_id&quot;: &quot;trace-event:sha256:8d77eb96972495f64e7d402cdbd3511799770c76317bca6b77fbbabade13883d&quot;,
+  &quot;recorded_at&quot;: &quot;2026-09-28T10:00:01Z&quot;,
+  &quot;schema_version&quot;: &quot;uah.trace_event/v1&quot;,
+  &quot;sequence&quot;: 14,
+  &quot;task_id&quot;: &quot;find_the_cup_rejected&quot;,
+  &quot;trace_id&quot;: &quot;trace:sha256:871c1c1d533da872bfc74faba13b35bbeae126a07b32aa8d0bfb6ff1fa82db23&quot;
+}</pre></details>
+    </section>
+<section class="event">
+      <header><strong>semantic_admission_rejected</strong><code>#15</code></header>
+      <p>Recorded 2026-09-28T10:00:01Z · Operation <code>uah-smoke-find-cup-rejected:operation:step_1</code></p>
+      <details><summary>Raw immutable event</summary><pre>{
+  &quot;artifact_refs&quot;: [
+    &quot;semantic-rejection:sha256:32f72a1fd3f1aa5b07cfac423d9d4887658ffc1716a0d07b6e49a062ccdca2c1&quot;,
+    &quot;proposal:sha256:45aa2ecfd3e38ce7b110e4c4266120d82d0c2301f8d4ac8039feafa1ec25a489&quot;,
+    &quot;compiled-task:sha256:28c5066d1b8bde6520192b9973b062db372640c20541124e3c422fe3ce67ef03&quot;
+  ],
+  &quot;commit_id&quot;: &quot;lifecycle-commit:sha256:477405e7691616e2bb24dad99337663d8be0e1c0ea50becc386962fadd94fda6&quot;,
+  &quot;commit_index&quot;: 1,
+  &quot;commit_size&quot;: 1,
+  &quot;data_json&quot;: &quot;{\&quot;compiled_task_id\&quot;:\&quot;compiled-task:sha256:28c5066d1b8bde6520192b9973b062db372640c20541124e3c422fe3ce67ef03\&quot;,\&quot;proposal_id\&quot;:\&quot;proposal:sha256:45aa2ecfd3e38ce7b110e4c4266120d82d0c2301f8d4ac8039feafa1ec25a489\&quot;,\&quot;reason_codes\&quot;:[\&quot;object_outside_projection\&quot;,\&quot;missing_effect_obligation\&quot;],\&quot;rejection_id\&quot;:\&quot;semantic-rejection:sha256:32f72a1fd3f1aa5b07cfac423d9d4887658ffc1716a0d07b6e49a062ccdca2c1\&quot;}&quot;,
+  &quot;environment_run_id&quot;: &quot;environment-run:nao-smoke:001&quot;,
+  &quot;event_id&quot;: &quot;trace-event:sha256:e5ea4c871f3c5f06afddf98559dfc441c2a21311833afe4a449aaaa709d1985a&quot;,
+  &quot;event_type&quot;: &quot;semantic_admission_rejected&quot;,
+  &quot;operation_id&quot;: &quot;uah-smoke-find-cup-rejected:operation:step_1&quot;,
+  &quot;parent_event_id&quot;: &quot;trace-event:sha256:ce9b51158f5b1ab36e7077f99a50ebdb8826cd1c39e8af64c6ca49463dc8bdac&quot;,
+  &quot;recorded_at&quot;: &quot;2026-09-28T10:00:01Z&quot;,
+  &quot;schema_version&quot;: &quot;uah.trace_event/v1&quot;,
+  &quot;sequence&quot;: 15,
+  &quot;task_id&quot;: &quot;find_the_cup_rejected&quot;,
+  &quot;trace_id&quot;: &quot;trace:sha256:871c1c1d533da872bfc74faba13b35bbeae126a07b32aa8d0bfb6ff1fa82db23&quot;
+}</pre></details>
+    </section>
+    </article>
+<article class="trace" id="trace-trace-event:sha256:21ef20e022a908b06608892dcf45a0c1c295ac9844b7013238378fadf2399f29" data-status="rejected" data-event-types="budget_granted domain_admission_leased effect_obligation_failed evidence_issued execution_completed execution_started proposal_normalized semantic_admission_accepted task_compiled task_started terminal_task_rejected"
+      data-searchable="trace:sha256:24944c17eadbd21a4e6330a6098acd4a091bc1caee3e95ddaa24b155450aa731 find_the_bottle_counterexample environment-run:nao-smoke:001 task_started task_compiled proposal_normalized semantic_admission_accepted domain_admission_leased budget_granted execution_started execution_completed evidence_issued effect_obligation_failed terminal_task_rejected {
+  &quot;artifact_refs&quot;: [
+    &quot;environment-ingress:sha256:db033854332aad6f86f08040cd69c30bfb07312eb2c423d8154eabce088484d8&quot;,
+    &quot;task-ingress-decision:sha256:6273daeca3d11d7380baf8940504a335bab7cec7eaf13bf1791390905517cabb&quot;,
+    &quot;sha256:b4032b7b64c4c65c481cd45c84d8c31bd89af7d0a9fb7b70be1e6a93291caf5e&quot;
+  ],
+  &quot;commit_id&quot;: &quot;lifecycle-commit:sha256:21f2ea761f17338767bae994b4fdc04503d02502bdd7f33a8b7657f67df826ee&quot;,
+  &quot;commit_index&quot;: 1,
+  &quot;commit_size&quot;: 1,
+  &quot;data_json&quot;: &quot;{\&quot;decision_id\&quot;:\&quot;task-ingress-decision:sha256:6273daeca3d11d7380baf8940504a335bab7cec7eaf13bf1791390905517cabb\&quot;,\&quot;domain_contract_pack_revision\&quot;:\&quot;sha256:b4032b7b64c4c65c481cd45c84d8c31bd89af7d0a9fb7b70be1e6a93291caf5e\&quot;,\&quot;environment_ingress_id\&quot;:\&quot;ingress:recorded:uah-smoke-find-bottle-counterexample\&quot;,\&quot;ingress_artifact_id\&quot;:\&quot;environment-ingress:sha256:db033854332aad6f86f08040cd69c30bfb07312eb2c423d8154eabce088484d8\&quot;}&quot;,
+  &quot;environment_run_id&quot;: &quot;environment-run:nao-smoke:001&quot;,
+  &quot;event_id&quot;: &quot;trace-event:sha256:21ef20e022a908b06608892dcf45a0c1c295ac9844b7013238378fadf2399f29&quot;,
+  &quot;event_type&quot;: &quot;task_started&quot;,
+  &quot;operation_id&quot;: null,
+  &quot;parent_event_id&quot;: null,
+  &quot;recorded_at&quot;: &quot;2026-09-28t10:00:01z&quot;,
+  &quot;schema_version&quot;: &quot;uah.trace_event/v1&quot;,
+  &quot;sequence&quot;: 16,
+  &quot;task_id&quot;: &quot;find_the_bottle_counterexample&quot;,
+  &quot;trace_id&quot;: &quot;trace:sha256:24944c17eadbd21a4e6330a6098acd4a091bc1caee3e95ddaa24b155450aa731&quot;
+} {
+  &quot;artifact_refs&quot;: [
+    &quot;compiled-task:sha256:ede4c14769501abfd644c2c57bd532210aead3f8eba4ed6556c6402eef0f3c30&quot;
+  ],
+  &quot;commit_id&quot;: &quot;lifecycle-commit:sha256:50e952d36e2478700d494b9c11cf5ddda2978002db4a6e036cc8e5b8e4f5098b&quot;,
+  &quot;commit_index&quot;: 1,
+  &quot;commit_size&quot;: 1,
+  &quot;data_json&quot;: &quot;{\&quot;budgets\&quot;:{\&quot;model_calls\&quot;:0,\&quot;retry_attempts\&quot;:0,\&quot;tool_calls\&quot;:4,\&quot;wall_time_seconds\&quot;:60},\&quot;compiled_task_id\&quot;:\&quot;compiled-task:sha256:ede4c14769501abfd644c2c57bd532210aead3f8eba4ed6556c6402eef0f3c30\&quot;,\&quot;domain_contract_pack_revision\&quot;:\&quot;sha256:b4032b7b64c4c65c481cd45c84d8c31bd89af7d0a9fb7b70be1e6a93291caf5e\&quot;,\&quot;frame_id\&quot;:\&quot;nao_ros4hri\&quot;,\&quot;registry_version\&quot;:\&quot;sha256:fb7f9ffaceed518ab0ea4045fbe2618196f358cba941b910b51b663ca6097ae3\&quot;,\&quot;role_id\&quot;:\&quot;planner_llm\&quot;}&quot;,
+  &quot;environment_run_id&quot;: &quot;environment-run:nao-smoke:001&quot;,
+  &quot;event_id&quot;: &quot;trace-event:sha256:e51753824db9aef442243d4328d5642d56b363dbab89c5399985654387c57919&quot;,
+  &quot;event_type&quot;: &quot;task_compiled&quot;,
+  &quot;operation_id&quot;: null,
+  &quot;parent_event_id&quot;: &quot;trace-event:sha256:21ef20e022a908b06608892dcf45a0c1c295ac9844b7013238378fadf2399f29&quot;,
+  &quot;recorded_at&quot;: &quot;2026-09-28t10:00:01z&quot;,
+  &quot;schema_version&quot;: &quot;uah.trace_event/v1&quot;,
+  &quot;sequence&quot;: 17,
+  &quot;task_id&quot;: &quot;find_the_bottle_counterexample&quot;,
+  &quot;trace_id&quot;: &quot;trace:sha256:24944c17eadbd21a4e6330a6098acd4a091bc1caee3e95ddaa24b155450aa731&quot;
+} {
+  &quot;artifact_refs&quot;: [
+    &quot;proposal:sha256:7015bb0caccfa718e29a52652fa87aecab1ac81717df979da57d4306877e641a&quot;,
+    &quot;compiled-task:sha256:ede4c14769501abfd644c2c57bd532210aead3f8eba4ed6556c6402eef0f3c30&quot;,
+    &quot;model-output:sha256:10a7f6aedb297988b0568df1339ae096e6215586e8ee8beba44e1757d6c3f31e&quot;
+  ],
+  &quot;commit_id&quot;: &quot;lifecycle-commit:sha256:489dc8005df2b68e5cb96fea4678beef905c4ccf04ad454aeb5bd002cd08247c&quot;,
+  &quot;commit_index&quot;: 1,
+  &quot;commit_size&quot;: 1,
+  &quot;data_json&quot;: &quot;{\&quot;compiled_task_id\&quot;:\&quot;compiled-task:sha256:ede4c14769501abfd644c2c57bd532210aead3f8eba4ed6556c6402eef0f3c30\&quot;,\&quot;object_id\&quot;:\&quot;find_object\&quot;,\&quot;proposal_id\&quot;:\&quot;proposal:sha256:7015bb0caccfa718e29a52652fa87aecab1ac81717df979da57d4306877e641a\&quot;}&quot;,
+  &quot;environment_run_id&quot;: &quot;environment-run:nao-smoke:001&quot;,
+  &quot;event_id&quot;: &quot;trace-event:sha256:21ea06115425ba09813cc6dfaa7b77bfd41d167eb2fe0516448832fa5069cc39&quot;,
+  &quot;event_type&quot;: &quot;proposal_normalized&quot;,
+  &quot;operation_id&quot;: &quot;uah-smoke-find-bottle-counterexample:operation:step_1&quot;,
+  &quot;parent_event_id&quot;: &quot;trace-event:sha256:e51753824db9aef442243d4328d5642d56b363dbab89c5399985654387c57919&quot;,
+  &quot;recorded_at&quot;: &quot;2026-09-28t10:00:01z&quot;,
+  &quot;schema_version&quot;: &quot;uah.trace_event/v1&quot;,
+  &quot;sequence&quot;: 18,
+  &quot;task_id&quot;: &quot;find_the_bottle_counterexample&quot;,
+  &quot;trace_id&quot;: &quot;trace:sha256:24944c17eadbd21a4e6330a6098acd4a091bc1caee3e95ddaa24b155450aa731&quot;
+} {
+  &quot;artifact_refs&quot;: [
+    &quot;admission:sha256:4a9ec13dd6fdc8d5b36b259d1089d401555e99bb90051e1a84d8b12d7986bb57&quot;,
+    &quot;proposal:sha256:7015bb0caccfa718e29a52652fa87aecab1ac81717df979da57d4306877e641a&quot;
+  ],
+  &quot;commit_id&quot;: &quot;lifecycle-commit:sha256:3c36928c2ae1049fbce2784a12071181c14ccd92cb57276b215d65ea2e3fc1f6&quot;,
+  &quot;commit_index&quot;: 1,
+  &quot;commit_size&quot;: 1,
+  &quot;data_json&quot;: &quot;{\&quot;ab_level\&quot;:1,\&quot;admission_id\&quot;:\&quot;admission:sha256:4a9ec13dd6fdc8d5b36b259d1089d401555e99bb90051e1a84d8b12d7986bb57\&quot;,\&quot;admitted_operation\&quot;:{\&quot;ab_level\&quot;:1,\&quot;admission_id\&quot;:\&quot;admission:sha256:4a9ec13dd6fdc8d5b36b259d1089d401555e99bb90051e1a84d8b12d7986bb57\&quot;,\&quot;binding_fingerprint\&quot;:\&quot;binding:sha256:e140de7336a910c33c013bd6addd9211618f23c174a662662d68888c2c322294\&quot;,\&quot;binding_id\&quot;:\&quot;nao_fake.find_object.v1\&quot;,\&quot;binding_owner\&quot;:\&quot;object_finder\&quot;,\&quot;binding_source_revision\&quot;:\&quot;uah-smoke-v1\&quot;,\&quot;domain_contract_pack_revision\&quot;:\&quot;sha256:b4032b7b64c4c65c481cd45c84d8c31bd89af7d0a9fb7b70be1e6a93291caf5e\&quot;,\&quot;effect_obligation_ids\&quot;:[\&quot;target_observed\&quot;],\&quot;environment_id\&quot;:\&quot;nao_fake\&quot;,\&quot;evidence_adapter\&quot;:\&quot;ab_harness_nao.smoke:fresh_detection\&quot;,\&quot;frame_id\&quot;:\&quot;nao_ros4hri\&quot;,\&quot;input_schema_id\&quot;:\&quot;input-schema:sha256:5b9e04eb5d392aad4f5e4cdfc8f722963f228a99b60437b88f5a48b46e467ccc\&quot;,\&quot;input_schema_ref\&quot;:\&quot;schema://find_object/input/v1\&quot;,\&quot;object_snapshot\&quot;:{\&quot;ab_level\&quot;:1,\&quot;category\&quot;:\&quot;perception\&quot;,\&quot;decomposes_to\&quot;:[\&quot;resolve_target_reference\&quot;],\&quot;expected_effects\&quot;:[\&quot;requested object localized\&quot;],\&quot;kind\&quot;:\&quot;skill\&quot;,\&quot;object_id\&quot;:\&quot;find_object\&quot;,\&quot;observable_success\&quot;:[\&quot;fresh detector-backed result returned\&quot;],\&quot;owner_package\&quot;:\&quot;object_finder\&quot;,\&quot;runtime_callable\&quot;:true},\&quot;output_schema_ref\&quot;:\&quot;schema://find_object/result/v1\&quot;,\&quot;proposal\&quot;:{\&quot;arguments_json\&quot;:\&quot;{\\\&quot;label\\\&quot;:\\\&quot;bottle\\\&quot;}\&quot;,\&quot;compiled_task_id\&quot;:\&quot;compiled-task:sha256:ede4c14769501abfd644c2c57bd532210aead3f8eba4ed6556c6402eef0f3c30\&quot;,\&quot;environment_run_id\&quot;:\&quot;environment-run:nao-smoke:001\&quot;,\&quot;object_id\&quot;:\&quot;find_object\&quot;,\&quot;operation_id\&quot;:\&quot;uah-smoke-find-bottle-counterexample:operation:step_1\&quot;,\&quot;output_type\&quot;:\&quot;executable_plan\&quot;,\&quot;proposal_id\&quot;:\&quot;proposal:sha256:7015bb0caccfa718e29a52652fa87aecab1ac81717df979da57d4306877e641a\&quot;,\&quot;raw_output_artifact_id\&quot;:\&quot;model-output:sha256:10a7f6aedb297988b0568df1339ae096e6215586e8ee8beba44e1757d6c3f31e\&quot;,\&quot;schema_version\&quot;:\&quot;uah.typed_proposal/v1\&quot;,\&quot;task_id\&quot;:\&quot;find_the_bottle_counterexample\&quot;,\&quot;trace_id\&quot;:\&quot;trace:sha256:24944c17eadbd21a4e6330a6098acd4a091bc1caee3e95ddaa24b155450aa731\&quot;},\&quot;runtime_mode\&quot;:\&quot;smoke\&quot;,\&quot;schema_version\&quot;:\&quot;uah.admitted_operation/v3\&quot;},\&quot;binding_id\&quot;:\&quot;nao_fake.find_object.v1\&quot;,\&quot;binding_owner\&quot;:\&quot;object_finder\&quot;,\&quot;frame_id\&quot;:\&quot;nao_ros4hri\&quot;,\&quot;input_schema_id\&quot;:\&quot;input-schema:sha256:5b9e04eb5d392aad4f5e4cdfc8f722963f228a99b60437b88f5a48b46e467ccc\&quot;,\&quot;object_id\&quot;:\&quot;find_object\&quot;,\&quot;object_snapshot\&quot;:{\&quot;ab_level\&quot;:1,\&quot;category\&quot;:\&quot;perception\&quot;,\&quot;decomposes_to\&quot;:[\&quot;resolve_target_reference\&quot;],\&quot;expected_effects\&quot;:[\&quot;requested object localized\&quot;],\&quot;kind\&quot;:\&quot;skill\&quot;,\&quot;object_id\&quot;:\&quot;find_object\&quot;,\&quot;observable_success\&quot;:[\&quot;fresh detector-backed result returned\&quot;],\&quot;owner_package\&quot;:\&quot;object_finder\&quot;,\&quot;runtime_callable\&quot;:true},\&quot;proposal_id\&quot;:\&quot;proposal:sha256:7015bb0caccfa718e29a52652fa87aecab1ac81717df979da57d4306877e641a\&quot;,\&quot;schema_version\&quot;:\&quot;uah.admitted_operation/v3\&quot;}&quot;,
+  &quot;environment_run_id&quot;: &quot;environment-run:nao-smoke:001&quot;,
+  &quot;event_id&quot;: &quot;trace-event:sha256:b2dc0580334b4e9755fee0592ec804c4859a6bec1f01c95a2f9c34613cda81c2&quot;,
+  &quot;event_type&quot;: &quot;semantic_admission_accepted&quot;,
+  &quot;operation_id&quot;: &quot;uah-smoke-find-bottle-counterexample:operation:step_1&quot;,
+  &quot;parent_event_id&quot;: &quot;trace-event:sha256:21ea06115425ba09813cc6dfaa7b77bfd41d167eb2fe0516448832fa5069cc39&quot;,
+  &quot;recorded_at&quot;: &quot;2026-09-28t10:00:01z&quot;,
+  &quot;schema_version&quot;: &quot;uah.trace_event/v1&quot;,
+  &quot;sequence&quot;: 19,
+  &quot;task_id&quot;: &quot;find_the_bottle_counterexample&quot;,
+  &quot;trace_id&quot;: &quot;trace:sha256:24944c17eadbd21a4e6330a6098acd4a091bc1caee3e95ddaa24b155450aa731&quot;
+} {
+  &quot;artifact_refs&quot;: [
+    &quot;execution-lease:sha256:16977a725adbd74e96d6ef01f961ad0f32220c54350acaf27027b9a8fbbf4208&quot;,
+    &quot;admission:sha256:4a9ec13dd6fdc8d5b36b259d1089d401555e99bb90051e1a84d8b12d7986bb57&quot;,
+    &quot;environment-attestation:nao-smoke:001&quot;
+  ],
+  &quot;commit_id&quot;: &quot;lifecycle-commit:sha256:89efe74785075fac8872ed28cd945f0738e4a349d7c9cd735f1547b9e3d007ae&quot;,
+  &quot;commit_index&quot;: 1,
+  &quot;commit_size&quot;: 1,
+  &quot;data_json&quot;: &quot;{\&quot;admission_id\&quot;:\&quot;admission:sha256:4a9ec13dd6fdc8d5b36b259d1089d401555e99bb90051e1a84d8b12d7986bb57\&quot;,\&quot;binding_id\&quot;:\&quot;nao_fake.find_object.v1\&quot;,\&quot;execution_lease_id\&quot;:\&quot;execution-lease:sha256:16977a725adbd74e96d6ef01f961ad0f32220c54350acaf27027b9a8fbbf4208\&quot;,\&quot;lease_owner_id\&quot;:\&quot;nao_fake.lifecycle_owner\&quot;,\&quot;object_id\&quot;:\&quot;find_object\&quot;}&quot;,
+  &quot;environment_run_id&quot;: &quot;environment-run:nao-smoke:001&quot;,
+  &quot;event_id&quot;: &quot;trace-event:sha256:430c9a5398f22b280a26060db594a9a0317ad802da69814741f4095eb88fc004&quot;,
+  &quot;event_type&quot;: &quot;domain_admission_leased&quot;,
+  &quot;operation_id&quot;: &quot;uah-smoke-find-bottle-counterexample:operation:step_1&quot;,
+  &quot;parent_event_id&quot;: &quot;trace-event:sha256:b2dc0580334b4e9755fee0592ec804c4859a6bec1f01c95a2f9c34613cda81c2&quot;,
+  &quot;recorded_at&quot;: &quot;2026-09-28t10:00:01z&quot;,
+  &quot;schema_version&quot;: &quot;uah.trace_event/v1&quot;,
+  &quot;sequence&quot;: 20,
+  &quot;task_id&quot;: &quot;find_the_bottle_counterexample&quot;,
+  &quot;trace_id&quot;: &quot;trace:sha256:24944c17eadbd21a4e6330a6098acd4a091bc1caee3e95ddaa24b155450aa731&quot;
+} {
+  &quot;artifact_refs&quot;: [
+    &quot;budget-decision:sha256:6992517ec234100b233b36ef3790165f9bac824583b3b91aab8f5c3dc00cf0fb&quot;,
+    &quot;compiled-task:sha256:ede4c14769501abfd644c2c57bd532210aead3f8eba4ed6556c6402eef0f3c30&quot;
+  ],
+  &quot;commit_id&quot;: &quot;lifecycle-commit:sha256:a9bc02f776462d7d490310268ce378ab8bb05d665aac4c31102c10d033ac994c&quot;,
+  &quot;commit_index&quot;: 1,
+  &quot;commit_size&quot;: 2,
+  &quot;data_json&quot;: &quot;{\&quot;compiled_task_id\&quot;:\&quot;compiled-task:sha256:ede4c14769501abfd644c2c57bd532210aead3f8eba4ed6556c6402eef0f3c30\&quot;,\&quot;consumed_after\&quot;:1,\&quot;consumed_before\&quot;:0,\&quot;decision_id\&quot;:\&quot;budget-decision:sha256:6992517ec234100b233b36ef3790165f9bac824583b3b91aab8f5c3dc00cf0fb\&quot;,\&quot;environment_run_id\&quot;:\&quot;environment-run:nao-smoke:001\&quot;,\&quot;limit\&quot;:4,\&quot;outcome\&quot;:\&quot;granted\&quot;,\&quot;reason_code\&quot;:\&quot;within_budget\&quot;,\&quot;resource\&quot;:\&quot;tool_call\&quot;,\&quot;schema_version\&quot;:\&quot;uah.budget_decision/v1\&quot;,\&quot;subject_id\&quot;:\&quot;uah-smoke-find-bottle-counterexample:operation:step_1\&quot;,\&quot;task_id\&quot;:\&quot;find_the_bottle_counterexample\&quot;,\&quot;trace_id\&quot;:\&quot;trace:sha256:24944c17eadbd21a4e6330a6098acd4a091bc1caee3e95ddaa24b155450aa731\&quot;,\&quot;units\&quot;:1}&quot;,
+  &quot;environment_run_id&quot;: &quot;environment-run:nao-smoke:001&quot;,
+  &quot;event_id&quot;: &quot;trace-event:sha256:c1e890aa00798b361c6919512f2827a8bb3ed03af62800c6ea293690167275cc&quot;,
+  &quot;event_type&quot;: &quot;budget_granted&quot;,
+  &quot;operation_id&quot;: &quot;uah-smoke-find-bottle-counterexample:operation:step_1&quot;,
+  &quot;parent_event_id&quot;: &quot;trace-event:sha256:430c9a5398f22b280a26060db594a9a0317ad802da69814741f4095eb88fc004&quot;,
+  &quot;recorded_at&quot;: &quot;2026-09-28t10:00:01z&quot;,
+  &quot;schema_version&quot;: &quot;uah.trace_event/v1&quot;,
+  &quot;sequence&quot;: 21,
+  &quot;task_id&quot;: &quot;find_the_bottle_counterexample&quot;,
+  &quot;trace_id&quot;: &quot;trace:sha256:24944c17eadbd21a4e6330a6098acd4a091bc1caee3e95ddaa24b155450aa731&quot;
+} {
+  &quot;artifact_refs&quot;: [
+    &quot;execution-lease:sha256:16977a725adbd74e96d6ef01f961ad0f32220c54350acaf27027b9a8fbbf4208&quot;
+  ],
+  &quot;commit_id&quot;: &quot;lifecycle-commit:sha256:a9bc02f776462d7d490310268ce378ab8bb05d665aac4c31102c10d033ac994c&quot;,
+  &quot;commit_index&quot;: 2,
+  &quot;commit_size&quot;: 2,
+  &quot;data_json&quot;: &quot;{\&quot;execution_lease_id\&quot;:\&quot;execution-lease:sha256:16977a725adbd74e96d6ef01f961ad0f32220c54350acaf27027b9a8fbbf4208\&quot;}&quot;,
+  &quot;environment_run_id&quot;: &quot;environment-run:nao-smoke:001&quot;,
+  &quot;event_id&quot;: &quot;trace-event:sha256:7cede1d931e4f609f3c6206190751ce3b3b69082840b7057ba451946906797a4&quot;,
+  &quot;event_type&quot;: &quot;execution_started&quot;,
+  &quot;operation_id&quot;: &quot;uah-smoke-find-bottle-counterexample:operation:step_1&quot;,
+  &quot;parent_event_id&quot;: &quot;trace-event:sha256:c1e890aa00798b361c6919512f2827a8bb3ed03af62800c6ea293690167275cc&quot;,
+  &quot;recorded_at&quot;: &quot;2026-09-28t10:00:01z&quot;,
+  &quot;schema_version&quot;: &quot;uah.trace_event/v1&quot;,
+  &quot;sequence&quot;: 22,
+  &quot;task_id&quot;: &quot;find_the_bottle_counterexample&quot;,
+  &quot;trace_id&quot;: &quot;trace:sha256:24944c17eadbd21a4e6330a6098acd4a091bc1caee3e95ddaa24b155450aa731&quot;
+} {
+  &quot;artifact_refs&quot;: [
+    &quot;execution-receipt:sha256:54e3923756d64528b627066a14d3fd231f9945ac22ffeb8c004326e1c84de127&quot;,
+    &quot;execution-lease:sha256:16977a725adbd74e96d6ef01f961ad0f32220c54350acaf27027b9a8fbbf4208&quot;
+  ],
+  &quot;commit_id&quot;: &quot;lifecycle-commit:sha256:63affa29708f1d741af083cc0eb51fde3d9be08fd50932bc2b0d427d95565a70&quot;,
+  &quot;commit_index&quot;: 1,
+  &quot;commit_size&quot;: 2,
+  &quot;data_json&quot;: &quot;{\&quot;admission_id\&quot;:\&quot;admission:sha256:4a9ec13dd6fdc8d5b36b259d1089d401555e99bb90051e1a84d8b12d7986bb57\&quot;,\&quot;binding_id\&quot;:\&quot;nao_fake.find_object.v1\&quot;,\&quot;execution_lease_id\&quot;:\&quot;execution-lease:sha256:16977a725adbd74e96d6ef01f961ad0f32220c54350acaf27027b9a8fbbf4208\&quot;,\&quot;execution_result_id\&quot;:\&quot;execution-receipt:sha256:54e3923756d64528b627066a14d3fd231f9945ac22ffeb8c004326e1c84de127\&quot;,\&quot;object_id\&quot;:\&quot;find_object\&quot;,\&quot;owner\&quot;:\&quot;object_finder\&quot;,\&quot;succeeded\&quot;:false}&quot;,
+  &quot;environment_run_id&quot;: &quot;environment-run:nao-smoke:001&quot;,
+  &quot;event_id&quot;: &quot;trace-event:sha256:f2d0593cd8186892835154bd5037f3db293c2e12233b30813aa320e9595361ef&quot;,
+  &quot;event_type&quot;: &quot;execution_completed&quot;,
+  &quot;operation_id&quot;: &quot;uah-smoke-find-bottle-counterexample:operation:step_1&quot;,
+  &quot;parent_event_id&quot;: &quot;trace-event:sha256:7cede1d931e4f609f3c6206190751ce3b3b69082840b7057ba451946906797a4&quot;,
+  &quot;recorded_at&quot;: &quot;2026-09-28t10:00:01z&quot;,
+  &quot;schema_version&quot;: &quot;uah.trace_event/v1&quot;,
+  &quot;sequence&quot;: 23,
+  &quot;task_id&quot;: &quot;find_the_bottle_counterexample&quot;,
+  &quot;trace_id&quot;: &quot;trace:sha256:24944c17eadbd21a4e6330a6098acd4a091bc1caee3e95ddaa24b155450aa731&quot;
+} {
+  &quot;artifact_refs&quot;: [
+    &quot;effect-evidence:sha256:028f6bb50ae892af13d8488bb979634cd8f9ebf38e25c78dc6028885d891c617&quot;,
+    &quot;execution-receipt:sha256:54e3923756d64528b627066a14d3fd231f9945ac22ffeb8c004326e1c84de127&quot;
+  ],
+  &quot;commit_id&quot;: &quot;lifecycle-commit:sha256:63affa29708f1d741af083cc0eb51fde3d9be08fd50932bc2b0d427d95565a70&quot;,
+  &quot;commit_index&quot;: 2,
+  &quot;commit_size&quot;: 2,
+  &quot;data_json&quot;: &quot;{\&quot;binding_id\&quot;:\&quot;nao_fake.find_object.v1\&quot;,\&quot;evidence_artifact_id\&quot;:\&quot;effect-evidence:sha256:028f6bb50ae892af13d8488bb979634cd8f9ebf38e25c78dc6028885d891c617\&quot;,\&quot;execution_lease_id\&quot;:\&quot;execution-lease:sha256:16977a725adbd74e96d6ef01f961ad0f32220c54350acaf27027b9a8fbbf4208\&quot;,\&quot;execution_result_id\&quot;:\&quot;execution-receipt:sha256:54e3923756d64528b627066a14d3fd231f9945ac22ffeb8c004326e1c84de127\&quot;,\&quot;native_evidence_ref\&quot;:\&quot;builtin://uah-smoke/detection-bottle\&quot;,\&quot;object_id\&quot;:\&quot;find_object\&quot;,\&quot;observed_effects\&quot;:[],\&quot;owner\&quot;:\&quot;object_finder\&quot;,\&quot;succeeded\&quot;:false}&quot;,
+  &quot;environment_run_id&quot;: &quot;environment-run:nao-smoke:001&quot;,
+  &quot;event_id&quot;: &quot;trace-event:sha256:8422e51ca9a227e4ce1e72a4061ba4675aa28b63b1803e640ede9d4b733f2404&quot;,
+  &quot;event_type&quot;: &quot;evidence_issued&quot;,
+  &quot;operation_id&quot;: &quot;uah-smoke-find-bottle-counterexample:operation:step_1&quot;,
+  &quot;parent_event_id&quot;: &quot;trace-event:sha256:f2d0593cd8186892835154bd5037f3db293c2e12233b30813aa320e9595361ef&quot;,
+  &quot;recorded_at&quot;: &quot;2026-09-28t10:00:01z&quot;,
+  &quot;schema_version&quot;: &quot;uah.trace_event/v1&quot;,
+  &quot;sequence&quot;: 24,
+  &quot;task_id&quot;: &quot;find_the_bottle_counterexample&quot;,
+  &quot;trace_id&quot;: &quot;trace:sha256:24944c17eadbd21a4e6330a6098acd4a091bc1caee3e95ddaa24b155450aa731&quot;
+} {
+  &quot;artifact_refs&quot;: [
+    &quot;task-acceptance:sha256:96a3b4ace1459de4c144fc68bcec3a89403fca92013b20931b5e88c91d53f8e8&quot;
+  ],
+  &quot;commit_id&quot;: &quot;lifecycle-commit:sha256:e77d4ccb7d437c4d90e3aa2d2f1c027b7f09db4a20110c8ef9c2a804ab0df260&quot;,
+  &quot;commit_index&quot;: 1,
+  &quot;commit_size&quot;: 2,
+  &quot;data_json&quot;: &quot;{\&quot;effect_id\&quot;:\&quot;fresh detector-backed result returned\&quot;,\&quot;obligation_id\&quot;:\&quot;target_observed\&quot;,\&quot;outcome\&quot;:\&quot;failed\&quot;,\&quot;requirement\&quot;:\&quot;required\&quot;}&quot;,
+  &quot;environment_run_id&quot;: &quot;environment-run:nao-smoke:001&quot;,
+  &quot;event_id&quot;: &quot;trace-event:sha256:a9bb87eba3993af434c873e1b0935e6d90b180c0824bc8b3fb13e352c01ea7c1&quot;,
+  &quot;event_type&quot;: &quot;effect_obligation_failed&quot;,
+  &quot;operation_id&quot;: null,
+  &quot;parent_event_id&quot;: &quot;trace-event:sha256:8422e51ca9a227e4ce1e72a4061ba4675aa28b63b1803e640ede9d4b733f2404&quot;,
+  &quot;recorded_at&quot;: &quot;2026-09-28t10:00:01z&quot;,
+  &quot;schema_version&quot;: &quot;uah.trace_event/v1&quot;,
+  &quot;sequence&quot;: 25,
+  &quot;task_id&quot;: &quot;find_the_bottle_counterexample&quot;,
+  &quot;trace_id&quot;: &quot;trace:sha256:24944c17eadbd21a4e6330a6098acd4a091bc1caee3e95ddaa24b155450aa731&quot;
+} {
+  &quot;artifact_refs&quot;: [
+    &quot;task-acceptance:sha256:96a3b4ace1459de4c144fc68bcec3a89403fca92013b20931b5e88c91d53f8e8&quot;,
+    &quot;compiled-task:sha256:ede4c14769501abfd644c2c57bd532210aead3f8eba4ed6556c6402eef0f3c30&quot;,
+    &quot;effect-evidence:sha256:028f6bb50ae892af13d8488bb979634cd8f9ebf38e25c78dc6028885d891c617&quot;
+  ],
+  &quot;commit_id&quot;: &quot;lifecycle-commit:sha256:e77d4ccb7d437c4d90e3aa2d2f1c027b7f09db4a20110c8ef9c2a804ab0df260&quot;,
+  &quot;commit_index&quot;: 2,
+  &quot;commit_size&quot;: 2,
+  &quot;data_json&quot;: &quot;{\&quot;acceptance_id\&quot;:\&quot;task-acceptance:sha256:96a3b4ace1459de4c144fc68bcec3a89403fca92013b20931b5e88c91d53f8e8\&quot;,\&quot;compiled_task_id\&quot;:\&quot;compiled-task:sha256:ede4c14769501abfd644c2c57bd532210aead3f8eba4ed6556c6402eef0f3c30\&quot;,\&quot;deficit_obligation_ids\&quot;:[],\&quot;evidence_artifact_ids\&quot;:[\&quot;effect-evidence:sha256:028f6bb50ae892af13d8488bb979634cd8f9ebf38e25c78dc6028885d891c617\&quot;],\&quot;evidence_refs\&quot;:[\&quot;builtin://uah-smoke/detection-bottle\&quot;],\&quot;failed_obligation_ids\&quot;:[\&quot;target_observed\&quot;],\&quot;pending_obligation_ids\&quot;:[],\&quot;satisfied_obligation_ids\&quot;:[],\&quot;status\&quot;:\&quot;rejected\&quot;}&quot;,
+  &quot;environment_run_id&quot;: &quot;environment-run:nao-smoke:001&quot;,
+  &quot;event_id&quot;: &quot;trace-event:sha256:e3aa5b94a64502a0fbf44748165e8b2d3fca5f3964f990483f52d9855e5b1b59&quot;,
+  &quot;event_type&quot;: &quot;terminal_task_rejected&quot;,
+  &quot;operation_id&quot;: null,
+  &quot;parent_event_id&quot;: &quot;trace-event:sha256:a9bb87eba3993af434c873e1b0935e6d90b180c0824bc8b3fb13e352c01ea7c1&quot;,
+  &quot;recorded_at&quot;: &quot;2026-09-28t10:00:01z&quot;,
+  &quot;schema_version&quot;: &quot;uah.trace_event/v1&quot;,
+  &quot;sequence&quot;: 26,
+  &quot;task_id&quot;: &quot;find_the_bottle_counterexample&quot;,
+  &quot;trace_id&quot;: &quot;trace:sha256:24944c17eadbd21a4e6330a6098acd4a091bc1caee3e95ddaa24b155450aa731&quot;
+}">
+      <header><h2>trace:sha256:24944c17eadbd21a4e6330a6098acd4a091bc1caee3e95ddaa24b155450aa731</h2><span class="badge rejected">rejected</span>
+        <span class="badge open">recorded</span></header>
+      <p>Task <code>find_the_bottle_counterexample</code> · Environment <code>environment-run:nao-smoke:001</code> · Failure stage: <code>task_acceptance</code></p>
+
+      <section class="event">
+      <header><strong>task_started</strong><code>#16</code></header>
+      <p>Recorded 2026-09-28T10:00:01Z</p>
+      <details><summary>Raw immutable event</summary><pre>{
+  &quot;artifact_refs&quot;: [
+    &quot;environment-ingress:sha256:db033854332aad6f86f08040cd69c30bfb07312eb2c423d8154eabce088484d8&quot;,
+    &quot;task-ingress-decision:sha256:6273daeca3d11d7380baf8940504a335bab7cec7eaf13bf1791390905517cabb&quot;,
+    &quot;sha256:b4032b7b64c4c65c481cd45c84d8c31bd89af7d0a9fb7b70be1e6a93291caf5e&quot;
+  ],
+  &quot;commit_id&quot;: &quot;lifecycle-commit:sha256:21f2ea761f17338767bae994b4fdc04503d02502bdd7f33a8b7657f67df826ee&quot;,
+  &quot;commit_index&quot;: 1,
+  &quot;commit_size&quot;: 1,
+  &quot;data_json&quot;: &quot;{\&quot;decision_id\&quot;:\&quot;task-ingress-decision:sha256:6273daeca3d11d7380baf8940504a335bab7cec7eaf13bf1791390905517cabb\&quot;,\&quot;domain_contract_pack_revision\&quot;:\&quot;sha256:b4032b7b64c4c65c481cd45c84d8c31bd89af7d0a9fb7b70be1e6a93291caf5e\&quot;,\&quot;environment_ingress_id\&quot;:\&quot;ingress:recorded:uah-smoke-find-bottle-counterexample\&quot;,\&quot;ingress_artifact_id\&quot;:\&quot;environment-ingress:sha256:db033854332aad6f86f08040cd69c30bfb07312eb2c423d8154eabce088484d8\&quot;}&quot;,
+  &quot;environment_run_id&quot;: &quot;environment-run:nao-smoke:001&quot;,
+  &quot;event_id&quot;: &quot;trace-event:sha256:21ef20e022a908b06608892dcf45a0c1c295ac9844b7013238378fadf2399f29&quot;,
+  &quot;event_type&quot;: &quot;task_started&quot;,
+  &quot;operation_id&quot;: null,
+  &quot;parent_event_id&quot;: null,
+  &quot;recorded_at&quot;: &quot;2026-09-28T10:00:01Z&quot;,
+  &quot;schema_version&quot;: &quot;uah.trace_event/v1&quot;,
+  &quot;sequence&quot;: 16,
+  &quot;task_id&quot;: &quot;find_the_bottle_counterexample&quot;,
+  &quot;trace_id&quot;: &quot;trace:sha256:24944c17eadbd21a4e6330a6098acd4a091bc1caee3e95ddaa24b155450aa731&quot;
+}</pre></details>
+    </section>
+<section class="event">
+      <header><strong>task_compiled</strong><code>#17</code></header>
+      <p>Recorded 2026-09-28T10:00:01Z</p>
+      <details><summary>Raw immutable event</summary><pre>{
+  &quot;artifact_refs&quot;: [
+    &quot;compiled-task:sha256:ede4c14769501abfd644c2c57bd532210aead3f8eba4ed6556c6402eef0f3c30&quot;
+  ],
+  &quot;commit_id&quot;: &quot;lifecycle-commit:sha256:50e952d36e2478700d494b9c11cf5ddda2978002db4a6e036cc8e5b8e4f5098b&quot;,
+  &quot;commit_index&quot;: 1,
+  &quot;commit_size&quot;: 1,
+  &quot;data_json&quot;: &quot;{\&quot;budgets\&quot;:{\&quot;model_calls\&quot;:0,\&quot;retry_attempts\&quot;:0,\&quot;tool_calls\&quot;:4,\&quot;wall_time_seconds\&quot;:60},\&quot;compiled_task_id\&quot;:\&quot;compiled-task:sha256:ede4c14769501abfd644c2c57bd532210aead3f8eba4ed6556c6402eef0f3c30\&quot;,\&quot;domain_contract_pack_revision\&quot;:\&quot;sha256:b4032b7b64c4c65c481cd45c84d8c31bd89af7d0a9fb7b70be1e6a93291caf5e\&quot;,\&quot;frame_id\&quot;:\&quot;nao_ros4hri\&quot;,\&quot;registry_version\&quot;:\&quot;sha256:fb7f9ffaceed518ab0ea4045fbe2618196f358cba941b910b51b663ca6097ae3\&quot;,\&quot;role_id\&quot;:\&quot;planner_llm\&quot;}&quot;,
+  &quot;environment_run_id&quot;: &quot;environment-run:nao-smoke:001&quot;,
+  &quot;event_id&quot;: &quot;trace-event:sha256:e51753824db9aef442243d4328d5642d56b363dbab89c5399985654387c57919&quot;,
+  &quot;event_type&quot;: &quot;task_compiled&quot;,
+  &quot;operation_id&quot;: null,
+  &quot;parent_event_id&quot;: &quot;trace-event:sha256:21ef20e022a908b06608892dcf45a0c1c295ac9844b7013238378fadf2399f29&quot;,
+  &quot;recorded_at&quot;: &quot;2026-09-28T10:00:01Z&quot;,
+  &quot;schema_version&quot;: &quot;uah.trace_event/v1&quot;,
+  &quot;sequence&quot;: 17,
+  &quot;task_id&quot;: &quot;find_the_bottle_counterexample&quot;,
+  &quot;trace_id&quot;: &quot;trace:sha256:24944c17eadbd21a4e6330a6098acd4a091bc1caee3e95ddaa24b155450aa731&quot;
+}</pre></details>
+    </section>
+<section class="event">
+      <header><strong>proposal_normalized</strong><code>#18</code></header>
+      <p>Recorded 2026-09-28T10:00:01Z · Operation <code>uah-smoke-find-bottle-counterexample:operation:step_1</code></p>
+      <details><summary>Raw immutable event</summary><pre>{
+  &quot;artifact_refs&quot;: [
+    &quot;proposal:sha256:7015bb0caccfa718e29a52652fa87aecab1ac81717df979da57d4306877e641a&quot;,
+    &quot;compiled-task:sha256:ede4c14769501abfd644c2c57bd532210aead3f8eba4ed6556c6402eef0f3c30&quot;,
+    &quot;model-output:sha256:10a7f6aedb297988b0568df1339ae096e6215586e8ee8beba44e1757d6c3f31e&quot;
+  ],
+  &quot;commit_id&quot;: &quot;lifecycle-commit:sha256:489dc8005df2b68e5cb96fea4678beef905c4ccf04ad454aeb5bd002cd08247c&quot;,
+  &quot;commit_index&quot;: 1,
+  &quot;commit_size&quot;: 1,
+  &quot;data_json&quot;: &quot;{\&quot;compiled_task_id\&quot;:\&quot;compiled-task:sha256:ede4c14769501abfd644c2c57bd532210aead3f8eba4ed6556c6402eef0f3c30\&quot;,\&quot;object_id\&quot;:\&quot;find_object\&quot;,\&quot;proposal_id\&quot;:\&quot;proposal:sha256:7015bb0caccfa718e29a52652fa87aecab1ac81717df979da57d4306877e641a\&quot;}&quot;,
+  &quot;environment_run_id&quot;: &quot;environment-run:nao-smoke:001&quot;,
+  &quot;event_id&quot;: &quot;trace-event:sha256:21ea06115425ba09813cc6dfaa7b77bfd41d167eb2fe0516448832fa5069cc39&quot;,
+  &quot;event_type&quot;: &quot;proposal_normalized&quot;,
+  &quot;operation_id&quot;: &quot;uah-smoke-find-bottle-counterexample:operation:step_1&quot;,
+  &quot;parent_event_id&quot;: &quot;trace-event:sha256:e51753824db9aef442243d4328d5642d56b363dbab89c5399985654387c57919&quot;,
+  &quot;recorded_at&quot;: &quot;2026-09-28T10:00:01Z&quot;,
+  &quot;schema_version&quot;: &quot;uah.trace_event/v1&quot;,
+  &quot;sequence&quot;: 18,
+  &quot;task_id&quot;: &quot;find_the_bottle_counterexample&quot;,
+  &quot;trace_id&quot;: &quot;trace:sha256:24944c17eadbd21a4e6330a6098acd4a091bc1caee3e95ddaa24b155450aa731&quot;
+}</pre></details>
+    </section>
+<section class="event">
+      <header><strong>semantic_admission_accepted</strong><code>#19</code></header>
+      <p>Recorded 2026-09-28T10:00:01Z · Operation <code>uah-smoke-find-bottle-counterexample:operation:step_1</code></p>
+      <details><summary>Raw immutable event</summary><pre>{
+  &quot;artifact_refs&quot;: [
+    &quot;admission:sha256:4a9ec13dd6fdc8d5b36b259d1089d401555e99bb90051e1a84d8b12d7986bb57&quot;,
+    &quot;proposal:sha256:7015bb0caccfa718e29a52652fa87aecab1ac81717df979da57d4306877e641a&quot;
+  ],
+  &quot;commit_id&quot;: &quot;lifecycle-commit:sha256:3c36928c2ae1049fbce2784a12071181c14ccd92cb57276b215d65ea2e3fc1f6&quot;,
+  &quot;commit_index&quot;: 1,
+  &quot;commit_size&quot;: 1,
+  &quot;data_json&quot;: &quot;{\&quot;ab_level\&quot;:1,\&quot;admission_id\&quot;:\&quot;admission:sha256:4a9ec13dd6fdc8d5b36b259d1089d401555e99bb90051e1a84d8b12d7986bb57\&quot;,\&quot;admitted_operation\&quot;:{\&quot;ab_level\&quot;:1,\&quot;admission_id\&quot;:\&quot;admission:sha256:4a9ec13dd6fdc8d5b36b259d1089d401555e99bb90051e1a84d8b12d7986bb57\&quot;,\&quot;binding_fingerprint\&quot;:\&quot;binding:sha256:e140de7336a910c33c013bd6addd9211618f23c174a662662d68888c2c322294\&quot;,\&quot;binding_id\&quot;:\&quot;nao_fake.find_object.v1\&quot;,\&quot;binding_owner\&quot;:\&quot;object_finder\&quot;,\&quot;binding_source_revision\&quot;:\&quot;uah-smoke-v1\&quot;,\&quot;domain_contract_pack_revision\&quot;:\&quot;sha256:b4032b7b64c4c65c481cd45c84d8c31bd89af7d0a9fb7b70be1e6a93291caf5e\&quot;,\&quot;effect_obligation_ids\&quot;:[\&quot;target_observed\&quot;],\&quot;environment_id\&quot;:\&quot;nao_fake\&quot;,\&quot;evidence_adapter\&quot;:\&quot;ab_harness_nao.smoke:fresh_detection\&quot;,\&quot;frame_id\&quot;:\&quot;nao_ros4hri\&quot;,\&quot;input_schema_id\&quot;:\&quot;input-schema:sha256:5b9e04eb5d392aad4f5e4cdfc8f722963f228a99b60437b88f5a48b46e467ccc\&quot;,\&quot;input_schema_ref\&quot;:\&quot;schema://find_object/input/v1\&quot;,\&quot;object_snapshot\&quot;:{\&quot;ab_level\&quot;:1,\&quot;category\&quot;:\&quot;perception\&quot;,\&quot;decomposes_to\&quot;:[\&quot;resolve_target_reference\&quot;],\&quot;expected_effects\&quot;:[\&quot;requested object localized\&quot;],\&quot;kind\&quot;:\&quot;skill\&quot;,\&quot;object_id\&quot;:\&quot;find_object\&quot;,\&quot;observable_success\&quot;:[\&quot;fresh detector-backed result returned\&quot;],\&quot;owner_package\&quot;:\&quot;object_finder\&quot;,\&quot;runtime_callable\&quot;:true},\&quot;output_schema_ref\&quot;:\&quot;schema://find_object/result/v1\&quot;,\&quot;proposal\&quot;:{\&quot;arguments_json\&quot;:\&quot;{\\\&quot;label\\\&quot;:\\\&quot;bottle\\\&quot;}\&quot;,\&quot;compiled_task_id\&quot;:\&quot;compiled-task:sha256:ede4c14769501abfd644c2c57bd532210aead3f8eba4ed6556c6402eef0f3c30\&quot;,\&quot;environment_run_id\&quot;:\&quot;environment-run:nao-smoke:001\&quot;,\&quot;object_id\&quot;:\&quot;find_object\&quot;,\&quot;operation_id\&quot;:\&quot;uah-smoke-find-bottle-counterexample:operation:step_1\&quot;,\&quot;output_type\&quot;:\&quot;executable_plan\&quot;,\&quot;proposal_id\&quot;:\&quot;proposal:sha256:7015bb0caccfa718e29a52652fa87aecab1ac81717df979da57d4306877e641a\&quot;,\&quot;raw_output_artifact_id\&quot;:\&quot;model-output:sha256:10a7f6aedb297988b0568df1339ae096e6215586e8ee8beba44e1757d6c3f31e\&quot;,\&quot;schema_version\&quot;:\&quot;uah.typed_proposal/v1\&quot;,\&quot;task_id\&quot;:\&quot;find_the_bottle_counterexample\&quot;,\&quot;trace_id\&quot;:\&quot;trace:sha256:24944c17eadbd21a4e6330a6098acd4a091bc1caee3e95ddaa24b155450aa731\&quot;},\&quot;runtime_mode\&quot;:\&quot;smoke\&quot;,\&quot;schema_version\&quot;:\&quot;uah.admitted_operation/v3\&quot;},\&quot;binding_id\&quot;:\&quot;nao_fake.find_object.v1\&quot;,\&quot;binding_owner\&quot;:\&quot;object_finder\&quot;,\&quot;frame_id\&quot;:\&quot;nao_ros4hri\&quot;,\&quot;input_schema_id\&quot;:\&quot;input-schema:sha256:5b9e04eb5d392aad4f5e4cdfc8f722963f228a99b60437b88f5a48b46e467ccc\&quot;,\&quot;object_id\&quot;:\&quot;find_object\&quot;,\&quot;object_snapshot\&quot;:{\&quot;ab_level\&quot;:1,\&quot;category\&quot;:\&quot;perception\&quot;,\&quot;decomposes_to\&quot;:[\&quot;resolve_target_reference\&quot;],\&quot;expected_effects\&quot;:[\&quot;requested object localized\&quot;],\&quot;kind\&quot;:\&quot;skill\&quot;,\&quot;object_id\&quot;:\&quot;find_object\&quot;,\&quot;observable_success\&quot;:[\&quot;fresh detector-backed result returned\&quot;],\&quot;owner_package\&quot;:\&quot;object_finder\&quot;,\&quot;runtime_callable\&quot;:true},\&quot;proposal_id\&quot;:\&quot;proposal:sha256:7015bb0caccfa718e29a52652fa87aecab1ac81717df979da57d4306877e641a\&quot;,\&quot;schema_version\&quot;:\&quot;uah.admitted_operation/v3\&quot;}&quot;,
+  &quot;environment_run_id&quot;: &quot;environment-run:nao-smoke:001&quot;,
+  &quot;event_id&quot;: &quot;trace-event:sha256:b2dc0580334b4e9755fee0592ec804c4859a6bec1f01c95a2f9c34613cda81c2&quot;,
+  &quot;event_type&quot;: &quot;semantic_admission_accepted&quot;,
+  &quot;operation_id&quot;: &quot;uah-smoke-find-bottle-counterexample:operation:step_1&quot;,
+  &quot;parent_event_id&quot;: &quot;trace-event:sha256:21ea06115425ba09813cc6dfaa7b77bfd41d167eb2fe0516448832fa5069cc39&quot;,
+  &quot;recorded_at&quot;: &quot;2026-09-28T10:00:01Z&quot;,
+  &quot;schema_version&quot;: &quot;uah.trace_event/v1&quot;,
+  &quot;sequence&quot;: 19,
+  &quot;task_id&quot;: &quot;find_the_bottle_counterexample&quot;,
+  &quot;trace_id&quot;: &quot;trace:sha256:24944c17eadbd21a4e6330a6098acd4a091bc1caee3e95ddaa24b155450aa731&quot;
+}</pre></details>
+    </section>
+<section class="event">
+      <header><strong>domain_admission_leased</strong><code>#20</code></header>
+      <p>Recorded 2026-09-28T10:00:01Z · Operation <code>uah-smoke-find-bottle-counterexample:operation:step_1</code></p>
+      <details><summary>Raw immutable event</summary><pre>{
+  &quot;artifact_refs&quot;: [
+    &quot;execution-lease:sha256:16977a725adbd74e96d6ef01f961ad0f32220c54350acaf27027b9a8fbbf4208&quot;,
+    &quot;admission:sha256:4a9ec13dd6fdc8d5b36b259d1089d401555e99bb90051e1a84d8b12d7986bb57&quot;,
+    &quot;environment-attestation:nao-smoke:001&quot;
+  ],
+  &quot;commit_id&quot;: &quot;lifecycle-commit:sha256:89efe74785075fac8872ed28cd945f0738e4a349d7c9cd735f1547b9e3d007ae&quot;,
+  &quot;commit_index&quot;: 1,
+  &quot;commit_size&quot;: 1,
+  &quot;data_json&quot;: &quot;{\&quot;admission_id\&quot;:\&quot;admission:sha256:4a9ec13dd6fdc8d5b36b259d1089d401555e99bb90051e1a84d8b12d7986bb57\&quot;,\&quot;binding_id\&quot;:\&quot;nao_fake.find_object.v1\&quot;,\&quot;execution_lease_id\&quot;:\&quot;execution-lease:sha256:16977a725adbd74e96d6ef01f961ad0f32220c54350acaf27027b9a8fbbf4208\&quot;,\&quot;lease_owner_id\&quot;:\&quot;nao_fake.lifecycle_owner\&quot;,\&quot;object_id\&quot;:\&quot;find_object\&quot;}&quot;,
+  &quot;environment_run_id&quot;: &quot;environment-run:nao-smoke:001&quot;,
+  &quot;event_id&quot;: &quot;trace-event:sha256:430c9a5398f22b280a26060db594a9a0317ad802da69814741f4095eb88fc004&quot;,
+  &quot;event_type&quot;: &quot;domain_admission_leased&quot;,
+  &quot;operation_id&quot;: &quot;uah-smoke-find-bottle-counterexample:operation:step_1&quot;,
+  &quot;parent_event_id&quot;: &quot;trace-event:sha256:b2dc0580334b4e9755fee0592ec804c4859a6bec1f01c95a2f9c34613cda81c2&quot;,
+  &quot;recorded_at&quot;: &quot;2026-09-28T10:00:01Z&quot;,
+  &quot;schema_version&quot;: &quot;uah.trace_event/v1&quot;,
+  &quot;sequence&quot;: 20,
+  &quot;task_id&quot;: &quot;find_the_bottle_counterexample&quot;,
+  &quot;trace_id&quot;: &quot;trace:sha256:24944c17eadbd21a4e6330a6098acd4a091bc1caee3e95ddaa24b155450aa731&quot;
+}</pre></details>
+    </section>
+<section class="event">
+      <header><strong>budget_granted</strong><code>#21</code></header>
+      <p>Recorded 2026-09-28T10:00:01Z · Operation <code>uah-smoke-find-bottle-counterexample:operation:step_1</code></p>
+      <details><summary>Raw immutable event</summary><pre>{
+  &quot;artifact_refs&quot;: [
+    &quot;budget-decision:sha256:6992517ec234100b233b36ef3790165f9bac824583b3b91aab8f5c3dc00cf0fb&quot;,
+    &quot;compiled-task:sha256:ede4c14769501abfd644c2c57bd532210aead3f8eba4ed6556c6402eef0f3c30&quot;
+  ],
+  &quot;commit_id&quot;: &quot;lifecycle-commit:sha256:a9bc02f776462d7d490310268ce378ab8bb05d665aac4c31102c10d033ac994c&quot;,
+  &quot;commit_index&quot;: 1,
+  &quot;commit_size&quot;: 2,
+  &quot;data_json&quot;: &quot;{\&quot;compiled_task_id\&quot;:\&quot;compiled-task:sha256:ede4c14769501abfd644c2c57bd532210aead3f8eba4ed6556c6402eef0f3c30\&quot;,\&quot;consumed_after\&quot;:1,\&quot;consumed_before\&quot;:0,\&quot;decision_id\&quot;:\&quot;budget-decision:sha256:6992517ec234100b233b36ef3790165f9bac824583b3b91aab8f5c3dc00cf0fb\&quot;,\&quot;environment_run_id\&quot;:\&quot;environment-run:nao-smoke:001\&quot;,\&quot;limit\&quot;:4,\&quot;outcome\&quot;:\&quot;granted\&quot;,\&quot;reason_code\&quot;:\&quot;within_budget\&quot;,\&quot;resource\&quot;:\&quot;tool_call\&quot;,\&quot;schema_version\&quot;:\&quot;uah.budget_decision/v1\&quot;,\&quot;subject_id\&quot;:\&quot;uah-smoke-find-bottle-counterexample:operation:step_1\&quot;,\&quot;task_id\&quot;:\&quot;find_the_bottle_counterexample\&quot;,\&quot;trace_id\&quot;:\&quot;trace:sha256:24944c17eadbd21a4e6330a6098acd4a091bc1caee3e95ddaa24b155450aa731\&quot;,\&quot;units\&quot;:1}&quot;,
+  &quot;environment_run_id&quot;: &quot;environment-run:nao-smoke:001&quot;,
+  &quot;event_id&quot;: &quot;trace-event:sha256:c1e890aa00798b361c6919512f2827a8bb3ed03af62800c6ea293690167275cc&quot;,
+  &quot;event_type&quot;: &quot;budget_granted&quot;,
+  &quot;operation_id&quot;: &quot;uah-smoke-find-bottle-counterexample:operation:step_1&quot;,
+  &quot;parent_event_id&quot;: &quot;trace-event:sha256:430c9a5398f22b280a26060db594a9a0317ad802da69814741f4095eb88fc004&quot;,
+  &quot;recorded_at&quot;: &quot;2026-09-28T10:00:01Z&quot;,
+  &quot;schema_version&quot;: &quot;uah.trace_event/v1&quot;,
+  &quot;sequence&quot;: 21,
+  &quot;task_id&quot;: &quot;find_the_bottle_counterexample&quot;,
+  &quot;trace_id&quot;: &quot;trace:sha256:24944c17eadbd21a4e6330a6098acd4a091bc1caee3e95ddaa24b155450aa731&quot;
+}</pre></details>
+    </section>
+<section class="event">
+      <header><strong>execution_started</strong><code>#22</code></header>
+      <p>Recorded 2026-09-28T10:00:01Z · Operation <code>uah-smoke-find-bottle-counterexample:operation:step_1</code></p>
+      <details><summary>Raw immutable event</summary><pre>{
+  &quot;artifact_refs&quot;: [
+    &quot;execution-lease:sha256:16977a725adbd74e96d6ef01f961ad0f32220c54350acaf27027b9a8fbbf4208&quot;
+  ],
+  &quot;commit_id&quot;: &quot;lifecycle-commit:sha256:a9bc02f776462d7d490310268ce378ab8bb05d665aac4c31102c10d033ac994c&quot;,
+  &quot;commit_index&quot;: 2,
+  &quot;commit_size&quot;: 2,
+  &quot;data_json&quot;: &quot;{\&quot;execution_lease_id\&quot;:\&quot;execution-lease:sha256:16977a725adbd74e96d6ef01f961ad0f32220c54350acaf27027b9a8fbbf4208\&quot;}&quot;,
+  &quot;environment_run_id&quot;: &quot;environment-run:nao-smoke:001&quot;,
+  &quot;event_id&quot;: &quot;trace-event:sha256:7cede1d931e4f609f3c6206190751ce3b3b69082840b7057ba451946906797a4&quot;,
+  &quot;event_type&quot;: &quot;execution_started&quot;,
+  &quot;operation_id&quot;: &quot;uah-smoke-find-bottle-counterexample:operation:step_1&quot;,
+  &quot;parent_event_id&quot;: &quot;trace-event:sha256:c1e890aa00798b361c6919512f2827a8bb3ed03af62800c6ea293690167275cc&quot;,
+  &quot;recorded_at&quot;: &quot;2026-09-28T10:00:01Z&quot;,
+  &quot;schema_version&quot;: &quot;uah.trace_event/v1&quot;,
+  &quot;sequence&quot;: 22,
+  &quot;task_id&quot;: &quot;find_the_bottle_counterexample&quot;,
+  &quot;trace_id&quot;: &quot;trace:sha256:24944c17eadbd21a4e6330a6098acd4a091bc1caee3e95ddaa24b155450aa731&quot;
+}</pre></details>
+    </section>
+<section class="event">
+      <header><strong>execution_completed</strong><code>#23</code></header>
+      <p>Recorded 2026-09-28T10:00:01Z · Operation <code>uah-smoke-find-bottle-counterexample:operation:step_1</code></p>
+      <details><summary>Raw immutable event</summary><pre>{
+  &quot;artifact_refs&quot;: [
+    &quot;execution-receipt:sha256:54e3923756d64528b627066a14d3fd231f9945ac22ffeb8c004326e1c84de127&quot;,
+    &quot;execution-lease:sha256:16977a725adbd74e96d6ef01f961ad0f32220c54350acaf27027b9a8fbbf4208&quot;
+  ],
+  &quot;commit_id&quot;: &quot;lifecycle-commit:sha256:63affa29708f1d741af083cc0eb51fde3d9be08fd50932bc2b0d427d95565a70&quot;,
+  &quot;commit_index&quot;: 1,
+  &quot;commit_size&quot;: 2,
+  &quot;data_json&quot;: &quot;{\&quot;admission_id\&quot;:\&quot;admission:sha256:4a9ec13dd6fdc8d5b36b259d1089d401555e99bb90051e1a84d8b12d7986bb57\&quot;,\&quot;binding_id\&quot;:\&quot;nao_fake.find_object.v1\&quot;,\&quot;execution_lease_id\&quot;:\&quot;execution-lease:sha256:16977a725adbd74e96d6ef01f961ad0f32220c54350acaf27027b9a8fbbf4208\&quot;,\&quot;execution_result_id\&quot;:\&quot;execution-receipt:sha256:54e3923756d64528b627066a14d3fd231f9945ac22ffeb8c004326e1c84de127\&quot;,\&quot;object_id\&quot;:\&quot;find_object\&quot;,\&quot;owner\&quot;:\&quot;object_finder\&quot;,\&quot;succeeded\&quot;:false}&quot;,
+  &quot;environment_run_id&quot;: &quot;environment-run:nao-smoke:001&quot;,
+  &quot;event_id&quot;: &quot;trace-event:sha256:f2d0593cd8186892835154bd5037f3db293c2e12233b30813aa320e9595361ef&quot;,
+  &quot;event_type&quot;: &quot;execution_completed&quot;,
+  &quot;operation_id&quot;: &quot;uah-smoke-find-bottle-counterexample:operation:step_1&quot;,
+  &quot;parent_event_id&quot;: &quot;trace-event:sha256:7cede1d931e4f609f3c6206190751ce3b3b69082840b7057ba451946906797a4&quot;,
+  &quot;recorded_at&quot;: &quot;2026-09-28T10:00:01Z&quot;,
+  &quot;schema_version&quot;: &quot;uah.trace_event/v1&quot;,
+  &quot;sequence&quot;: 23,
+  &quot;task_id&quot;: &quot;find_the_bottle_counterexample&quot;,
+  &quot;trace_id&quot;: &quot;trace:sha256:24944c17eadbd21a4e6330a6098acd4a091bc1caee3e95ddaa24b155450aa731&quot;
+}</pre></details>
+    </section>
+<section class="event">
+      <header><strong>evidence_issued</strong><code>#24</code></header>
+      <p>Recorded 2026-09-28T10:00:01Z · Operation <code>uah-smoke-find-bottle-counterexample:operation:step_1</code></p>
+      <details><summary>Raw immutable event</summary><pre>{
+  &quot;artifact_refs&quot;: [
+    &quot;effect-evidence:sha256:028f6bb50ae892af13d8488bb979634cd8f9ebf38e25c78dc6028885d891c617&quot;,
+    &quot;execution-receipt:sha256:54e3923756d64528b627066a14d3fd231f9945ac22ffeb8c004326e1c84de127&quot;
+  ],
+  &quot;commit_id&quot;: &quot;lifecycle-commit:sha256:63affa29708f1d741af083cc0eb51fde3d9be08fd50932bc2b0d427d95565a70&quot;,
+  &quot;commit_index&quot;: 2,
+  &quot;commit_size&quot;: 2,
+  &quot;data_json&quot;: &quot;{\&quot;binding_id\&quot;:\&quot;nao_fake.find_object.v1\&quot;,\&quot;evidence_artifact_id\&quot;:\&quot;effect-evidence:sha256:028f6bb50ae892af13d8488bb979634cd8f9ebf38e25c78dc6028885d891c617\&quot;,\&quot;execution_lease_id\&quot;:\&quot;execution-lease:sha256:16977a725adbd74e96d6ef01f961ad0f32220c54350acaf27027b9a8fbbf4208\&quot;,\&quot;execution_result_id\&quot;:\&quot;execution-receipt:sha256:54e3923756d64528b627066a14d3fd231f9945ac22ffeb8c004326e1c84de127\&quot;,\&quot;native_evidence_ref\&quot;:\&quot;builtin://uah-smoke/detection-bottle\&quot;,\&quot;object_id\&quot;:\&quot;find_object\&quot;,\&quot;observed_effects\&quot;:[],\&quot;owner\&quot;:\&quot;object_finder\&quot;,\&quot;succeeded\&quot;:false}&quot;,
+  &quot;environment_run_id&quot;: &quot;environment-run:nao-smoke:001&quot;,
+  &quot;event_id&quot;: &quot;trace-event:sha256:8422e51ca9a227e4ce1e72a4061ba4675aa28b63b1803e640ede9d4b733f2404&quot;,
+  &quot;event_type&quot;: &quot;evidence_issued&quot;,
+  &quot;operation_id&quot;: &quot;uah-smoke-find-bottle-counterexample:operation:step_1&quot;,
+  &quot;parent_event_id&quot;: &quot;trace-event:sha256:f2d0593cd8186892835154bd5037f3db293c2e12233b30813aa320e9595361ef&quot;,
+  &quot;recorded_at&quot;: &quot;2026-09-28T10:00:01Z&quot;,
+  &quot;schema_version&quot;: &quot;uah.trace_event/v1&quot;,
+  &quot;sequence&quot;: 24,
+  &quot;task_id&quot;: &quot;find_the_bottle_counterexample&quot;,
+  &quot;trace_id&quot;: &quot;trace:sha256:24944c17eadbd21a4e6330a6098acd4a091bc1caee3e95ddaa24b155450aa731&quot;
+}</pre></details>
+    </section>
+<section class="event">
+      <header><strong>effect_obligation_failed</strong><code>#25</code></header>
+      <p>Recorded 2026-09-28T10:00:01Z</p>
+      <details><summary>Raw immutable event</summary><pre>{
+  &quot;artifact_refs&quot;: [
+    &quot;task-acceptance:sha256:96a3b4ace1459de4c144fc68bcec3a89403fca92013b20931b5e88c91d53f8e8&quot;
+  ],
+  &quot;commit_id&quot;: &quot;lifecycle-commit:sha256:e77d4ccb7d437c4d90e3aa2d2f1c027b7f09db4a20110c8ef9c2a804ab0df260&quot;,
+  &quot;commit_index&quot;: 1,
+  &quot;commit_size&quot;: 2,
+  &quot;data_json&quot;: &quot;{\&quot;effect_id\&quot;:\&quot;fresh detector-backed result returned\&quot;,\&quot;obligation_id\&quot;:\&quot;target_observed\&quot;,\&quot;outcome\&quot;:\&quot;failed\&quot;,\&quot;requirement\&quot;:\&quot;required\&quot;}&quot;,
+  &quot;environment_run_id&quot;: &quot;environment-run:nao-smoke:001&quot;,
+  &quot;event_id&quot;: &quot;trace-event:sha256:a9bb87eba3993af434c873e1b0935e6d90b180c0824bc8b3fb13e352c01ea7c1&quot;,
+  &quot;event_type&quot;: &quot;effect_obligation_failed&quot;,
+  &quot;operation_id&quot;: null,
+  &quot;parent_event_id&quot;: &quot;trace-event:sha256:8422e51ca9a227e4ce1e72a4061ba4675aa28b63b1803e640ede9d4b733f2404&quot;,
+  &quot;recorded_at&quot;: &quot;2026-09-28T10:00:01Z&quot;,
+  &quot;schema_version&quot;: &quot;uah.trace_event/v1&quot;,
+  &quot;sequence&quot;: 25,
+  &quot;task_id&quot;: &quot;find_the_bottle_counterexample&quot;,
+  &quot;trace_id&quot;: &quot;trace:sha256:24944c17eadbd21a4e6330a6098acd4a091bc1caee3e95ddaa24b155450aa731&quot;
+}</pre></details>
+    </section>
+<section class="event">
+      <header><strong>terminal_task_rejected</strong><code>#26</code></header>
+      <p>Recorded 2026-09-28T10:00:01Z</p>
+      <details><summary>Raw immutable event</summary><pre>{
+  &quot;artifact_refs&quot;: [
+    &quot;task-acceptance:sha256:96a3b4ace1459de4c144fc68bcec3a89403fca92013b20931b5e88c91d53f8e8&quot;,
+    &quot;compiled-task:sha256:ede4c14769501abfd644c2c57bd532210aead3f8eba4ed6556c6402eef0f3c30&quot;,
+    &quot;effect-evidence:sha256:028f6bb50ae892af13d8488bb979634cd8f9ebf38e25c78dc6028885d891c617&quot;
+  ],
+  &quot;commit_id&quot;: &quot;lifecycle-commit:sha256:e77d4ccb7d437c4d90e3aa2d2f1c027b7f09db4a20110c8ef9c2a804ab0df260&quot;,
+  &quot;commit_index&quot;: 2,
+  &quot;commit_size&quot;: 2,
+  &quot;data_json&quot;: &quot;{\&quot;acceptance_id\&quot;:\&quot;task-acceptance:sha256:96a3b4ace1459de4c144fc68bcec3a89403fca92013b20931b5e88c91d53f8e8\&quot;,\&quot;compiled_task_id\&quot;:\&quot;compiled-task:sha256:ede4c14769501abfd644c2c57bd532210aead3f8eba4ed6556c6402eef0f3c30\&quot;,\&quot;deficit_obligation_ids\&quot;:[],\&quot;evidence_artifact_ids\&quot;:[\&quot;effect-evidence:sha256:028f6bb50ae892af13d8488bb979634cd8f9ebf38e25c78dc6028885d891c617\&quot;],\&quot;evidence_refs\&quot;:[\&quot;builtin://uah-smoke/detection-bottle\&quot;],\&quot;failed_obligation_ids\&quot;:[\&quot;target_observed\&quot;],\&quot;pending_obligation_ids\&quot;:[],\&quot;satisfied_obligation_ids\&quot;:[],\&quot;status\&quot;:\&quot;rejected\&quot;}&quot;,
+  &quot;environment_run_id&quot;: &quot;environment-run:nao-smoke:001&quot;,
+  &quot;event_id&quot;: &quot;trace-event:sha256:e3aa5b94a64502a0fbf44748165e8b2d3fca5f3964f990483f52d9855e5b1b59&quot;,
+  &quot;event_type&quot;: &quot;terminal_task_rejected&quot;,
+  &quot;operation_id&quot;: null,
+  &quot;parent_event_id&quot;: &quot;trace-event:sha256:a9bb87eba3993af434c873e1b0935e6d90b180c0824bc8b3fb13e352c01ea7c1&quot;,
+  &quot;recorded_at&quot;: &quot;2026-09-28T10:00:01Z&quot;,
+  &quot;schema_version&quot;: &quot;uah.trace_event/v1&quot;,
+  &quot;sequence&quot;: 26,
+  &quot;task_id&quot;: &quot;find_the_bottle_counterexample&quot;,
+  &quot;trace_id&quot;: &quot;trace:sha256:24944c17eadbd21a4e6330a6098acd4a091bc1caee3e95ddaa24b155450aa731&quot;
+}</pre></details>
+    </section>
+    </article></section>
+    <script type="application/json" id="observatory-graph">{"data_label":"recorded","edges":[{"relation":"ledger_parent_event","source":"trace-event:sha256:6f04e34994504f41a503201387962bcb7974f0fdc5288cb68d66d6a9bd79d1f4","target":"trace-event:sha256:34e4dc9a7c3082c86f422078b7b938e70148363c028e5860cc1567b9dd330d91"},{"relation":"ledger_parent_event","source":"trace-event:sha256:34e4dc9a7c3082c86f422078b7b938e70148363c028e5860cc1567b9dd330d91","target":"trace-event:sha256:fc34f0baac4866337a53a36222071f51fe2fcc2f13e4a350c63025a72bac4bfb"},{"relation":"ledger_parent_event","source":"trace-event:sha256:fc34f0baac4866337a53a36222071f51fe2fcc2f13e4a350c63025a72bac4bfb","target":"trace-event:sha256:9bcfe4f505d069c1cfc914ca0311339e7f3ef4d89b07da1b7da43beb82738898"},{"relation":"ledger_parent_event","source":"trace-event:sha256:9bcfe4f505d069c1cfc914ca0311339e7f3ef4d89b07da1b7da43beb82738898","target":"trace-event:sha256:ceb8a23a527aa3a79d2ee80201713644f2117dd1e87374ba0cba28e61bddd2dd"},{"relation":"ledger_parent_event","source":"trace-event:sha256:ceb8a23a527aa3a79d2ee80201713644f2117dd1e87374ba0cba28e61bddd2dd","target":"trace-event:sha256:0c828820f33d71e25d2fd01c7b765e4a5deebde94bab1271bf3d5c6bf8b11a7b"},{"relation":"ledger_parent_event","source":"trace-event:sha256:0c828820f33d71e25d2fd01c7b765e4a5deebde94bab1271bf3d5c6bf8b11a7b","target":"trace-event:sha256:c2048c6ad4e2f0a2e05a86bbf9014812a49f1c17bc93e42e33b365471f96a37f"},{"relation":"ledger_parent_event","source":"trace-event:sha256:c2048c6ad4e2f0a2e05a86bbf9014812a49f1c17bc93e42e33b365471f96a37f","target":"trace-event:sha256:822f13072c5f5ddbd7f14eac585a5d8cd79aa11e3cf1c0c8fa8c08c0f2a4d1ca"},{"relation":"ledger_parent_event","source":"trace-event:sha256:822f13072c5f5ddbd7f14eac585a5d8cd79aa11e3cf1c0c8fa8c08c0f2a4d1ca","target":"trace-event:sha256:1cc7971e709297bad88d80d17ad3362a8a167b9b8918e435a3f823eb0d00d8e2"},{"relation":"ledger_parent_event","source":"trace-event:sha256:1cc7971e709297bad88d80d17ad3362a8a167b9b8918e435a3f823eb0d00d8e2","target":"trace-event:sha256:26996e65493fb8893476a3f76514b6f25af73c282dd0d66202f9774cab50745e"},{"relation":"ledger_parent_event","source":"trace-event:sha256:26996e65493fb8893476a3f76514b6f25af73c282dd0d66202f9774cab50745e","target":"trace-event:sha256:1ca9ecf7d2699445522ab2f5b7553e77b71a34ba4f2cd972d413852bd3d377bd"},{"relation":"ledger_parent_event","source":"trace-event:sha256:050c78a56261a31a9fd690db789b2953d78625647e3156fd9f8ab14d69498c2a","target":"trace-event:sha256:8d77eb96972495f64e7d402cdbd3511799770c76317bca6b77fbbabade13883d"},{"relation":"ledger_parent_event","source":"trace-event:sha256:8d77eb96972495f64e7d402cdbd3511799770c76317bca6b77fbbabade13883d","target":"trace-event:sha256:ce9b51158f5b1ab36e7077f99a50ebdb8826cd1c39e8af64c6ca49463dc8bdac"},{"relation":"ledger_parent_event","source":"trace-event:sha256:ce9b51158f5b1ab36e7077f99a50ebdb8826cd1c39e8af64c6ca49463dc8bdac","target":"trace-event:sha256:e5ea4c871f3c5f06afddf98559dfc441c2a21311833afe4a449aaaa709d1985a"},{"relation":"ledger_parent_event","source":"trace-event:sha256:21ef20e022a908b06608892dcf45a0c1c295ac9844b7013238378fadf2399f29","target":"trace-event:sha256:e51753824db9aef442243d4328d5642d56b363dbab89c5399985654387c57919"},{"relation":"ledger_parent_event","source":"trace-event:sha256:e51753824db9aef442243d4328d5642d56b363dbab89c5399985654387c57919","target":"trace-event:sha256:21ea06115425ba09813cc6dfaa7b77bfd41d167eb2fe0516448832fa5069cc39"},{"relation":"ledger_parent_event","source":"trace-event:sha256:21ea06115425ba09813cc6dfaa7b77bfd41d167eb2fe0516448832fa5069cc39","target":"trace-event:sha256:b2dc0580334b4e9755fee0592ec804c4859a6bec1f01c95a2f9c34613cda81c2"},{"relation":"ledger_parent_event","source":"trace-event:sha256:b2dc0580334b4e9755fee0592ec804c4859a6bec1f01c95a2f9c34613cda81c2","target":"trace-event:sha256:430c9a5398f22b280a26060db594a9a0317ad802da69814741f4095eb88fc004"},{"relation":"ledger_parent_event","source":"trace-event:sha256:430c9a5398f22b280a26060db594a9a0317ad802da69814741f4095eb88fc004","target":"trace-event:sha256:c1e890aa00798b361c6919512f2827a8bb3ed03af62800c6ea293690167275cc"},{"relation":"ledger_parent_event","source":"trace-event:sha256:c1e890aa00798b361c6919512f2827a8bb3ed03af62800c6ea293690167275cc","target":"trace-event:sha256:7cede1d931e4f609f3c6206190751ce3b3b69082840b7057ba451946906797a4"},{"relation":"ledger_parent_event","source":"trace-event:sha256:7cede1d931e4f609f3c6206190751ce3b3b69082840b7057ba451946906797a4","target":"trace-event:sha256:f2d0593cd8186892835154bd5037f3db293c2e12233b30813aa320e9595361ef"},{"relation":"ledger_parent_event","source":"trace-event:sha256:f2d0593cd8186892835154bd5037f3db293c2e12233b30813aa320e9595361ef","target":"trace-event:sha256:8422e51ca9a227e4ce1e72a4061ba4675aa28b63b1803e640ede9d4b733f2404"},{"relation":"ledger_parent_event","source":"trace-event:sha256:8422e51ca9a227e4ce1e72a4061ba4675aa28b63b1803e640ede9d4b733f2404","target":"trace-event:sha256:a9bb87eba3993af434c873e1b0935e6d90b180c0824bc8b3fb13e352c01ea7c1"},{"relation":"ledger_parent_event","source":"trace-event:sha256:a9bb87eba3993af434c873e1b0935e6d90b180c0824bc8b3fb13e352c01ea7c1","target":"trace-event:sha256:e3aa5b94a64502a0fbf44748165e8b2d3fca5f3964f990483f52d9855e5b1b59"}],"nodes":[{"data":{"decision_id":"task-ingress-decision:sha256:adbc1edbf4062739e35b65270579b05de5dd1826743d7ea77b4bf41c94f2efc0","domain_contract_pack_revision":"sha256:b4032b7b64c4c65c481cd45c84d8c31bd89af7d0a9fb7b70be1e6a93291caf5e","environment_ingress_id":"ingress:recorded:uah-smoke-find-cup","ingress_artifact_id":"environment-ingress:sha256:b14a66af406a77f528f95b65c6374c898ca373dd67f9090b9d9cdf8bc404f5cf"},"environment_run_id":"environment-run:nao-smoke:001","event_type":"task_started","id":"trace-event:sha256:6f04e34994504f41a503201387962bcb7974f0fdc5288cb68d66d6a9bd79d1f4","kind":"lifecycle_event","operation_id":null,"sequence":1,"task_id":"find_the_cup","trace_id":"trace:sha256:e7b30a3dc4fab39b098dfb9a91c6b473edd0459d66d2269494a294acb97ab9c0"},{"data":{"budgets":{"model_calls":0,"retry_attempts":0,"tool_calls":4,"wall_time_seconds":60},"compiled_task_id":"compiled-task:sha256:678452c347e29beeb2e5e6592d142c27f99d7ff2b38b7a69deff0de912239919","domain_contract_pack_revision":"sha256:b4032b7b64c4c65c481cd45c84d8c31bd89af7d0a9fb7b70be1e6a93291caf5e","frame_id":"nao_ros4hri","registry_version":"sha256:fb7f9ffaceed518ab0ea4045fbe2618196f358cba941b910b51b663ca6097ae3","role_id":"planner_llm"},"environment_run_id":"environment-run:nao-smoke:001","event_type":"task_compiled","id":"trace-event:sha256:34e4dc9a7c3082c86f422078b7b938e70148363c028e5860cc1567b9dd330d91","kind":"lifecycle_event","operation_id":null,"sequence":2,"task_id":"find_the_cup","trace_id":"trace:sha256:e7b30a3dc4fab39b098dfb9a91c6b473edd0459d66d2269494a294acb97ab9c0"},{"data":{"compiled_task_id":"compiled-task:sha256:678452c347e29beeb2e5e6592d142c27f99d7ff2b38b7a69deff0de912239919","object_id":"find_object","proposal_id":"proposal:sha256:0190e798b695cc16973fffac2875ba27751c353f932af4f7b947b4c3df30c54e"},"environment_run_id":"environment-run:nao-smoke:001","event_type":"proposal_normalized","id":"trace-event:sha256:fc34f0baac4866337a53a36222071f51fe2fcc2f13e4a350c63025a72bac4bfb","kind":"lifecycle_event","operation_id":"uah-smoke-find-cup:operation:step_1","sequence":3,"task_id":"find_the_cup","trace_id":"trace:sha256:e7b30a3dc4fab39b098dfb9a91c6b473edd0459d66d2269494a294acb97ab9c0"},{"data":{"ab_level":1,"admission_id":"admission:sha256:d447f94edb37c42ba18e31868b4de86afee18a324934fdc917bfff14538fa5c1","admitted_operation":{"ab_level":1,"admission_id":"admission:sha256:d447f94edb37c42ba18e31868b4de86afee18a324934fdc917bfff14538fa5c1","binding_fingerprint":"binding:sha256:e140de7336a910c33c013bd6addd9211618f23c174a662662d68888c2c322294","binding_id":"nao_fake.find_object.v1","binding_owner":"object_finder","binding_source_revision":"uah-smoke-v1","domain_contract_pack_revision":"sha256:b4032b7b64c4c65c481cd45c84d8c31bd89af7d0a9fb7b70be1e6a93291caf5e","effect_obligation_ids":["target_observed"],"environment_id":"nao_fake","evidence_adapter":"ab_harness_nao.smoke:fresh_detection","frame_id":"nao_ros4hri","input_schema_id":"input-schema:sha256:5b9e04eb5d392aad4f5e4cdfc8f722963f228a99b60437b88f5a48b46e467ccc","input_schema_ref":"schema://find_object/input/v1","object_snapshot":{"ab_level":1,"category":"perception","decomposes_to":["resolve_target_reference"],"expected_effects":["requested object localized"],"kind":"skill","object_id":"find_object","observable_success":["fresh detector-backed result returned"],"owner_package":"object_finder","runtime_callable":true},"output_schema_ref":"schema://find_object/result/v1","proposal":{"arguments_json":"{\"label\":\"cup\"}","compiled_task_id":"compiled-task:sha256:678452c347e29beeb2e5e6592d142c27f99d7ff2b38b7a69deff0de912239919","environment_run_id":"environment-run:nao-smoke:001","object_id":"find_object","operation_id":"uah-smoke-find-cup:operation:step_1","output_type":"executable_plan","proposal_id":"proposal:sha256:0190e798b695cc16973fffac2875ba27751c353f932af4f7b947b4c3df30c54e","raw_output_artifact_id":"model-output:sha256:689cbc3a6bf19bb5201de7d4c8de6af7935ad85553ebe88c986432dec81262a9","schema_version":"uah.typed_proposal/v1","task_id":"find_the_cup","trace_id":"trace:sha256:e7b30a3dc4fab39b098dfb9a91c6b473edd0459d66d2269494a294acb97ab9c0"},"runtime_mode":"smoke","schema_version":"uah.admitted_operation/v3"},"binding_id":"nao_fake.find_object.v1","binding_owner":"object_finder","frame_id":"nao_ros4hri","input_schema_id":"input-schema:sha256:5b9e04eb5d392aad4f5e4cdfc8f722963f228a99b60437b88f5a48b46e467ccc","object_id":"find_object","object_snapshot":{"ab_level":1,"category":"perception","decomposes_to":["resolve_target_reference"],"expected_effects":["requested object localized"],"kind":"skill","object_id":"find_object","observable_success":["fresh detector-backed result returned"],"owner_package":"object_finder","runtime_callable":true},"proposal_id":"proposal:sha256:0190e798b695cc16973fffac2875ba27751c353f932af4f7b947b4c3df30c54e","schema_version":"uah.admitted_operation/v3"},"environment_run_id":"environment-run:nao-smoke:001","event_type":"semantic_admission_accepted","id":"trace-event:sha256:9bcfe4f505d069c1cfc914ca0311339e7f3ef4d89b07da1b7da43beb82738898","kind":"lifecycle_event","operation_id":"uah-smoke-find-cup:operation:step_1","sequence":4,"task_id":"find_the_cup","trace_id":"trace:sha256:e7b30a3dc4fab39b098dfb9a91c6b473edd0459d66d2269494a294acb97ab9c0"},{"data":{"admission_id":"admission:sha256:d447f94edb37c42ba18e31868b4de86afee18a324934fdc917bfff14538fa5c1","binding_id":"nao_fake.find_object.v1","execution_lease_id":"execution-lease:sha256:7352fe5fc78c21c1ae5611a3ef40f04881f3bac53ea480052f716fe9ae3d4870","lease_owner_id":"nao_fake.lifecycle_owner","object_id":"find_object"},"environment_run_id":"environment-run:nao-smoke:001","event_type":"domain_admission_leased","id":"trace-event:sha256:ceb8a23a527aa3a79d2ee80201713644f2117dd1e87374ba0cba28e61bddd2dd","kind":"lifecycle_event","operation_id":"uah-smoke-find-cup:operation:step_1","sequence":5,"task_id":"find_the_cup","trace_id":"trace:sha256:e7b30a3dc4fab39b098dfb9a91c6b473edd0459d66d2269494a294acb97ab9c0"},{"data":{"compiled_task_id":"compiled-task:sha256:678452c347e29beeb2e5e6592d142c27f99d7ff2b38b7a69deff0de912239919","consumed_after":1,"consumed_before":0,"decision_id":"budget-decision:sha256:10bb5c123bf30416d6dc9965bef0bcacd57637d5feb61bfe66c842bb6fdc1150","environment_run_id":"environment-run:nao-smoke:001","limit":4,"outcome":"granted","reason_code":"within_budget","resource":"tool_call","schema_version":"uah.budget_decision/v1","subject_id":"uah-smoke-find-cup:operation:step_1","task_id":"find_the_cup","trace_id":"trace:sha256:e7b30a3dc4fab39b098dfb9a91c6b473edd0459d66d2269494a294acb97ab9c0","units":1},"environment_run_id":"environment-run:nao-smoke:001","event_type":"budget_granted","id":"trace-event:sha256:0c828820f33d71e25d2fd01c7b765e4a5deebde94bab1271bf3d5c6bf8b11a7b","kind":"lifecycle_event","operation_id":"uah-smoke-find-cup:operation:step_1","sequence":6,"task_id":"find_the_cup","trace_id":"trace:sha256:e7b30a3dc4fab39b098dfb9a91c6b473edd0459d66d2269494a294acb97ab9c0"},{"data":{"execution_lease_id":"execution-lease:sha256:7352fe5fc78c21c1ae5611a3ef40f04881f3bac53ea480052f716fe9ae3d4870"},"environment_run_id":"environment-run:nao-smoke:001","event_type":"execution_started","id":"trace-event:sha256:c2048c6ad4e2f0a2e05a86bbf9014812a49f1c17bc93e42e33b365471f96a37f","kind":"lifecycle_event","operation_id":"uah-smoke-find-cup:operation:step_1","sequence":7,"task_id":"find_the_cup","trace_id":"trace:sha256:e7b30a3dc4fab39b098dfb9a91c6b473edd0459d66d2269494a294acb97ab9c0"},{"data":{"admission_id":"admission:sha256:d447f94edb37c42ba18e31868b4de86afee18a324934fdc917bfff14538fa5c1","binding_id":"nao_fake.find_object.v1","execution_lease_id":"execution-lease:sha256:7352fe5fc78c21c1ae5611a3ef40f04881f3bac53ea480052f716fe9ae3d4870","execution_result_id":"execution-receipt:sha256:beba1a632ac63a3cb5a41ff3f4e2b53143222b38bad48eb782677b9b6a34c641","object_id":"find_object","owner":"object_finder","succeeded":true},"environment_run_id":"environment-run:nao-smoke:001","event_type":"execution_completed","id":"trace-event:sha256:822f13072c5f5ddbd7f14eac585a5d8cd79aa11e3cf1c0c8fa8c08c0f2a4d1ca","kind":"lifecycle_event","operation_id":"uah-smoke-find-cup:operation:step_1","sequence":8,"task_id":"find_the_cup","trace_id":"trace:sha256:e7b30a3dc4fab39b098dfb9a91c6b473edd0459d66d2269494a294acb97ab9c0"},{"data":{"binding_id":"nao_fake.find_object.v1","evidence_artifact_id":"effect-evidence:sha256:0b9bc69fdcaf286fd056d48ff42072fed6fe5556f9dd3f62beb53846ad2790b5","execution_lease_id":"execution-lease:sha256:7352fe5fc78c21c1ae5611a3ef40f04881f3bac53ea480052f716fe9ae3d4870","execution_result_id":"execution-receipt:sha256:beba1a632ac63a3cb5a41ff3f4e2b53143222b38bad48eb782677b9b6a34c641","native_evidence_ref":"builtin://uah-smoke/detection-cup","object_id":"find_object","observed_effects":["fresh detector-backed result returned"],"owner":"object_finder","succeeded":true},"environment_run_id":"environment-run:nao-smoke:001","event_type":"evidence_issued","id":"trace-event:sha256:1cc7971e709297bad88d80d17ad3362a8a167b9b8918e435a3f823eb0d00d8e2","kind":"lifecycle_event","operation_id":"uah-smoke-find-cup:operation:step_1","sequence":9,"task_id":"find_the_cup","trace_id":"trace:sha256:e7b30a3dc4fab39b098dfb9a91c6b473edd0459d66d2269494a294acb97ab9c0"},{"data":{"effect_id":"fresh detector-backed result returned","obligation_id":"target_observed","outcome":"satisfied","requirement":"required"},"environment_run_id":"environment-run:nao-smoke:001","event_type":"effect_obligation_satisfied","id":"trace-event:sha256:26996e65493fb8893476a3f76514b6f25af73c282dd0d66202f9774cab50745e","kind":"lifecycle_event","operation_id":null,"sequence":10,"task_id":"find_the_cup","trace_id":"trace:sha256:e7b30a3dc4fab39b098dfb9a91c6b473edd0459d66d2269494a294acb97ab9c0"},{"data":{"acceptance_id":"task-acceptance:sha256:4439808e05f522c011abb507913382147ef5ed29b24d4eee6e412370de323c7e","compiled_task_id":"compiled-task:sha256:678452c347e29beeb2e5e6592d142c27f99d7ff2b38b7a69deff0de912239919","deficit_obligation_ids":[],"evidence_artifact_ids":["effect-evidence:sha256:0b9bc69fdcaf286fd056d48ff42072fed6fe5556f9dd3f62beb53846ad2790b5"],"evidence_refs":["builtin://uah-smoke/detection-cup"],"failed_obligation_ids":[],"pending_obligation_ids":[],"satisfied_obligation_ids":["target_observed"],"status":"accepted"},"environment_run_id":"environment-run:nao-smoke:001","event_type":"terminal_task_accepted","id":"trace-event:sha256:1ca9ecf7d2699445522ab2f5b7553e77b71a34ba4f2cd972d413852bd3d377bd","kind":"lifecycle_event","operation_id":null,"sequence":11,"task_id":"find_the_cup","trace_id":"trace:sha256:e7b30a3dc4fab39b098dfb9a91c6b473edd0459d66d2269494a294acb97ab9c0"},{"data":{"decision_id":"task-ingress-decision:sha256:9858cfa8832ccc951b7c013dd7cd37d832d519e7e06d817701f89e7e3b7525c9","domain_contract_pack_revision":"sha256:b4032b7b64c4c65c481cd45c84d8c31bd89af7d0a9fb7b70be1e6a93291caf5e","environment_ingress_id":"ingress:recorded:uah-smoke-find-cup-rejected","ingress_artifact_id":"environment-ingress:sha256:85cef77db804c3bf58a48aa3bb997ec760389d9de1013ff7e1b419ebbac7431f"},"environment_run_id":"environment-run:nao-smoke:001","event_type":"task_started","id":"trace-event:sha256:050c78a56261a31a9fd690db789b2953d78625647e3156fd9f8ab14d69498c2a","kind":"lifecycle_event","operation_id":null,"sequence":12,"task_id":"find_the_cup_rejected","trace_id":"trace:sha256:871c1c1d533da872bfc74faba13b35bbeae126a07b32aa8d0bfb6ff1fa82db23"},{"data":{"budgets":{"model_calls":0,"retry_attempts":0,"tool_calls":4,"wall_time_seconds":60},"compiled_task_id":"compiled-task:sha256:28c5066d1b8bde6520192b9973b062db372640c20541124e3c422fe3ce67ef03","domain_contract_pack_revision":"sha256:b4032b7b64c4c65c481cd45c84d8c31bd89af7d0a9fb7b70be1e6a93291caf5e","frame_id":"nao_ros4hri","registry_version":"sha256:fb7f9ffaceed518ab0ea4045fbe2618196f358cba941b910b51b663ca6097ae3","role_id":"planner_llm"},"environment_run_id":"environment-run:nao-smoke:001","event_type":"task_compiled","id":"trace-event:sha256:8d77eb96972495f64e7d402cdbd3511799770c76317bca6b77fbbabade13883d","kind":"lifecycle_event","operation_id":null,"sequence":13,"task_id":"find_the_cup_rejected","trace_id":"trace:sha256:871c1c1d533da872bfc74faba13b35bbeae126a07b32aa8d0bfb6ff1fa82db23"},{"data":{"compiled_task_id":"compiled-task:sha256:28c5066d1b8bde6520192b9973b062db372640c20541124e3c422fe3ce67ef03","object_id":"walk_to","proposal_id":"proposal:sha256:45aa2ecfd3e38ce7b110e4c4266120d82d0c2301f8d4ac8039feafa1ec25a489"},"environment_run_id":"environment-run:nao-smoke:001","event_type":"proposal_normalized","id":"trace-event:sha256:ce9b51158f5b1ab36e7077f99a50ebdb8826cd1c39e8af64c6ca49463dc8bdac","kind":"lifecycle_event","operation_id":"uah-smoke-find-cup-rejected:operation:step_1","sequence":14,"task_id":"find_the_cup_rejected","trace_id":"trace:sha256:871c1c1d533da872bfc74faba13b35bbeae126a07b32aa8d0bfb6ff1fa82db23"},{"data":{"compiled_task_id":"compiled-task:sha256:28c5066d1b8bde6520192b9973b062db372640c20541124e3c422fe3ce67ef03","proposal_id":"proposal:sha256:45aa2ecfd3e38ce7b110e4c4266120d82d0c2301f8d4ac8039feafa1ec25a489","reason_codes":["object_outside_projection","missing_effect_obligation"],"rejection_id":"semantic-rejection:sha256:32f72a1fd3f1aa5b07cfac423d9d4887658ffc1716a0d07b6e49a062ccdca2c1"},"environment_run_id":"environment-run:nao-smoke:001","event_type":"semantic_admission_rejected","id":"trace-event:sha256:e5ea4c871f3c5f06afddf98559dfc441c2a21311833afe4a449aaaa709d1985a","kind":"lifecycle_event","operation_id":"uah-smoke-find-cup-rejected:operation:step_1","sequence":15,"task_id":"find_the_cup_rejected","trace_id":"trace:sha256:871c1c1d533da872bfc74faba13b35bbeae126a07b32aa8d0bfb6ff1fa82db23"},{"data":{"decision_id":"task-ingress-decision:sha256:6273daeca3d11d7380baf8940504a335bab7cec7eaf13bf1791390905517cabb","domain_contract_pack_revision":"sha256:b4032b7b64c4c65c481cd45c84d8c31bd89af7d0a9fb7b70be1e6a93291caf5e","environment_ingress_id":"ingress:recorded:uah-smoke-find-bottle-counterexample","ingress_artifact_id":"environment-ingress:sha256:db033854332aad6f86f08040cd69c30bfb07312eb2c423d8154eabce088484d8"},"environment_run_id":"environment-run:nao-smoke:001","event_type":"task_started","id":"trace-event:sha256:21ef20e022a908b06608892dcf45a0c1c295ac9844b7013238378fadf2399f29","kind":"lifecycle_event","operation_id":null,"sequence":16,"task_id":"find_the_bottle_counterexample","trace_id":"trace:sha256:24944c17eadbd21a4e6330a6098acd4a091bc1caee3e95ddaa24b155450aa731"},{"data":{"budgets":{"model_calls":0,"retry_attempts":0,"tool_calls":4,"wall_time_seconds":60},"compiled_task_id":"compiled-task:sha256:ede4c14769501abfd644c2c57bd532210aead3f8eba4ed6556c6402eef0f3c30","domain_contract_pack_revision":"sha256:b4032b7b64c4c65c481cd45c84d8c31bd89af7d0a9fb7b70be1e6a93291caf5e","frame_id":"nao_ros4hri","registry_version":"sha256:fb7f9ffaceed518ab0ea4045fbe2618196f358cba941b910b51b663ca6097ae3","role_id":"planner_llm"},"environment_run_id":"environment-run:nao-smoke:001","event_type":"task_compiled","id":"trace-event:sha256:e51753824db9aef442243d4328d5642d56b363dbab89c5399985654387c57919","kind":"lifecycle_event","operation_id":null,"sequence":17,"task_id":"find_the_bottle_counterexample","trace_id":"trace:sha256:24944c17eadbd21a4e6330a6098acd4a091bc1caee3e95ddaa24b155450aa731"},{"data":{"compiled_task_id":"compiled-task:sha256:ede4c14769501abfd644c2c57bd532210aead3f8eba4ed6556c6402eef0f3c30","object_id":"find_object","proposal_id":"proposal:sha256:7015bb0caccfa718e29a52652fa87aecab1ac81717df979da57d4306877e641a"},"environment_run_id":"environment-run:nao-smoke:001","event_type":"proposal_normalized","id":"trace-event:sha256:21ea06115425ba09813cc6dfaa7b77bfd41d167eb2fe0516448832fa5069cc39","kind":"lifecycle_event","operation_id":"uah-smoke-find-bottle-counterexample:operation:step_1","sequence":18,"task_id":"find_the_bottle_counterexample","trace_id":"trace:sha256:24944c17eadbd21a4e6330a6098acd4a091bc1caee3e95ddaa24b155450aa731"},{"data":{"ab_level":1,"admission_id":"admission:sha256:4a9ec13dd6fdc8d5b36b259d1089d401555e99bb90051e1a84d8b12d7986bb57","admitted_operation":{"ab_level":1,"admission_id":"admission:sha256:4a9ec13dd6fdc8d5b36b259d1089d401555e99bb90051e1a84d8b12d7986bb57","binding_fingerprint":"binding:sha256:e140de7336a910c33c013bd6addd9211618f23c174a662662d68888c2c322294","binding_id":"nao_fake.find_object.v1","binding_owner":"object_finder","binding_source_revision":"uah-smoke-v1","domain_contract_pack_revision":"sha256:b4032b7b64c4c65c481cd45c84d8c31bd89af7d0a9fb7b70be1e6a93291caf5e","effect_obligation_ids":["target_observed"],"environment_id":"nao_fake","evidence_adapter":"ab_harness_nao.smoke:fresh_detection","frame_id":"nao_ros4hri","input_schema_id":"input-schema:sha256:5b9e04eb5d392aad4f5e4cdfc8f722963f228a99b60437b88f5a48b46e467ccc","input_schema_ref":"schema://find_object/input/v1","object_snapshot":{"ab_level":1,"category":"perception","decomposes_to":["resolve_target_reference"],"expected_effects":["requested object localized"],"kind":"skill","object_id":"find_object","observable_success":["fresh detector-backed result returned"],"owner_package":"object_finder","runtime_callable":true},"output_schema_ref":"schema://find_object/result/v1","proposal":{"arguments_json":"{\"label\":\"bottle\"}","compiled_task_id":"compiled-task:sha256:ede4c14769501abfd644c2c57bd532210aead3f8eba4ed6556c6402eef0f3c30","environment_run_id":"environment-run:nao-smoke:001","object_id":"find_object","operation_id":"uah-smoke-find-bottle-counterexample:operation:step_1","output_type":"executable_plan","proposal_id":"proposal:sha256:7015bb0caccfa718e29a52652fa87aecab1ac81717df979da57d4306877e641a","raw_output_artifact_id":"model-output:sha256:10a7f6aedb297988b0568df1339ae096e6215586e8ee8beba44e1757d6c3f31e","schema_version":"uah.typed_proposal/v1","task_id":"find_the_bottle_counterexample","trace_id":"trace:sha256:24944c17eadbd21a4e6330a6098acd4a091bc1caee3e95ddaa24b155450aa731"},"runtime_mode":"smoke","schema_version":"uah.admitted_operation/v3"},"binding_id":"nao_fake.find_object.v1","binding_owner":"object_finder","frame_id":"nao_ros4hri","input_schema_id":"input-schema:sha256:5b9e04eb5d392aad4f5e4cdfc8f722963f228a99b60437b88f5a48b46e467ccc","object_id":"find_object","object_snapshot":{"ab_level":1,"category":"perception","decomposes_to":["resolve_target_reference"],"expected_effects":["requested object localized"],"kind":"skill","object_id":"find_object","observable_success":["fresh detector-backed result returned"],"owner_package":"object_finder","runtime_callable":true},"proposal_id":"proposal:sha256:7015bb0caccfa718e29a52652fa87aecab1ac81717df979da57d4306877e641a","schema_version":"uah.admitted_operation/v3"},"environment_run_id":"environment-run:nao-smoke:001","event_type":"semantic_admission_accepted","id":"trace-event:sha256:b2dc0580334b4e9755fee0592ec804c4859a6bec1f01c95a2f9c34613cda81c2","kind":"lifecycle_event","operation_id":"uah-smoke-find-bottle-counterexample:operation:step_1","sequence":19,"task_id":"find_the_bottle_counterexample","trace_id":"trace:sha256:24944c17eadbd21a4e6330a6098acd4a091bc1caee3e95ddaa24b155450aa731"},{"data":{"admission_id":"admission:sha256:4a9ec13dd6fdc8d5b36b259d1089d401555e99bb90051e1a84d8b12d7986bb57","binding_id":"nao_fake.find_object.v1","execution_lease_id":"execution-lease:sha256:16977a725adbd74e96d6ef01f961ad0f32220c54350acaf27027b9a8fbbf4208","lease_owner_id":"nao_fake.lifecycle_owner","object_id":"find_object"},"environment_run_id":"environment-run:nao-smoke:001","event_type":"domain_admission_leased","id":"trace-event:sha256:430c9a5398f22b280a26060db594a9a0317ad802da69814741f4095eb88fc004","kind":"lifecycle_event","operation_id":"uah-smoke-find-bottle-counterexample:operation:step_1","sequence":20,"task_id":"find_the_bottle_counterexample","trace_id":"trace:sha256:24944c17eadbd21a4e6330a6098acd4a091bc1caee3e95ddaa24b155450aa731"},{"data":{"compiled_task_id":"compiled-task:sha256:ede4c14769501abfd644c2c57bd532210aead3f8eba4ed6556c6402eef0f3c30","consumed_after":1,"consumed_before":0,"decision_id":"budget-decision:sha256:6992517ec234100b233b36ef3790165f9bac824583b3b91aab8f5c3dc00cf0fb","environment_run_id":"environment-run:nao-smoke:001","limit":4,"outcome":"granted","reason_code":"within_budget","resource":"tool_call","schema_version":"uah.budget_decision/v1","subject_id":"uah-smoke-find-bottle-counterexample:operation:step_1","task_id":"find_the_bottle_counterexample","trace_id":"trace:sha256:24944c17eadbd21a4e6330a6098acd4a091bc1caee3e95ddaa24b155450aa731","units":1},"environment_run_id":"environment-run:nao-smoke:001","event_type":"budget_granted","id":"trace-event:sha256:c1e890aa00798b361c6919512f2827a8bb3ed03af62800c6ea293690167275cc","kind":"lifecycle_event","operation_id":"uah-smoke-find-bottle-counterexample:operation:step_1","sequence":21,"task_id":"find_the_bottle_counterexample","trace_id":"trace:sha256:24944c17eadbd21a4e6330a6098acd4a091bc1caee3e95ddaa24b155450aa731"},{"data":{"execution_lease_id":"execution-lease:sha256:16977a725adbd74e96d6ef01f961ad0f32220c54350acaf27027b9a8fbbf4208"},"environment_run_id":"environment-run:nao-smoke:001","event_type":"execution_started","id":"trace-event:sha256:7cede1d931e4f609f3c6206190751ce3b3b69082840b7057ba451946906797a4","kind":"lifecycle_event","operation_id":"uah-smoke-find-bottle-counterexample:operation:step_1","sequence":22,"task_id":"find_the_bottle_counterexample","trace_id":"trace:sha256:24944c17eadbd21a4e6330a6098acd4a091bc1caee3e95ddaa24b155450aa731"},{"data":{"admission_id":"admission:sha256:4a9ec13dd6fdc8d5b36b259d1089d401555e99bb90051e1a84d8b12d7986bb57","binding_id":"nao_fake.find_object.v1","execution_lease_id":"execution-lease:sha256:16977a725adbd74e96d6ef01f961ad0f32220c54350acaf27027b9a8fbbf4208","execution_result_id":"execution-receipt:sha256:54e3923756d64528b627066a14d3fd231f9945ac22ffeb8c004326e1c84de127","object_id":"find_object","owner":"object_finder","succeeded":false},"environment_run_id":"environment-run:nao-smoke:001","event_type":"execution_completed","id":"trace-event:sha256:f2d0593cd8186892835154bd5037f3db293c2e12233b30813aa320e9595361ef","kind":"lifecycle_event","operation_id":"uah-smoke-find-bottle-counterexample:operation:step_1","sequence":23,"task_id":"find_the_bottle_counterexample","trace_id":"trace:sha256:24944c17eadbd21a4e6330a6098acd4a091bc1caee3e95ddaa24b155450aa731"},{"data":{"binding_id":"nao_fake.find_object.v1","evidence_artifact_id":"effect-evidence:sha256:028f6bb50ae892af13d8488bb979634cd8f9ebf38e25c78dc6028885d891c617","execution_lease_id":"execution-lease:sha256:16977a725adbd74e96d6ef01f961ad0f32220c54350acaf27027b9a8fbbf4208","execution_result_id":"execution-receipt:sha256:54e3923756d64528b627066a14d3fd231f9945ac22ffeb8c004326e1c84de127","native_evidence_ref":"builtin://uah-smoke/detection-bottle","object_id":"find_object","observed_effects":[],"owner":"object_finder","succeeded":false},"environment_run_id":"environment-run:nao-smoke:001","event_type":"evidence_issued","id":"trace-event:sha256:8422e51ca9a227e4ce1e72a4061ba4675aa28b63b1803e640ede9d4b733f2404","kind":"lifecycle_event","operation_id":"uah-smoke-find-bottle-counterexample:operation:step_1","sequence":24,"task_id":"find_the_bottle_counterexample","trace_id":"trace:sha256:24944c17eadbd21a4e6330a6098acd4a091bc1caee3e95ddaa24b155450aa731"},{"data":{"effect_id":"fresh detector-backed result returned","obligation_id":"target_observed","outcome":"failed","requirement":"required"},"environment_run_id":"environment-run:nao-smoke:001","event_type":"effect_obligation_failed","id":"trace-event:sha256:a9bb87eba3993af434c873e1b0935e6d90b180c0824bc8b3fb13e352c01ea7c1","kind":"lifecycle_event","operation_id":null,"sequence":25,"task_id":"find_the_bottle_counterexample","trace_id":"trace:sha256:24944c17eadbd21a4e6330a6098acd4a091bc1caee3e95ddaa24b155450aa731"},{"data":{"acceptance_id":"task-acceptance:sha256:96a3b4ace1459de4c144fc68bcec3a89403fca92013b20931b5e88c91d53f8e8","compiled_task_id":"compiled-task:sha256:ede4c14769501abfd644c2c57bd532210aead3f8eba4ed6556c6402eef0f3c30","deficit_obligation_ids":[],"evidence_artifact_ids":["effect-evidence:sha256:028f6bb50ae892af13d8488bb979634cd8f9ebf38e25c78dc6028885d891c617"],"evidence_refs":["builtin://uah-smoke/detection-bottle"],"failed_obligation_ids":["target_observed"],"pending_obligation_ids":[],"satisfied_obligation_ids":[],"status":"rejected"},"environment_run_id":"environment-run:nao-smoke:001","event_type":"terminal_task_rejected","id":"trace-event:sha256:e3aa5b94a64502a0fbf44748165e8b2d3fca5f3964f990483f52d9855e5b1b59","kind":"lifecycle_event","operation_id":null,"sequence":26,"task_id":"find_the_bottle_counterexample","trace_id":"trace:sha256:24944c17eadbd21a4e6330a6098acd4a091bc1caee3e95ddaa24b155450aa731"},{"id":"operation-node:trace:sha256:24944c17eadbd21a4e6330a6098acd4a091bc1caee3e95ddaa24b155450aa731:uah-smoke-find-bottle-counterexample:operation:step_1","kind":"operation","operation_id":"uah-smoke-find-bottle-counterexample:operation:step_1","trace_id":"trace:sha256:24944c17eadbd21a4e6330a6098acd4a091bc1caee3e95ddaa24b155450aa731"},{"id":"operation-node:trace:sha256:871c1c1d533da872bfc74faba13b35bbeae126a07b32aa8d0bfb6ff1fa82db23:uah-smoke-find-cup-rejected:operation:step_1","kind":"operation","operation_id":"uah-smoke-find-cup-rejected:operation:step_1","trace_id":"trace:sha256:871c1c1d533da872bfc74faba13b35bbeae126a07b32aa8d0bfb6ff1fa82db23"},{"id":"operation-node:trace:sha256:e7b30a3dc4fab39b098dfb9a91c6b473edd0459d66d2269494a294acb97ab9c0:uah-smoke-find-cup:operation:step_1","kind":"operation","operation_id":"uah-smoke-find-cup:operation:step_1","trace_id":"trace:sha256:e7b30a3dc4fab39b098dfb9a91c6b473edd0459d66d2269494a294acb97ab9c0"}],"schema_version":"uah.observatory_graph/v1"}</script>
+  </main>
+  <script>
+    (() => {
+      const traces = Array.from(document.querySelectorAll('.trace,.agent-run'));
+      const query = document.getElementById('query');
+      const status = document.getElementById('status');
+      const eventType = document.getElementById('event-type');
+      const apply = () => {
+        const q = query.value.trim().toLowerCase();
+        for (const trace of traces) {
+          const matchesQuery = !q || trace.dataset.searchable.includes(q);
+          const matchesStatus = !status.value || trace.dataset.status === status.value;
+          const matchesType = !eventType.value || trace.dataset.eventTypes.split(' ').includes(eventType.value);
+          trace.classList.toggle('hidden', !(matchesQuery && matchesStatus && matchesType));
+        }
+      };
+      query.addEventListener('input', apply);
+      status.addEventListener('change', apply);
+      eventType.addEventListener('change', apply);
+    })();
+  </script>
+</body>
+</html>

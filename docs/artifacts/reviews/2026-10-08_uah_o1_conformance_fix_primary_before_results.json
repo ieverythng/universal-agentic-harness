@@ -1,0 +1,2436 @@
+{
+  "mismatches": 60,
+  "results": [
+    {
+      "actual": {
+        "actors": [],
+        "environments": [
+          "environment:independent"
+        ],
+        "events": [
+          "trace-event:sha256:8f27aa86ddf54a785dba685c5e3c615e21adcd77e0cdeb3ffba1cf3ca8b96ea4"
+        ],
+        "label": "synthetic",
+        "traces": [
+          [
+            "trace:independent",
+            "accepted"
+          ]
+        ]
+      },
+      "case": "valid-v1-task",
+      "consumer": "project",
+      "expected": "accept",
+      "generator": false,
+      "matches": true
+    },
+    {
+      "actual": {
+        "actors": [],
+        "environments": [
+          "environment:independent"
+        ],
+        "events": [
+          "trace-event:sha256:8f27aa86ddf54a785dba685c5e3c615e21adcd77e0cdeb3ffba1cf3ca8b96ea4"
+        ],
+        "label": "synthetic",
+        "traces": [
+          [
+            "trace:independent",
+            "accepted"
+          ]
+        ]
+      },
+      "case": "valid-v1-task",
+      "consumer": "project",
+      "expected": "accept",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "actors": [],
+        "environments": [
+          "environment:independent"
+        ],
+        "events": [
+          "trace-event:sha256:8f27aa86ddf54a785dba685c5e3c615e21adcd77e0cdeb3ffba1cf3ca8b96ea4"
+        ],
+        "graph_html_agree": true,
+        "label": "synthetic",
+        "traces": [
+          [
+            "trace:independent",
+            "accepted"
+          ]
+        ]
+      },
+      "case": "valid-v1-task",
+      "consumer": "render",
+      "expected": "accept",
+      "generator": false,
+      "matches": true
+    },
+    {
+      "actual": {
+        "actors": [],
+        "environments": [
+          "environment:independent"
+        ],
+        "events": [
+          "trace-event:sha256:8f27aa86ddf54a785dba685c5e3c615e21adcd77e0cdeb3ffba1cf3ca8b96ea4"
+        ],
+        "graph_html_agree": true,
+        "label": "synthetic",
+        "traces": [
+          [
+            "trace:independent",
+            "accepted"
+          ]
+        ]
+      },
+      "case": "valid-v1-task",
+      "consumer": "render",
+      "expected": "accept",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "actors": [
+          "actor:one"
+        ],
+        "environments": [
+          "environment:independent"
+        ],
+        "events": [
+          "trace-event:sha256:5b5a634a83bf3eaadfcc4767074414d7c04a3c59c825383eac091585a4189536"
+        ],
+        "label": "synthetic",
+        "traces": [
+          [
+            "trace:independent",
+            "accepted"
+          ]
+        ]
+      },
+      "case": "valid-v2-task",
+      "consumer": "project",
+      "expected": "accept",
+      "generator": false,
+      "matches": true
+    },
+    {
+      "actual": {
+        "actors": [
+          "actor:one"
+        ],
+        "environments": [
+          "environment:independent"
+        ],
+        "events": [
+          "trace-event:sha256:5b5a634a83bf3eaadfcc4767074414d7c04a3c59c825383eac091585a4189536"
+        ],
+        "label": "synthetic",
+        "traces": [
+          [
+            "trace:independent",
+            "accepted"
+          ]
+        ]
+      },
+      "case": "valid-v2-task",
+      "consumer": "project",
+      "expected": "accept",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "actors": [
+          "actor:one"
+        ],
+        "environments": [
+          "environment:independent"
+        ],
+        "events": [
+          "trace-event:sha256:5b5a634a83bf3eaadfcc4767074414d7c04a3c59c825383eac091585a4189536"
+        ],
+        "graph_html_agree": true,
+        "label": "synthetic",
+        "traces": [
+          [
+            "trace:independent",
+            "accepted"
+          ]
+        ]
+      },
+      "case": "valid-v2-task",
+      "consumer": "render",
+      "expected": "accept",
+      "generator": false,
+      "matches": true
+    },
+    {
+      "actual": {
+        "actors": [
+          "actor:one"
+        ],
+        "environments": [
+          "environment:independent"
+        ],
+        "events": [
+          "trace-event:sha256:5b5a634a83bf3eaadfcc4767074414d7c04a3c59c825383eac091585a4189536"
+        ],
+        "graph_html_agree": true,
+        "label": "synthetic",
+        "traces": [
+          [
+            "trace:independent",
+            "accepted"
+          ]
+        ]
+      },
+      "case": "valid-v2-task",
+      "consumer": "render",
+      "expected": "accept",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "actors": [
+          "actor:one"
+        ],
+        "environments": [
+          "environment:independent"
+        ],
+        "events": [
+          "trace-event:sha256:8e38fca0069665242e33d0d48acbdb923059a613015361dff1caa2587927f374"
+        ],
+        "label": "synthetic",
+        "traces": []
+      },
+      "case": "valid-v2-agent",
+      "consumer": "project",
+      "expected": "accept",
+      "generator": false,
+      "matches": true
+    },
+    {
+      "actual": {
+        "actors": [
+          "actor:one"
+        ],
+        "environments": [
+          "environment:independent"
+        ],
+        "events": [
+          "trace-event:sha256:8e38fca0069665242e33d0d48acbdb923059a613015361dff1caa2587927f374"
+        ],
+        "label": "synthetic",
+        "traces": []
+      },
+      "case": "valid-v2-agent",
+      "consumer": "project",
+      "expected": "accept",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "actors": [
+          "actor:one"
+        ],
+        "environments": [
+          "environment:independent"
+        ],
+        "events": [
+          "trace-event:sha256:8e38fca0069665242e33d0d48acbdb923059a613015361dff1caa2587927f374"
+        ],
+        "graph_html_agree": true,
+        "label": "synthetic",
+        "traces": []
+      },
+      "case": "valid-v2-agent",
+      "consumer": "render",
+      "expected": "accept",
+      "generator": false,
+      "matches": true
+    },
+    {
+      "actual": {
+        "actors": [
+          "actor:one"
+        ],
+        "environments": [
+          "environment:independent"
+        ],
+        "events": [
+          "trace-event:sha256:8e38fca0069665242e33d0d48acbdb923059a613015361dff1caa2587927f374"
+        ],
+        "graph_html_agree": true,
+        "label": "synthetic",
+        "traces": []
+      },
+      "case": "valid-v2-agent",
+      "consumer": "render",
+      "expected": "accept",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "actors": [
+          "actor:one",
+          "actor:two"
+        ],
+        "environments": [
+          "environment:independent"
+        ],
+        "events": [
+          "trace-event:sha256:8f27aa86ddf54a785dba685c5e3c615e21adcd77e0cdeb3ffba1cf3ca8b96ea4",
+          "trace-event:sha256:67dcc66da79442c889a48814d8c7853c8ead574ed4e78e754a897939ef3e1297",
+          "trace-event:sha256:c54e6a561855f02c378d02117502ad12440b6e850546f9e2b1b82f4151039444"
+        ],
+        "graph_html_agree": true,
+        "label": "synthetic",
+        "traces": [
+          [
+            "trace:independent",
+            "accepted"
+          ]
+        ]
+      },
+      "case": "mixed-order-0",
+      "consumer": "render",
+      "expected": "accept",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "actors": [
+          "actor:one",
+          "actor:two"
+        ],
+        "environments": [
+          "environment:independent"
+        ],
+        "events": [
+          "trace-event:sha256:8f27aa86ddf54a785dba685c5e3c615e21adcd77e0cdeb3ffba1cf3ca8b96ea4",
+          "trace-event:sha256:67dcc66da79442c889a48814d8c7853c8ead574ed4e78e754a897939ef3e1297",
+          "trace-event:sha256:c54e6a561855f02c378d02117502ad12440b6e850546f9e2b1b82f4151039444"
+        ],
+        "graph_html_agree": true,
+        "label": "synthetic",
+        "traces": [
+          [
+            "trace:independent",
+            "accepted"
+          ]
+        ]
+      },
+      "case": "mixed-order-1",
+      "consumer": "render",
+      "expected": "accept",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "actors": [
+          "actor:one",
+          "actor:two"
+        ],
+        "environments": [
+          "environment:independent"
+        ],
+        "events": [
+          "trace-event:sha256:8f27aa86ddf54a785dba685c5e3c615e21adcd77e0cdeb3ffba1cf3ca8b96ea4",
+          "trace-event:sha256:67dcc66da79442c889a48814d8c7853c8ead574ed4e78e754a897939ef3e1297",
+          "trace-event:sha256:c54e6a561855f02c378d02117502ad12440b6e850546f9e2b1b82f4151039444"
+        ],
+        "graph_html_agree": true,
+        "label": "synthetic",
+        "traces": [
+          [
+            "trace:independent",
+            "accepted"
+          ]
+        ]
+      },
+      "case": "mixed-order-2",
+      "consumer": "render",
+      "expected": "accept",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "actors": [
+          "actor:one",
+          "actor:two"
+        ],
+        "environments": [
+          "environment:independent"
+        ],
+        "events": [
+          "trace-event:sha256:8f27aa86ddf54a785dba685c5e3c615e21adcd77e0cdeb3ffba1cf3ca8b96ea4",
+          "trace-event:sha256:67dcc66da79442c889a48814d8c7853c8ead574ed4e78e754a897939ef3e1297",
+          "trace-event:sha256:c54e6a561855f02c378d02117502ad12440b6e850546f9e2b1b82f4151039444"
+        ],
+        "graph_html_agree": true,
+        "label": "synthetic",
+        "traces": [
+          [
+            "trace:independent",
+            "accepted"
+          ]
+        ]
+      },
+      "case": "mixed-order-3",
+      "consumer": "render",
+      "expected": "accept",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "actors": [
+          "actor:one",
+          "actor:two"
+        ],
+        "environments": [
+          "environment:independent"
+        ],
+        "events": [
+          "trace-event:sha256:8f27aa86ddf54a785dba685c5e3c615e21adcd77e0cdeb3ffba1cf3ca8b96ea4",
+          "trace-event:sha256:67dcc66da79442c889a48814d8c7853c8ead574ed4e78e754a897939ef3e1297",
+          "trace-event:sha256:c54e6a561855f02c378d02117502ad12440b6e850546f9e2b1b82f4151039444"
+        ],
+        "graph_html_agree": true,
+        "label": "synthetic",
+        "traces": [
+          [
+            "trace:independent",
+            "accepted"
+          ]
+        ]
+      },
+      "case": "mixed-order-4",
+      "consumer": "render",
+      "expected": "accept",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "actors": [
+          "actor:one",
+          "actor:two"
+        ],
+        "environments": [
+          "environment:independent"
+        ],
+        "events": [
+          "trace-event:sha256:8f27aa86ddf54a785dba685c5e3c615e21adcd77e0cdeb3ffba1cf3ca8b96ea4",
+          "trace-event:sha256:67dcc66da79442c889a48814d8c7853c8ead574ed4e78e754a897939ef3e1297",
+          "trace-event:sha256:c54e6a561855f02c378d02117502ad12440b6e850546f9e2b1b82f4151039444"
+        ],
+        "graph_html_agree": true,
+        "label": "synthetic",
+        "traces": [
+          [
+            "trace:independent",
+            "accepted"
+          ]
+        ]
+      },
+      "case": "mixed-order-5",
+      "consumer": "render",
+      "expected": "accept",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "actors": [],
+        "environments": [],
+        "events": [],
+        "label": "synthetic",
+        "traces": []
+      },
+      "case": "empty",
+      "consumer": "project",
+      "expected": "accept",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "actors": [],
+        "environments": [],
+        "events": [],
+        "graph_html_agree": true,
+        "label": "synthetic",
+        "traces": []
+      },
+      "case": "empty",
+      "consumer": "render",
+      "expected": "accept",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": "accepted",
+      "case": "explicit-status-terminal_task_accepted",
+      "expected": "accepted",
+      "matches": true
+    },
+    {
+      "actual": "accepted",
+      "case": "explicit-status-terminal_task_accepted_with_deficit",
+      "expected": "accepted",
+      "matches": true
+    },
+    {
+      "actual": "rejected",
+      "case": "explicit-status-terminal_task_rejected",
+      "expected": "rejected",
+      "matches": true
+    },
+    {
+      "actual": "open",
+      "case": "explicit-status-execution_failed",
+      "expected": "open",
+      "matches": true
+    },
+    {
+      "actual": "open",
+      "case": "explicit-status-semantic_admission_rejected",
+      "expected": "open",
+      "matches": true
+    },
+    {
+      "actual": "open",
+      "case": "explicit-status-budget_exhausted",
+      "expected": "open",
+      "matches": true
+    },
+    {
+      "actual": "open",
+      "case": "explicit-status-retry_exhausted",
+      "expected": "open",
+      "matches": true
+    },
+    {
+      "actual": {
+        "actors": [
+          "actor:forged"
+        ],
+        "environments": [
+          "environment:independent"
+        ],
+        "events": [
+          "trace-event:sha256:8f27aa86ddf54a785dba685c5e3c615e21adcd77e0cdeb3ffba1cf3ca8b96ea4"
+        ],
+        "label": "synthetic",
+        "traces": [
+          [
+            "trace:independent",
+            "accepted"
+          ]
+        ]
+      },
+      "case": "v1-excluded-{'agent_run_id': 'actor:forged'}",
+      "consumer": "project",
+      "expected": "reject",
+      "generator": false,
+      "matches": false
+    },
+    {
+      "actual": {
+        "actors": [
+          "actor:forged"
+        ],
+        "environments": [
+          "environment:independent"
+        ],
+        "events": [
+          "trace-event:sha256:8f27aa86ddf54a785dba685c5e3c615e21adcd77e0cdeb3ffba1cf3ca8b96ea4"
+        ],
+        "label": "synthetic",
+        "traces": [
+          [
+            "trace:independent",
+            "accepted"
+          ]
+        ]
+      },
+      "case": "v1-excluded-{'agent_run_id': 'actor:forged'}",
+      "consumer": "project",
+      "expected": "reject",
+      "generator": true,
+      "matches": false
+    },
+    {
+      "actual": {
+        "actors": [
+          "actor:forged"
+        ],
+        "environments": [
+          "environment:independent"
+        ],
+        "events": [
+          "trace-event:sha256:8f27aa86ddf54a785dba685c5e3c615e21adcd77e0cdeb3ffba1cf3ca8b96ea4"
+        ],
+        "graph_html_agree": true,
+        "label": "synthetic",
+        "traces": [
+          [
+            "trace:independent",
+            "accepted"
+          ]
+        ]
+      },
+      "case": "v1-excluded-{'agent_run_id': 'actor:forged'}",
+      "consumer": "render",
+      "expected": "reject",
+      "generator": false,
+      "matches": false
+    },
+    {
+      "actual": {
+        "actors": [
+          "actor:forged"
+        ],
+        "environments": [
+          "environment:independent"
+        ],
+        "events": [
+          "trace-event:sha256:8f27aa86ddf54a785dba685c5e3c615e21adcd77e0cdeb3ffba1cf3ca8b96ea4"
+        ],
+        "graph_html_agree": true,
+        "label": "synthetic",
+        "traces": [
+          [
+            "trace:independent",
+            "accepted"
+          ]
+        ]
+      },
+      "case": "v1-excluded-{'agent_run_id': 'actor:forged'}",
+      "consumer": "render",
+      "expected": "reject",
+      "generator": true,
+      "matches": false
+    },
+    {
+      "actual": {
+        "actors": [],
+        "environments": [
+          "environment:independent"
+        ],
+        "events": [
+          "trace-event:sha256:8f27aa86ddf54a785dba685c5e3c615e21adcd77e0cdeb3ffba1cf3ca8b96ea4"
+        ],
+        "label": "synthetic",
+        "traces": []
+      },
+      "case": "v1-excluded-{'event_scope': 'agent'}",
+      "consumer": "project",
+      "expected": "reject",
+      "generator": false,
+      "matches": false
+    },
+    {
+      "actual": {
+        "actors": [],
+        "environments": [
+          "environment:independent"
+        ],
+        "events": [
+          "trace-event:sha256:8f27aa86ddf54a785dba685c5e3c615e21adcd77e0cdeb3ffba1cf3ca8b96ea4"
+        ],
+        "label": "synthetic",
+        "traces": []
+      },
+      "case": "v1-excluded-{'event_scope': 'agent'}",
+      "consumer": "project",
+      "expected": "reject",
+      "generator": true,
+      "matches": false
+    },
+    {
+      "actual": {
+        "actors": [],
+        "environments": [
+          "environment:independent"
+        ],
+        "events": [
+          "trace-event:sha256:8f27aa86ddf54a785dba685c5e3c615e21adcd77e0cdeb3ffba1cf3ca8b96ea4"
+        ],
+        "graph_html_agree": true,
+        "label": "synthetic",
+        "traces": []
+      },
+      "case": "v1-excluded-{'event_scope': 'agent'}",
+      "consumer": "render",
+      "expected": "reject",
+      "generator": false,
+      "matches": false
+    },
+    {
+      "actual": {
+        "actors": [],
+        "environments": [
+          "environment:independent"
+        ],
+        "events": [
+          "trace-event:sha256:8f27aa86ddf54a785dba685c5e3c615e21adcd77e0cdeb3ffba1cf3ca8b96ea4"
+        ],
+        "graph_html_agree": true,
+        "label": "synthetic",
+        "traces": []
+      },
+      "case": "v1-excluded-{'event_scope': 'agent'}",
+      "consumer": "render",
+      "expected": "reject",
+      "generator": true,
+      "matches": false
+    },
+    {
+      "actual": {
+        "actors": [
+          "actor:forged"
+        ],
+        "environments": [
+          "environment:independent"
+        ],
+        "events": [
+          "trace-event:sha256:8f27aa86ddf54a785dba685c5e3c615e21adcd77e0cdeb3ffba1cf3ca8b96ea4"
+        ],
+        "label": "synthetic",
+        "traces": []
+      },
+      "case": "v1-excluded-{'event_scope': 'agent', 'agent_run_id': 'actor:forged'}",
+      "consumer": "project",
+      "expected": "reject",
+      "generator": false,
+      "matches": false
+    },
+    {
+      "actual": {
+        "actors": [
+          "actor:forged"
+        ],
+        "environments": [
+          "environment:independent"
+        ],
+        "events": [
+          "trace-event:sha256:8f27aa86ddf54a785dba685c5e3c615e21adcd77e0cdeb3ffba1cf3ca8b96ea4"
+        ],
+        "label": "synthetic",
+        "traces": []
+      },
+      "case": "v1-excluded-{'event_scope': 'agent', 'agent_run_id': 'actor:forged'}",
+      "consumer": "project",
+      "expected": "reject",
+      "generator": true,
+      "matches": false
+    },
+    {
+      "actual": {
+        "actors": [
+          "actor:forged"
+        ],
+        "environments": [
+          "environment:independent"
+        ],
+        "events": [
+          "trace-event:sha256:8f27aa86ddf54a785dba685c5e3c615e21adcd77e0cdeb3ffba1cf3ca8b96ea4"
+        ],
+        "graph_html_agree": true,
+        "label": "synthetic",
+        "traces": []
+      },
+      "case": "v1-excluded-{'event_scope': 'agent', 'agent_run_id': 'actor:forged'}",
+      "consumer": "render",
+      "expected": "reject",
+      "generator": false,
+      "matches": false
+    },
+    {
+      "actual": {
+        "actors": [
+          "actor:forged"
+        ],
+        "environments": [
+          "environment:independent"
+        ],
+        "events": [
+          "trace-event:sha256:8f27aa86ddf54a785dba685c5e3c615e21adcd77e0cdeb3ffba1cf3ca8b96ea4"
+        ],
+        "graph_html_agree": true,
+        "label": "synthetic",
+        "traces": []
+      },
+      "case": "v1-excluded-{'event_scope': 'agent', 'agent_run_id': 'actor:forged'}",
+      "consumer": "render",
+      "expected": "reject",
+      "generator": true,
+      "matches": false
+    },
+    {
+      "actual": {
+        "actors": [],
+        "environments": [
+          "environment:independent"
+        ],
+        "events": [
+          "trace-event:sha256:8f27aa86ddf54a785dba685c5e3c615e21adcd77e0cdeb3ffba1cf3ca8b96ea4"
+        ],
+        "label": "synthetic",
+        "traces": []
+      },
+      "case": "v1-excluded-{'event_scope': 'unknown'}",
+      "consumer": "project",
+      "expected": "reject",
+      "generator": false,
+      "matches": false
+    },
+    {
+      "actual": {
+        "actors": [],
+        "environments": [
+          "environment:independent"
+        ],
+        "events": [
+          "trace-event:sha256:8f27aa86ddf54a785dba685c5e3c615e21adcd77e0cdeb3ffba1cf3ca8b96ea4"
+        ],
+        "label": "synthetic",
+        "traces": []
+      },
+      "case": "v1-excluded-{'event_scope': 'unknown'}",
+      "consumer": "project",
+      "expected": "reject",
+      "generator": true,
+      "matches": false
+    },
+    {
+      "actual": {
+        "actors": [],
+        "environments": [
+          "environment:independent"
+        ],
+        "events": [
+          "trace-event:sha256:8f27aa86ddf54a785dba685c5e3c615e21adcd77e0cdeb3ffba1cf3ca8b96ea4"
+        ],
+        "graph_html_agree": true,
+        "label": "synthetic",
+        "traces": []
+      },
+      "case": "v1-excluded-{'event_scope': 'unknown'}",
+      "consumer": "render",
+      "expected": "reject",
+      "generator": false,
+      "matches": false
+    },
+    {
+      "actual": {
+        "actors": [],
+        "environments": [
+          "environment:independent"
+        ],
+        "events": [
+          "trace-event:sha256:8f27aa86ddf54a785dba685c5e3c615e21adcd77e0cdeb3ffba1cf3ca8b96ea4"
+        ],
+        "graph_html_agree": true,
+        "label": "synthetic",
+        "traces": []
+      },
+      "case": "v1-excluded-{'event_scope': 'unknown'}",
+      "consumer": "render",
+      "expected": "reject",
+      "generator": true,
+      "matches": false
+    },
+    {
+      "actual": {
+        "actors": [],
+        "environments": [
+          "environment:independent"
+        ],
+        "events": [
+          "trace-event:sha256:8f27aa86ddf54a785dba685c5e3c615e21adcd77e0cdeb3ffba1cf3ca8b96ea4"
+        ],
+        "label": "synthetic",
+        "traces": []
+      },
+      "case": "v1-excluded-{'event_scope': None}",
+      "consumer": "project",
+      "expected": "reject",
+      "generator": false,
+      "matches": false
+    },
+    {
+      "actual": {
+        "actors": [],
+        "environments": [
+          "environment:independent"
+        ],
+        "events": [
+          "trace-event:sha256:8f27aa86ddf54a785dba685c5e3c615e21adcd77e0cdeb3ffba1cf3ca8b96ea4"
+        ],
+        "label": "synthetic",
+        "traces": []
+      },
+      "case": "v1-excluded-{'event_scope': None}",
+      "consumer": "project",
+      "expected": "reject",
+      "generator": true,
+      "matches": false
+    },
+    {
+      "actual": {
+        "actors": [],
+        "environments": [
+          "environment:independent"
+        ],
+        "events": [
+          "trace-event:sha256:8f27aa86ddf54a785dba685c5e3c615e21adcd77e0cdeb3ffba1cf3ca8b96ea4"
+        ],
+        "graph_html_agree": true,
+        "label": "synthetic",
+        "traces": []
+      },
+      "case": "v1-excluded-{'event_scope': None}",
+      "consumer": "render",
+      "expected": "reject",
+      "generator": false,
+      "matches": false
+    },
+    {
+      "actual": {
+        "actors": [],
+        "environments": [
+          "environment:independent"
+        ],
+        "events": [
+          "trace-event:sha256:8f27aa86ddf54a785dba685c5e3c615e21adcd77e0cdeb3ffba1cf3ca8b96ea4"
+        ],
+        "graph_html_agree": true,
+        "label": "synthetic",
+        "traces": []
+      },
+      "case": "v1-excluded-{'event_scope': None}",
+      "consumer": "render",
+      "expected": "reject",
+      "generator": true,
+      "matches": false
+    },
+    {
+      "actual": {
+        "actors": [
+          7
+        ],
+        "environments": [
+          "environment:independent"
+        ],
+        "events": [
+          "trace-event:sha256:8f27aa86ddf54a785dba685c5e3c615e21adcd77e0cdeb3ffba1cf3ca8b96ea4"
+        ],
+        "label": "synthetic",
+        "traces": [
+          [
+            "trace:independent",
+            "accepted"
+          ]
+        ]
+      },
+      "case": "v1-excluded-{'agent_run_id': 7}",
+      "consumer": "project",
+      "expected": "reject",
+      "generator": false,
+      "matches": false
+    },
+    {
+      "actual": {
+        "actors": [
+          7
+        ],
+        "environments": [
+          "environment:independent"
+        ],
+        "events": [
+          "trace-event:sha256:8f27aa86ddf54a785dba685c5e3c615e21adcd77e0cdeb3ffba1cf3ca8b96ea4"
+        ],
+        "label": "synthetic",
+        "traces": [
+          [
+            "trace:independent",
+            "accepted"
+          ]
+        ]
+      },
+      "case": "v1-excluded-{'agent_run_id': 7}",
+      "consumer": "project",
+      "expected": "reject",
+      "generator": true,
+      "matches": false
+    },
+    {
+      "actual": {
+        "error_type": "TypeError",
+        "message": "sequence item 0: expected str instance, int found"
+      },
+      "case": "v1-excluded-{'agent_run_id': 7}",
+      "consumer": "render",
+      "expected": "reject",
+      "generator": false,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "TypeError",
+        "message": "sequence item 0: expected str instance, int found"
+      },
+      "case": "v1-excluded-{'agent_run_id': 7}",
+      "consumer": "render",
+      "expected": "reject",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "ValueError",
+        "message": "trace event identity does not match content"
+      },
+      "case": "stale-event_type",
+      "consumer": "project",
+      "expected": "reject",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "ValueError",
+        "message": "trace event identity does not match content"
+      },
+      "case": "stale-event_type",
+      "consumer": "render",
+      "expected": "reject",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "ValueError",
+        "message": "trace event identity does not match content"
+      },
+      "case": "stale-environment_run_id",
+      "consumer": "project",
+      "expected": "reject",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "ValueError",
+        "message": "trace event identity does not match content"
+      },
+      "case": "stale-environment_run_id",
+      "consumer": "render",
+      "expected": "reject",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "ValueError",
+        "message": "trace event identity does not match content"
+      },
+      "case": "stale-task_id",
+      "consumer": "project",
+      "expected": "reject",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "ValueError",
+        "message": "trace event identity does not match content"
+      },
+      "case": "stale-task_id",
+      "consumer": "render",
+      "expected": "reject",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "ValueError",
+        "message": "trace event identity does not match content"
+      },
+      "case": "stale-trace_id",
+      "consumer": "project",
+      "expected": "reject",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "ValueError",
+        "message": "trace event identity does not match content"
+      },
+      "case": "stale-trace_id",
+      "consumer": "render",
+      "expected": "reject",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "ValueError",
+        "message": "trace event identity does not match content"
+      },
+      "case": "stale-sequence",
+      "consumer": "project",
+      "expected": "reject",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "ValueError",
+        "message": "trace event identity does not match content"
+      },
+      "case": "stale-sequence",
+      "consumer": "render",
+      "expected": "reject",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "ValueError",
+        "message": "trace event identity does not match content"
+      },
+      "case": "stale-commit_id",
+      "consumer": "project",
+      "expected": "reject",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "ValueError",
+        "message": "trace event identity does not match content"
+      },
+      "case": "stale-commit_id",
+      "consumer": "render",
+      "expected": "reject",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "ValueError",
+        "message": "trace event identity does not match content"
+      },
+      "case": "stale-commit_index",
+      "consumer": "project",
+      "expected": "reject",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "ValueError",
+        "message": "trace event identity does not match content"
+      },
+      "case": "stale-commit_index",
+      "consumer": "render",
+      "expected": "reject",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "ValueError",
+        "message": "trace event identity does not match content"
+      },
+      "case": "stale-commit_size",
+      "consumer": "project",
+      "expected": "reject",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "ValueError",
+        "message": "trace event identity does not match content"
+      },
+      "case": "stale-commit_size",
+      "consumer": "render",
+      "expected": "reject",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "ValueError",
+        "message": "trace event identity does not match content"
+      },
+      "case": "stale-recorded_at",
+      "consumer": "project",
+      "expected": "reject",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "ValueError",
+        "message": "trace event identity does not match content"
+      },
+      "case": "stale-recorded_at",
+      "consumer": "render",
+      "expected": "reject",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "ValueError",
+        "message": "trace event identity does not match content"
+      },
+      "case": "stale-operation_id",
+      "consumer": "project",
+      "expected": "reject",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "ValueError",
+        "message": "trace event identity does not match content"
+      },
+      "case": "stale-operation_id",
+      "consumer": "render",
+      "expected": "reject",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "ValueError",
+        "message": "trace event identity does not match content"
+      },
+      "case": "stale-parent_event_id",
+      "consumer": "project",
+      "expected": "reject",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "ValueError",
+        "message": "trace event identity does not match content"
+      },
+      "case": "stale-parent_event_id",
+      "consumer": "render",
+      "expected": "reject",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "ValueError",
+        "message": "trace event identity does not match content"
+      },
+      "case": "stale-artifact_refs",
+      "consumer": "project",
+      "expected": "reject",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "ValueError",
+        "message": "trace event identity does not match content"
+      },
+      "case": "stale-artifact_refs",
+      "consumer": "render",
+      "expected": "reject",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "ValueError",
+        "message": "trace event identity does not match content"
+      },
+      "case": "stale-data_json",
+      "consumer": "project",
+      "expected": "reject",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "ValueError",
+        "message": "trace event identity does not match content"
+      },
+      "case": "stale-data_json",
+      "consumer": "render",
+      "expected": "reject",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "ValueError",
+        "message": "trace event identity does not match content"
+      },
+      "case": "stale-event_id",
+      "consumer": "project",
+      "expected": "reject",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "ValueError",
+        "message": "trace event identity does not match content"
+      },
+      "case": "stale-event_id",
+      "consumer": "render",
+      "expected": "reject",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "ValueError",
+        "message": "trace event identity does not match content"
+      },
+      "case": "stale-v2-agent_run_id",
+      "consumer": "render",
+      "expected": "reject",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "ValueError",
+        "message": "trace event identity does not match content"
+      },
+      "case": "stale-v2-event_scope",
+      "consumer": "render",
+      "expected": "reject",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "ValueError",
+        "message": "trace event identity does not match content"
+      },
+      "case": "shape-{'schema_version': 'uah.trace_event/v9'}",
+      "consumer": "project",
+      "expected": "reject",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "ValueError",
+        "message": "trace event identity does not match content"
+      },
+      "case": "shape-{'schema_version': 'uah.trace_event/v9'}",
+      "consumer": "render",
+      "expected": "reject",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "actors": [],
+        "environments": [
+          "environment:independent"
+        ],
+        "events": [
+          "trace-event:sha256:8f27aa86ddf54a785dba685c5e3c615e21adcd77e0cdeb3ffba1cf3ca8b96ea4"
+        ],
+        "label": "synthetic",
+        "traces": []
+      },
+      "case": "shape-{'event_scope': 'bogus'}",
+      "consumer": "project",
+      "expected": "reject",
+      "generator": true,
+      "matches": false
+    },
+    {
+      "actual": {
+        "actors": [],
+        "environments": [
+          "environment:independent"
+        ],
+        "events": [
+          "trace-event:sha256:8f27aa86ddf54a785dba685c5e3c615e21adcd77e0cdeb3ffba1cf3ca8b96ea4"
+        ],
+        "graph_html_agree": true,
+        "label": "synthetic",
+        "traces": []
+      },
+      "case": "shape-{'event_scope': 'bogus'}",
+      "consumer": "render",
+      "expected": "reject",
+      "generator": true,
+      "matches": false
+    },
+    {
+      "actual": {
+        "actors": [],
+        "environments": [
+          "environment:independent"
+        ],
+        "events": [
+          "trace-event:sha256:8f27aa86ddf54a785dba685c5e3c615e21adcd77e0cdeb3ffba1cf3ca8b96ea4"
+        ],
+        "label": "synthetic",
+        "traces": [
+          [
+            "trace:independent",
+            "accepted"
+          ]
+        ]
+      },
+      "case": "shape-{'artifact_refs': ['artifact:independent']}",
+      "consumer": "project",
+      "expected": "reject",
+      "generator": true,
+      "matches": false
+    },
+    {
+      "actual": {
+        "actors": [],
+        "environments": [
+          "environment:independent"
+        ],
+        "events": [
+          "trace-event:sha256:8f27aa86ddf54a785dba685c5e3c615e21adcd77e0cdeb3ffba1cf3ca8b96ea4"
+        ],
+        "graph_html_agree": true,
+        "label": "synthetic",
+        "traces": [
+          [
+            "trace:independent",
+            "accepted"
+          ]
+        ]
+      },
+      "case": "shape-{'artifact_refs': ['artifact:independent']}",
+      "consumer": "render",
+      "expected": "reject",
+      "generator": true,
+      "matches": false
+    },
+    {
+      "actual": {
+        "actors": [],
+        "environments": [
+          "environment:independent"
+        ],
+        "events": [
+          "trace-event:sha256:2f4d2128a858123b01104684ec54aac29ef8fa2f5020b9473b6667c6d2ce9915"
+        ],
+        "label": "synthetic",
+        "traces": [
+          [
+            "trace:independent",
+            "accepted"
+          ]
+        ]
+      },
+      "case": "shape-{'artifact_refs': ()}",
+      "consumer": "project",
+      "expected": "reject",
+      "generator": true,
+      "matches": false
+    },
+    {
+      "actual": {
+        "actors": [],
+        "environments": [
+          "environment:independent"
+        ],
+        "events": [
+          "trace-event:sha256:2f4d2128a858123b01104684ec54aac29ef8fa2f5020b9473b6667c6d2ce9915"
+        ],
+        "graph_html_agree": true,
+        "label": "synthetic",
+        "traces": [
+          [
+            "trace:independent",
+            "accepted"
+          ]
+        ]
+      },
+      "case": "shape-{'artifact_refs': ()}",
+      "consumer": "render",
+      "expected": "reject",
+      "generator": true,
+      "matches": false
+    },
+    {
+      "actual": {
+        "actors": [],
+        "environments": [
+          "environment:independent"
+        ],
+        "events": [
+          "trace-event:sha256:94037a4401a67a443e376892c566af4f2aeb8b1915b649d4a449c65caedef96f"
+        ],
+        "label": "synthetic",
+        "traces": [
+          [
+            "trace:independent",
+            "accepted"
+          ]
+        ]
+      },
+      "case": "shape-{'artifact_refs': ('',)}",
+      "consumer": "project",
+      "expected": "reject",
+      "generator": true,
+      "matches": false
+    },
+    {
+      "actual": {
+        "actors": [],
+        "environments": [
+          "environment:independent"
+        ],
+        "events": [
+          "trace-event:sha256:94037a4401a67a443e376892c566af4f2aeb8b1915b649d4a449c65caedef96f"
+        ],
+        "graph_html_agree": true,
+        "label": "synthetic",
+        "traces": [
+          [
+            "trace:independent",
+            "accepted"
+          ]
+        ]
+      },
+      "case": "shape-{'artifact_refs': ('',)}",
+      "consumer": "render",
+      "expected": "reject",
+      "generator": true,
+      "matches": false
+    },
+    {
+      "actual": {
+        "actors": [],
+        "environments": [
+          "environment:independent"
+        ],
+        "events": [
+          "trace-event:sha256:e13c37e27b5290bb8d0c86badc67f1ddfae9c1e964ea448653177a6f85296f61"
+        ],
+        "label": "synthetic",
+        "traces": [
+          [
+            "trace:independent",
+            "accepted"
+          ]
+        ]
+      },
+      "case": "shape-{'sequence': 0}",
+      "consumer": "project",
+      "expected": "reject",
+      "generator": true,
+      "matches": false
+    },
+    {
+      "actual": {
+        "actors": [],
+        "environments": [
+          "environment:independent"
+        ],
+        "events": [
+          "trace-event:sha256:e13c37e27b5290bb8d0c86badc67f1ddfae9c1e964ea448653177a6f85296f61"
+        ],
+        "graph_html_agree": true,
+        "label": "synthetic",
+        "traces": [
+          [
+            "trace:independent",
+            "accepted"
+          ]
+        ]
+      },
+      "case": "shape-{'sequence': 0}",
+      "consumer": "render",
+      "expected": "reject",
+      "generator": true,
+      "matches": false
+    },
+    {
+      "actual": {
+        "actors": [],
+        "environments": [
+          "environment:independent"
+        ],
+        "events": [
+          "trace-event:sha256:5d01899cc198f91b2560419a53206061fa10d829ceeb5ea407560b41f55fd82e"
+        ],
+        "label": "synthetic",
+        "traces": [
+          [
+            "trace:independent",
+            "accepted"
+          ]
+        ]
+      },
+      "case": "shape-{'sequence': -1}",
+      "consumer": "project",
+      "expected": "reject",
+      "generator": true,
+      "matches": false
+    },
+    {
+      "actual": {
+        "actors": [],
+        "environments": [
+          "environment:independent"
+        ],
+        "events": [
+          "trace-event:sha256:5d01899cc198f91b2560419a53206061fa10d829ceeb5ea407560b41f55fd82e"
+        ],
+        "graph_html_agree": true,
+        "label": "synthetic",
+        "traces": [
+          [
+            "trace:independent",
+            "accepted"
+          ]
+        ]
+      },
+      "case": "shape-{'sequence': -1}",
+      "consumer": "render",
+      "expected": "reject",
+      "generator": true,
+      "matches": false
+    },
+    {
+      "actual": {
+        "actors": [],
+        "environments": [
+          "environment:independent"
+        ],
+        "events": [
+          "trace-event:sha256:5e1fdd7ba6a36823f680c8c691f82aafaed480581517f674e1b53521e4763332"
+        ],
+        "label": "synthetic",
+        "traces": [
+          [
+            "trace:independent",
+            "accepted"
+          ]
+        ]
+      },
+      "case": "shape-{'commit_index': 0}",
+      "consumer": "project",
+      "expected": "reject",
+      "generator": true,
+      "matches": false
+    },
+    {
+      "actual": {
+        "actors": [],
+        "environments": [
+          "environment:independent"
+        ],
+        "events": [
+          "trace-event:sha256:5e1fdd7ba6a36823f680c8c691f82aafaed480581517f674e1b53521e4763332"
+        ],
+        "graph_html_agree": true,
+        "label": "synthetic",
+        "traces": [
+          [
+            "trace:independent",
+            "accepted"
+          ]
+        ]
+      },
+      "case": "shape-{'commit_index': 0}",
+      "consumer": "render",
+      "expected": "reject",
+      "generator": true,
+      "matches": false
+    },
+    {
+      "actual": {
+        "actors": [],
+        "environments": [
+          "environment:independent"
+        ],
+        "events": [
+          "trace-event:sha256:10da8b0ae2f14087e8834c5d0d3112632ea6eb04a3b482e0f0b745a46a0558c8"
+        ],
+        "label": "synthetic",
+        "traces": [
+          [
+            "trace:independent",
+            "accepted"
+          ]
+        ]
+      },
+      "case": "shape-{'commit_index': 2}",
+      "consumer": "project",
+      "expected": "reject",
+      "generator": true,
+      "matches": false
+    },
+    {
+      "actual": {
+        "actors": [],
+        "environments": [
+          "environment:independent"
+        ],
+        "events": [
+          "trace-event:sha256:10da8b0ae2f14087e8834c5d0d3112632ea6eb04a3b482e0f0b745a46a0558c8"
+        ],
+        "graph_html_agree": true,
+        "label": "synthetic",
+        "traces": [
+          [
+            "trace:independent",
+            "accepted"
+          ]
+        ]
+      },
+      "case": "shape-{'commit_index': 2}",
+      "consumer": "render",
+      "expected": "reject",
+      "generator": true,
+      "matches": false
+    },
+    {
+      "actual": {
+        "actors": [],
+        "environments": [
+          "environment:independent"
+        ],
+        "events": [
+          "trace-event:sha256:1295c18f88993b39b49e8887c3868203a6182c7e983aa86d516098841e37eaa4"
+        ],
+        "label": "synthetic",
+        "traces": [
+          [
+            "trace:independent",
+            "accepted"
+          ]
+        ]
+      },
+      "case": "shape-{'task_id': None}",
+      "consumer": "project",
+      "expected": "reject",
+      "generator": true,
+      "matches": false
+    },
+    {
+      "actual": {
+        "error_type": "TypeError",
+        "message": "sequence item 1: expected str instance, NoneType found"
+      },
+      "case": "shape-{'task_id': None}",
+      "consumer": "render",
+      "expected": "reject",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "actors": [],
+        "environments": [
+          "environment:independent"
+        ],
+        "events": [
+          "trace-event:sha256:bfefd60837015faaee33f39369a4508d28a0e82f3bbee55304b40887051689f7"
+        ],
+        "label": "synthetic",
+        "traces": [
+          [
+            "",
+            "accepted"
+          ]
+        ]
+      },
+      "case": "shape-{'trace_id': ''}",
+      "consumer": "project",
+      "expected": "reject",
+      "generator": true,
+      "matches": false
+    },
+    {
+      "actual": {
+        "actors": [],
+        "environments": [
+          "environment:independent"
+        ],
+        "events": [
+          "trace-event:sha256:bfefd60837015faaee33f39369a4508d28a0e82f3bbee55304b40887051689f7"
+        ],
+        "graph_html_agree": true,
+        "label": "synthetic",
+        "traces": [
+          [
+            "",
+            "accepted"
+          ]
+        ]
+      },
+      "case": "shape-{'trace_id': ''}",
+      "consumer": "render",
+      "expected": "reject",
+      "generator": true,
+      "matches": false
+    },
+    {
+      "actual": {
+        "actors": [],
+        "environments": [
+          "environment:independent"
+        ],
+        "events": [
+          "trace-event:sha256:39bf026929009dad75efbdac8aa3a8924125a7caa6e56bd2634b4196d940e0d9"
+        ],
+        "label": "synthetic",
+        "traces": [
+          [
+            "trace:independent",
+            "accepted"
+          ]
+        ]
+      },
+      "case": "shape-{'data_json': '[]'}",
+      "consumer": "project",
+      "expected": "reject",
+      "generator": true,
+      "matches": false
+    },
+    {
+      "actual": {
+        "actors": [],
+        "environments": [
+          "environment:independent"
+        ],
+        "events": [
+          "trace-event:sha256:39bf026929009dad75efbdac8aa3a8924125a7caa6e56bd2634b4196d940e0d9"
+        ],
+        "graph_html_agree": true,
+        "label": "synthetic",
+        "traces": [
+          [
+            "trace:independent",
+            "accepted"
+          ]
+        ]
+      },
+      "case": "shape-{'data_json': '[]'}",
+      "consumer": "render",
+      "expected": "reject",
+      "generator": true,
+      "matches": false
+    },
+    {
+      "actual": {
+        "actors": [],
+        "environments": [
+          "environment:independent"
+        ],
+        "events": [
+          "trace-event:sha256:7c0383a4317c5edb96d6a3ad188275f391f0da13a61e84a0614b8bdb548fc283"
+        ],
+        "label": "synthetic",
+        "traces": [
+          [
+            "trace:independent",
+            "accepted"
+          ]
+        ]
+      },
+      "case": "shape-{'data_json': '{\"a\": 1}'}",
+      "consumer": "project",
+      "expected": "reject",
+      "generator": true,
+      "matches": false
+    },
+    {
+      "actual": {
+        "actors": [],
+        "environments": [
+          "environment:independent"
+        ],
+        "events": [
+          "trace-event:sha256:7c0383a4317c5edb96d6a3ad188275f391f0da13a61e84a0614b8bdb548fc283"
+        ],
+        "graph_html_agree": true,
+        "label": "synthetic",
+        "traces": [
+          [
+            "trace:independent",
+            "accepted"
+          ]
+        ]
+      },
+      "case": "shape-{'data_json': '{\"a\": 1}'}",
+      "consumer": "render",
+      "expected": "reject",
+      "generator": true,
+      "matches": false
+    },
+    {
+      "actual": {
+        "actors": [],
+        "environments": [
+          ""
+        ],
+        "events": [
+          "trace-event:sha256:1afca25dafc9385c9f8b71df53c105e1dd5c58b512647523ca8d594b1f5a5c10"
+        ],
+        "label": "synthetic",
+        "traces": [
+          [
+            "trace:independent",
+            "accepted"
+          ]
+        ]
+      },
+      "case": "shape-{'environment_run_id': ''}",
+      "consumer": "project",
+      "expected": "reject",
+      "generator": true,
+      "matches": false
+    },
+    {
+      "actual": {
+        "actors": [],
+        "environments": [
+          ""
+        ],
+        "events": [
+          "trace-event:sha256:1afca25dafc9385c9f8b71df53c105e1dd5c58b512647523ca8d594b1f5a5c10"
+        ],
+        "graph_html_agree": true,
+        "label": "synthetic",
+        "traces": [
+          [
+            "trace:independent",
+            "accepted"
+          ]
+        ]
+      },
+      "case": "shape-{'environment_run_id': ''}",
+      "consumer": "render",
+      "expected": "reject",
+      "generator": true,
+      "matches": false
+    },
+    {
+      "actual": {
+        "actors": [],
+        "environments": [
+          "environment:independent"
+        ],
+        "events": [
+          "trace-event:sha256:1dc5c1a597457a4a67e28800f9179938a1eb2d02ddd0ed1c7e064152fb1c59ff"
+        ],
+        "label": "synthetic",
+        "traces": [
+          [
+            "trace:independent",
+            "open"
+          ]
+        ]
+      },
+      "case": "shape-{'event_type': ''}",
+      "consumer": "project",
+      "expected": "reject",
+      "generator": true,
+      "matches": false
+    },
+    {
+      "actual": {
+        "actors": [],
+        "environments": [
+          "environment:independent"
+        ],
+        "events": [
+          "trace-event:sha256:1dc5c1a597457a4a67e28800f9179938a1eb2d02ddd0ed1c7e064152fb1c59ff"
+        ],
+        "graph_html_agree": true,
+        "label": "synthetic",
+        "traces": [
+          [
+            "trace:independent",
+            "open"
+          ]
+        ]
+      },
+      "case": "shape-{'event_type': ''}",
+      "consumer": "render",
+      "expected": "reject",
+      "generator": true,
+      "matches": false
+    },
+    {
+      "actual": {
+        "actors": [],
+        "environments": [
+          "environment:independent"
+        ],
+        "events": [
+          "trace-event:sha256:9bcbec7997e4c8888bc35e04e941b09539ee5708c8ae0811e5a7a8056301669a"
+        ],
+        "label": "synthetic",
+        "traces": [
+          [
+            "trace:independent",
+            "accepted"
+          ]
+        ]
+      },
+      "case": "shape-{'recorded_at': ''}",
+      "consumer": "project",
+      "expected": "reject",
+      "generator": true,
+      "matches": false
+    },
+    {
+      "actual": {
+        "actors": [],
+        "environments": [
+          "environment:independent"
+        ],
+        "events": [
+          "trace-event:sha256:9bcbec7997e4c8888bc35e04e941b09539ee5708c8ae0811e5a7a8056301669a"
+        ],
+        "graph_html_agree": true,
+        "label": "synthetic",
+        "traces": [
+          [
+            "trace:independent",
+            "accepted"
+          ]
+        ]
+      },
+      "case": "shape-{'recorded_at': ''}",
+      "consumer": "render",
+      "expected": "reject",
+      "generator": true,
+      "matches": false
+    },
+    {
+      "actual": {
+        "actors": [],
+        "environments": [
+          "environment:independent"
+        ],
+        "events": [
+          "trace-event:sha256:d41a710b9a1337b9fbf6dc23ede1be43efb5011f5e7323e27370f3ce3923966e"
+        ],
+        "label": "synthetic",
+        "traces": [
+          [
+            "trace:independent",
+            "accepted"
+          ]
+        ]
+      },
+      "case": "invalid-type-v1-{'sequence': 'one'}",
+      "consumer": "project",
+      "expected": "reject",
+      "generator": true,
+      "matches": false
+    },
+    {
+      "actual": {
+        "actors": [],
+        "environments": [
+          "environment:independent"
+        ],
+        "events": [
+          "trace-event:sha256:02522041141fb88500cd5fcc455d9a890b6d7a037a670da746e3adec917c13b5"
+        ],
+        "label": "synthetic",
+        "traces": [
+          [
+            "trace:independent",
+            "accepted"
+          ]
+        ]
+      },
+      "case": "invalid-type-v1-{'artifact_refs': (1,)}",
+      "consumer": "project",
+      "expected": "reject",
+      "generator": true,
+      "matches": false
+    },
+    {
+      "actual": {
+        "actors": [],
+        "environments": [
+          1
+        ],
+        "events": [
+          "trace-event:sha256:c48dd498385951ecc264b9b717b74704f47f3c02a03df81a3ad97e89bc46a5a6"
+        ],
+        "label": "synthetic",
+        "traces": [
+          [
+            "trace:independent",
+            "accepted"
+          ]
+        ]
+      },
+      "case": "invalid-type-v1-{'environment_run_id': 1}",
+      "consumer": "project",
+      "expected": "reject",
+      "generator": true,
+      "matches": false
+    },
+    {
+      "actual": {
+        "actors": [],
+        "environments": [
+          "environment:independent"
+        ],
+        "events": [
+          "trace-event:sha256:03063413f0ae25d75b0ea48e2c77e279cdb2d41c3356ae0a7e8d45e8ebf5f7c5"
+        ],
+        "label": "synthetic",
+        "traces": [
+          [
+            "trace:independent",
+            "accepted"
+          ]
+        ]
+      },
+      "case": "invalid-type-v1-{'data_json': None}",
+      "consumer": "project",
+      "expected": "reject",
+      "generator": true,
+      "matches": false
+    },
+    {
+      "actual": {
+        "actors": [],
+        "environments": [
+          "environment:independent"
+        ],
+        "events": [
+          "trace-event:sha256:1e8bf61f8bac99ee6fa901e3fedf3685d3dd0aa93acab0476690b32f950fa75a"
+        ],
+        "label": "synthetic",
+        "traces": [
+          [
+            "trace:independent",
+            "accepted"
+          ]
+        ]
+      },
+      "case": "invalid-type-v2-{'agent_run_id': None}",
+      "consumer": "project",
+      "expected": "reject",
+      "generator": true,
+      "matches": false
+    },
+    {
+      "actual": {
+        "actors": [
+          ""
+        ],
+        "environments": [
+          "environment:independent"
+        ],
+        "events": [
+          "trace-event:sha256:1a596a5d7476626d88be1e00f7f9c66122fc38d09ffafa50341a3aece3eb4427"
+        ],
+        "label": "synthetic",
+        "traces": [
+          [
+            "trace:independent",
+            "accepted"
+          ]
+        ]
+      },
+      "case": "invalid-type-v2-{'agent_run_id': ''}",
+      "consumer": "project",
+      "expected": "reject",
+      "generator": true,
+      "matches": false
+    },
+    {
+      "actual": {
+        "actors": [
+          "actor:one"
+        ],
+        "environments": [
+          "environment:independent"
+        ],
+        "events": [
+          "trace-event:sha256:d53885b2c7a54096a63ec5817bd960c8ee1f0c7e71a45d850fe7107ae0e141cb"
+        ],
+        "label": "synthetic",
+        "traces": []
+      },
+      "case": "invalid-type-v2-{'event_scope': 'agent'}",
+      "consumer": "project",
+      "expected": "reject",
+      "generator": true,
+      "matches": false
+    },
+    {
+      "actual": {
+        "actors": [
+          "actor:one"
+        ],
+        "environments": [
+          "environment:independent"
+        ],
+        "events": [
+          "trace-event:sha256:bed1926edc6313323cacf868eb9a47359b414d72bd0b3828daf9e639002b15e8"
+        ],
+        "label": "synthetic",
+        "traces": []
+      },
+      "case": "invalid-type-v2-{'event_scope': 'bogus'}",
+      "consumer": "project",
+      "expected": "reject",
+      "generator": true,
+      "matches": false
+    },
+    {
+      "actual": {
+        "error_type": "TypeError",
+        "message": "Observatory accepts TraceEvent values only"
+      },
+      "case": "foreign-<object object at 0x7a4f091789e0>",
+      "consumer": "project",
+      "expected": "reject",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "TypeError",
+        "message": "Observatory accepts TraceEvent values only"
+      },
+      "case": "foreign-{}",
+      "consumer": "project",
+      "expected": "reject",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "TypeError",
+        "message": "Observatory accepts TraceEvent values only"
+      },
+      "case": "foreign-{'schema_version': 'foreign/v1'}",
+      "consumer": "project",
+      "expected": "reject",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "TypeError",
+        "message": "Observatory accepts TraceEvent values only"
+      },
+      "case": "foreign-'foreign'",
+      "consumer": "project",
+      "expected": "reject",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "TypeError",
+        "message": "Observatory accepts TraceEvent values only"
+      },
+      "case": "foreign-7",
+      "consumer": "project",
+      "expected": "reject",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "TypeError",
+        "message": "Observatory accepts TraceEvent values only"
+      },
+      "case": "foreign-None",
+      "consumer": "project",
+      "expected": "reject",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "ValueError",
+        "message": "Observatory event identities must be unique"
+      },
+      "case": "duplicate-identity",
+      "consumer": "render",
+      "expected": "reject",
+      "generator": false,
+      "matches": true
+    },
+    {
+      "actual": {
+        "actors": [],
+        "environments": [
+          "environment:independent"
+        ],
+        "events": [
+          "trace-event:sha256:8f27aa86ddf54a785dba685c5e3c615e21adcd77e0cdeb3ffba1cf3ca8b96ea4",
+          "trace-event:sha256:204c5b3d1719df4ffb9be19840130bca9bea37d3c8c2dabee28bc2e329488118"
+        ],
+        "label": "synthetic",
+        "traces": [
+          [
+            "trace:independent",
+            "rejected"
+          ]
+        ]
+      },
+      "case": "duplicate-sequence-distinct-ids",
+      "consumer": "project",
+      "expected": "accept",
+      "generator": false,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "ValueError",
+        "message": "trace mixes task or environment lineage"
+      },
+      "case": "mixed-trace-lineage",
+      "consumer": "project",
+      "expected": "reject",
+      "generator": false,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "ValueError",
+        "message": "agent run mixes environment lineage"
+      },
+      "case": "mixed-actor-environments",
+      "consumer": "project",
+      "expected": "reject",
+      "generator": false,
+      "matches": true
+    },
+    {
+      "actual": {
+        "actors": [],
+        "environments": [
+          "environment:independent"
+        ],
+        "events": [
+          "trace-event:sha256:73b95f3f5f68004baa7673e90abbdd21e5b38253c48d254281b8553ccfbce60b"
+        ],
+        "graph_html_agree": true,
+        "label": "synthetic",
+        "traces": [
+          [
+            "trace:independent",
+            "accepted"
+          ]
+        ]
+      },
+      "case": "missing-parent-synthetic",
+      "consumer": "render",
+      "expected": "accept",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "actors": [],
+        "environments": [
+          "environment:independent"
+        ],
+        "events": [
+          "trace-event:sha256:44065f97a3d1d33b98b3d947eff25442624e77acc5ca3e4e71511aecdf960813"
+        ],
+        "graph_html_agree": true,
+        "label": "synthetic",
+        "traces": [
+          [
+            "trace:independent",
+            "accepted"
+          ]
+        ]
+      },
+      "case": "incomplete-commit-synthetic",
+      "consumer": "render",
+      "expected": "accept",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "actors": [
+          "actor:one"
+        ],
+        "environments": [
+          "environment:later",
+          "environment:independent"
+        ],
+        "events": [
+          "trace-event:sha256:5b5a634a83bf3eaadfcc4767074414d7c04a3c59c825383eac091585a4189536"
+        ],
+        "label": "synthetic",
+        "traces": [
+          [
+            "trace:independent",
+            "accepted"
+          ]
+        ]
+      },
+      "all_retained_fields_stable": false,
+      "case": "later-input-alias-mutation",
+      "expected": {
+        "actors": [
+          "actor:one"
+        ],
+        "environments": [
+          "environment:independent"
+        ],
+        "events": [
+          "trace-event:sha256:5b5a634a83bf3eaadfcc4767074414d7c04a3c59c825383eac091585a4189536"
+        ],
+        "label": "synthetic",
+        "traces": [
+          [
+            "trace:independent",
+            "accepted"
+          ]
+        ]
+      },
+      "matches": false,
+      "payload_getter_detached": true,
+      "shared_detached_views": false
+    }
+  ],
+  "total": 134
+}

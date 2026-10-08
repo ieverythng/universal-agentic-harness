@@ -1,0 +1,371 @@
+import json
+from dataclasses import replace
+
+import pytest
+
+from ab_harness.agent_configuration import AgentRoleConfiguration
+from ab_harness.agent_identity import AgentManifest
+from ab_harness.bindings import BindingCatalog
+from ab_harness.contracts import ABControlBand, ABImplementationBinding
+from ab_harness.contracts import (
+    ABObjectView,
+    AbstractionFrame,
+    AgentOutput,
+    AgentRoleSpec,
+)
+from ab_harness.domain_contracts import (
+    DomainContractPack,
+    DomainEffectRule,
+    TaskIngressRule,
+)
+from ab_harness.environment_ingress import EnvironmentIngress
+from ab_harness.environment_runs import EnvironmentRun, EnvironmentRunAttestation
+from ab_harness.lifecycle import LifecycleLedger
+from ab_harness.prompt_compiler import CompiledPrompt, PromptCompiler, PromptPack
+from ab_harness.proposal_admission import ProposalNormalizer, SemanticAdmission
+from ab_harness.registry import RegistrySnapshot
+from ab_harness.schema_validation import (
+    ArgumentField,
+    InMemoryArgumentSchemaRegistry,
+    ObjectArgumentSchema,
+)
+from ab_harness.task_compiler import (
+    TaskBudgets,
+    TaskEffectRequest,
+    TaskSpec,
+    TaskSpecCompiler,
+)
+from ab_harness.task_ingress_authority import TaskIngressAuthority
+from ab_harness.task_registry import EnvironmentTaskRegistry
+
+
+def _inputs(*, runtime_callable=True):
+    registry = RegistrySnapshot(
+        (
+            ABObjectView(
+                "write_note",
+                1,
+                "skill",
+                "workspace",
+                "notes",
+                expected_effects=("note_written",),
+                observable_success=("note_written",),
+                runtime_callable=runtime_callable,
+            ),
+        ),
+        source="synthetic:registry",
+        version="registry:v1",
+    )
+    role = AgentRoleSpec("note_writer", ("operation",), ABControlBand(1, 1, 1))
+    frame = AbstractionFrame(
+        "notes", "workspace", "one note mutation", registry.version
+    )
+    domain = DomainContractPack.issue(
+        domain_contract_pack_id="domain:notes",
+        frame_id=frame.frame_id,
+        registry_version=frame.registry_version,
+        allowed_role_ids=(role.role_id,),
+        supported_task_type_ids=("write_note",),
+        ingress_rules=(
+            TaskIngressRule("request:notes", "request", "start_task", "request_id"),
+        ),
+        effect_rules=(
+            DomainEffectRule("note_written", "write_note", "notes", "terminal"),
+        ),
+    )
+    ledger = LifecycleLedger()
+    environment = EnvironmentRun(
+        EnvironmentRunAttestation(
+            environment_run_id="environment-run:notes:1",
+            environment_profile_id="profile:notes",
+            domain_contract_pack_revision=domain.revision,
+            native_runtime_revision="runtime:v1",
+            environment_owner_id="notes",
+            attestation_id="attestation:1",
+            started_at="2026-10-04T09:00:00Z",
+            readiness_evidence_refs=("ready:1",),
+        )
+    )
+    ingress = TaskIngressAuthority(
+        environment_profile_id="profile:notes",
+        domain_contract_pack=domain,
+        lifecycle_ledger=ledger,
+    ).admit(
+        environment,
+        EnvironmentIngress(
+            "ingress:1",
+            environment.environment_run_id,
+            "request:notes",
+            "request",
+            "request-artifact:1",
+            (("request_id", "task:note"),),
+            "2026-10-04T09:00:01Z",
+        ),
+    )
+    compiled = TaskSpecCompiler().compile(
+        task_ingress_decision=ingress,
+        task_spec=TaskSpec(
+            ingress.task_id,
+            ingress.trace_id,
+            "write_note",
+            role.role_id,
+            frame.frame_id,
+            domain.revision,
+            "Write a note about the experiment",
+            (TaskEffectRequest("written", "note_written", "required"),),
+            (),
+            TaskBudgets(60, 2, 2),
+        ),
+        role=role,
+        frame=frame,
+        registry=registry,
+        domain_contract_pack=domain,
+        task_registry=EnvironmentTaskRegistry(ledger),
+    )
+    role_configuration = AgentRoleConfiguration(
+        role,
+        frame,
+        domain.domain_contract_pack_id,
+        domain.revision,
+        ("write_note",),
+    )
+    pack = PromptPack(
+        kernel_protocol_version="uah.protocol/v1",
+        role_instructions="Propose one bounded note mutation.",
+        domain_instructions="Notes are owned and verified by the workspace owner.",
+    )
+    manifest = AgentManifest(
+        role_configuration.role_configuration_id,
+        "model:recorded",
+        pack.prompt_pack_id,
+        "build:v1",
+        (("synthetic", "adapter:v1"),),
+    )
+    binding = ABImplementationBinding(
+        "binding:write",
+        "write_note",
+        "notes_environment",
+        "notes",
+        "python_method",
+        "SECRET_IMPLEMENTATION_LOCATOR",
+        "binding:v1",
+        "schema:write",
+        "schema:result",
+        "private:adapter",
+        ("fake",),
+        "approved",
+    )
+    schema = ObjectArgumentSchema.issue(
+        schema_ref="schema:write",
+        fields=(ArgumentField("text", "string"),),
+        required=("text",),
+    )
+    return dict(
+        compiled_task=compiled,
+        manifest=manifest,
+        role_configuration=role_configuration,
+        prompt_pack=pack,
+        binding_catalog=BindingCatalog(registry, (binding,)),
+        argument_schemas=(schema,),
+        environment_id="notes_environment",
+        runtime_mode="fake",
+    )
+
+
+def test_prompt_compiler_renders_one_deterministic_task_scoped_protocol_and_schema():
+    inputs = _inputs()
+
+    prompt = PromptCompiler().compile(**inputs)
+    repeated = PromptCompiler().compile(**inputs)
+
+    assert prompt == repeated
+    assert prompt.compiled_task_id == inputs["compiled_task"].compiled_task_id
+    assert prompt.agent_id == inputs["manifest"].agent_id
+    assert tuple(message.role for message in prompt.messages) == ("system", "user")
+    assert "AB coordinates are frame-relative" in prompt.messages[0].content
+    assert "Write a note about the experiment" in prompt.messages[1].content
+    schema = json.loads(prompt.output_schema_json)
+    choice = schema["oneOf"][0]
+    assert choice["required"] == ["output_type", "object_id", "arguments"]
+    assert choice["properties"]["object_id"] == {"const": "write_note"}
+    assert choice["properties"]["arguments"]["required"] == ["text"]
+    assert not choice["additionalProperties"]
+    assert "SECRET_IMPLEMENTATION_LOCATOR" not in json.dumps(prompt.to_dict())
+
+
+@pytest.mark.parametrize(
+    "changed", ("manifest_role", "manifest_pack", "frame", "domain", "objects", "role")
+)
+def test_prompt_compiler_rejects_role_domain_or_manifest_scope_drift(changed):
+    inputs = _inputs()
+    configuration = inputs["role_configuration"]
+    if changed == "manifest_role":
+        inputs["manifest"] = replace(
+            inputs["manifest"], role_configuration_id="role:unregistered"
+        )
+    elif changed == "manifest_pack":
+        inputs["manifest"] = replace(inputs["manifest"], prompt_pack_id="prompt:other")
+    else:
+        changes = {
+            "frame": {
+                "primary_frame": replace(
+                    configuration.primary_frame, registry_version="registry:other"
+                )
+            },
+            "domain": {"domain_contract_pack_revision": "domain:other"},
+            "objects": {"projected_object_ids": ()},
+            "role": {"role": replace(configuration.role, role_id="other_role")},
+        }
+        inputs["role_configuration"] = replace(configuration, **changes[changed])
+        inputs["manifest"] = replace(
+            inputs["manifest"],
+            role_configuration_id=inputs["role_configuration"].role_configuration_id,
+        )
+
+    with pytest.raises(ValueError, match="(match|scope)"):
+        PromptCompiler().compile(**inputs)
+
+
+@pytest.mark.parametrize(
+    "changed", ("missing_schema", "duplicate_schema", "wrong_environment", "wrong_mode")
+)
+def test_prompt_compiler_requires_one_reviewed_runtime_binding_and_argument_schema(
+    changed,
+):
+    inputs = _inputs()
+    if changed == "missing_schema":
+        inputs["argument_schemas"] = ()
+    elif changed == "duplicate_schema":
+        inputs["argument_schemas"] = inputs["argument_schemas"] * 2
+    elif changed == "wrong_environment":
+        inputs["environment_id"] = "foreign_environment"
+    else:
+        inputs["runtime_mode"] = "live"
+
+    with pytest.raises((ValueError, LookupError)):
+        PromptCompiler().compile(**inputs)
+
+
+def test_prompt_compiler_only_exposes_schema_valid_examples_in_the_task_projection():
+    inputs = _inputs()
+    selected = '{"output_type":"operation","object_id":"write_note","arguments":{"text":"A grounded note"}}'
+    excluded = '{"output_type":"operation","object_id":"unexposed","arguments":{"secret_example":"HIDDEN_EXAMPLE"}}'
+    inputs["prompt_pack"] = replace(
+        inputs["prompt_pack"], examples=(selected, excluded)
+    )
+    inputs["role_configuration"] = replace(
+        inputs["role_configuration"], projected_object_ids=("write_note", "unexposed")
+    )
+    inputs["manifest"] = replace(
+        inputs["manifest"],
+        role_configuration_id=inputs["role_configuration"].role_configuration_id,
+        prompt_pack_id=inputs["prompt_pack"].prompt_pack_id,
+    )
+
+    prompt = PromptCompiler().compile(**inputs)
+
+    assert "A grounded note" in prompt.messages[0].content
+    assert "HIDDEN_EXAMPLE" not in prompt.messages[0].content
+    inputs["prompt_pack"] = replace(
+        inputs["prompt_pack"],
+        examples=(
+            '{"output_type":"operation","object_id":"write_note","arguments":{"text":42}}',
+        ),
+    )
+    inputs["manifest"] = replace(
+        inputs["manifest"], prompt_pack_id=inputs["prompt_pack"].prompt_pack_id
+    )
+    with pytest.raises(ValueError, match="example"):
+        PromptCompiler().compile(**inputs)
+
+
+def test_prompt_artifacts_round_trip_and_reject_malformed_or_substituted_content():
+    inputs = _inputs()
+    prompt = PromptCompiler().compile(**inputs)
+    assert CompiledPrompt.from_dict(json.loads(json.dumps(prompt.to_dict()))) == prompt
+    assert (
+        PromptPack.from_dict(json.loads(json.dumps(inputs["prompt_pack"].to_dict())))
+        == inputs["prompt_pack"]
+    )
+    malformed = prompt.to_dict()
+    del malformed["messages"]
+    with pytest.raises(ValueError):
+        CompiledPrompt.from_dict(malformed)
+    substituted = prompt.to_dict()
+    substituted["task_id"] = "task:foreign"
+    with pytest.raises(ValueError, match="identity"):
+        CompiledPrompt.from_dict(substituted)
+    with pytest.raises(ValueError, match="canonical"):
+        replace(prompt, output_schema_json='{"type": "object"}')
+
+
+def test_prompt_compiler_preserves_task_narrowing_and_matches_semantic_admission():
+    inputs = _inputs()
+    configuration = inputs["role_configuration"]
+    inputs["role_configuration"] = replace(
+        configuration,
+        role=replace(
+            configuration.role,
+            allowed_output_types=("operation", "other_output"),
+            control_band=ABControlBand(0, 1, 2),
+        ),
+    )
+    inputs["manifest"] = replace(
+        inputs["manifest"],
+        role_configuration_id=inputs["role_configuration"].role_configuration_id,
+    )
+
+    prompt = PromptCompiler().compile(**inputs)
+
+    choice = json.loads(prompt.output_schema_json)["oneOf"][0]
+    assert choice["properties"]["output_type"]["enum"] == ["operation"]
+    normalization = ProposalNormalizer().normalize(
+        compiled_task=inputs["compiled_task"],
+        operation_id="operation:write",
+        raw_output_artifact_id="raw:recorded-output",
+        output=AgentOutput(
+            "operation",
+            {"object_id": "write_note", "arguments": {"text": "A grounded note"}},
+            ("write_note",),
+        ),
+    )
+    assert normalization.proposal is not None
+    admitted = SemanticAdmission(
+        catalog=inputs["binding_catalog"],
+        environment_id=inputs["environment_id"],
+        runtime_mode=inputs["runtime_mode"],
+        schema_validator=InMemoryArgumentSchemaRegistry(inputs["argument_schemas"]),
+    ).admit(inputs["compiled_task"], normalization.proposal)
+    assert admitted.accepted
+
+
+def test_prompt_compiler_refuses_to_invent_operations_for_an_inspect_only_task():
+    with pytest.raises(ValueError, match="direct proposal"):
+        PromptCompiler().compile(**_inputs(runtime_callable=False))
+
+
+@pytest.mark.parametrize(
+    "artifact",
+    (
+        "compiled_task",
+        "manifest",
+        "role_configuration",
+        "prompt_pack",
+        "argument_schema",
+    ),
+)
+def test_prompt_compiler_reverifies_every_frozen_source_at_the_compile_boundary(
+    artifact,
+):
+    inputs = _inputs()
+    target, field_name = {
+        "compiled_task": (inputs["compiled_task"], "compiled_task_id"),
+        "manifest": (inputs["manifest"], "agent_id"),
+        "role_configuration": (inputs["role_configuration"], "role_configuration_id"),
+        "prompt_pack": (inputs["prompt_pack"], "prompt_pack_id"),
+        "argument_schema": (inputs["argument_schemas"][0], "schema_id"),
+    }[artifact]
+    object.__setattr__(target, field_name, "artifact:substituted")
+
+    with pytest.raises(ValueError, match="identity"):
+        PromptCompiler().compile(**inputs)

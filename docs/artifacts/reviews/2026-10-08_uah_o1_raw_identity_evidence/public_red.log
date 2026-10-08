@@ -1,0 +1,17 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_____ test_raw_stale_terminal_kind_rejects_before_deriving_accepted_status _____
+
+    def test_raw_stale_terminal_kind_rejects_before_deriving_accepted_status():
+        ledger, events = raw_events()
+        assert project_observatory(events).traces[0].status is ObservatoryTraceStatus.OPEN
+        original_id = events[0].event_id
+        object.__setattr__(events[0], "event_type", "terminal_task_accepted")
+
+>       with pytest.raises(ValueError, match="identity does not match"):
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_observatory_raw_identity.py:33: Failed
+=========================== short test summary info ============================
+FAILED tests/test_observatory_raw_identity.py::test_raw_stale_terminal_kind_rejects_before_deriving_accepted_status
+1 failed in 0.10s

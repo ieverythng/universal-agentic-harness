@@ -1,0 +1,135 @@
+--- docs/artifacts/reviews/2026-10-08_uah_r4_fix_evidence/lifecycle.py.before	2026-10-08 17:29:32.318115380 +0200
++++ src/ab_harness/lifecycle.py	2026-10-08 17:36:25.967864128 +0200
+@@ -534,6 +534,7 @@
+     proposal_by_operation: dict[str, str] = field(default_factory=dict)
+     rejected_operation_ids: set[str] = field(default_factory=set)
+     admission_by_operation: dict[str, str] = field(default_factory=dict)
++    current_admission_operation_ids: set[str] = field(default_factory=set)
+     object_by_operation: dict[str, str] = field(default_factory=dict)
+     binding_by_operation: dict[str, str] = field(default_factory=dict)
+     owner_by_operation: dict[str, str] = field(default_factory=dict)
+@@ -629,15 +630,17 @@
+                     )
+                 )
+             combined = (*existing, *staged)
+-            _reduce_events(tuple(combined))
++            _reduce_events(tuple(combined), active_from_sequence=len(existing) + 1)
+             self._append(staged)
+             self._events.extend(staged)
+             return LifecycleCommit(events=tuple(replace(event) for event in staged))
+
+     def start_execution(self, lease: ExecutionLease) -> LifecycleCommit:
++        from ab_harness.domain_lifecycle import ExecutionLease
+         from ab_harness.runtime_controls import BudgetExhaustedError
+         from ab_harness.runtime_controls import TaskBudgetAuthority
+
++        ExecutionLease.verify_identity(lease)
+         authority = TaskBudgetAuthority(self)
+         for attempt in range(2):
+             assessment = authority.assess(
+@@ -752,6 +755,25 @@
+                 raise ValueError("recorded execution lease identity is invalid")
+             return admission_id, execution_lease_id
+
++    def require_current_admission(self, admitted_operation: AdmittedOperation) -> None:
++        """Require the exact full semantic artifact recorded for active use."""
++        from ab_harness.proposal_admission import AdmittedOperation
++
++        AdmittedOperation.verify_identity(admitted_operation)
++        with self._file_lock():
++            self._refresh_from_disk()
++            event = next((
++                event for event in reversed(self._events)
++                if event.trace_id == admitted_operation.trace_id
++                and event.operation_id == admitted_operation.operation_id
++                and event.event_type == "semantic_admission_accepted"
++            ), None)
++            if event is None or "admitted_operation" not in event.data:
++                raise ValueError("active execution requires current semantic provenance")
++            recorded = AdmittedOperation.from_dict(event.data["admitted_operation"])
++            if AdmittedOperation.to_dict(recorded) != AdmittedOperation.to_dict(admitted_operation):
++                raise ValueError("active execution requires the exact admitted operation in recorded semantic provenance")
++
+     def replay(self, trace_id: str) -> LifecycleReplay:
+         with self._file_lock():
+             self._refresh_from_disk()
+@@ -1128,7 +1150,7 @@
+             ),
+         )
+     if isinstance(fact, AdmittedOperation):
+-        fact.verify_identity()
++        AdmittedOperation.verify_identity(fact)
+         return (
+             _operation_spec(
+                 fact.proposal,
+@@ -1150,7 +1172,7 @@
+             ),
+         )
+     if isinstance(fact, DomainAdmissionRejection):
+-        fact.verify_identity()
++        DomainAdmissionRejection.verify_identity(fact)
+         admitted = fact.admitted_operation
+         return (
+             _operation_spec(
+@@ -1171,7 +1193,7 @@
+             ),
+         )
+     if isinstance(fact, ExecutionLease):
+-        fact.verify_identity()
++        ExecutionLease.verify_identity(fact)
+         admitted = fact.admitted_operation
+         return (
+             _operation_spec(
+@@ -1193,7 +1215,7 @@
+         )
+     if isinstance(fact, ExecutionStartedFact):
+         lease = fact.lease
+-        lease.verify_identity()
++        ExecutionLease.verify_identity(lease)
+         return (
+             _operation_spec(
+                 lease.admitted_operation.proposal,
+@@ -1524,6 +1546,7 @@
+     events: tuple[TraceEvent, ...],
+     *,
+     require_global_sequence: bool = True,
++    active_from_sequence: int | None = None,
+ ) -> dict[str, _TraceState]:
+     _validate_commit_frames(events)
+     from ab_harness.agent_lifecycle import apply_agent_event, apply_invocation_event
+@@ -1621,12 +1644,27 @@
+         if event.agent_run_id is not None:
+             _validate_model_task_event(state, event)
+             apply_invocation_event(agent_states, event)
++        if active_from_sequence is not None and event.sequence >= active_from_sequence:
++            _require_current_event_authority(state, event)
+         _apply_event(state, event)
+         state.last_event_id = event.event_id
+         known_event_ids.add(event.event_id)
+     return states
+
+
++def _require_current_event_authority(state: _TraceState, event: TraceEvent) -> None:
++    operation_id = event.operation_id
++    if event.event_type.startswith(("domain_admission_", "execution_", "evidence_")):
++        if operation_id not in state.current_admission_operation_ids:
++            raise ValueError("new active fact requires current semantic provenance")
++    if event.event_type == "budget_granted" and event.data.get("resource") == "tool_call":
++        if event.data.get("subject_id") not in state.current_admission_operation_ids:
++            raise ValueError("tool dispatch requires current semantic provenance")
++    if event.event_type in {"terminal_task_accepted", "terminal_task_accepted_with_deficit"}:
++        if not state.evidence_issued_operation_ids <= state.current_admission_operation_ids:
++            raise ValueError("current task success requires current semantic provenance")
++
++
+ def _validate_commit_frames(events: tuple[TraceEvent, ...]) -> None:
+     offset = 0
+     while offset < len(events):
+@@ -1905,6 +1943,7 @@
+             or admitted.operation_id != operation_id
+         ):
+             raise ValueError("recorded admitted operation does not match trace lineage")
++        state.current_admission_operation_ids.add(operation_id)
+     if data["proposal_id"] != state.proposal_by_operation.get(operation_id):
+         raise ValueError("semantic admission does not match operation proposal")
+     if operation_id in state.admission_by_operation:

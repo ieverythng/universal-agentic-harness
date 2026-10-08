@@ -1,0 +1,15 @@
+Source freeze 2026-10-08 15:15:11 UTC (17:15:11 Europe/Madrid).
+Focused public tests: PYTHONPATH=src:tests python -m pytest -q tests/test_admitted_object_snapshot.py tests/test_two_stage_admission.py tests/test_lifecycle_ledger.py
+107 passed in 2.23s.
+Expanded public tests: PYTHONPATH=src:tests python -m pytest -q tests/test_admitted_object_snapshot.py tests/test_two_stage_admission.py tests/test_lifecycle_ledger.py tests/test_model_invocation.py tests/test_agent_runtime.py
+147 passed in 3.57s; repeat after saving the log passed 147 tests in 3.65s.
+Plain python without PYTHONPATH was accidentally rerun while verifying command labels and failed collection with ModuleNotFoundError; no source changed. The corrected public command above passed.
+Full suite before root integration: PYTHONPATH=src:tests python -m pytest -q
+433 passed, 2 failed in 8.45s.
+Expected external-scope failures: test_argument_schema_validation.py::test_admitted_operation_pins_the_validated_input_schema_identity expected v2; test_observatory.py::test_committed_o1_example_matches_recorded_nao_canary stale generated example.
+Root owns expected v3 assertion and generated O1 refresh, plus final full hooks.
+Ruff scoped: All checks passed.
+git diff --check: passed.
+Recorded O1 check: stale expected before root regeneration.
+Actor-runtime O1 check: passed.
+No full hooks run by R4 author.

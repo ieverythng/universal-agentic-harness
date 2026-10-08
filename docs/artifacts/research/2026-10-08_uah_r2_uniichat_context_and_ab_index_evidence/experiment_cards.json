@@ -1,0 +1,635 @@
+{
+  "schema_version": "uah_context_experiment_cards_proposal/v0",
+  "date": "2026-10-08",
+  "status": "planned_not_scored",
+  "not_registry_schema": true,
+  "observed_metrics": null,
+  "threshold_note": "All acceptance thresholds and resource limits are preregistration proposals, not measured capabilities or accepted release gates.",
+  "cards": [
+    {
+      "identity_class": "provisional_experiment",
+      "implementation_status": "unimplemented",
+      "evidence_status": "planned",
+      "scoring_status": "not_scored",
+      "result_source": null,
+      "producer_run_id": null,
+      "fixture_corpus_sha256": null,
+      "development_partition_sha256": null,
+      "holdout_partition_sha256": null,
+      "metric_contract_version": "uah_context_metrics_proposal/v0",
+      "source_report": "docs/artifacts/research/2026-10-08_uah_r2_uniichat_context_and_ab_index.md",
+      "baseline_head": "28fab5e7f2c244d86a64c371f2118017999b2387",
+      "authority": "candidate_only; no semantic promotion or owner-effect evidence",
+      "freeze_gate": "Before any implementation screen, freeze exact corpus bytes, labels, source/selector revisions, train/holdout hashes and factor identities; null identities forbid a qualified comparison.",
+      "limits": {
+        "wall_seconds": 1200,
+        "incremental_rss_mib": 512,
+        "archive_bytes_per_fixture": 2097152,
+        "selected_utf8_bytes_per_query": 32768,
+        "concurrency": 1,
+        "paid_requests": 0
+      },
+      "splits": {
+        "development": {
+          "count": 24,
+          "prefix": "CTX-1-DEV",
+          "seed": 2026100801
+        },
+        "holdout": {
+          "count": 12,
+          "prefix": "CTX-1-HOLD",
+          "seed": 2026100811
+        },
+        "separation": "Hold out whole task families/branches; no summary ancestry or near-duplicate raw histories across partitions. Fixture generator and oracle labels are not implemented. IDs/seeds are recipe reservations, not retained fixtures. Each downstream card uses a fresh family-separated holdout. Upstream selector/model selection uses development only; configuration is frozen before opening that card's holdout."
+      },
+      "experiment_id": "UAH-CTX-ARCHIVE-v0",
+      "title": "Exact synthetic interaction archive and deterministic bounded selection",
+      "horizon": "H1 proposed seam",
+      "dependencies": [],
+      "question": "Can a privacy-approved synthetic archive preserve exact raw items and reproduce a bounded source-resolving selection after restart without changing lifecycle authority?",
+      "source_paths": [
+        "src/ab_harness/lifecycle.py",
+        "src/ab_harness/prompt_compiler.py",
+        "src/ab_harness/model_invocation.py",
+        "docs/research/2026-10-08_uah_r1_effect_evidence_and_trace_contracts.md"
+      ],
+      "baseline": "Full raw synthetic archive as source oracle, current no-context CompiledPrompt as authority control",
+      "arms": [
+        "Recent-window deterministic selector",
+        "Scoped flat-metadata deterministic selector"
+      ],
+      "held_fixed": [
+        "Raw histories and oracle labels",
+        "Scope/owner identities",
+        "Compiled task and prompt pack",
+        "Ordered rendering and tie-breaks",
+        "Byte/output reserves",
+        "No summarizer or learned ranker"
+      ],
+      "controls": [
+        "Empty relevant set",
+        "Missing raw artifact",
+        "Wrong digest",
+        "Unicode/JSON escape expansion",
+        "Unauthorized role/domain source",
+        "Imported older approval",
+        "Injected summary success claim",
+        "Changed note at task closure",
+        "Crash between artifact durability and committed selection reference",
+        "Competing appenders with stale branch/cutoff",
+        "Fork/sibling-source isolation",
+        "Retention-induced unavailable source",
+        "Missing/corrupt derived view after restart"
+      ],
+      "metrics": [
+        {
+          "name": "archive_roundtrip_exact",
+          "unit": "fraction",
+          "value": null,
+          "status": "not_scored"
+        },
+        {
+          "name": "source_resolution",
+          "unit": "fraction",
+          "value": null,
+          "status": "not_scored"
+        },
+        {
+          "name": "required_reference_recall",
+          "unit": "fraction",
+          "value": null,
+          "status": "not_scored"
+        },
+        {
+          "name": "counterexample_recall",
+          "unit": "fraction",
+          "value": null,
+          "status": "not_scored"
+        },
+        {
+          "name": "unauthorized_disclosures",
+          "unit": "count",
+          "value": null,
+          "status": "not_scored"
+        },
+        {
+          "name": "restart_selection_identity_match",
+          "unit": "fraction",
+          "value": null,
+          "status": "not_scored"
+        },
+        {
+          "name": "selected_utf8",
+          "unit": "bytes",
+          "value": null,
+          "status": "not_scored"
+        },
+        {
+          "name": "selection_latency_p95",
+          "unit": "milliseconds",
+          "value": null,
+          "status": "not_scored"
+        },
+        {
+          "name": "incremental_peak_rss",
+          "unit": "MiB",
+          "value": null,
+          "status": "not_scored"
+        }
+      ],
+      "acceptance": [
+        "Exact roundtrip and source/selection identity match for every fixture",
+        "Zero unauthorized disclosures or authority changes",
+        "All required support/counterexample references selected or explicit unavailable/insufficient-budget failure",
+        "Every omission recorded; selection <=32768 UTF-8 bytes",
+        "Current-content oracle and historical-write receipt remain distinct",
+        "Acknowledged items survive the declared durability boundary; stale competing appenders fail closed and fork sources remain isolated"
+      ],
+      "failure": [
+        "Unresolvable committed reference",
+        "Silent content clipping",
+        "Counterexample omission reported as complete",
+        "Private source in unapproved immutable prompt"
+      ],
+      "stop": [
+        "Any authority bypass or scope leak",
+        "Wall/memory bound exceeded",
+        "Corpus/holdout hashes or retention scope unresolved"
+      ],
+      "next_action": "GRILL accepts narrow synthetic contract; DEV chooses minimal existing seams and reviews public restart/negative tests",
+      "metric_contract_source": "docs/artifacts/research/2026-10-08_uah_r2_uniichat_context_and_ab_index_evidence/metric_contract.md"
+    },
+    {
+      "identity_class": "provisional_experiment",
+      "implementation_status": "unimplemented",
+      "evidence_status": "planned",
+      "scoring_status": "not_scored",
+      "result_source": null,
+      "producer_run_id": null,
+      "fixture_corpus_sha256": null,
+      "development_partition_sha256": null,
+      "holdout_partition_sha256": null,
+      "metric_contract_version": "uah_context_metrics_proposal/v0",
+      "source_report": "docs/artifacts/research/2026-10-08_uah_r2_uniichat_context_and_ab_index.md",
+      "baseline_head": "28fab5e7f2c244d86a64c371f2118017999b2387",
+      "authority": "candidate_only; no semantic promotion or owner-effect evidence",
+      "freeze_gate": "Before any implementation screen, freeze exact corpus bytes, labels, source/selector revisions, train/holdout hashes and factor identities; null identities forbid a qualified comparison.",
+      "limits": {
+        "wall_seconds": 1200,
+        "incremental_rss_mib": 512,
+        "archive_bytes_per_fixture": 2097152,
+        "selected_utf8_bytes_per_query": 32768,
+        "concurrency": 1,
+        "paid_requests": 0
+      },
+      "splits": {
+        "development": {
+          "count": 24,
+          "prefix": "CTX-2-DEV",
+          "seed": 2026100802
+        },
+        "holdout": {
+          "count": 12,
+          "prefix": "CTX-2-HOLD",
+          "seed": 2026100812
+        },
+        "separation": "Hold out whole task families/branches; no summary ancestry or near-duplicate raw histories across partitions. Fixture generator and oracle labels are not implemented. IDs/seeds are recipe reservations, not retained fixtures. Each downstream card uses a fresh family-separated holdout. Upstream selector/model selection uses development only; configuration is frozen before opening that card's holdout."
+      },
+      "experiment_id": "UAH-CTX-HIERARCHY-v0",
+      "title": "Chronological dyadic summary retrieval fidelity",
+      "horizon": "H3 optional context view",
+      "dependencies": [
+        "UAH-CTX-ARCHIVE-v0"
+      ],
+      "question": "Does a chronological summary hierarchy improve discovery or input cost over deterministic flat/recent-window retrieval without losing raw-source fidelity?",
+      "source_paths": [
+        "docs/artifacts/research/2026-10-08_uah_r2_uniichat_context_and_ab_index_evidence/optchat.md",
+        "src/ab_harness/workbench.py"
+      ],
+      "baseline": "Accepted exact archive and frozen flat/recent-window selectors from ARCHIVE",
+      "arms": [
+        "Chronological dyadic traversal",
+        "Flat scoped retrieval",
+        "Recent-window control",
+        "Shuffled or deliberately lossy summary control"
+      ],
+      "held_fixed": [
+        "Source corpus and relevance labels",
+        "Same eligible candidates and byte budget",
+        "Same query/answer verifier",
+        "Summary model/prompt/revision when used",
+        "Same max 16 zooms/query",
+        "Equal query and tool-call accounting"
+      ],
+      "catalog_sizes": [
+        8,
+        32,
+        128
+      ],
+      "controls": [
+        "Deep old negative condition",
+        "Correction followed by imported old contradiction",
+        "Fact in clipped tool-output middle",
+        "Misleading parent heading",
+        "Duplicate name different owners",
+        "Fabricated summary with raw disagreement",
+        "Failed final compaction"
+      ],
+      "additional_limits": {
+        "max_zooms_per_query": 16,
+        "summary_calls_total": 64,
+        "output_tokens_per_summary": 512,
+        "live_provider_permission_required": true,
+        "model_route": null
+      },
+      "metrics": [
+        {
+          "name": "exact_fact_recovery",
+          "unit": "fraction",
+          "value": null,
+          "status": "not_scored"
+        },
+        {
+          "name": "support_recall",
+          "unit": "fraction",
+          "value": null,
+          "status": "not_scored"
+        },
+        {
+          "name": "counterexample_recall",
+          "unit": "fraction",
+          "value": null,
+          "status": "not_scored"
+        },
+        {
+          "name": "false_recall",
+          "unit": "fraction",
+          "value": null,
+          "status": "not_scored"
+        },
+        {
+          "name": "correction_precedence",
+          "unit": "fraction",
+          "value": null,
+          "status": "not_scored"
+        },
+        {
+          "name": "source_citation_accuracy",
+          "unit": "fraction",
+          "value": null,
+          "status": "not_scored"
+        },
+        {
+          "name": "selected_utf8",
+          "unit": "bytes",
+          "value": null,
+          "status": "not_scored"
+        },
+        {
+          "name": "zoom_calls",
+          "unit": "count",
+          "value": null,
+          "status": "not_scored"
+        },
+        {
+          "name": "summary_calls",
+          "unit": "count",
+          "value": null,
+          "status": "not_scored"
+        },
+        {
+          "name": "retrieval_latency_p95",
+          "unit": "milliseconds",
+          "value": null,
+          "status": "not_scored"
+        },
+        {
+          "name": "rendered_input",
+          "unit": "tokens",
+          "value": null,
+          "status": "not_scored"
+        }
+      ],
+      "acceptance": [
+        "Zero scope/authority violations and exact source resolution",
+        "Required counterexamples and corrections all recovered or explicit abstention",
+        "Predeclared >=0.05 absolute holdout exact-fact recovery uplift over flat, or >=0.20 relative selected-byte reduction with no recovery loss",
+        "No choice of primary success criterion after seeing holdout"
+      ],
+      "failure": [
+        "Smaller context with lost negative evidence",
+        "Summary assertion overrides raw source",
+        "Fresh turn hangs beyond run bound"
+      ],
+      "stop": [
+        "Compactor attempts executable dispatch",
+        "Unqualified tokenizer/context for live model",
+        "Model unavailable or unapproved cost",
+        "Resource bounds exceeded"
+      ],
+      "next_action": "Freeze summaries/corpus separately and select primary retrieval criterion before tuning; fake summaries may test mechanics only",
+      "metric_contract_source": "docs/artifacts/research/2026-10-08_uah_r2_uniichat_context_and_ab_index_evidence/metric_contract.md"
+    },
+    {
+      "identity_class": "provisional_experiment",
+      "implementation_status": "unimplemented",
+      "evidence_status": "planned",
+      "scoring_status": "not_scored",
+      "result_source": null,
+      "producer_run_id": null,
+      "fixture_corpus_sha256": null,
+      "development_partition_sha256": null,
+      "holdout_partition_sha256": null,
+      "metric_contract_version": "uah_context_metrics_proposal/v0",
+      "source_report": "docs/artifacts/research/2026-10-08_uah_r2_uniichat_context_and_ab_index.md",
+      "baseline_head": "28fab5e7f2c244d86a64c371f2118017999b2387",
+      "authority": "candidate_only; no semantic promotion or owner-effect evidence",
+      "freeze_gate": "Before any implementation screen, freeze exact corpus bytes, labels, source/selector revisions, train/holdout hashes and factor identities; null identities forbid a qualified comparison.",
+      "limits": {
+        "wall_seconds": 1200,
+        "incremental_rss_mib": 512,
+        "archive_bytes_per_fixture": 2097152,
+        "selected_utf8_bytes_per_query": 32768,
+        "concurrency": 1,
+        "paid_requests": 0
+      },
+      "splits": {
+        "development": {
+          "count": 24,
+          "prefix": "CTX-3-DEV",
+          "seed": 2026100803
+        },
+        "holdout": {
+          "count": 12,
+          "prefix": "CTX-3-HOLD",
+          "seed": 2026100813
+        },
+        "separation": "Hold out whole task families/branches; no summary ancestry or near-duplicate raw histories across partitions. Fixture generator and oracle labels are not implemented. IDs/seeds are recipe reservations, not retained fixtures. Each downstream card uses a fresh family-separated holdout. Upstream selector/model selection uses development only; configuration is frozen before opening that card's holdout."
+      },
+      "experiment_id": "UAH-CTX-ABINDEX-v0",
+      "title": "Separate frame-aware AB and operation index ablation",
+      "horizon": "H3 optional semantic projection",
+      "dependencies": [
+        "UAH-CTX-ARCHIVE-v0",
+        "UAH-CTX-HIERARCHY-v0"
+      ],
+      "question": "Does explicit frame/object/operation metadata improve retrieval beyond identical chronology-only sources?",
+      "source_paths": [
+        "CONTEXT.md",
+        "src/ab_harness/contracts.py",
+        "src/ab_harness/operation_edges.py",
+        "docs/artifacts/decisions/2026-09-08_uah_identity_environment_and_memory_grill.md"
+      ],
+      "baseline": "Frozen archive + flat/hierarchy selector chosen solely on development results; freeze downstream configuration before fresh ABINDEX holdout access",
+      "arms": [
+        "No semantic index",
+        "Frame/object/op index",
+        "Permuted AB-label negative control"
+      ],
+      "held_fixed": [
+        "Corpus/query/holdout IDs",
+        "Summary contents/tree shape",
+        "Byte/zoom budget",
+        "Owner/binding identities",
+        "Deterministic ordering and relevance oracle"
+      ],
+      "controls": [
+        "Same object name in distinct frames",
+        "Interleaved traces",
+        "Parallel operations",
+        "continues_with versus decomposes_to",
+        "Unauthorized cross-frame delegation",
+        "Message reorder with invariant AB coordinates"
+      ],
+      "metrics": [
+        {
+          "name": "exact_fact_recovery",
+          "unit": "fraction",
+          "value": null,
+          "status": "not_scored"
+        },
+        {
+          "name": "counterexample_recall",
+          "unit": "fraction",
+          "value": null,
+          "status": "not_scored"
+        },
+        {
+          "name": "cross_frame_false_match",
+          "unit": "fraction",
+          "value": null,
+          "status": "not_scored"
+        },
+        {
+          "name": "source_resolution",
+          "unit": "fraction",
+          "value": null,
+          "status": "not_scored"
+        },
+        {
+          "name": "selection_latency_p95",
+          "unit": "milliseconds",
+          "value": null,
+          "status": "not_scored"
+        },
+        {
+          "name": "selected_utf8",
+          "unit": "bytes",
+          "value": null,
+          "status": "not_scored"
+        }
+      ],
+      "acceptance": [
+        "Zero AB promotion, fabricated operation links or scope widening",
+        "Predeclared >=0.05 absolute holdout recovery uplift with no required-counterexample loss",
+        "Useful gain absent or reduced in permuted-label control"
+      ],
+      "failure": [
+        "Gain depends on AB-depth-as-capability assumption",
+        "Label leakage or family overlap",
+        "Tree parent treated as semantic authority"
+      ],
+      "stop": [
+        "Any registry/ledger mutation",
+        "Insufficient distinct-frame fixtures",
+        "Resource bound exceeded"
+      ],
+      "next_action": "Keep semantic graph labels owner-derived; do not derive AB from summary hierarchy",
+      "metric_contract_source": "docs/artifacts/research/2026-10-08_uah_r2_uniichat_context_and_ab_index_evidence/metric_contract.md"
+    },
+    {
+      "identity_class": "provisional_experiment",
+      "implementation_status": "unimplemented",
+      "evidence_status": "planned",
+      "scoring_status": "not_scored",
+      "result_source": null,
+      "producer_run_id": null,
+      "fixture_corpus_sha256": null,
+      "development_partition_sha256": null,
+      "holdout_partition_sha256": null,
+      "metric_contract_version": "uah_context_metrics_proposal/v0",
+      "source_report": "docs/artifacts/research/2026-10-08_uah_r2_uniichat_context_and_ab_index.md",
+      "baseline_head": "28fab5e7f2c244d86a64c371f2118017999b2387",
+      "authority": "candidate_only; no semantic promotion or owner-effect evidence",
+      "freeze_gate": "Before any implementation screen, freeze exact corpus bytes, labels, source/selector revisions, train/holdout hashes and factor identities; null identities forbid a qualified comparison.",
+      "limits": {
+        "wall_seconds": 1200,
+        "incremental_rss_mib": 512,
+        "archive_bytes_per_fixture": 2097152,
+        "selected_utf8_bytes_per_query": 32768,
+        "concurrency": 1,
+        "paid_requests": 0
+      },
+      "splits": {
+        "development": {
+          "count": 24,
+          "prefix": "CTX-4-DEV",
+          "seed": 2026100804
+        },
+        "holdout": {
+          "count": 12,
+          "prefix": "CTX-4-HOLD",
+          "seed": 2026100814
+        },
+        "separation": "Hold out whole task families/branches; no summary ancestry or near-duplicate raw histories across partitions. Fixture generator and oracle labels are not implemented. IDs/seeds are recipe reservations, not retained fixtures. Each downstream card uses a fresh family-separated holdout. Upstream selector/model selection uses development only; configuration is frozen before opening that card's holdout."
+      },
+      "experiment_id": "UAH-CTX-S1RANK-v0",
+      "title": "Optional closed-candidate System One relevance reranker",
+      "horizon": "H3 optional model adapter",
+      "dependencies": [
+        "UAH-CTX-ARCHIVE-v0"
+      ],
+      "conditional_dependencies": [
+        "Qualified classifier/provider route",
+        "Frozen candidate/schema ordering and token budget",
+        "UAH-CTX-HIERARCHY-v0 only if ranking its summaries"
+      ],
+      "question": "Can within-schema ranking improve authorized summary/excerpt selection over deterministic scores while preserving opposition evidence and no-fit behavior?",
+      "source_paths": [
+        "docs/research/jev_system_one_uah_research.md",
+        "src/ab_harness/workbench.py"
+      ],
+      "baseline": "Same deterministic legal shortlist and no-fit option without learned reranking",
+      "arms": [
+        "Deterministic rank",
+        "Available pinned local classifier",
+        "Hosted Jev only after separate access/privacy/free-tier authorization"
+      ],
+      "held_fixed": [
+        "Closed candidate IDs and legal mask",
+        "Same raw excerpts/summary products",
+        "Same budgets and relevance labels",
+        "No candidate generation",
+        "No training unless separately scoped"
+      ],
+      "controls": [
+        "Candidate order permutation",
+        "Irrelevant shortlist/no-fit",
+        "Support versus counterexample imbalance",
+        "Duplicate owner names",
+        "False summary evidence claim",
+        "Unseen holdout task families"
+      ],
+      "model_identity": null,
+      "additional_limits": {
+        "max_candidate_labels": 32,
+        "max_classifier_calls": 108,
+        "model_asset_downloads": 0,
+        "training_runs": 0,
+        "probability_epsilon": 0.000001,
+        "latency_gate_p95_ms": 500,
+        "live_provider_permission_required": true,
+        "primary_classifier_arms": 1
+      },
+      "metrics": [
+        {
+          "name": "top_k_recall",
+          "unit": "fraction",
+          "value": null,
+          "status": "not_scored"
+        },
+        {
+          "name": "counterexample_recall",
+          "unit": "fraction",
+          "value": null,
+          "status": "not_scored"
+        },
+        {
+          "name": "no_fit_precision",
+          "unit": "fraction",
+          "value": null,
+          "status": "not_scored"
+        },
+        {
+          "name": "no_fit_recall",
+          "unit": "fraction",
+          "value": null,
+          "status": "not_scored"
+        },
+        {
+          "name": "brier_score",
+          "unit": "dimensionless",
+          "value": null,
+          "status": "not_scored"
+        },
+        {
+          "name": "log_loss",
+          "unit": "nats",
+          "value": null,
+          "status": "not_scored"
+        },
+        {
+          "name": "ece_10_equal_mass_bins",
+          "unit": "fraction",
+          "value": null,
+          "status": "not_scored"
+        },
+        {
+          "name": "permutation_disagreement",
+          "unit": "fraction",
+          "value": null,
+          "status": "not_scored"
+        },
+        {
+          "name": "latency_p95",
+          "unit": "milliseconds",
+          "value": null,
+          "status": "not_scored"
+        },
+        {
+          "name": "peak_vram",
+          "unit": "MiB",
+          "value": null,
+          "status": "not_scored"
+        },
+        {
+          "name": "request_cost",
+          "unit": "USD",
+          "value": null,
+          "status": "not_scored"
+        }
+      ],
+      "acceptance": [
+        "Zero fabricated candidate IDs or authority changes",
+        "Predeclared >=0.05 absolute macro top-4 recall uplift on fresh holdout and no required counterexample/no-fit regression",
+        "Permutation disagreement <=0.02; p95 latency <=500ms under measured route",
+        "Qualified probabilities only; no calibration claim from confidence labels"
+      ],
+      "failure": [
+        "Relevance replaces scope eligibility",
+        "Unsupported confidence interpreted as calibrated probability",
+        "Jev asked to generate summary/schema/evidence",
+        "Missing performance data relabelled zero"
+      ],
+      "stop": [
+        "Unavailable pinned asset or route",
+        "Private data or paid call required",
+        "Context/tokenization unqualified",
+        "Resource bound exceeded"
+      ],
+      "next_action": "Revalidate current availability separately; September Jev note is historical evidence, not refreshed deployment qualification",
+      "metric_contract_source": "docs/artifacts/research/2026-10-08_uah_r2_uniichat_context_and_ab_index_evidence/metric_contract.md",
+      "top_k": 4
+    }
+  ]
+}

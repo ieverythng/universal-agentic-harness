@@ -1,12 +1,12 @@
 # Universal Agentic Harness: AB-Aware Foundation and Implementation Plan
 
 **Status:** Architecture baseline; H0 synthetic proof implemented; H1-H2 incomplete
-**Date:** 2026-09-08
+**Date:** 2026-10-04
 **Branch baseline:** `feat/pre-commit-queue` at `5c3db78`
 **Seed artifact:** `Universal Agentic Harness Blueprint.html` (user-provided,
 2026-07-12)
 **Primary reference subsystem:** NAO ROS4HRI + Neural Workbench
-**Canonical delivery status:** `../plans/universal_agentic_harness_masterplan.md` (2026-09-08)
+**Canonical delivery status:** `../plans/universal_agentic_harness_masterplan.md` (2026-10-04)
 
 The phase tables in this foundation preserve the original extraction plan. Use
 the canonical masterplan for current H0-H6 implementation status, acceptance
@@ -186,12 +186,14 @@ for one revision. An `agent_run_id` is an activation of that embodiment bound
 to exactly one `environment_run_id`. Agent and handle registration remain
 reusable across environment activations.
 
-This is the target identity spine. The current code implements environment
-profile/run, content-addressed ingress, task, trace, operation, proposal,
-admission, lease, result, evidence, and event identities plus a monolithic
-`ConfigurationIdentity`. `AgentRoleConfiguration`, agent and handle
-registries, `AgentRun`, model allocation, and invocation identities remain
-H1/H2 contracts rather than executable registries.
+The current identity spine includes content-addressed role and model
+configurations, agent manifests, initial handle revisions, environment-bound
+agent runs, task and operation identities, admission, execution leases,
+results, evidence, and events. Role/model/manifest registries are in memory;
+actor attachment, fixed allocation, startup readiness, release, and termination
+replay from the common ledger. `ConfigurationIdentity` remains the recorded
+qualification configuration. Dynamic scheduling and qualified handle rebinding
+remain H3 work.
 
 ### Hardware-aware model allocation spine
 
@@ -264,7 +266,7 @@ lease without an explicit isolation contract.
 %% uah-render: Figure 1C. Registration validates; startup acquires model capacity
 flowchart TB
     Manifest["AgentManifest<br/>immutable embodiment candidate"]:::identity
-    Registration["RegistrationPreflight<br/>schema + role + policy + capacity snapshot"]:::gate
+    Registration["RegistrationPreflight<br/>schema + role + declared model compatibility"]:::gate
     Registered["RegisteredAgent<br/>no run, lease, or invocation"]:::semantic
     Handle["AgentHandleRevision<br/>stable routed identity"]:::identity
     Start["AgentRunStartRequest<br/>explicit startup intent"]:::proposal
@@ -286,11 +288,49 @@ flowchart TB
     Startup -->|failed| Failed
 ```
 
-Registration performs no model load or invocation. It validates immutable
-contracts and a current, explicitly non-reserving capacity snapshot. An
-operator, user, or admitted agent action later requests startup. Only that path
-creates an agent run, obtains a model lease, performs live readiness probes, and
-exposes task ingress after the required policy passes.
+The diagram describes the complete startup target. The implemented registration
+preflight checks immutable role/model references, declared capabilities,
+provider kind, and context compatibility. It reserves no capacity and performs
+no model action. Hardware capacity is checked when a fixed lease is requested.
+Startup preflight evaluates a bounded readiness report supplied by the declared
+instance owner; the allocator does not execute those probes.
+
+```mermaid
+%% uah-render: Figure 1E. Implemented H1 attachment, fixed lease, readiness and standby
+flowchart TB
+    Registry["Role/model registries + RegistrationPreflight<br/>declared compatibility only"]:::semantic
+    Attach["AgentRunRegistry.attach<br/>profile + attestation + manifest + handle pinned"]:::identity
+    Standby["attached_standby / standby<br/>no model reservation"]:::identity
+    Acquire["FixedModelAllocator.acquire<br/>exact model + fresh owner capacity"]:::gate
+    Lease["ModelLease<br/>exclusive host/instance reservation"]:::execution
+    Readiness["StartupPreflight<br/>owner report + bounded freshness"]:::gate
+    Ready["ready<br/>eligible for bounded invocation"]:::identity
+    Invoke["PromptCompiler + provider port<br/>atomic model-call grant + invocation"]:::compiler
+    Release["ModelLeaseRelease<br/>same logical activation"]:::gate
+    Terminal["terminate<br/>idle lease release + terminal atomically"]:::domain
+    Registry --> Attach
+    Attach --> Standby
+    Standby --> Acquire
+    Acquire -->|accepted| Lease
+    Lease --> Readiness
+    Readiness -->|passed| Ready
+    Readiness -->|failed, atomic release| Standby
+    Ready --> Invoke
+    Invoke -->|typed output or failure| Ready
+    Ready --> Release
+    Release --> Standby
+    Standby --> Terminal
+```
+
+The fixed allocator accepts an owner-issued RAM, VRAM, and context snapshot no
+older than 30 seconds. Reservations are exclusive per host and instance within
+the ledger. Repeating an active request returns its exact lease; a released
+request cannot acquire again. Reacquisition requires a new request identity and
+fresh capacity. Startup evidence must identify the exact model, instance, and
+lease and stay within two attempts, ten seconds, and 30-second freshness.
+Failed startup records the failed judgment and release atomically. These are
+declared and owner-reported readiness contracts, not measured model quality or
+H2 qualification.
 
 ### Environment activation, ingress, and agent standby
 
@@ -310,7 +350,7 @@ flowchart TB
     Chatbot["chatbot agent_run_id<br/>standby or invoking"]:::identity
     Planner["planner agent_run_id<br/>standby or invoking"]:::identity
     Ingress["EnvironmentIngress<br/>observation + request + feedback"]:::trace
-    Policy["TaskIngressPolicy<br/>state update + start + resume + reject"]:::gate
+    Policy["TaskIngressAuthority<br/>state update + start + resume + reject"]:::gate
     Task["TaskSpec + trace_id<br/>typed obligations + causal workflow"]:::semantic
     Start --> Native
     Native --> Attestation
@@ -339,10 +379,19 @@ capacity. A later invocation reacquires a compatible lease and performs any
 freshness checks required by deployment policy. This supports continuous
 agents on hardware that cannot keep every configured model loaded.
 
-`TaskIngressPolicy` is deterministic and environment-scoped. It classifies a
-normalized ingress item as a state update, new task, resumed task, notification
-to existing tasks, or rejection. A model may interpret admitted content after
-this association, but it cannot rewrite task or trace lineage.
+The current registry persists attachment and termination through scoped actor
+events. It refuses a second live run for the same environment and handle and
+pins profile, attestation, manifest, and handle revision for replay. Fixed leases
+and startup reports drive readiness and standby; releasing a lease preserves
+the logical activation. General context persistence, in-flight interruption,
+and dynamic model scheduling remain open.
+
+`TaskIngressAuthority` is deterministic and environment-scoped. It classifies
+a normalized ingress item as a state update, new task, resumed task,
+notification to existing tasks, or rejection. It is the only public writer for
+task-bearing ingress. The task registry is a read-only ledger projection. A
+model may interpret admitted content after this association, but it cannot
+rewrite task or trace lineage.
 
 ### Frame projection and prompt compilation
 
@@ -356,7 +405,7 @@ flowchart TB
     State["CurrentState<br/>fresh domain context + lineage"]:::projection
     Interaction["InteractionModuleCompiler<br/>closed task AB projection"]:::compiler
     Module["InteractionModuleSpec<br/>objects + permissions + evidence closure"]:::projection
-    Prompt["PromptCompiler (planned)<br/>kernel + role + domain + task"]:::compiler
+    Prompt["PromptCompiler<br/>kernel + role + domain + task"]:::compiler
     Model["ModelAdapter<br/>local or remote LLM"]:::model
     Proposal["TypedProposal<br/>zero execution authority"]:::proposal
     Task --> Interaction
@@ -379,26 +428,46 @@ wholesale registry dump.
 ### Two-stage admission and execution authority
 
 ```mermaid
-%% uah-render: Figure 3. Semantic admission before domain lifecycle authority
-flowchart TB
+%% uah-render: Figure 3. Admission, runtime control, evidence, and task closure
+flowchart LR
     Module["InteractionModuleSpec<br/>admission source of truth"]:::projection
+    Raw["Raw typed model output<br/>immutable artifact"]:::model
+    Normalize["ProposalNormalizer<br/>finite canonical contract"]:::compiler
     Proposal["TypedProposal<br/>zero execution authority"]:::proposal
+    ProposalReject["ProposalNormalizationRejection<br/>nonterminal fact"]:::failure
     SemanticGate["UAH Semantic Admission<br/>schema + frame + role + binding"]:::gate
     Admitted["AdmittedOperation<br/>immutable semantic decision"]:::gate
+    SemanticReject["SemanticAdmissionRejection<br/>nonterminal fact"]:::failure
     DomainGate["Domain Lifecycle Admission<br/>readiness + dedupe + fencing"]:::domain
     Lease["ExecutionLease<br/>owner-granted authority"]:::execution
+    Control["H1 Dispatch Control<br/>budget + cancellation + timeout policy"]:::gate
     Owner["Environment Owner<br/>exact binding execution"]:::execution
-    Evidence["Terminal Result + EffectEvidence<br/>owner-issued observations"]:::evidence
+    Evidence["ExecutionReceipt + EffectEvidence<br/>accepted observations"]:::evidence
+    EvidenceReject["EvidenceRejection<br/>native result retained"]:::failure
+    Acceptance["TaskAcceptanceEvaluator<br/>compiled obligations only"]:::gate
+    Terminal["accepted | accepted_with_deficit<br/>suspended | rejected"]:::evidence
     Ledger["Append-only Lifecycle Ledger<br/>events + artifacts + replay"]:::trace
     Observatory["Observatory<br/>read-only trace projection"]:::observatory
-    Proposal --> SemanticGate
+    Raw --> Normalize
+    Normalize -->|valid| Proposal
+    Normalize -->|invalid| ProposalReject
     Module --> SemanticGate
+    Proposal --> SemanticGate
     SemanticGate -->|accepted| Admitted
+    SemanticGate -->|rejected| SemanticReject
     Admitted --> DomainGate
     DomainGate -->|leased| Lease
-    Lease --> Owner
-    Owner --> Evidence
-    Evidence --> Ledger
+    Lease --> Control
+    Control -->|granted| Owner
+    Control -->|cancelled or exhausted| Ledger
+    Owner -->|valid evidence| Evidence
+    Owner -->|invalid evidence| EvidenceReject
+    Evidence --> Acceptance
+    Acceptance --> Terminal
+    ProposalReject --> Ledger
+    SemanticReject --> Ledger
+    EvidenceReject --> Ledger
+    Terminal --> Ledger
     Ledger --> Observatory
 ```
 
@@ -406,8 +475,12 @@ The proposal has no authority. UAH semantic admission validates the
 frame-relative object, role reach, finite canonical JSON arguments, approved
 binding, and evidence obligations. The current domain gate applies native
 readiness, duplicate suppression, environment, attestation, pack-revision, and
-binding checks before granting an `ExecutionLease`. Concurrency, cancellation,
-supersession, expiry, and runtime argument-schema validation remain planned.
+binding checks before granting an `ExecutionLease`. Input arguments are
+validated against a reviewed, content-addressed schema before semantic
+admission. Initial H1 dispatch control atomically records a tool-budget grant
+with execution start, supports owner-authorized cancellation before dispatch,
+records timeout observations, and bounds retry decisions. It does not implement
+in-flight interruption, supersession, expiry, or output-schema validation.
 The owner executes the immutable admitted value, not a reparsed copy of raw
 model output.
 
@@ -416,29 +489,52 @@ both decisions. `ProposalNormalizer` binds canonical finite-JSON arguments to
 the raw-output artifact, compiled task, environment run, task, trace, and
 operation. `SemanticAdmission` checks role output ownership, projection reach,
 direct-control band, runtime callability, prohibited effects, approved binding,
-binding owner/environment/runtime, schema-reference presence, and obligation
-lineage before emitting a content-addressed `AdmittedOperation`.
+binding owner/environment/runtime, resolved input-schema content, canonical
+argument types, and obligation lineage before emitting a content-addressed
+`uah.admitted_operation/v3` that pins the validated schema identity and the
+exact frozen `ABObjectView` used by the compiled task. The environment owner
+compares that view with its live catalog before dispatch and validates observed
+effects against the admitted snapshot. Current semantic-admission events carry
+the full artifact so restart can reverify its nested and outer identities.
+The current wire parser rejects active v2 payloads and does not infer missing
+snapshots for historical metadata. Original R4 probes reproduced an all-marker
+replay downgrade and current consumers accepting a genuine old concrete
+artifact. The [separately reviewed nested-owner correction](../artifacts/reviews/2026-10-08_uah_r4_nested_owner.md)
+now rejects these active continuations and validates actual concrete nested
+fields before detached dispatch, evidence and ledger consumption. Both fresh
+reviews approve that bounded repair; historical read-only controls pass.
+This does not qualify release-wide authority or replace the separately open
+raw-ingress producer-provenance gate.
+The separate ARCH-01 implementation gives SemanticAdmission ownership of pure
+task-local operation eligibility. PromptCompiler uses that same rule to form
+choices; expected effects and observable effects both respect prohibited
+effects. Static eligibility grants no execution authority and does not replace
+binding, argument-schema or domain gates. Two fresh reviews approve this
+bounded static rule; its gate and stateful limits are tracked in
+the [ARCH-01 receipt](../artifacts/reviews/2026-10-08_uah_arch01_static_eligibility.md).
 `DomainLifecycleAdmission` independently rechecks activation, domain revision,
 binding environment, readiness attestation, and duplicate operation before
 issuing a content-addressed, operation-scoped `ExecutionLease`. Native
-concurrency, cancellation, supersession, and payload-schema evaluation remain
-open. The implemented owner now accepts only the exact lease, fences the full
-binding fingerprint, records execution start before the handler, and preserves
-the native result separately from normalized evidence. The common ledger
-persists and replays the accepted chain into a deterministic trace digest.
+concurrency, supersession, and output-schema evaluation remain open.
+Normalization, semantic admission, domain admission, and evidence validation
+emit content-addressed rejection facts with ordered reason codes. The ledger
+replays those facts as nonterminal failure stages. The owner preserves the
+native result separately from normalized evidence. Explicit task acceptance
+produces accepted, deficit, suspended, or required-effect-rejected terminal
+facts and deterministic trace digests. An operation rejection never makes the
+whole task terminal by inference.
 
 ### Prompt compilation seam
 
-The planned `PromptCompiler` will render one model-facing view from the same
-immutable `InteractionModuleSpec` consumed by semantic admission. It is not an
-executable module in the current repository:
+The implemented `PromptCompiler` renders one model-facing view from the same
+immutable `InteractionModuleSpec` consumed by semantic admission:
 
 ```text
 stable UAH protocol kernel
   + role contract from role_configuration_id
   + minimal versioned domain policy
   + task-scoped AB object and capability projection
-  + current task, lineage, fresh state, and selected evidence
+  + task lineage, obligations, prohibitions, and budgets
   -> compiled prompt + structured operation schemas + prompt artifact hash
 ```
 
@@ -446,6 +542,24 @@ Raw transport locators remain harness-side. The model sees normalized AB
 objects and structured operation schemas, not direct ROS topics, Python
 functions, provider URLs, or other implementation shortcuts. Prompt wording
 cannot widen the objects or authority admitted by `InteractionModuleSpec`.
+
+`uah.prompt_pack/v1` carries versioned role/domain wording and constrained
+examples. The compiler verifies role, frame, domain, manifest, and pack identity,
+narrows direct operation choices, checks approved argument schemas, and filters
+examples against the task. `uah.compiled_prompt/v1` pins messages, output schema,
+and binding/schema source fingerprints. This first compiler supports one direct
+typed operation; dynamic context/memory and delegated outputs remain open.
+
+`ModelInvocationAuthority` requires that compiled task to exist in the ledger
+and the exact actor to be ready under the same unexpired model lease. It records
+one model-call debit and invocation start atomically before calling the
+`ProviderPort`. Typed completion retains finite raw JSON and exact prompt,
+lease, model, actor, and task lineage; typed failure retains its request.
+Repeated completed invocation IDs return recorded artifacts without another
+provider call, while an outstanding call cannot retry automatically. Task
+acceptance is blocked until its invocation settles. Output is still untrusted
+input to proposal normalization, not admitted authority or effect evidence.
+The port is verified with a fake provider; live ZeroTier transport remains open.
 
 ### H3 Neural Workbench attachment seam
 
@@ -576,6 +690,14 @@ source coordinates. A replan keeps the root semantic operation when the
 desired effect is unchanged; new `plan_id` or `plan_version` values remain
 domain lineage beneath that operation.
 
+`uah.operation_edge/v1` implements the graph identity and same-frame replay
+rules. Both endpoint operations must already be normalized and semantically
+admitted, their recorded frames must match, one structural parent is allowed,
+cycles are rejected, and the target cannot already hold a lease. Cross-frame
+`delegates_to` is frozen as an artifact contract but currently fails closed
+because one trace has only one compiled target projection. Executable
+delegation therefore remains an H2 multi-actor seam.
+
 ### NAO `report_result` reference delegation
 
 The NAO `report_result` contract is frozen as an AB1 object in the planner's
@@ -619,9 +741,9 @@ owner-reviewed, content-addressed DomainContractPack revision before H2 parity.
 | `AgentRoleConfiguration` | Immutable role manifest | Primary frame, explicit auxiliary frame projections, control bands, capability packs, budgets, authority policy | Model or provider selection |
 | `AgentManifest` | Content-addressed composition | Role, model configuration, prompt pack, harness and adapter revisions | Mutable run state |
 | Agent registry | `register(agent_manifest)` and `get(agent_id)` | Immutable agent embodiments and content-addressed lookup | Handle continuity, hardware placement, or runtime state |
-| Agent handle registry | `resolve(agent_handle_id)` and `promote(candidate_agent_id, fidelity_report)` | Immutable handle revisions, one active agent, role invariance and rollback lineage | Hardware placement or silent model fallback |
+| Agent handle registry | `register(agent_handle_id, candidate_agent_id, fidelity_evidence_refs)` and `resolve(agent_handle_id)` | Initial immutable handle revision and one active agent; the current slice rejects rebinding | Fidelity evaluation, hardware placement, or silent model fallback |
 | Environment run registry | `register(environment_run_attestation)` and `close(environment_run_id)` | Attested native activation, profile revision, roster, lifecycle state, and evidence anchors | Starting native infrastructure or inventing readiness evidence |
-| Task ingress policy | `classify(environment_run, environment_ingress)` | Deterministic state-update, start, resume, notify, or reject decision and lineage assignment | Model invocation or domain-side execution policy |
+| Task ingress authority | `admit(environment_run, environment_ingress)` | Deterministic state-update, start, resume, notify, or reject decision, ledger append for accepted task-bearing ingress, and lineage assignment | Model invocation or domain-side execution policy |
 | `InteractionModuleCompiler` | `compile(role, task, domain, state)` | Minimal closed AB graph, permissions, evidence closure | Prompt wording or execution |
 | `PromptCompiler` | `compile_prompt(agent, module, task_context)` | Stable kernel prefix, role/domain presentation, schemas, artifact hash | Admission or binding resolution |
 | Model allocator | `lease(agent_run, resource_request)` | Compatible instance selection, measured capacity, lease lifetime, isolation and release | Changing the agent's model configuration or semantic authority |
@@ -696,7 +818,7 @@ derives the initial trace as
 issuance deterministic and environment-scoped without replacing native goal or
 request identities. Resume and notification require a registered task lookup
 and reuse the original trace only within the same environment run. The current
-registry rejects duplicate starts and replayed task-bearing ingress.
+authority rejects duplicate starts and replayed task-bearing ingress.
 Acceptance-derived terminal judgments reject later ingress, while suspended
 judgments remain resumable. The task registry is a projection over the common
 `uah.trace_event/v1` ledger rather than a second event store. Global sequence,
@@ -707,7 +829,7 @@ cancellation/failure grammar remains open.
 Each decision has a content-derived identity that includes the ingress artifact
 identity. Compilation also requires the exact start lineage to be present in
 the ledger, so constructing a matching decision value outside the ingress
-policy cannot grant task authority.
+authority cannot grant task authority.
 
 ### AgentRoleConfiguration
 
@@ -778,6 +900,10 @@ change creates a new `agent_id`. A restart of the unchanged agent creates a new
 uses the required role configuration and its fidelity report passes the
 deployment's structural, behavioral, resource, and rollback gates. The handle
 does not own conversation state or weaken the authority policy.
+
+The current registry does not perform that promotion. It accepts one initial
+binding with declared evidence references and refuses a second registration.
+Qualified rebinding remains an H3 seam.
 
 The role's `model_admission_profile_id` defines provider-neutral protocol,
 context, structured-output, behavioral, and evaluation requirements. A
@@ -886,19 +1012,23 @@ budgets:
   wall_time_sec: 90
   model_calls: 3
   tool_calls: 12
+  retry_attempts: 2
 ```
 
-The implemented H0 compiler uses the narrower `uah.task_spec/v1` subset needed
+The implemented H0 compiler uses the narrower `uah.task_spec/v2` subset needed
 for the first executable proof. A successful start-task decision, task and
 trace lineage, role, frame, registry, budgets, and DomainContractPack revision
-produce one content-addressed `uah.compiled_task/v1` artifact. Effect requests
+produce one content-addressed `uah.compiled_task/v2` artifact. Effect requests
 carry requirement only; the reviewed domain pack supplies the AB object,
 evidence owner, and failure policy. The compiler rejects owner or observable
 drift, prohibited effects, revision mismatches, mutable collections, and
 resume-time recompilation. Two-stage admission already consumes this artifact.
-Future prompt compilation must consume it rather than independently recreating
-projection or acceptance inputs. The compiled budget values are declared
-limits only; runtime budget consumption and enforcement remain open.
+Prompt compilation consumes it rather than independently recreating projection
+or acceptance inputs. Tool-call consumption is enforced atomically
+at execution start, timeout observations derive from ledger-recorded start
+time, and retry decisions use the compiled attempt limit. The model-call limit
+is consumed atomically at provider invocation start. Task token/cost accounting
+remains open; hardware capacity is enforced separately at fixed model allocation.
 
 ### InteractionModuleSpec
 
@@ -974,11 +1104,16 @@ routing:
 This is the implemented H0 envelope. `data_json` is a canonical JSON object,
 and the event identity covers every field except `event_id`. Multi-event facts
 share one commit identity and occupy every position from 1 to `commit_size`;
-strict reload rejects incomplete or interleaved commits. Agent, handle, model,
-prompt, allocation, and operation-edge identities belong to the target H1
-envelope and are not emitted by the current tracer. A future cross-agent
-workflow will retain one `trace_id` while adding actor identity and typed
-`decomposes_to`, `delegates_to`, or `continues_with` edges.
+strict reload rejects incomplete or interleaved commits. The v1 serialized
+identity is preserved. H1 adds `uah.trace_event/v2` with `event_scope` and
+`agent_run_id`: agent-scoped facts carry null task/trace IDs, while new
+task-scoped invocation facts carry an explicit actor. Attachment retains the
+manifest, handle revision, profile, and activation attestation; allocation and
+startup facts retain their exact leases and owner reports. The current grammar emits explicit
+`operation_edge_recorded`, proposal/evidence rejection, budget, cancellation,
+timeout, retry, obligation, and terminal-rejection events. A future cross-agent
+workflow retains one `trace_id` while adding actor identity to new facts.
+Observatory does not infer an actor for older v1 task events.
 
 ## 6. Current Stack: Reusable Harness Mechanisms Already Implemented
 
@@ -1104,14 +1239,25 @@ src/ab_harness/
     domain_contracts.py        # content-addressed ingress/effect authority
     environment_profiles.py    # frozen reusable environment profiles
     environment_runs.py        # attested activation registration
-    environment_ingress.py     # normalized ingress and classified decisions
+    environment_ingress.py     # normalized ingress and decision values
+    task_ingress_authority.py  # sole task-bearing ingress writer
     task_registry.py           # ledger-projected task/trace lineage
     task_compiler.py           # TaskSpec and content-addressed CompiledTask
     proposal_admission.py      # TypedProposal and semantic admission
+    schema_validation.py       # reviewed input-schema validation
     domain_lifecycle.py        # domain gate and ExecutionLease
-    environment.py             # lease-only in-process owner and receipt
+    environment.py             # lease-only owner, receipt, evidence rejection
+    operation_edges.py         # frame-relative operation graph contracts
+    runtime_controls.py        # budget, cancellation, timeout, retry decisions
     acceptance.py              # obligation-based task acceptance
-    lifecycle.py               # TraceEvent v1, JSONL replay, verified digest
+    lifecycle.py               # v1/v2 events, JSONL replay, verified digest
+    agent_identity.py          # agent, handle, durable attached-run projection
+    agent_configuration.py     # role/model registries, registration preflight
+    agent_lifecycle.py         # scoped actor transitions and replay family
+    model_allocator.py         # fixed exclusive lease and owner readiness
+    prompt_compiler.py         # versioned pack and task-derived prompt artifact
+    model_invocation.py        # provider port, raw output, atomic call accounting
+    observatory.py             # read-only O1 projection and static HTML
     bindings.py                # approved implementation-binding catalog
     gate.py                    # legacy role/output gate used by chatbot path
     configuration.py           # compatibility configuration identity
@@ -1121,9 +1267,11 @@ src/ab_harness/
 src/ab_harness_nao/            # ROS-free NAO contracts and recorded qualification
 ```
 
-`identity.py`, `agent_registry.py`, `prompt_compiler.py`, provider adapters,
-runtime budget enforcement, and the Observatory renderer are planned H1/H2
-modules. They are not present in the current source tree.
+Fixed model leases, bounded owner-reported startup preflight, durable actor
+transitions, and O1 environment/task/trace and actor views are implemented.
+Prompt compilation and the provider-neutral invocation port have fake-provider
+fixtures. Live provider adapters, stale-effect-evidence policy, false-completion
+attribution, and complete context persistence remain open.
 
 Runtime and domain adapters remain outside the portable semantic core:
 
@@ -1330,8 +1478,11 @@ H5 cross-runtime federation and conformance
 H6 optional AB5 policy-foundry research
 ```
 
-The implemented H0 slice remains a contract proof. H1 is the next engineering
-target, and H2 remains the first cooperative real-environment demonstration.
+The implemented H0 slice remains a contract proof. H1 now supplies durable actor
+activation, fixed model allocation, bounded owner readiness, and standby.
+Prompt compilation and leased invocation now have a fake-provider proof. A live
+transport probe remains the next model-runtime target.
+H2 remains the first cooperative real-environment demonstration.
 H3 adaptation, H4 crystallization, H5 federation, and H6 policy research cannot
 be used to relabel incomplete H0-H2 work.
 
@@ -1339,10 +1490,10 @@ be used to relabel incomplete H0-H2 work.
 
 1. Freeze and review the environment, identity, task-ingress, operation-edge,
    effect-obligation, and task-acceptance schemas.
-2. Retain the implemented task acceptance, profile-verified environment run,
-   environment-bound ingress, common ledger, restart replay, and verified
-   digest. Next add owner-authorized rejection, cancellation, timeout, and
-   retry transitions.
+2. Retain task acceptance, profile-verified environment runs,
+   environment-bound ingress, common-ledger replay, operation edges, typed
+   rejection branches, terminal counterexamples, and initial H1 controls. Add
+   stale-evidence and false-completion policy next.
 3. Retain the implemented `CompiledTask -> TypedProposal -> AdmittedOperation
    -> ExecutionLease -> ExecutionReceipt` slice. Direct or reparsed dispatch is
    absent and must not be reintroduced.
@@ -1350,7 +1501,8 @@ be used to relabel incomplete H0-H2 work.
    navigation failure, and grouped delivery.
 5. Define the shared provider capability record from the union of current
    chatbot and planner transport behavior.
-6. Extract a generic prompt-pack loader behind compatibility wrappers.
+6. Compile the immutable prompt pack, role, domain, and task projection into one
+   deterministic prompt artifact, then invoke through an exact ready model lease.
 7. Extend the common trace event schema with adapters from
    `chatbot_turn_trace`, planner decisions, orchestrator feedback, and Workbench
    traces.
@@ -1363,8 +1515,8 @@ be used to relabel incomplete H0-H2 work.
    planner mechanism; reject slices that change domain behavior.
 12. Prototype Pi RPC and OpenHands sandbox adapters only after the kernel schemas
    stabilize.
-13. Decide whether `ab_harness` remains a package in Neural Workbench or becomes
-    a standalone repository after the first non-NAO adapter succeeds.
+13. Preserve the standalone UAH package and independently versioned
+    NeuralWorkbench companion boundary.
 
 ## 15. Adversarial Audit
 
@@ -1386,16 +1538,19 @@ be used to relabel incomplete H0-H2 work.
 - [~] Core H0 frame, band, role, projection, gate, task acceptance,
   profile-verified environment-run registration, content-addressed ingress
   decisions, ledger-authorized task starts, two-stage admission, lease-only
-  execution, and accepted-path replay are implemented and tested. The common
+  execution, accepted/rejected replay, and operation edges are implemented and
+  tested. The common
   ledger uses atomic commit-framed JSONL with cross-process advisory writer
-  coordination; state-update duplicate handling, operation edges, and the
-  remaining failure/cancellation grammar remain open.
+  coordination. Scoped actor activation, fixed leases, readiness, and standby
+  replay from the same ledger. State-update duplicate handling, stale effect
+  evidence, false completion, and live model integration remain open.
 - [ ] No same-model harness ablation has yet measured uplift.
 - [ ] No external Pi/OpenHands adapter has yet been prototyped.
 - [ ] Live ROS and robot behavior remain outside this documentation-only pass.
 
-**Decision:** accept the architecture and implemented H0 proof. Complete the H0
-lifecycle grammar before H1, then gate H2 cooperative integration by
+**Decision:** accept the architecture and implemented H0 proof plus the initial
+H1 control and fixed activation slices. Close stale-effect-evidence and
+false-completion policy while qualifying live leased invocation. Gate H2 cooperative integration by
 behavior-parity tests and same-model ablations. The canonical masterplan owns
 current status.
 

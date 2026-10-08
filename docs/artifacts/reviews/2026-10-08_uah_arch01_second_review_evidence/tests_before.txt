@@ -1,0 +1,86 @@
+exit_code=1
+...............F.F...................................................... [ 53%]
+...............................................................          [100%]
+=================================== FAILURES ===================================
+____ test_prompt_compiler_excludes_an_operation_with_a_forbidden_observable ____
+
+    def test_prompt_compiler_excludes_an_operation_with_a_forbidden_observable():
+        inputs = _inputs(
+            observable_success=("note_written", "unsafe_observable"),
+            prohibited_effects=("unsafe_observable",),
+        )
+        proposal = ProposalNormalizer().normalize(
+            compiled_task=inputs["compiled_task"],
+            operation_id="operation:forbidden",
+            raw_output_artifact_id="raw:forbidden",
+            output=AgentOutput(
+                "operation",
+                {"object_id": "write_note", "arguments": {"text": "A note"}},
+                ("write_note",),
+            ),
+        ).proposal
+        decision = SemanticAdmission(
+            catalog=inputs["binding_catalog"],
+            environment_id=inputs["environment_id"],
+            runtime_mode=inputs["runtime_mode"],
+            schema_validator=InMemoryArgumentSchemaRegistry(inputs["argument_schemas"]),
+        ).admit(inputs["compiled_task"], proposal)
+        assert decision.reason_codes == ("object_effect_prohibited",)
+>       with pytest.raises(ValueError, match="direct proposal"):
+E       Failed: DID NOT RAISE ValueError
+
+/home/juanbeck/universal-agentic-harness/tests/test_prompt_compiler.py:375: Failed
+_ test_prompt_and_admission_agree_on_task_prohibited_effects[expected1-observed1-prohibited1-False] _
+
+expected = ('note_written',), observed = ('note_written', 'unsafe')
+prohibited = ('unsafe',), eligible = False
+
+    @pytest.mark.parametrize(
+        "expected,observed,prohibited,eligible",
+        (
+            (("note_written", "unsafe"), ("note_written",), ("unsafe",), False),
+            (("note_written",), ("note_written", "unsafe"), ("unsafe",), False),
+            (("note_written", "unsafe"), ("note_written", "unsafe"), ("unsafe",), False),
+            (("note_written", "safe"), ("note_written", "safe"), ("unsafe",), True),
+            (("note_written", "safe"), ("note_written", "safe"), (), True),
+        ),
+    )
+    def test_prompt_and_admission_agree_on_task_prohibited_effects(
+        expected, observed, prohibited, eligible
+    ):
+        inputs = _inputs(
+            expected_effects=expected,
+            observable_success=observed,
+            prohibited_effects=prohibited,
+        )
+        proposal = ProposalNormalizer().normalize(
+            compiled_task=inputs["compiled_task"],
+            operation_id="operation:effects",
+            raw_output_artifact_id="raw:effects",
+            output=AgentOutput(
+                "operation",
+                {"object_id": "write_note", "arguments": {"text": "A note"}},
+                ("write_note",),
+            ),
+        ).proposal
+        decision = SemanticAdmission(
+            catalog=inputs["binding_catalog"],
+            environment_id=inputs["environment_id"],
+            runtime_mode=inputs["runtime_mode"],
+            schema_validator=InMemoryArgumentSchemaRegistry(inputs["argument_schemas"]),
+        ).admit(inputs["compiled_task"], proposal)
+        assert decision.accepted is eligible
+        if eligible:
+            prompt = PromptCompiler().compile(**inputs)
+            choice = json.loads(prompt.output_schema_json)["oneOf"][0]
+            assert choice["properties"]["object_id"] == {"const": "write_note"}
+        else:
+            assert decision.reason_codes == ("object_effect_prohibited",)
+>           with pytest.raises(ValueError, match="direct proposal"):
+E           Failed: DID NOT RAISE ValueError
+
+/home/juanbeck/universal-agentic-harness/tests/test_prompt_compiler.py:420: Failed
+=========================== short test summary info ============================
+FAILED tests/test_prompt_compiler.py::test_prompt_compiler_excludes_an_operation_with_a_forbidden_observable
+FAILED tests/test_prompt_compiler.py::test_prompt_and_admission_agree_on_task_prohibited_effects[expected1-observed1-prohibited1-False]
+2 failed, 133 passed in 1.42s

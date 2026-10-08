@@ -1,0 +1,27 @@
+[
+  {
+    "reverse_construction_order": false,
+    "write_succeeded": true,
+    "second_owner_wrote_before_callback_return": true,
+    "closure_content_matches": true,
+    "actual_text_before_callback_return": "wrong",
+    "phase": "callback_completed",
+    "terminal_acceptance_asserted": false
+  },
+  {
+    "reverse_construction_order": true,
+    "write_succeeded": true,
+    "second_owner_wrote_before_callback_return": true,
+    "closure_content_matches": true,
+    "actual_text_before_callback_return": "wrong",
+    "phase": "callback_completed",
+    "terminal_acceptance_asserted": false
+  },
+  {
+    "case": "preexisting_hardlink",
+    "same_inode": true,
+    "outside_text_after_write": "review note\n",
+    "write_succeeded": true,
+    "external_concurrent_writer": false
+  }
+]

@@ -1,0 +1,16 @@
+
+==================================== ERRORS ====================================
+_____________ ERROR collecting tests/test_synthetic_notes_owner.py _____________
+ImportError while importing test module '/home/juanbeck/universal-agentic-harness/tests/test_synthetic_notes_owner.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/usr/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_synthetic_notes_owner.py:1: in <module>
+    from ab_harness_synthetic import ExactNoteOracle, NativeNotesOwner
+E   ModuleNotFoundError: No module named 'ab_harness_synthetic'
+=========================== short test summary info ============================
+ERROR tests/test_synthetic_notes_owner.py
+!!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!
+1 error in 0.09s

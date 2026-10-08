@@ -1,0 +1,164 @@
+--- docs/artifacts/reviews/2026-10-08_uah_r4_nested_owner_evidence/proposal_admission.py.before	2026-10-08 17:54:45.951352520 +0200
++++ src/ab_harness/proposal_admission.py	2026-10-08 17:58:37.828931871 +0200
+@@ -144,8 +144,13 @@
+     def arguments(self) -> dict[str, Any]:
+         return json.loads(self.arguments_json)
+
++    def verified_copy(self) -> TypedProposal:
++        if type(self) is not TypedProposal:
++            raise ValueError("current proposal requires the supported concrete artifact")
++        return replace(self)
++
+     def to_dict(self) -> dict[str, object]:
+-        self.verify_identity()
++        TypedProposal.verify_identity(self)
+         return {
+             "proposal_id": self.proposal_id,
+             **_proposal_payload(
+@@ -451,7 +456,7 @@
+ ) -> dict[str, object]:
+     return {
+         "schema_version": ADMITTED_OPERATION_SCHEMA,
+-        "proposal": proposal.to_dict(),
++        "proposal": TypedProposal.to_dict(proposal),
+         "object_snapshot": asdict(object_snapshot),
+         "frame_id": frame_id,
+         "ab_level": ab_level,
+@@ -607,8 +612,21 @@
+     def arguments(self) -> dict[str, Any]:
+         return self.proposal.arguments
+
++    def verified_copy(self) -> AdmittedOperation:
++        if (
++            type(self) is not AdmittedOperation
++            or type(getattr(self, "proposal", None)) is not TypedProposal
++            or type(getattr(self, "object_snapshot", None)) is not ABObjectView
++        ):
++            raise ValueError("current admission requires complete supported proposal and snapshot artifacts")
++        return replace(
++            self,
++            proposal=TypedProposal.verified_copy(self.proposal),
++            object_snapshot=replace(self.object_snapshot),
++        )
++
+     def to_dict(self) -> dict[str, object]:
+-        self.verify_identity()
++        AdmittedOperation.verify_identity(self)
+         payload = {
+             "admission_id": self.admission_id,
+             **_admitted_operation_payload(
+
+--- docs/artifacts/reviews/2026-10-08_uah_r4_nested_owner_evidence/domain_lifecycle.py.before	2026-10-08 17:54:45.951926067 +0200
++++ src/ab_harness/domain_lifecycle.py	2026-10-08 17:58:37.829931873 +0200
+@@ -2,7 +2,7 @@
+
+ from __future__ import annotations
+
+-from dataclasses import dataclass
++from dataclasses import dataclass, replace
+ import hashlib
+ import json
+
+@@ -24,7 +24,7 @@
+ ) -> dict[str, object]:
+     return {
+         "schema_version": EXECUTION_LEASE_SCHEMA,
+-        "admitted_operation": admitted_operation.to_dict(),
++        "admitted_operation": AdmittedOperation.to_dict(admitted_operation),
+         "lease_owner_id": lease_owner_id,
+         "environment_attestation_id": environment_attestation_id,
+         "scope": "operation",
+@@ -111,8 +111,16 @@
+     def runtime_mode(self) -> str:
+         return self.admitted_operation.runtime_mode
+
++    def verified_copy(self) -> ExecutionLease:
++        if type(self) is not ExecutionLease:
++            raise ValueError("current execution requires the supported concrete lease")
++        return replace(
++            self,
++            admitted_operation=AdmittedOperation.verified_copy(self.admitted_operation),
++        )
++
+     def to_dict(self) -> dict[str, object]:
+-        self.verify_identity()
++        ExecutionLease.verify_identity(self)
+         return {
+             "execution_lease_id": self.execution_lease_id,
+             **_lease_payload(
+@@ -152,7 +160,7 @@
+ ) -> dict[str, object]:
+     return {
+         "schema_version": DOMAIN_ADMISSION_REJECTION_SCHEMA,
+-        "admitted_operation": admitted_operation.to_dict(),
++        "admitted_operation": AdmittedOperation.to_dict(admitted_operation),
+         "environment_run_id": environment_run_id,
+         "environment_id": environment_id,
+         "environment_attestation_id": environment_attestation_id,
+
+--- docs/artifacts/reviews/2026-10-08_uah_r4_nested_owner_evidence/environment.py.before	2026-10-08 17:54:45.952530709 +0200
++++ src/ab_harness/environment.py	2026-10-08 17:57:21.879715950 +0200
+@@ -121,7 +121,7 @@
+         owner_result: OwnerExecutionResult,
+         evidence: EffectEvidence,
+     ) -> ExecutionReceipt:
+-        ExecutionLease.verify_identity(lease)
++        lease = ExecutionLease.verified_copy(lease)
+         admitted = lease.admitted_operation
+         mismatched = []
+         if evidence.object_id != admitted.object_id:
+@@ -300,6 +300,7 @@
+         owner_result: OwnerExecutionResult,
+         reason_codes: tuple[str, ...],
+     ) -> EvidenceRejection:
++        lease = ExecutionLease.verified_copy(lease)
+         fields = {
+             "lease": lease,
+             "owner_result": owner_result,
+@@ -481,6 +482,7 @@
+         self._lifecycle_ledger = lifecycle_ledger
+
+     def execute(self, lease: ExecutionLease) -> EvidenceDecision:
++        lease = ExecutionLease.verified_copy(lease)
+         admitted = self._validate_lease(lease)
+         if self._catalog.object_for(admitted.object_id) != admitted.object_snapshot:
+             raise ValueError("execution lease object semantics no longer match the catalog")
+
+--- docs/artifacts/reviews/2026-10-08_uah_r4_nested_owner_evidence/lifecycle.py.before	2026-10-08 17:54:45.952530709 +0200
++++ src/ab_harness/lifecycle.py	2026-10-08 17:59:43.983137016 +0200
+@@ -759,7 +759,7 @@
+         """Require the exact full semantic artifact recorded for active use."""
+         from ab_harness.proposal_admission import AdmittedOperation
+
+-        AdmittedOperation.verify_identity(admitted_operation)
++        admitted_operation = AdmittedOperation.verified_copy(admitted_operation)
+         with self._file_lock():
+             self._refresh_from_disk()
+             event = next((
+@@ -1097,7 +1097,7 @@
+             ),
+         )
+     if isinstance(fact, TypedProposal):
+-        fact.verify_identity()
++        fact = TypedProposal.verified_copy(fact)
+         return (
+             _operation_spec(
+                 fact,
+@@ -1150,7 +1150,7 @@
+             ),
+         )
+     if isinstance(fact, AdmittedOperation):
+-        AdmittedOperation.verify_identity(fact)
++        fact = AdmittedOperation.verified_copy(fact)
+         return (
+             _operation_spec(
+                 fact.proposal,
+@@ -1193,7 +1193,7 @@
+             ),
+         )
+     if isinstance(fact, ExecutionLease):
+-        ExecutionLease.verify_identity(fact)
++        fact = ExecutionLease.verified_copy(fact)
+         admitted = fact.admitted_operation
+         return (
+             _operation_spec(

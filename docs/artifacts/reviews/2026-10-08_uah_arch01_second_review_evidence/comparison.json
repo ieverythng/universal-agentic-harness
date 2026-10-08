@@ -1,0 +1,12 @@
+{
+  "cases": 29,
+  "semantic_artifacts_identical": true,
+  "changed_prompt_cases": [
+    "prohibited_observed",
+    "decomposed_missing_obligation",
+    "two_one_observable_forbidden_forward",
+    "two_both_observable_forbidden_forward",
+    "two_one_observable_forbidden_reverse",
+    "two_both_observable_forbidden_reverse"
+  ]
+}

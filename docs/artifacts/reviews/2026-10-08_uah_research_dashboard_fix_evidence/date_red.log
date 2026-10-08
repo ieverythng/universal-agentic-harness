@@ -1,0 +1,11 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+____________ test_registry_owns_reconciliation_date_in_both_outputs ____________
+tests/test_research_dashboard.py:196: in test_registry_owns_reconciliation_date_in_both_outputs
+    assert "Reconciled: 2026-10-08." in markdown.read_text()
+E   AssertionError: assert 'Reconciled: 2026-10-08.' in '# Research dashboard\n\nReconciled: 2026-10-07.\n\n## Catalog\n\n<!-- research-records:start -->\n| Research record |...snapshot SHA-256: `e5f82fe88597cb751d622285efc0588ee1ee582255333f2aa9f90e6371e3bd6d`.\n<!-- research-records:end -->\n'
+E    +  where '# Research dashboard\n\nReconciled: 2026-10-07.\n\n## Catalog\n\n<!-- research-records:start -->\n| Research record |...snapshot SHA-256: `e5f82fe88597cb751d622285efc0588ee1ee582255333f2aa9f90e6371e3bd6d`.\n<!-- research-records:end -->\n' = read_text()
+E    +    where read_text = PosixPath('/tmp/pytest-of-juanbeck/pytest-72/test_registry_owns_reconciliat0/docs/research/dashboard.md').read_text
+=========================== short test summary info ============================
+FAILED tests/test_research_dashboard.py::test_registry_owns_reconciliation_date_in_both_outputs
+1 failed, 23 deselected in 0.10s

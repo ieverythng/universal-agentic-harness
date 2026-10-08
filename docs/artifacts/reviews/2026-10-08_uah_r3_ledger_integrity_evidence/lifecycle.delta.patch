@@ -1,0 +1,78 @@
+--- docs/artifacts/reviews/2026-10-08_uah_r3_ledger_integrity_evidence/lifecycle.py.before	2026-10-08 16:43:23.227404835 +0200
++++ src/ab_harness/lifecycle.py	2026-10-08 16:44:12.342395573 +0200
+@@ -5,6 +5,7 @@
+ from dataclasses import asdict
+ from dataclasses import dataclass
+ from dataclasses import field
++from dataclasses import replace
+ from datetime import datetime, timedelta, timezone
+ import hashlib
+ import json
+@@ -158,11 +159,15 @@
+         data = json.loads(self.data_json)
+         if not isinstance(data, dict) or self.data_json != _canonical_json(data):
+             raise ValueError("trace event data must be a canonical JSON object")
++        self.verify_identity()
++
++    def verify_identity(self) -> None:
+         if self.event_id != _content_id("trace-event", self._identity_payload()):
+             raise ValueError("trace event identity does not match content")
+
+     @property
+     def data(self) -> dict[str, object]:
++        self.verify_identity()
+         return json.loads(self.data_json)
+
+     def _identity_payload(self) -> dict[str, object]:
+@@ -187,6 +192,7 @@
+         return payload
+
+     def to_dict(self) -> dict[str, object]:
++        self.verify_identity()
+         payload = self._identity_payload()
+         payload["artifact_refs"] = list(self.artifact_refs)
+         return {"event_id": self.event_id, **payload}
+@@ -626,7 +632,7 @@
+             _reduce_events(tuple(combined))
+             self._append(staged)
+             self._events.extend(staged)
+-            return LifecycleCommit(events=tuple(staged))
++            return LifecycleCommit(events=tuple(replace(event) for event in staged))
+
+     def start_execution(self, lease: ExecutionLease) -> LifecycleCommit:
+         from ab_harness.runtime_controls import BudgetExhaustedError
+@@ -698,7 +704,7 @@
+     def events(self) -> tuple[TraceEvent, ...]:
+         with self._file_lock():
+             self._refresh_from_disk()
+-            return tuple(self._events)
++            return tuple(replace(event) for event in self._events)
+
+     def has_operation_event(
+         self,
+@@ -760,7 +766,7 @@
+                 _digest(events, state) if state.terminal_status is not None else None
+             )
+             return LifecycleReplay(
+-                events=events,
++                events=tuple(replace(event) for event in events),
+                 terminal_status=state.terminal_status,
+                 failure_stage=state.failure_stage,
+                 verified_trace_digest=digest,
+@@ -771,7 +777,7 @@
+
+         with self._file_lock():
+             self._refresh_from_disk()
+-            return replay_agent_runs(tuple(self._events))
++            return replay_agent_runs(tuple(replace(event) for event in self._events))
+
+     def replay_agent_run(self, agent_run_id: str) -> AgentRunReplay:
+         for replay in self.agent_runs():
+@@ -1524,6 +1530,7 @@
+     known_event_ids: set[str] = set()
+     known_task_ingress: set[tuple[str, str]] = set()
+     for index, event in enumerate(events, start=1):
++        event.verify_identity()
+         if require_global_sequence and event.sequence != index:
+             raise ValueError("lifecycle event sequence is not contiguous")
+         if event.event_id in known_event_ids:

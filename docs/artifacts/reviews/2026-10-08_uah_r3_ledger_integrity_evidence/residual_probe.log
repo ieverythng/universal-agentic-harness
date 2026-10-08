@@ -1,0 +1,1 @@
+{"control_status": "open", "foreign_render_rejected": true, "ledger_status": "open", "limitation": "raw iterable projection only; no ARCH-02 label change", "mutated_raw_projection_status": "accepted", "probe_id": "R3-O1-RAW-ITERABLE-IDENTITY", "stale_event_id": "trace-event:sha256:2caf1e64107d87f9525d5cb61fb8ce98524a1dd7ce464b6f12c4bb3faca0f12a"}

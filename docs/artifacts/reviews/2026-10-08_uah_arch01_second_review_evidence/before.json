@@ -1,0 +1,2142 @@
+{
+  "count": 29,
+  "results": [
+    {
+      "artifact": {
+        "ab_level": 1,
+        "admission_id": "admission:sha256:ed9e47dc803e54ea7dbab0dfd788cc11d32da6a0e6c4a0c2e5488a8ce504aa8d",
+        "binding_fingerprint": "binding:sha256:6f83ba98b632ba325f12ffec1244f8ff34fc1b8134270be63ac3b0ffadcc80b7",
+        "binding_id": "binding:alpha",
+        "binding_owner": "review_owner",
+        "binding_source_revision": "source:v1",
+        "domain_contract_pack_revision": "sha256:06b34400c656f64fc6f24a836544881c428c50752a4151ee498e130bd37d28a7",
+        "effect_obligation_ids": [
+          "obligation:alpha"
+        ],
+        "environment_id": "environment:review",
+        "evidence_adapter": "evidence:review",
+        "frame_id": "review_frame",
+        "input_schema_id": "input-schema:sha256:70dd0bbca6900b13bfc646f4d7f1c6aa9b266a33411f24fb13572b224600c958",
+        "input_schema_ref": "schema:alpha",
+        "object_snapshot": {
+          "ab_level": 1,
+          "category": "review",
+          "decomposes_to": [],
+          "expected_effects": [
+            "done_alpha"
+          ],
+          "kind": "skill",
+          "object_id": "alpha",
+          "observable_success": [
+            "done_alpha"
+          ],
+          "owner_package": "review_owner",
+          "runtime_callable": true
+        },
+        "output_schema_ref": "schema:out",
+        "proposal": {
+          "arguments_json": "{\"field_alpha\":\"valid\"}",
+          "compiled_task_id": "compiled-task:sha256:af3f25c3847e11a95045973503c080bbddd92430374b5376b95bc45d3c4aafde",
+          "environment_run_id": "environment:review",
+          "object_id": "alpha",
+          "operation_id": "operation:review",
+          "output_type": "operation",
+          "proposal_id": "proposal:sha256:1ffc8546c08fd9078c08a853951749d1827fda4f5b78ff9b794f82bf2016c1b2",
+          "raw_output_artifact_id": "raw:review",
+          "schema_version": "uah.typed_proposal/v1",
+          "task_id": "task:review",
+          "trace_id": "trace:sha256:f8cff60b4274b34770936312afcd54e1f7472e23e2aedb574e4a8d4ecb129729"
+        },
+        "runtime_mode": "fake",
+        "schema_version": "uah.admitted_operation/v3"
+      },
+      "choices": [
+        "alpha"
+      ],
+      "examples": [
+        "alpha"
+      ],
+      "name": "valid",
+      "output_schema": {
+        "oneOf": [
+          {
+            "additionalProperties": false,
+            "properties": {
+              "arguments": {
+                "additionalProperties": false,
+                "properties": {
+                  "field_alpha": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "field_alpha"
+                ],
+                "type": "object"
+              },
+              "object_id": {
+                "const": "alpha"
+              },
+              "output_type": {
+                "enum": [
+                  "operation"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "output_type",
+              "object_id",
+              "arguments"
+            ],
+            "type": "object"
+          }
+        ]
+      },
+      "prompt_id": "compiled-prompt:sha256:19ca501276727dbb9ec8e4f9858bce2a6db349386e85a7451db96abe9785e546",
+      "reasons": [],
+      "source_contracts": [
+        [
+          "alpha",
+          "binding:sha256:6f83ba98b632ba325f12ffec1244f8ff34fc1b8134270be63ac3b0ffadcc80b7",
+          "input-schema:sha256:70dd0bbca6900b13bfc646f4d7f1c6aa9b266a33411f24fb13572b224600c958"
+        ]
+      ]
+    },
+    {
+      "artifact": {
+        "ab_level": 1,
+        "admission_id": "admission:sha256:ed9e47dc803e54ea7dbab0dfd788cc11d32da6a0e6c4a0c2e5488a8ce504aa8d",
+        "binding_fingerprint": "binding:sha256:6f83ba98b632ba325f12ffec1244f8ff34fc1b8134270be63ac3b0ffadcc80b7",
+        "binding_id": "binding:alpha",
+        "binding_owner": "review_owner",
+        "binding_source_revision": "source:v1",
+        "domain_contract_pack_revision": "sha256:06b34400c656f64fc6f24a836544881c428c50752a4151ee498e130bd37d28a7",
+        "effect_obligation_ids": [
+          "obligation:alpha"
+        ],
+        "environment_id": "environment:review",
+        "evidence_adapter": "evidence:review",
+        "frame_id": "review_frame",
+        "input_schema_id": "input-schema:sha256:70dd0bbca6900b13bfc646f4d7f1c6aa9b266a33411f24fb13572b224600c958",
+        "input_schema_ref": "schema:alpha",
+        "object_snapshot": {
+          "ab_level": 1,
+          "category": "review",
+          "decomposes_to": [],
+          "expected_effects": [
+            "done_alpha"
+          ],
+          "kind": "skill",
+          "object_id": "alpha",
+          "observable_success": [
+            "done_alpha"
+          ],
+          "owner_package": "review_owner",
+          "runtime_callable": true
+        },
+        "output_schema_ref": "schema:out",
+        "proposal": {
+          "arguments_json": "{\"field_alpha\":\"valid\"}",
+          "compiled_task_id": "compiled-task:sha256:af3f25c3847e11a95045973503c080bbddd92430374b5376b95bc45d3c4aafde",
+          "environment_run_id": "environment:review",
+          "object_id": "alpha",
+          "operation_id": "operation:review",
+          "output_type": "operation",
+          "proposal_id": "proposal:sha256:1ffc8546c08fd9078c08a853951749d1827fda4f5b78ff9b794f82bf2016c1b2",
+          "raw_output_artifact_id": "raw:review",
+          "schema_version": "uah.typed_proposal/v1",
+          "task_id": "task:review",
+          "trace_id": "trace:sha256:f8cff60b4274b34770936312afcd54e1f7472e23e2aedb574e4a8d4ecb129729"
+        },
+        "runtime_mode": "fake",
+        "schema_version": "uah.admitted_operation/v3"
+      },
+      "choices": [
+        "alpha"
+      ],
+      "examples": [
+        "alpha"
+      ],
+      "name": "broader_configured_role_narrow_task",
+      "output_schema": {
+        "oneOf": [
+          {
+            "additionalProperties": false,
+            "properties": {
+              "arguments": {
+                "additionalProperties": false,
+                "properties": {
+                  "field_alpha": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "field_alpha"
+                ],
+                "type": "object"
+              },
+              "object_id": {
+                "const": "alpha"
+              },
+              "output_type": {
+                "enum": [
+                  "operation"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "output_type",
+              "object_id",
+              "arguments"
+            ],
+            "type": "object"
+          }
+        ]
+      },
+      "prompt_id": "compiled-prompt:sha256:b54f9cf0cf59a5cbc215335432433743523b92a0ba0bacfdef30bafd2a6091c1",
+      "reasons": [],
+      "source_contracts": [
+        [
+          "alpha",
+          "binding:sha256:6f83ba98b632ba325f12ffec1244f8ff34fc1b8134270be63ac3b0ffadcc80b7",
+          "input-schema:sha256:70dd0bbca6900b13bfc646f4d7f1c6aa9b266a33411f24fb13572b224600c958"
+        ]
+      ]
+    },
+    {
+      "artifact": {
+        "ab_level": 1,
+        "admission_id": "admission:sha256:976d06114cfd818bdb382771d57203fc0360f896547fc019928c1e3a596ef74a",
+        "binding_fingerprint": "binding:sha256:6f83ba98b632ba325f12ffec1244f8ff34fc1b8134270be63ac3b0ffadcc80b7",
+        "binding_id": "binding:alpha",
+        "binding_owner": "review_owner",
+        "binding_source_revision": "source:v1",
+        "domain_contract_pack_revision": "sha256:06b34400c656f64fc6f24a836544881c428c50752a4151ee498e130bd37d28a7",
+        "effect_obligation_ids": [
+          "obligation:alpha"
+        ],
+        "environment_id": "environment:review",
+        "evidence_adapter": "evidence:review",
+        "frame_id": "review_frame",
+        "input_schema_id": "input-schema:sha256:70dd0bbca6900b13bfc646f4d7f1c6aa9b266a33411f24fb13572b224600c958",
+        "input_schema_ref": "schema:alpha",
+        "object_snapshot": {
+          "ab_level": 1,
+          "category": "review",
+          "decomposes_to": [],
+          "expected_effects": [
+            "done_alpha",
+            "safe"
+          ],
+          "kind": "skill",
+          "object_id": "alpha",
+          "observable_success": [
+            "done_alpha",
+            "safe"
+          ],
+          "owner_package": "review_owner",
+          "runtime_callable": true
+        },
+        "output_schema_ref": "schema:out",
+        "proposal": {
+          "arguments_json": "{\"field_alpha\":\"valid\"}",
+          "compiled_task_id": "compiled-task:sha256:e4562292b6de07eb84d073f8e80d8ff9d37f219dd3803dc2649cd401d3c83ba6",
+          "environment_run_id": "environment:review",
+          "object_id": "alpha",
+          "operation_id": "operation:review",
+          "output_type": "operation",
+          "proposal_id": "proposal:sha256:9f236166510c0a0712e518431011ded8980b068c0d139d873b53a6fe83a25af7",
+          "raw_output_artifact_id": "raw:review",
+          "schema_version": "uah.typed_proposal/v1",
+          "task_id": "task:review",
+          "trace_id": "trace:sha256:f8cff60b4274b34770936312afcd54e1f7472e23e2aedb574e4a8d4ecb129729"
+        },
+        "runtime_mode": "fake",
+        "schema_version": "uah.admitted_operation/v3"
+      },
+      "choices": [
+        "alpha"
+      ],
+      "examples": [
+        "alpha"
+      ],
+      "name": "unrelated_prohibition",
+      "output_schema": {
+        "oneOf": [
+          {
+            "additionalProperties": false,
+            "properties": {
+              "arguments": {
+                "additionalProperties": false,
+                "properties": {
+                  "field_alpha": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "field_alpha"
+                ],
+                "type": "object"
+              },
+              "object_id": {
+                "const": "alpha"
+              },
+              "output_type": {
+                "enum": [
+                  "operation"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "output_type",
+              "object_id",
+              "arguments"
+            ],
+            "type": "object"
+          }
+        ]
+      },
+      "prompt_id": "compiled-prompt:sha256:af7deeeb4eb46c49b19955db314955ea8a8b87d40b62c2db42e3e0ee67ba3042",
+      "reasons": [],
+      "source_contracts": [
+        [
+          "alpha",
+          "binding:sha256:6f83ba98b632ba325f12ffec1244f8ff34fc1b8134270be63ac3b0ffadcc80b7",
+          "input-schema:sha256:70dd0bbca6900b13bfc646f4d7f1c6aa9b266a33411f24fb13572b224600c958"
+        ]
+      ]
+    },
+    {
+      "artifact": {
+        "ab_level": 1,
+        "admission_id": "admission:sha256:3657bbdbaca5a73899f014b7fd47efe1576d63bafd9131e22e0434c4c49cc0a8",
+        "binding_fingerprint": "binding:sha256:6f83ba98b632ba325f12ffec1244f8ff34fc1b8134270be63ac3b0ffadcc80b7",
+        "binding_id": "binding:alpha",
+        "binding_owner": "review_owner",
+        "binding_source_revision": "source:v1",
+        "domain_contract_pack_revision": "sha256:06b34400c656f64fc6f24a836544881c428c50752a4151ee498e130bd37d28a7",
+        "effect_obligation_ids": [
+          "obligation:alpha"
+        ],
+        "environment_id": "environment:review",
+        "evidence_adapter": "evidence:review",
+        "frame_id": "review_frame",
+        "input_schema_id": "input-schema:sha256:70dd0bbca6900b13bfc646f4d7f1c6aa9b266a33411f24fb13572b224600c958",
+        "input_schema_ref": "schema:alpha",
+        "object_snapshot": {
+          "ab_level": 1,
+          "category": "review",
+          "decomposes_to": [],
+          "expected_effects": [
+            "done_alpha"
+          ],
+          "kind": "skill",
+          "object_id": "alpha",
+          "observable_success": [
+            "done_alpha",
+            "UNSAFE"
+          ],
+          "owner_package": "review_owner",
+          "runtime_callable": true
+        },
+        "output_schema_ref": "schema:out",
+        "proposal": {
+          "arguments_json": "{\"field_alpha\":\"valid\"}",
+          "compiled_task_id": "compiled-task:sha256:28c753ba07ae24dc8eb44908f8ed72d57d62f8e85fff491b1a8d2795a791eca1",
+          "environment_run_id": "environment:review",
+          "object_id": "alpha",
+          "operation_id": "operation:review",
+          "output_type": "operation",
+          "proposal_id": "proposal:sha256:1df4c5d5f95fc83bca227b5fb8da75d1dc8f9de053f39e42fb5e4c1b29c36b0d",
+          "raw_output_artifact_id": "raw:review",
+          "schema_version": "uah.typed_proposal/v1",
+          "task_id": "task:review",
+          "trace_id": "trace:sha256:f8cff60b4274b34770936312afcd54e1f7472e23e2aedb574e4a8d4ecb129729"
+        },
+        "runtime_mode": "fake",
+        "schema_version": "uah.admitted_operation/v3"
+      },
+      "choices": [
+        "alpha"
+      ],
+      "examples": [
+        "alpha"
+      ],
+      "name": "case_distinct_effect_id",
+      "output_schema": {
+        "oneOf": [
+          {
+            "additionalProperties": false,
+            "properties": {
+              "arguments": {
+                "additionalProperties": false,
+                "properties": {
+                  "field_alpha": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "field_alpha"
+                ],
+                "type": "object"
+              },
+              "object_id": {
+                "const": "alpha"
+              },
+              "output_type": {
+                "enum": [
+                  "operation"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "output_type",
+              "object_id",
+              "arguments"
+            ],
+            "type": "object"
+          }
+        ]
+      },
+      "prompt_id": "compiled-prompt:sha256:bf0947489053c83ac08f157f1d602554e35d1f21b69c4d0d474757a4c02ccb6c",
+      "reasons": [],
+      "source_contracts": [
+        [
+          "alpha",
+          "binding:sha256:6f83ba98b632ba325f12ffec1244f8ff34fc1b8134270be63ac3b0ffadcc80b7",
+          "input-schema:sha256:70dd0bbca6900b13bfc646f4d7f1c6aa9b266a33411f24fb13572b224600c958"
+        ]
+      ]
+    },
+    {
+      "artifact": {
+        "compiled_task_id": "compiled-task:sha256:0ce37fdb749fc4c7895a9e552fabde9f468693c02e3baafaf6e3b090802926a7",
+        "proposal": {
+          "arguments_json": "{\"field_alpha\":\"valid\"}",
+          "compiled_task_id": "compiled-task:sha256:0ce37fdb749fc4c7895a9e552fabde9f468693c02e3baafaf6e3b090802926a7",
+          "environment_run_id": "environment:review",
+          "object_id": "alpha",
+          "operation_id": "operation:review",
+          "output_type": "operation",
+          "proposal_id": "proposal:sha256:d97fa64b91c48c180f9f29335e1523e266afe4e4887422c8751010c5e7ee03a4",
+          "raw_output_artifact_id": "raw:review",
+          "schema_version": "uah.typed_proposal/v1",
+          "task_id": "task:review",
+          "trace_id": "trace:sha256:f8cff60b4274b34770936312afcd54e1f7472e23e2aedb574e4a8d4ecb129729"
+        },
+        "reason_codes": [
+          "object_effect_prohibited"
+        ],
+        "rejection_id": "semantic-rejection:sha256:25ed7719e1e61fb84e0f485d676a898c1db465cd0a639ea30f4d3150516f4cc4",
+        "schema_version": "uah.semantic_admission_rejection/v1"
+      },
+      "name": "prohibited_expected",
+      "prompt_error": "compiled task exposes no direct proposal operations",
+      "reasons": [
+        "object_effect_prohibited"
+      ]
+    },
+    {
+      "artifact": {
+        "compiled_task_id": "compiled-task:sha256:d3a1f7d53df600040270f2e2cf3c68039bd5af8a5dfba59e1e34508b88d2f6f7",
+        "proposal": {
+          "arguments_json": "{\"field_alpha\":\"valid\"}",
+          "compiled_task_id": "compiled-task:sha256:d3a1f7d53df600040270f2e2cf3c68039bd5af8a5dfba59e1e34508b88d2f6f7",
+          "environment_run_id": "environment:review",
+          "object_id": "alpha",
+          "operation_id": "operation:review",
+          "output_type": "operation",
+          "proposal_id": "proposal:sha256:cfba8e17c31819c3bf888c73847705dd8729e9a0a9d29c1af2d843462319089f",
+          "raw_output_artifact_id": "raw:review",
+          "schema_version": "uah.typed_proposal/v1",
+          "task_id": "task:review",
+          "trace_id": "trace:sha256:f8cff60b4274b34770936312afcd54e1f7472e23e2aedb574e4a8d4ecb129729"
+        },
+        "reason_codes": [
+          "object_effect_prohibited"
+        ],
+        "rejection_id": "semantic-rejection:sha256:7f31ee9065db839ce2f2824653683f2e50f27ce5f21541e58156b0aca0d6aa67",
+        "schema_version": "uah.semantic_admission_rejection/v1"
+      },
+      "choices": [
+        "alpha"
+      ],
+      "examples": [
+        "alpha"
+      ],
+      "name": "prohibited_observed",
+      "output_schema": {
+        "oneOf": [
+          {
+            "additionalProperties": false,
+            "properties": {
+              "arguments": {
+                "additionalProperties": false,
+                "properties": {
+                  "field_alpha": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "field_alpha"
+                ],
+                "type": "object"
+              },
+              "object_id": {
+                "const": "alpha"
+              },
+              "output_type": {
+                "enum": [
+                  "operation"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "output_type",
+              "object_id",
+              "arguments"
+            ],
+            "type": "object"
+          }
+        ]
+      },
+      "prompt_id": "compiled-prompt:sha256:46a812d1538f519e824be5654b633f6d8e44d572c1ff5a5e0dade070af043645",
+      "reasons": [
+        "object_effect_prohibited"
+      ],
+      "source_contracts": [
+        [
+          "alpha",
+          "binding:sha256:6f83ba98b632ba325f12ffec1244f8ff34fc1b8134270be63ac3b0ffadcc80b7",
+          "input-schema:sha256:70dd0bbca6900b13bfc646f4d7f1c6aa9b266a33411f24fb13572b224600c958"
+        ]
+      ]
+    },
+    {
+      "artifact": {
+        "compiled_task_id": "compiled-task:sha256:a1af7fa046e2f36041ed627dade0a526689acad2a1c46226eb9b19bed59859ef",
+        "proposal": {
+          "arguments_json": "{\"field_alpha\":\"valid\"}",
+          "compiled_task_id": "compiled-task:sha256:a1af7fa046e2f36041ed627dade0a526689acad2a1c46226eb9b19bed59859ef",
+          "environment_run_id": "environment:review",
+          "object_id": "alpha",
+          "operation_id": "operation:review",
+          "output_type": "operation",
+          "proposal_id": "proposal:sha256:0ed322613b6b040c9bd04491f47b72870eb25ca5151d3dde5768c6a91ec772a7",
+          "raw_output_artifact_id": "raw:review",
+          "schema_version": "uah.typed_proposal/v1",
+          "task_id": "task:review",
+          "trace_id": "trace:sha256:f8cff60b4274b34770936312afcd54e1f7472e23e2aedb574e4a8d4ecb129729"
+        },
+        "reason_codes": [
+          "object_effect_prohibited"
+        ],
+        "rejection_id": "semantic-rejection:sha256:f9d489e055e632b9c6d5163b348b3e31e475b28d8c53bc9b8634cc3d933f5d0a",
+        "schema_version": "uah.semantic_admission_rejection/v1"
+      },
+      "name": "prohibited_both",
+      "prompt_error": "compiled task exposes no direct proposal operations",
+      "reasons": [
+        "object_effect_prohibited"
+      ]
+    },
+    {
+      "artifact": {
+        "compiled_task_id": "compiled-task:sha256:f3e302314c04221028cce6bd967924415737bb6ddd43c9f614e89eb31680ab8f",
+        "proposal": {
+          "arguments_json": "{\"field_alpha\":\"valid\"}",
+          "compiled_task_id": "compiled-task:sha256:f3e302314c04221028cce6bd967924415737bb6ddd43c9f614e89eb31680ab8f",
+          "environment_run_id": "environment:review",
+          "object_id": "alpha",
+          "operation_id": "operation:review",
+          "output_type": "operation",
+          "proposal_id": "proposal:sha256:1ca5a304b44beac07062b07fa635a9cd193be6b5d78534d203266d7808af3114",
+          "raw_output_artifact_id": "raw:review",
+          "schema_version": "uah.typed_proposal/v1",
+          "task_id": "task:review",
+          "trace_id": "trace:sha256:f8cff60b4274b34770936312afcd54e1f7472e23e2aedb574e4a8d4ecb129729"
+        },
+        "reason_codes": [
+          "object_not_runtime_callable"
+        ],
+        "rejection_id": "semantic-rejection:sha256:1f8efaa20d87d7ff34379a0991560c59fd6c9cb00413673f2b89e88b97528f49",
+        "schema_version": "uah.semantic_admission_rejection/v1"
+      },
+      "name": "not_callable",
+      "prompt_error": "compiled task exposes no direct proposal operations",
+      "reasons": [
+        "object_not_runtime_callable"
+      ]
+    },
+    {
+      "artifact": {
+        "compiled_task_id": "compiled-task:sha256:ad16efa112db5b5becfc715f79eb40d5c3922b3e4bebd02dc5da179bb8ac51e8",
+        "proposal": {
+          "arguments_json": "{\"field_alpha\":\"valid\"}",
+          "compiled_task_id": "compiled-task:sha256:ad16efa112db5b5becfc715f79eb40d5c3922b3e4bebd02dc5da179bb8ac51e8",
+          "environment_run_id": "environment:review",
+          "object_id": "alpha",
+          "operation_id": "operation:review",
+          "output_type": "operation",
+          "proposal_id": "proposal:sha256:f6df27c86c837dd30b257dfd170d42b9956130f70f6b7ddb9186ad0172a9aeff",
+          "raw_output_artifact_id": "raw:review",
+          "schema_version": "uah.typed_proposal/v1",
+          "task_id": "task:review",
+          "trace_id": "trace:sha256:f8cff60b4274b34770936312afcd54e1f7472e23e2aedb574e4a8d4ecb129729"
+        },
+        "reason_codes": [
+          "object_inspection_only"
+        ],
+        "rejection_id": "semantic-rejection:sha256:62923d1c0a9780e094b1630af633b05d9dfa1fc59f483e10ab7e8f08462ade61",
+        "schema_version": "uah.semantic_admission_rejection/v1"
+      },
+      "name": "inspect_only",
+      "prompt_error": "compiled task exposes no direct proposal operations",
+      "reasons": [
+        "object_inspection_only"
+      ]
+    },
+    {
+      "artifact": {
+        "compiled_task_id": "compiled-task:sha256:af3f25c3847e11a95045973503c080bbddd92430374b5376b95bc45d3c4aafde",
+        "proposal": {
+          "arguments_json": "{\"field_absent\":\"valid\"}",
+          "compiled_task_id": "compiled-task:sha256:af3f25c3847e11a95045973503c080bbddd92430374b5376b95bc45d3c4aafde",
+          "environment_run_id": "environment:review",
+          "object_id": "absent",
+          "operation_id": "operation:review",
+          "output_type": "operation",
+          "proposal_id": "proposal:sha256:129dfcc62edae84c36a9f069704f3df6220013ce6f5bb9c9270e1fa7347b5e51",
+          "raw_output_artifact_id": "raw:review",
+          "schema_version": "uah.typed_proposal/v1",
+          "task_id": "task:review",
+          "trace_id": "trace:sha256:f8cff60b4274b34770936312afcd54e1f7472e23e2aedb574e4a8d4ecb129729"
+        },
+        "reason_codes": [
+          "object_outside_projection",
+          "missing_effect_obligation"
+        ],
+        "rejection_id": "semantic-rejection:sha256:d4b2eccab549ae50150ba68f710d8b0d0b07381570bacda34fe6723a066bd45a",
+        "schema_version": "uah.semantic_admission_rejection/v1"
+      },
+      "choices": [
+        "alpha"
+      ],
+      "examples": [
+        "alpha"
+      ],
+      "name": "outside_projection",
+      "output_schema": {
+        "oneOf": [
+          {
+            "additionalProperties": false,
+            "properties": {
+              "arguments": {
+                "additionalProperties": false,
+                "properties": {
+                  "field_alpha": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "field_alpha"
+                ],
+                "type": "object"
+              },
+              "object_id": {
+                "const": "alpha"
+              },
+              "output_type": {
+                "enum": [
+                  "operation"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "output_type",
+              "object_id",
+              "arguments"
+            ],
+            "type": "object"
+          }
+        ]
+      },
+      "prompt_id": "compiled-prompt:sha256:19ca501276727dbb9ec8e4f9858bce2a6db349386e85a7451db96abe9785e546",
+      "reasons": [
+        "object_outside_projection",
+        "missing_effect_obligation"
+      ],
+      "source_contracts": [
+        [
+          "alpha",
+          "binding:sha256:6f83ba98b632ba325f12ffec1244f8ff34fc1b8134270be63ac3b0ffadcc80b7",
+          "input-schema:sha256:70dd0bbca6900b13bfc646f4d7f1c6aa9b266a33411f24fb13572b224600c958"
+        ]
+      ]
+    },
+    {
+      "artifact": {
+        "compiled_task_id": "compiled-task:sha256:af3f25c3847e11a95045973503c080bbddd92430374b5376b95bc45d3c4aafde",
+        "proposal": {
+          "arguments_json": "{\"field_alpha\":\"valid\"}",
+          "compiled_task_id": "compiled-task:sha256:af3f25c3847e11a95045973503c080bbddd92430374b5376b95bc45d3c4aafde",
+          "environment_run_id": "environment:review",
+          "object_id": "alpha",
+          "operation_id": "operation:review",
+          "output_type": "answer",
+          "proposal_id": "proposal:sha256:13f1bddc6353b0ae73e485b013b9f52799e60f35df14436562f63b920a1e50f7",
+          "raw_output_artifact_id": "raw:review",
+          "schema_version": "uah.typed_proposal/v1",
+          "task_id": "task:review",
+          "trace_id": "trace:sha256:f8cff60b4274b34770936312afcd54e1f7472e23e2aedb574e4a8d4ecb129729"
+        },
+        "reason_codes": [
+          "role_output_type_forbidden"
+        ],
+        "rejection_id": "semantic-rejection:sha256:a271a00b56cd25b92d549237869979cc0e2155b7f7248ecde42f9b7d9cf1ccf5",
+        "schema_version": "uah.semantic_admission_rejection/v1"
+      },
+      "choices": [
+        "alpha"
+      ],
+      "examples": [
+        "alpha"
+      ],
+      "name": "output_type_forbidden",
+      "output_schema": {
+        "oneOf": [
+          {
+            "additionalProperties": false,
+            "properties": {
+              "arguments": {
+                "additionalProperties": false,
+                "properties": {
+                  "field_alpha": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "field_alpha"
+                ],
+                "type": "object"
+              },
+              "object_id": {
+                "const": "alpha"
+              },
+              "output_type": {
+                "enum": [
+                  "operation"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "output_type",
+              "object_id",
+              "arguments"
+            ],
+            "type": "object"
+          }
+        ]
+      },
+      "prompt_id": "compiled-prompt:sha256:19ca501276727dbb9ec8e4f9858bce2a6db349386e85a7451db96abe9785e546",
+      "reasons": [
+        "role_output_type_forbidden"
+      ],
+      "source_contracts": [
+        [
+          "alpha",
+          "binding:sha256:6f83ba98b632ba325f12ffec1244f8ff34fc1b8134270be63ac3b0ffadcc80b7",
+          "input-schema:sha256:70dd0bbca6900b13bfc646f4d7f1c6aa9b266a33411f24fb13572b224600c958"
+        ]
+      ]
+    },
+    {
+      "artifact": {
+        "compiled_task_id": "compiled-task:sha256:b717f695398b845b115d0d702f0543e22b69cdc38513b2f198f91c9ac29b811b",
+        "proposal": {
+          "arguments_json": "{\"field_alpha\":\"valid\"}",
+          "compiled_task_id": "compiled-task:sha256:b717f695398b845b115d0d702f0543e22b69cdc38513b2f198f91c9ac29b811b",
+          "environment_run_id": "environment:review",
+          "object_id": "alpha",
+          "operation_id": "operation:review",
+          "output_type": "answer",
+          "proposal_id": "proposal:sha256:a17c49fadd23133bec7721ba0b20bd5f2d2d1804a399a6d43a1443ac26404f2d",
+          "raw_output_artifact_id": "raw:review",
+          "schema_version": "uah.typed_proposal/v1",
+          "task_id": "task:review",
+          "trace_id": "trace:sha256:f8cff60b4274b34770936312afcd54e1f7472e23e2aedb574e4a8d4ecb129729"
+        },
+        "reason_codes": [
+          "role_output_type_forbidden",
+          "object_inspection_only",
+          "object_not_runtime_callable",
+          "object_effect_prohibited"
+        ],
+        "rejection_id": "semantic-rejection:sha256:3795be4d40be1f4aeb6a31df613eaaff7b4ecaa5738852ad761e688aaaf8395d",
+        "schema_version": "uah.semantic_admission_rejection/v1"
+      },
+      "name": "combined_static_reasons",
+      "prompt_error": "compiled task exposes no direct proposal operations",
+      "reasons": [
+        "role_output_type_forbidden",
+        "object_inspection_only",
+        "object_not_runtime_callable",
+        "object_effect_prohibited"
+      ]
+    },
+    {
+      "artifact": {
+        "compiled_task_id": "compiled-task:sha256:4de62a86cd51fa5a3501570f41619e7eb139601d11643cfb1fc2ccbea3b012df",
+        "proposal": {
+          "arguments_json": "{\"field_beta\":\"valid\"}",
+          "compiled_task_id": "compiled-task:sha256:4de62a86cd51fa5a3501570f41619e7eb139601d11643cfb1fc2ccbea3b012df",
+          "environment_run_id": "environment:review",
+          "object_id": "beta",
+          "operation_id": "operation:review",
+          "output_type": "operation",
+          "proposal_id": "proposal:sha256:54e9e84e0c41feeb79e33c04d7e6ebcd8ca7204f3944bc57f5a4148708a10dcf",
+          "raw_output_artifact_id": "raw:review",
+          "schema_version": "uah.typed_proposal/v1",
+          "task_id": "task:review",
+          "trace_id": "trace:sha256:f8cff60b4274b34770936312afcd54e1f7472e23e2aedb574e4a8d4ecb129729"
+        },
+        "reason_codes": [
+          "missing_effect_obligation"
+        ],
+        "rejection_id": "semantic-rejection:sha256:0b6d77379297cac3fbf8cb3ee492278ebefdf3a34f7308863c508bdb5dc0d0dc",
+        "schema_version": "uah.semantic_admission_rejection/v1"
+      },
+      "choices": [
+        "alpha",
+        "beta"
+      ],
+      "examples": [
+        "alpha",
+        "beta"
+      ],
+      "name": "decomposed_missing_obligation",
+      "output_schema": {
+        "oneOf": [
+          {
+            "additionalProperties": false,
+            "properties": {
+              "arguments": {
+                "additionalProperties": false,
+                "properties": {
+                  "field_alpha": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "field_alpha"
+                ],
+                "type": "object"
+              },
+              "object_id": {
+                "const": "alpha"
+              },
+              "output_type": {
+                "enum": [
+                  "operation"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "output_type",
+              "object_id",
+              "arguments"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "arguments": {
+                "additionalProperties": false,
+                "properties": {
+                  "field_beta": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "field_beta"
+                ],
+                "type": "object"
+              },
+              "object_id": {
+                "const": "beta"
+              },
+              "output_type": {
+                "enum": [
+                  "operation"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "output_type",
+              "object_id",
+              "arguments"
+            ],
+            "type": "object"
+          }
+        ]
+      },
+      "prompt_id": "compiled-prompt:sha256:ae853001d8d869b9f835a13e369871114ff3c3fd1dab531f5d1860a12dffe94d",
+      "reasons": [
+        "missing_effect_obligation"
+      ],
+      "source_contracts": [
+        [
+          "alpha",
+          "binding:sha256:6f83ba98b632ba325f12ffec1244f8ff34fc1b8134270be63ac3b0ffadcc80b7",
+          "input-schema:sha256:70dd0bbca6900b13bfc646f4d7f1c6aa9b266a33411f24fb13572b224600c958"
+        ],
+        [
+          "beta",
+          "binding:sha256:c94e7d1b72648bbe131a266a7ecada727ac3a88390fc680c6a536f10b73bbd42",
+          "input-schema:sha256:62d038b6fd360836a63d10f3c65d84b3ee64c078e3c0e6713d1c1dbeae0f770d"
+        ]
+      ]
+    },
+    {
+      "artifact": {
+        "compiled_task_id": "compiled-task:sha256:1f076b9d2bbc2e1f01970a16b9786ce0a13c0c8856e13a4da4922d1f18cf872f",
+        "proposal": {
+          "arguments_json": "{\"field_beta\":\"valid\"}",
+          "compiled_task_id": "compiled-task:sha256:1f076b9d2bbc2e1f01970a16b9786ce0a13c0c8856e13a4da4922d1f18cf872f",
+          "environment_run_id": "environment:review",
+          "object_id": "beta",
+          "operation_id": "operation:review",
+          "output_type": "answer",
+          "proposal_id": "proposal:sha256:7fdebb2399726569dc672c85c4e6f8a7a03d5b288683dcd4963c60518fd1474c",
+          "raw_output_artifact_id": "raw:review",
+          "schema_version": "uah.typed_proposal/v1",
+          "task_id": "task:review",
+          "trace_id": "trace:sha256:f8cff60b4274b34770936312afcd54e1f7472e23e2aedb574e4a8d4ecb129729"
+        },
+        "reason_codes": [
+          "role_output_type_forbidden",
+          "object_inspection_only",
+          "object_not_runtime_callable",
+          "object_effect_prohibited",
+          "missing_effect_obligation"
+        ],
+        "rejection_id": "semantic-rejection:sha256:f8f98d287c0d7ec6326604725a667652a135677a3240049341ba9252dec61bc3",
+        "schema_version": "uah.semantic_admission_rejection/v1"
+      },
+      "choices": [
+        "alpha"
+      ],
+      "examples": [
+        "alpha"
+      ],
+      "name": "all_static_reasons_in_order",
+      "output_schema": {
+        "oneOf": [
+          {
+            "additionalProperties": false,
+            "properties": {
+              "arguments": {
+                "additionalProperties": false,
+                "properties": {
+                  "field_alpha": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "field_alpha"
+                ],
+                "type": "object"
+              },
+              "object_id": {
+                "const": "alpha"
+              },
+              "output_type": {
+                "enum": [
+                  "operation"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "output_type",
+              "object_id",
+              "arguments"
+            ],
+            "type": "object"
+          }
+        ]
+      },
+      "prompt_id": "compiled-prompt:sha256:0d84d2d2c7552a3584b25c15ecb228f294d708771074963f1a6467ff9a27708c",
+      "reasons": [
+        "role_output_type_forbidden",
+        "object_inspection_only",
+        "object_not_runtime_callable",
+        "object_effect_prohibited",
+        "missing_effect_obligation"
+      ],
+      "source_contracts": [
+        [
+          "alpha",
+          "binding:sha256:6f83ba98b632ba325f12ffec1244f8ff34fc1b8134270be63ac3b0ffadcc80b7",
+          "input-schema:sha256:70dd0bbca6900b13bfc646f4d7f1c6aa9b266a33411f24fb13572b224600c958"
+        ]
+      ]
+    },
+    {
+      "artifact": {
+        "ab_level": 1,
+        "admission_id": "admission:sha256:b47e7ffc65054cb40d9455e4239675ca9464da69411213a7f208466f051dc6e5",
+        "binding_fingerprint": "binding:sha256:6f83ba98b632ba325f12ffec1244f8ff34fc1b8134270be63ac3b0ffadcc80b7",
+        "binding_id": "binding:alpha",
+        "binding_owner": "review_owner",
+        "binding_source_revision": "source:v1",
+        "domain_contract_pack_revision": "sha256:f332a18db27f7367fc9f64e4ad93dfa2526407df2ba232bcebee051fb3e5c027",
+        "effect_obligation_ids": [
+          "obligation:alpha"
+        ],
+        "environment_id": "environment:review",
+        "evidence_adapter": "evidence:review",
+        "frame_id": "review_frame",
+        "input_schema_id": "input-schema:sha256:70dd0bbca6900b13bfc646f4d7f1c6aa9b266a33411f24fb13572b224600c958",
+        "input_schema_ref": "schema:alpha",
+        "object_snapshot": {
+          "ab_level": 1,
+          "category": "review",
+          "decomposes_to": [],
+          "expected_effects": [
+            "done_alpha"
+          ],
+          "kind": "skill",
+          "object_id": "alpha",
+          "observable_success": [
+            "done_alpha"
+          ],
+          "owner_package": "review_owner",
+          "runtime_callable": true
+        },
+        "output_schema_ref": "schema:out",
+        "proposal": {
+          "arguments_json": "{\"field_alpha\":\"valid\"}",
+          "compiled_task_id": "compiled-task:sha256:ab0d980c9276cd3fe59621017d564bd3244498d01b89e3dcabe1a38f1f197681",
+          "environment_run_id": "environment:review",
+          "object_id": "alpha",
+          "operation_id": "operation:review",
+          "output_type": "operation",
+          "proposal_id": "proposal:sha256:828fbd19d33c810e573027d944af98881bed24d87795b006c555e7f8bb43979a",
+          "raw_output_artifact_id": "raw:review",
+          "schema_version": "uah.typed_proposal/v1",
+          "task_id": "task:review",
+          "trace_id": "trace:sha256:f8cff60b4274b34770936312afcd54e1f7472e23e2aedb574e4a8d4ecb129729"
+        },
+        "runtime_mode": "fake",
+        "schema_version": "uah.admitted_operation/v3"
+      },
+      "choices": [
+        "alpha",
+        "beta"
+      ],
+      "examples": [
+        "alpha",
+        "beta"
+      ],
+      "name": "two_valid_forward",
+      "output_schema": {
+        "oneOf": [
+          {
+            "additionalProperties": false,
+            "properties": {
+              "arguments": {
+                "additionalProperties": false,
+                "properties": {
+                  "field_alpha": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "field_alpha"
+                ],
+                "type": "object"
+              },
+              "object_id": {
+                "const": "alpha"
+              },
+              "output_type": {
+                "enum": [
+                  "operation"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "output_type",
+              "object_id",
+              "arguments"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "arguments": {
+                "additionalProperties": false,
+                "properties": {
+                  "field_beta": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "field_beta"
+                ],
+                "type": "object"
+              },
+              "object_id": {
+                "const": "beta"
+              },
+              "output_type": {
+                "enum": [
+                  "operation"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "output_type",
+              "object_id",
+              "arguments"
+            ],
+            "type": "object"
+          }
+        ]
+      },
+      "prompt_id": "compiled-prompt:sha256:802ea8aced6387efb9216d29f79e41db21b6857d21856f2ad414a9bf684a858d",
+      "reasons": [],
+      "source_contracts": [
+        [
+          "alpha",
+          "binding:sha256:6f83ba98b632ba325f12ffec1244f8ff34fc1b8134270be63ac3b0ffadcc80b7",
+          "input-schema:sha256:70dd0bbca6900b13bfc646f4d7f1c6aa9b266a33411f24fb13572b224600c958"
+        ],
+        [
+          "beta",
+          "binding:sha256:c94e7d1b72648bbe131a266a7ecada727ac3a88390fc680c6a536f10b73bbd42",
+          "input-schema:sha256:62d038b6fd360836a63d10f3c65d84b3ee64c078e3c0e6713d1c1dbeae0f770d"
+        ]
+      ]
+    },
+    {
+      "artifact": {
+        "compiled_task_id": "compiled-task:sha256:eef6cdfe6b85d921e4d4998791124182037a513120af7c89bc3b416f9770d224",
+        "proposal": {
+          "arguments_json": "{\"field_alpha\":\"valid\"}",
+          "compiled_task_id": "compiled-task:sha256:eef6cdfe6b85d921e4d4998791124182037a513120af7c89bc3b416f9770d224",
+          "environment_run_id": "environment:review",
+          "object_id": "alpha",
+          "operation_id": "operation:review",
+          "output_type": "operation",
+          "proposal_id": "proposal:sha256:002a8c5e4148cee07ea2b84cd5443f5c3093fba2285352e92f1d7bdc8f45dce5",
+          "raw_output_artifact_id": "raw:review",
+          "schema_version": "uah.typed_proposal/v1",
+          "task_id": "task:review",
+          "trace_id": "trace:sha256:f8cff60b4274b34770936312afcd54e1f7472e23e2aedb574e4a8d4ecb129729"
+        },
+        "reason_codes": [
+          "object_effect_prohibited"
+        ],
+        "rejection_id": "semantic-rejection:sha256:09fe8240713e38357fd66fe401f4a85b352df72f113502c7eb2b715151b61e97",
+        "schema_version": "uah.semantic_admission_rejection/v1"
+      },
+      "choices": [
+        "alpha",
+        "beta"
+      ],
+      "examples": [
+        "alpha",
+        "beta"
+      ],
+      "name": "two_one_observable_forbidden_forward",
+      "output_schema": {
+        "oneOf": [
+          {
+            "additionalProperties": false,
+            "properties": {
+              "arguments": {
+                "additionalProperties": false,
+                "properties": {
+                  "field_alpha": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "field_alpha"
+                ],
+                "type": "object"
+              },
+              "object_id": {
+                "const": "alpha"
+              },
+              "output_type": {
+                "enum": [
+                  "operation"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "output_type",
+              "object_id",
+              "arguments"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "arguments": {
+                "additionalProperties": false,
+                "properties": {
+                  "field_beta": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "field_beta"
+                ],
+                "type": "object"
+              },
+              "object_id": {
+                "const": "beta"
+              },
+              "output_type": {
+                "enum": [
+                  "operation"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "output_type",
+              "object_id",
+              "arguments"
+            ],
+            "type": "object"
+          }
+        ]
+      },
+      "prompt_id": "compiled-prompt:sha256:bc5cc55c07d688b1f4b9dc3a18b08269d80c88df1cd8d62e0788aa1b44fcec14",
+      "reasons": [
+        "object_effect_prohibited"
+      ],
+      "source_contracts": [
+        [
+          "alpha",
+          "binding:sha256:6f83ba98b632ba325f12ffec1244f8ff34fc1b8134270be63ac3b0ffadcc80b7",
+          "input-schema:sha256:70dd0bbca6900b13bfc646f4d7f1c6aa9b266a33411f24fb13572b224600c958"
+        ],
+        [
+          "beta",
+          "binding:sha256:c94e7d1b72648bbe131a266a7ecada727ac3a88390fc680c6a536f10b73bbd42",
+          "input-schema:sha256:62d038b6fd360836a63d10f3c65d84b3ee64c078e3c0e6713d1c1dbeae0f770d"
+        ]
+      ]
+    },
+    {
+      "artifact": {
+        "compiled_task_id": "compiled-task:sha256:1c5ecc6f5a64dca780890cae6322539722b755ec9910e1b18b6f2a81d29ad7c0",
+        "proposal": {
+          "arguments_json": "{\"field_alpha\":\"valid\"}",
+          "compiled_task_id": "compiled-task:sha256:1c5ecc6f5a64dca780890cae6322539722b755ec9910e1b18b6f2a81d29ad7c0",
+          "environment_run_id": "environment:review",
+          "object_id": "alpha",
+          "operation_id": "operation:review",
+          "output_type": "operation",
+          "proposal_id": "proposal:sha256:0e6924ee70e6b755fc7a119cc85072b7de6c1ca6c239f667fa596cd2d6e20bf8",
+          "raw_output_artifact_id": "raw:review",
+          "schema_version": "uah.typed_proposal/v1",
+          "task_id": "task:review",
+          "trace_id": "trace:sha256:f8cff60b4274b34770936312afcd54e1f7472e23e2aedb574e4a8d4ecb129729"
+        },
+        "reason_codes": [
+          "object_effect_prohibited"
+        ],
+        "rejection_id": "semantic-rejection:sha256:c7547a0750bac4c906c2fa9a80a44693713a230326fe6c3c0329566cb98e557a",
+        "schema_version": "uah.semantic_admission_rejection/v1"
+      },
+      "choices": [
+        "alpha",
+        "beta"
+      ],
+      "examples": [
+        "alpha",
+        "beta"
+      ],
+      "name": "two_both_observable_forbidden_forward",
+      "output_schema": {
+        "oneOf": [
+          {
+            "additionalProperties": false,
+            "properties": {
+              "arguments": {
+                "additionalProperties": false,
+                "properties": {
+                  "field_alpha": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "field_alpha"
+                ],
+                "type": "object"
+              },
+              "object_id": {
+                "const": "alpha"
+              },
+              "output_type": {
+                "enum": [
+                  "operation"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "output_type",
+              "object_id",
+              "arguments"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "arguments": {
+                "additionalProperties": false,
+                "properties": {
+                  "field_beta": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "field_beta"
+                ],
+                "type": "object"
+              },
+              "object_id": {
+                "const": "beta"
+              },
+              "output_type": {
+                "enum": [
+                  "operation"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "output_type",
+              "object_id",
+              "arguments"
+            ],
+            "type": "object"
+          }
+        ]
+      },
+      "prompt_id": "compiled-prompt:sha256:6b8288f3bcb9da14088804a27e7d775c28840d3173d9f55ccb40546dee85e8a4",
+      "reasons": [
+        "object_effect_prohibited"
+      ],
+      "source_contracts": [
+        [
+          "alpha",
+          "binding:sha256:6f83ba98b632ba325f12ffec1244f8ff34fc1b8134270be63ac3b0ffadcc80b7",
+          "input-schema:sha256:70dd0bbca6900b13bfc646f4d7f1c6aa9b266a33411f24fb13572b224600c958"
+        ],
+        [
+          "beta",
+          "binding:sha256:c94e7d1b72648bbe131a266a7ecada727ac3a88390fc680c6a536f10b73bbd42",
+          "input-schema:sha256:62d038b6fd360836a63d10f3c65d84b3ee64c078e3c0e6713d1c1dbeae0f770d"
+        ]
+      ]
+    },
+    {
+      "artifact": {
+        "ab_level": 1,
+        "admission_id": "admission:sha256:2482e6a9efb6d41012d248c6eb87e05f1a369868c7350eb15dd05314906b1ed9",
+        "binding_fingerprint": "binding:sha256:6f83ba98b632ba325f12ffec1244f8ff34fc1b8134270be63ac3b0ffadcc80b7",
+        "binding_id": "binding:alpha",
+        "binding_owner": "review_owner",
+        "binding_source_revision": "source:v1",
+        "domain_contract_pack_revision": "sha256:f332a18db27f7367fc9f64e4ad93dfa2526407df2ba232bcebee051fb3e5c027",
+        "effect_obligation_ids": [
+          "obligation:alpha"
+        ],
+        "environment_id": "environment:review",
+        "evidence_adapter": "evidence:review",
+        "frame_id": "review_frame",
+        "input_schema_id": "input-schema:sha256:70dd0bbca6900b13bfc646f4d7f1c6aa9b266a33411f24fb13572b224600c958",
+        "input_schema_ref": "schema:alpha",
+        "object_snapshot": {
+          "ab_level": 1,
+          "category": "review",
+          "decomposes_to": [],
+          "expected_effects": [
+            "done_alpha"
+          ],
+          "kind": "skill",
+          "object_id": "alpha",
+          "observable_success": [
+            "done_alpha"
+          ],
+          "owner_package": "review_owner",
+          "runtime_callable": true
+        },
+        "output_schema_ref": "schema:out",
+        "proposal": {
+          "arguments_json": "{\"field_alpha\":\"valid\"}",
+          "compiled_task_id": "compiled-task:sha256:2280d750280507e0231e0778b58469c4f9f12303002c4667f5dc34bf987190ff",
+          "environment_run_id": "environment:review",
+          "object_id": "alpha",
+          "operation_id": "operation:review",
+          "output_type": "operation",
+          "proposal_id": "proposal:sha256:6437406bfd5c2120e3ff37716b23ed7672ca527a1ec762522fe438c4eaafa46c",
+          "raw_output_artifact_id": "raw:review",
+          "schema_version": "uah.typed_proposal/v1",
+          "task_id": "task:review",
+          "trace_id": "trace:sha256:f8cff60b4274b34770936312afcd54e1f7472e23e2aedb574e4a8d4ecb129729"
+        },
+        "runtime_mode": "fake",
+        "schema_version": "uah.admitted_operation/v3"
+      },
+      "choices": [
+        "alpha",
+        "beta"
+      ],
+      "examples": [
+        "beta",
+        "alpha"
+      ],
+      "name": "two_valid_reverse",
+      "output_schema": {
+        "oneOf": [
+          {
+            "additionalProperties": false,
+            "properties": {
+              "arguments": {
+                "additionalProperties": false,
+                "properties": {
+                  "field_alpha": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "field_alpha"
+                ],
+                "type": "object"
+              },
+              "object_id": {
+                "const": "alpha"
+              },
+              "output_type": {
+                "enum": [
+                  "operation"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "output_type",
+              "object_id",
+              "arguments"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "arguments": {
+                "additionalProperties": false,
+                "properties": {
+                  "field_beta": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "field_beta"
+                ],
+                "type": "object"
+              },
+              "object_id": {
+                "const": "beta"
+              },
+              "output_type": {
+                "enum": [
+                  "operation"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "output_type",
+              "object_id",
+              "arguments"
+            ],
+            "type": "object"
+          }
+        ]
+      },
+      "prompt_id": "compiled-prompt:sha256:8ad0be993f37f8d8f1aced59763cb07a99e2cecdd4c4157d5d0f074dea4feae5",
+      "reasons": [],
+      "source_contracts": [
+        [
+          "alpha",
+          "binding:sha256:6f83ba98b632ba325f12ffec1244f8ff34fc1b8134270be63ac3b0ffadcc80b7",
+          "input-schema:sha256:70dd0bbca6900b13bfc646f4d7f1c6aa9b266a33411f24fb13572b224600c958"
+        ],
+        [
+          "beta",
+          "binding:sha256:c94e7d1b72648bbe131a266a7ecada727ac3a88390fc680c6a536f10b73bbd42",
+          "input-schema:sha256:62d038b6fd360836a63d10f3c65d84b3ee64c078e3c0e6713d1c1dbeae0f770d"
+        ]
+      ]
+    },
+    {
+      "artifact": {
+        "compiled_task_id": "compiled-task:sha256:27f0a90648b849a8c621da492f77265be030e1dc5518d25899109827497f6502",
+        "proposal": {
+          "arguments_json": "{\"field_alpha\":\"valid\"}",
+          "compiled_task_id": "compiled-task:sha256:27f0a90648b849a8c621da492f77265be030e1dc5518d25899109827497f6502",
+          "environment_run_id": "environment:review",
+          "object_id": "alpha",
+          "operation_id": "operation:review",
+          "output_type": "operation",
+          "proposal_id": "proposal:sha256:f5427094f369567855bf822f5b3768da32724c2e041d0056580271c72d829ed0",
+          "raw_output_artifact_id": "raw:review",
+          "schema_version": "uah.typed_proposal/v1",
+          "task_id": "task:review",
+          "trace_id": "trace:sha256:f8cff60b4274b34770936312afcd54e1f7472e23e2aedb574e4a8d4ecb129729"
+        },
+        "reason_codes": [
+          "object_effect_prohibited"
+        ],
+        "rejection_id": "semantic-rejection:sha256:6c66f727bc3ef2837179a3a1e2c87a98858d3e1bd55e7806f7bfb2ef15c13aff",
+        "schema_version": "uah.semantic_admission_rejection/v1"
+      },
+      "choices": [
+        "alpha",
+        "beta"
+      ],
+      "examples": [
+        "beta",
+        "alpha"
+      ],
+      "name": "two_one_observable_forbidden_reverse",
+      "output_schema": {
+        "oneOf": [
+          {
+            "additionalProperties": false,
+            "properties": {
+              "arguments": {
+                "additionalProperties": false,
+                "properties": {
+                  "field_alpha": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "field_alpha"
+                ],
+                "type": "object"
+              },
+              "object_id": {
+                "const": "alpha"
+              },
+              "output_type": {
+                "enum": [
+                  "operation"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "output_type",
+              "object_id",
+              "arguments"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "arguments": {
+                "additionalProperties": false,
+                "properties": {
+                  "field_beta": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "field_beta"
+                ],
+                "type": "object"
+              },
+              "object_id": {
+                "const": "beta"
+              },
+              "output_type": {
+                "enum": [
+                  "operation"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "output_type",
+              "object_id",
+              "arguments"
+            ],
+            "type": "object"
+          }
+        ]
+      },
+      "prompt_id": "compiled-prompt:sha256:f9218f6ebdd8e6c7a556a9a1603afb99a3fe5169344d62c1d4c866b48d382790",
+      "reasons": [
+        "object_effect_prohibited"
+      ],
+      "source_contracts": [
+        [
+          "alpha",
+          "binding:sha256:6f83ba98b632ba325f12ffec1244f8ff34fc1b8134270be63ac3b0ffadcc80b7",
+          "input-schema:sha256:70dd0bbca6900b13bfc646f4d7f1c6aa9b266a33411f24fb13572b224600c958"
+        ],
+        [
+          "beta",
+          "binding:sha256:c94e7d1b72648bbe131a266a7ecada727ac3a88390fc680c6a536f10b73bbd42",
+          "input-schema:sha256:62d038b6fd360836a63d10f3c65d84b3ee64c078e3c0e6713d1c1dbeae0f770d"
+        ]
+      ]
+    },
+    {
+      "artifact": {
+        "compiled_task_id": "compiled-task:sha256:9c959ee5ebf2f94646d61c6d6235cd3823ae5e07be5fb3d39704223ec6a785e0",
+        "proposal": {
+          "arguments_json": "{\"field_alpha\":\"valid\"}",
+          "compiled_task_id": "compiled-task:sha256:9c959ee5ebf2f94646d61c6d6235cd3823ae5e07be5fb3d39704223ec6a785e0",
+          "environment_run_id": "environment:review",
+          "object_id": "alpha",
+          "operation_id": "operation:review",
+          "output_type": "operation",
+          "proposal_id": "proposal:sha256:0daf85a9c1263bd28ea969efa3b8a3ff4de9a906f00cbacc0bfdd9498edce128",
+          "raw_output_artifact_id": "raw:review",
+          "schema_version": "uah.typed_proposal/v1",
+          "task_id": "task:review",
+          "trace_id": "trace:sha256:f8cff60b4274b34770936312afcd54e1f7472e23e2aedb574e4a8d4ecb129729"
+        },
+        "reason_codes": [
+          "object_effect_prohibited"
+        ],
+        "rejection_id": "semantic-rejection:sha256:e615e564fa63e097ee357231befe3e81c058b6178c1d7177c4d1996bf1343d76",
+        "schema_version": "uah.semantic_admission_rejection/v1"
+      },
+      "choices": [
+        "alpha",
+        "beta"
+      ],
+      "examples": [
+        "beta",
+        "alpha"
+      ],
+      "name": "two_both_observable_forbidden_reverse",
+      "output_schema": {
+        "oneOf": [
+          {
+            "additionalProperties": false,
+            "properties": {
+              "arguments": {
+                "additionalProperties": false,
+                "properties": {
+                  "field_alpha": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "field_alpha"
+                ],
+                "type": "object"
+              },
+              "object_id": {
+                "const": "alpha"
+              },
+              "output_type": {
+                "enum": [
+                  "operation"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "output_type",
+              "object_id",
+              "arguments"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "arguments": {
+                "additionalProperties": false,
+                "properties": {
+                  "field_beta": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "field_beta"
+                ],
+                "type": "object"
+              },
+              "object_id": {
+                "const": "beta"
+              },
+              "output_type": {
+                "enum": [
+                  "operation"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "output_type",
+              "object_id",
+              "arguments"
+            ],
+            "type": "object"
+          }
+        ]
+      },
+      "prompt_id": "compiled-prompt:sha256:163009e589cf599e299a36a8556a03af06580e991ee4f09f69a210a4326e4706",
+      "reasons": [
+        "object_effect_prohibited"
+      ],
+      "source_contracts": [
+        [
+          "alpha",
+          "binding:sha256:6f83ba98b632ba325f12ffec1244f8ff34fc1b8134270be63ac3b0ffadcc80b7",
+          "input-schema:sha256:70dd0bbca6900b13bfc646f4d7f1c6aa9b266a33411f24fb13572b224600c958"
+        ],
+        [
+          "beta",
+          "binding:sha256:c94e7d1b72648bbe131a266a7ecada727ac3a88390fc680c6a536f10b73bbd42",
+          "input-schema:sha256:62d038b6fd360836a63d10f3c65d84b3ee64c078e3c0e6713d1c1dbeae0f770d"
+        ]
+      ]
+    },
+    {
+      "artifact": {
+        "compiled_task_id": "compiled-task:sha256:af3f25c3847e11a95045973503c080bbddd92430374b5376b95bc45d3c4aafde",
+        "proposal": {
+          "arguments_json": "{}",
+          "compiled_task_id": "compiled-task:sha256:af3f25c3847e11a95045973503c080bbddd92430374b5376b95bc45d3c4aafde",
+          "environment_run_id": "environment:review",
+          "object_id": "alpha",
+          "operation_id": "operation:review",
+          "output_type": "operation",
+          "proposal_id": "proposal:sha256:dc4f0fb744d151083d1d37ec378492fcc9cf866010ad1a64c11f4f9a93583370",
+          "raw_output_artifact_id": "raw:review",
+          "schema_version": "uah.typed_proposal/v1",
+          "task_id": "task:review",
+          "trace_id": "trace:sha256:f8cff60b4274b34770936312afcd54e1f7472e23e2aedb574e4a8d4ecb129729"
+        },
+        "reason_codes": [
+          "proposal_arguments_schema_invalid"
+        ],
+        "rejection_id": "semantic-rejection:sha256:61fc5549310954c62d1e55b2b59424f3d4cc04a08d64addb5d635e260149e19c",
+        "schema_version": "uah.semantic_admission_rejection/v1"
+      },
+      "choices": [
+        "alpha"
+      ],
+      "examples": [
+        "alpha"
+      ],
+      "name": "arguments_missing",
+      "output_schema": {
+        "oneOf": [
+          {
+            "additionalProperties": false,
+            "properties": {
+              "arguments": {
+                "additionalProperties": false,
+                "properties": {
+                  "field_alpha": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "field_alpha"
+                ],
+                "type": "object"
+              },
+              "object_id": {
+                "const": "alpha"
+              },
+              "output_type": {
+                "enum": [
+                  "operation"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "output_type",
+              "object_id",
+              "arguments"
+            ],
+            "type": "object"
+          }
+        ]
+      },
+      "prompt_id": "compiled-prompt:sha256:19ca501276727dbb9ec8e4f9858bce2a6db349386e85a7451db96abe9785e546",
+      "reasons": [
+        "proposal_arguments_schema_invalid"
+      ],
+      "source_contracts": [
+        [
+          "alpha",
+          "binding:sha256:6f83ba98b632ba325f12ffec1244f8ff34fc1b8134270be63ac3b0ffadcc80b7",
+          "input-schema:sha256:70dd0bbca6900b13bfc646f4d7f1c6aa9b266a33411f24fb13572b224600c958"
+        ]
+      ]
+    },
+    {
+      "artifact": {
+        "compiled_task_id": "compiled-task:sha256:af3f25c3847e11a95045973503c080bbddd92430374b5376b95bc45d3c4aafde",
+        "proposal": {
+          "arguments_json": "{\"field_alpha\":1}",
+          "compiled_task_id": "compiled-task:sha256:af3f25c3847e11a95045973503c080bbddd92430374b5376b95bc45d3c4aafde",
+          "environment_run_id": "environment:review",
+          "object_id": "alpha",
+          "operation_id": "operation:review",
+          "output_type": "operation",
+          "proposal_id": "proposal:sha256:b0be5bfe02bd8091ab5756eb72c53c4f85784a3f8d40fc598893bddcb9a9a9ea",
+          "raw_output_artifact_id": "raw:review",
+          "schema_version": "uah.typed_proposal/v1",
+          "task_id": "task:review",
+          "trace_id": "trace:sha256:f8cff60b4274b34770936312afcd54e1f7472e23e2aedb574e4a8d4ecb129729"
+        },
+        "reason_codes": [
+          "proposal_arguments_schema_invalid"
+        ],
+        "rejection_id": "semantic-rejection:sha256:78a64de22a0c37c827945d547c5a0f5769ce8f5ece810495e3b558da1b744a07",
+        "schema_version": "uah.semantic_admission_rejection/v1"
+      },
+      "choices": [
+        "alpha"
+      ],
+      "examples": [
+        "alpha"
+      ],
+      "name": "arguments_type",
+      "output_schema": {
+        "oneOf": [
+          {
+            "additionalProperties": false,
+            "properties": {
+              "arguments": {
+                "additionalProperties": false,
+                "properties": {
+                  "field_alpha": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "field_alpha"
+                ],
+                "type": "object"
+              },
+              "object_id": {
+                "const": "alpha"
+              },
+              "output_type": {
+                "enum": [
+                  "operation"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "output_type",
+              "object_id",
+              "arguments"
+            ],
+            "type": "object"
+          }
+        ]
+      },
+      "prompt_id": "compiled-prompt:sha256:19ca501276727dbb9ec8e4f9858bce2a6db349386e85a7451db96abe9785e546",
+      "reasons": [
+        "proposal_arguments_schema_invalid"
+      ],
+      "source_contracts": [
+        [
+          "alpha",
+          "binding:sha256:6f83ba98b632ba325f12ffec1244f8ff34fc1b8134270be63ac3b0ffadcc80b7",
+          "input-schema:sha256:70dd0bbca6900b13bfc646f4d7f1c6aa9b266a33411f24fb13572b224600c958"
+        ]
+      ]
+    },
+    {
+      "artifact": {
+        "compiled_task_id": "compiled-task:sha256:af3f25c3847e11a95045973503c080bbddd92430374b5376b95bc45d3c4aafde",
+        "proposal": {
+          "arguments_json": "{\"extra\":true,\"field_alpha\":\"ok\"}",
+          "compiled_task_id": "compiled-task:sha256:af3f25c3847e11a95045973503c080bbddd92430374b5376b95bc45d3c4aafde",
+          "environment_run_id": "environment:review",
+          "object_id": "alpha",
+          "operation_id": "operation:review",
+          "output_type": "operation",
+          "proposal_id": "proposal:sha256:add401e2cae3b461ccd3540f8b070b628a5323ffeabed53bad9cfbc068ce2ff5",
+          "raw_output_artifact_id": "raw:review",
+          "schema_version": "uah.typed_proposal/v1",
+          "task_id": "task:review",
+          "trace_id": "trace:sha256:f8cff60b4274b34770936312afcd54e1f7472e23e2aedb574e4a8d4ecb129729"
+        },
+        "reason_codes": [
+          "proposal_arguments_schema_invalid"
+        ],
+        "rejection_id": "semantic-rejection:sha256:f3488cca287802d3f4e6bfcc215b970c0d948ff38a09022f5859fb94087f0e9d",
+        "schema_version": "uah.semantic_admission_rejection/v1"
+      },
+      "choices": [
+        "alpha"
+      ],
+      "examples": [
+        "alpha"
+      ],
+      "name": "arguments_extra",
+      "output_schema": {
+        "oneOf": [
+          {
+            "additionalProperties": false,
+            "properties": {
+              "arguments": {
+                "additionalProperties": false,
+                "properties": {
+                  "field_alpha": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "field_alpha"
+                ],
+                "type": "object"
+              },
+              "object_id": {
+                "const": "alpha"
+              },
+              "output_type": {
+                "enum": [
+                  "operation"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "output_type",
+              "object_id",
+              "arguments"
+            ],
+            "type": "object"
+          }
+        ]
+      },
+      "prompt_id": "compiled-prompt:sha256:19ca501276727dbb9ec8e4f9858bce2a6db349386e85a7451db96abe9785e546",
+      "reasons": [
+        "proposal_arguments_schema_invalid"
+      ],
+      "source_contracts": [
+        [
+          "alpha",
+          "binding:sha256:6f83ba98b632ba325f12ffec1244f8ff34fc1b8134270be63ac3b0ffadcc80b7",
+          "input-schema:sha256:70dd0bbca6900b13bfc646f4d7f1c6aa9b266a33411f24fb13572b224600c958"
+        ]
+      ]
+    },
+    {
+      "artifact": {
+        "compiled_task_id": "compiled-task:sha256:af3f25c3847e11a95045973503c080bbddd92430374b5376b95bc45d3c4aafde",
+        "proposal": {
+          "arguments_json": "{\"field_alpha\":\"valid\"}",
+          "compiled_task_id": "compiled-task:sha256:af3f25c3847e11a95045973503c080bbddd92430374b5376b95bc45d3c4aafde",
+          "environment_run_id": "environment:review",
+          "object_id": "alpha",
+          "operation_id": "operation:review",
+          "output_type": "operation",
+          "proposal_id": "proposal:sha256:1ffc8546c08fd9078c08a853951749d1827fda4f5b78ff9b794f82bf2016c1b2",
+          "raw_output_artifact_id": "raw:review",
+          "schema_version": "uah.typed_proposal/v1",
+          "task_id": "task:review",
+          "trace_id": "trace:sha256:f8cff60b4274b34770936312afcd54e1f7472e23e2aedb574e4a8d4ecb129729"
+        },
+        "reason_codes": [
+          "binding_unavailable"
+        ],
+        "rejection_id": "semantic-rejection:sha256:1c5f03c73d1f2d0432c73ca782577d5768b904fb96345a16e4c5fde5f9bf94d7",
+        "schema_version": "uah.semantic_admission_rejection/v1"
+      },
+      "name": "candidate",
+      "prompt_error": "no approved binding for AB object: alpha",
+      "reasons": [
+        "binding_unavailable"
+      ]
+    },
+    {
+      "artifact": {
+        "compiled_task_id": "compiled-task:sha256:af3f25c3847e11a95045973503c080bbddd92430374b5376b95bc45d3c4aafde",
+        "proposal": {
+          "arguments_json": "{\"field_alpha\":\"valid\"}",
+          "compiled_task_id": "compiled-task:sha256:af3f25c3847e11a95045973503c080bbddd92430374b5376b95bc45d3c4aafde",
+          "environment_run_id": "environment:review",
+          "object_id": "alpha",
+          "operation_id": "operation:review",
+          "output_type": "operation",
+          "proposal_id": "proposal:sha256:1ffc8546c08fd9078c08a853951749d1827fda4f5b78ff9b794f82bf2016c1b2",
+          "raw_output_artifact_id": "raw:review",
+          "schema_version": "uah.typed_proposal/v1",
+          "task_id": "task:review",
+          "trace_id": "trace:sha256:f8cff60b4274b34770936312afcd54e1f7472e23e2aedb574e4a8d4ecb129729"
+        },
+        "reason_codes": [
+          "binding_unavailable"
+        ],
+        "rejection_id": "semantic-rejection:sha256:1c5f03c73d1f2d0432c73ca782577d5768b904fb96345a16e4c5fde5f9bf94d7",
+        "schema_version": "uah.semantic_admission_rejection/v1"
+      },
+      "name": "disabled",
+      "prompt_error": "no approved binding for AB object: alpha",
+      "reasons": [
+        "binding_unavailable"
+      ]
+    },
+    {
+      "artifact": {
+        "compiled_task_id": "compiled-task:sha256:af3f25c3847e11a95045973503c080bbddd92430374b5376b95bc45d3c4aafde",
+        "proposal": {
+          "arguments_json": "{\"field_alpha\":\"valid\"}",
+          "compiled_task_id": "compiled-task:sha256:af3f25c3847e11a95045973503c080bbddd92430374b5376b95bc45d3c4aafde",
+          "environment_run_id": "environment:review",
+          "object_id": "alpha",
+          "operation_id": "operation:review",
+          "output_type": "operation",
+          "proposal_id": "proposal:sha256:1ffc8546c08fd9078c08a853951749d1827fda4f5b78ff9b794f82bf2016c1b2",
+          "raw_output_artifact_id": "raw:review",
+          "schema_version": "uah.typed_proposal/v1",
+          "task_id": "task:review",
+          "trace_id": "trace:sha256:f8cff60b4274b34770936312afcd54e1f7472e23e2aedb574e4a8d4ecb129729"
+        },
+        "reason_codes": [
+          "binding_unavailable"
+        ],
+        "rejection_id": "semantic-rejection:sha256:1c5f03c73d1f2d0432c73ca782577d5768b904fb96345a16e4c5fde5f9bf94d7",
+        "schema_version": "uah.semantic_admission_rejection/v1"
+      },
+      "name": "wrong_environment",
+      "prompt_error": "no approved binding for AB object: alpha",
+      "reasons": [
+        "binding_unavailable"
+      ]
+    },
+    {
+      "artifact": {
+        "compiled_task_id": "compiled-task:sha256:af3f25c3847e11a95045973503c080bbddd92430374b5376b95bc45d3c4aafde",
+        "proposal": {
+          "arguments_json": "{\"field_alpha\":\"valid\"}",
+          "compiled_task_id": "compiled-task:sha256:af3f25c3847e11a95045973503c080bbddd92430374b5376b95bc45d3c4aafde",
+          "environment_run_id": "environment:review",
+          "object_id": "alpha",
+          "operation_id": "operation:review",
+          "output_type": "operation",
+          "proposal_id": "proposal:sha256:1ffc8546c08fd9078c08a853951749d1827fda4f5b78ff9b794f82bf2016c1b2",
+          "raw_output_artifact_id": "raw:review",
+          "schema_version": "uah.typed_proposal/v1",
+          "task_id": "task:review",
+          "trace_id": "trace:sha256:f8cff60b4274b34770936312afcd54e1f7472e23e2aedb574e4a8d4ecb129729"
+        },
+        "reason_codes": [
+          "binding_unavailable"
+        ],
+        "rejection_id": "semantic-rejection:sha256:1c5f03c73d1f2d0432c73ca782577d5768b904fb96345a16e4c5fde5f9bf94d7",
+        "schema_version": "uah.semantic_admission_rejection/v1"
+      },
+      "name": "wrong_runtime",
+      "prompt_error": "no approved binding for runtime mode fake: alpha",
+      "reasons": [
+        "binding_unavailable"
+      ]
+    },
+    {
+      "artifact": {
+        "compiled_task_id": "compiled-task:sha256:af3f25c3847e11a95045973503c080bbddd92430374b5376b95bc45d3c4aafde",
+        "proposal": {
+          "arguments_json": "{\"field_alpha\":\"valid\"}",
+          "compiled_task_id": "compiled-task:sha256:af3f25c3847e11a95045973503c080bbddd92430374b5376b95bc45d3c4aafde",
+          "environment_run_id": "environment:review",
+          "object_id": "alpha",
+          "operation_id": "operation:review",
+          "output_type": "operation",
+          "proposal_id": "proposal:sha256:1ffc8546c08fd9078c08a853951749d1827fda4f5b78ff9b794f82bf2016c1b2",
+          "raw_output_artifact_id": "raw:review",
+          "schema_version": "uah.typed_proposal/v1",
+          "task_id": "task:review",
+          "trace_id": "trace:sha256:f8cff60b4274b34770936312afcd54e1f7472e23e2aedb574e4a8d4ecb129729"
+        },
+        "reason_codes": [
+          "binding_owner_mismatch"
+        ],
+        "rejection_id": "semantic-rejection:sha256:2b176860289b3c6d9ba39f1ce0eee1370fa71742616a637afb2b1ed7b71dc449",
+        "schema_version": "uah.semantic_admission_rejection/v1"
+      },
+      "name": "wrong_owner",
+      "prompt_error": "binding owner does not match projected object owner",
+      "reasons": [
+        "binding_owner_mismatch"
+      ]
+    },
+    {
+      "artifact": {
+        "compiled_task_id": "compiled-task:sha256:af3f25c3847e11a95045973503c080bbddd92430374b5376b95bc45d3c4aafde",
+        "proposal": {
+          "arguments_json": "{\"field_alpha\":\"valid\"}",
+          "compiled_task_id": "compiled-task:sha256:af3f25c3847e11a95045973503c080bbddd92430374b5376b95bc45d3c4aafde",
+          "environment_run_id": "environment:review",
+          "object_id": "alpha",
+          "operation_id": "operation:review",
+          "output_type": "operation",
+          "proposal_id": "proposal:sha256:1ffc8546c08fd9078c08a853951749d1827fda4f5b78ff9b794f82bf2016c1b2",
+          "raw_output_artifact_id": "raw:review",
+          "schema_version": "uah.typed_proposal/v1",
+          "task_id": "task:review",
+          "trace_id": "trace:sha256:f8cff60b4274b34770936312afcd54e1f7472e23e2aedb574e4a8d4ecb129729"
+        },
+        "reason_codes": [
+          "input_schema_unavailable"
+        ],
+        "rejection_id": "semantic-rejection:sha256:e2a9a3dd18fb201a9ae37ed2bae2344084dcbd4784c9d0aa421dcb74adb6a9ca",
+        "schema_version": "uah.semantic_admission_rejection/v1"
+      },
+      "name": "missing_schema",
+      "prompt_error": "binding argument schema is not registered",
+      "reasons": [
+        "input_schema_unavailable"
+      ]
+    }
+  ],
+  "variant": "before"
+}

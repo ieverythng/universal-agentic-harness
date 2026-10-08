@@ -1,0 +1,38 @@
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+________ test_stripped_current_body_cannot_reuse_recorded_lease[False] _________
+
+tmp_path = PosixPath('/tmp/pytest-of-juanbeck/pytest-136/test_stripped_current_body_can0')
+wrong_frame = False
+
+    @pytest.mark.parametrize("wrong_frame", [False, True])
+    def test_stripped_current_body_cannot_reuse_recorded_lease(tmp_path, wrong_frame):
+        _, _, environment, ledger, admitted, _ = authority_fixture(tmp_path)
+        strip_current_markers(ledger, wrong_frame=wrong_frame)
+        historical = LifecycleLedger(ledger.path)
+        assert len(historical.events()) == 5
+        before = historical.path.read_bytes()
+>       with pytest.raises(ValueError, match="current|semantic|provenance"):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/test_admission_active_provenance.py:112: Failed
+_________ test_stripped_current_body_cannot_reuse_recorded_lease[True] _________
+
+tmp_path = PosixPath('/tmp/pytest-of-juanbeck/pytest-136/test_stripped_current_body_can1')
+wrong_frame = True
+
+    @pytest.mark.parametrize("wrong_frame", [False, True])
+    def test_stripped_current_body_cannot_reuse_recorded_lease(tmp_path, wrong_frame):
+        _, _, environment, ledger, admitted, _ = authority_fixture(tmp_path)
+        strip_current_markers(ledger, wrong_frame=wrong_frame)
+        historical = LifecycleLedger(ledger.path)
+        assert len(historical.events()) == 5
+        before = historical.path.read_bytes()
+>       with pytest.raises(ValueError, match="current|semantic|provenance"):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/test_admission_active_provenance.py:112: Failed
+=========================== short test summary info ============================
+FAILED tests/test_admission_active_provenance.py::test_stripped_current_body_cannot_reuse_recorded_lease[False]
+FAILED tests/test_admission_active_provenance.py::test_stripped_current_body_cannot_reuse_recorded_lease[True]
+2 failed, 2 deselected in 0.20s

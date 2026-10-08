@@ -1,0 +1,50 @@
+{
+  "schema_version": 1,
+  "inspection_date": "2026-10-08",
+  "source_budget_artifact_families": 6,
+  "sources": [
+    {
+      "id": "P1",
+      "url": "https://api.github.com/gists/91837951a5ce5b38f341ec1ba1df6449/3c190e06f34aba0c69f49042c526093269604935",
+      "revision": "3c190e06f34aba0c69f49042c526093269604935",
+      "retained_path": "optchat.md",
+      "sha256": "12f300f760af82bc07bc5201051d1267824ded09c9def8186e4f8144368038d8",
+      "status": "exact_retained_source"
+    },
+    {
+      "id": "P2",
+      "url": "https://api.github.com/gists/91837951a5ce5b38f341ec1ba1df6449/f51fe5c910427fd6f384d22823140b1693c76207",
+      "revision": "f51fe5c910427fd6f384d22823140b1693c76207",
+      "retained_path": null,
+      "status": "historical_lineage_source_inspected_not_locally_retained"
+    },
+    {
+      "id": "P3",
+      "url": "https://github.com/VictorTaelin/OptMem/blob/1fb164cf39028047781f72ac3bb1e5a691c1dcb0/memo",
+      "revision": "1fb164cf39028047781f72ac3bb1e5a691c1dcb0",
+      "sha256": "3dc120d01be3115ef6267eab4103e7909fc830d6227b549f20991ba999ee9ffb",
+      "retained_path": null,
+      "status": "historical_owning_code_family_inspected_not_latest_UniiChat_implementation"
+    },
+    {
+      "id": "P4",
+      "url": "https://docs.ollama.com/context-length",
+      "revision": null,
+      "status": "living_primary_docs_accessed_2026-10-08_not_installed_runtime_identity"
+    },
+    {
+      "id": "P5",
+      "url": "https://docs.ollama.com/api/chat",
+      "revision": null,
+      "status": "living_primary_docs_accessed_2026-10-08_not_route_telemetry"
+    },
+    {
+      "id": "P6",
+      "url": "https://github.com/ggml-org/llama.cpp/blob/c1d0e7a004015f23bc0233470b747b596f29b264/tools/server/README.md",
+      "tag": "b10621",
+      "revision": "c1d0e7a004015f23bc0233470b747b596f29b264",
+      "committed_at": "2026-08-25T09:42:21Z",
+      "status": "pinned_document_not_verified_live_Watson_build"
+    }
+  ]
+}

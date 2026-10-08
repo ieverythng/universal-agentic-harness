@@ -1,0 +1,85 @@
+FFFFFFFFFF.F.F...                                                        [100%]
+=================================== FAILURES ===================================
+_______ test_public_event_exports_do_not_alias_ledger_authority[events] ________
+tests/test_lifecycle_ledger.py:101: in test_public_event_exports_do_not_alias_ledger_authority
+    assert tuple(event.to_dict() for event in ledger.events()) == original
+E   AssertionError: assert ({'event_id':...cb90ae', ...}) == ({'event_id':...cb90ae', ...})
+E
+E     At index 1 diff: {'event_id': 'trace-event:sha256:342d5c7c14beaa30e1e53bebe5be9fcb5b1aae8fdd71f06306016b2d8498ac73', 'schema_version': 'uah.trace_event/v1', 'sequence': 2, 'commit_id': 'lifecycle-commit:sha256:9b40247f7aaa46a5908f53a562481ceaab6519c950f87cc489d53b6e52cb90ae', 'commit_index': 1, 'commit_size': 1, 'recorded_at': '2026-09-28T13:00:00Z', 'event_type': 'terminal_task_accepted', 'environment_run_id': 'environment-run:ledger:001', 'task_id': 'task:ledger:001', 'trace_id': 'trace:ledger:001', 'operation_id': None, 'parent_event_id': 'trace-event:sha256:faf96c15...
+E
+E     ...Full output truncated (2 lines hidden), use '-vv' to show
+_______ test_public_event_exports_do_not_alias_ledger_authority[replay] ________
+tests/test_lifecycle_ledger.py:101: in test_public_event_exports_do_not_alias_ledger_authority
+    assert tuple(event.to_dict() for event in ledger.events()) == original
+E   AssertionError: assert ({'event_id':...cb90ae', ...}) == ({'event_id':...cb90ae', ...})
+E
+E     At index 1 diff: {'event_id': 'trace-event:sha256:342d5c7c14beaa30e1e53bebe5be9fcb5b1aae8fdd71f06306016b2d8498ac73', 'schema_version': 'uah.trace_event/v1', 'sequence': 2, 'commit_id': 'lifecycle-commit:sha256:9b40247f7aaa46a5908f53a562481ceaab6519c950f87cc489d53b6e52cb90ae', 'commit_index': 1, 'commit_size': 1, 'recorded_at': '2026-09-28T13:00:00Z', 'event_type': 'terminal_task_accepted', 'environment_run_id': 'environment-run:ledger:001', 'task_id': 'task:ledger:001', 'trace_id': 'trace:ledger:001', 'operation_id': None, 'parent_event_id': 'trace-event:sha256:faf96c15...
+E
+E     ...Full output truncated (2 lines hidden), use '-vv' to show
+_______ test_public_event_exports_do_not_alias_ledger_authority[commit] ________
+tests/test_lifecycle_ledger.py:101: in test_public_event_exports_do_not_alias_ledger_authority
+    assert tuple(event.to_dict() for event in ledger.events()) == original
+E   AssertionError: assert ({'event_id':...bc7e9b', ...}) == ({'event_id':...bc7e9b', ...})
+E
+E     At index 2 diff: {'event_id': 'trace-event:sha256:aea0128167ead496ab9ddf408dab816fc54d097986ce25850429560b4fc9f2d0', 'schema_version': 'uah.trace_event/v1', 'sequence': 3, 'commit_id': 'lifecycle-commit:sha256:877efc25a1764c44f164187f0d4566694c663b686447f07ff4e004531dbc7e9b', 'commit_index': 1, 'commit_size': 1, 'recorded_at': '2026-09-28T13:00:00Z', 'event_type': 'terminal_task_accepted', 'environment_run_id': 'environment-run:ledger:001', 'task_id': 'task:ledger:001', 'trace_id': 'trace:ledger:001', 'operation_id': None, 'parent_event_id': 'trace-event:sha256:342d5c7c...
+E
+E     ...Full output truncated (2 lines hidden), use '-vv' to show
+_____ test_foreign_event_with_stale_identity_is_rejected[event_type-data] ______
+tests/test_lifecycle_ledger.py:113: in test_foreign_event_with_stale_identity_is_rejected
+    with pytest.raises(ValueError, match="identity does not match"):
+E   Failed: DID NOT RAISE ValueError
+_ test_foreign_event_with_stale_identity_is_rejected[event_type-serialization] _
+tests/test_lifecycle_ledger.py:113: in test_foreign_event_with_stale_identity_is_rejected
+    with pytest.raises(ValueError, match="identity does not match"):
+E   Failed: DID NOT RAISE ValueError
+____ test_foreign_event_with_stale_identity_is_rejected[event_type-render] _____
+tests/test_lifecycle_ledger.py:113: in test_foreign_event_with_stale_identity_is_rejected
+    with pytest.raises(ValueError, match="identity does not match"):
+E   Failed: DID NOT RAISE ValueError
+______ test_foreign_event_with_stale_identity_is_rejected[data_json-data] ______
+tests/test_lifecycle_ledger.py:113: in test_foreign_event_with_stale_identity_is_rejected
+    with pytest.raises(ValueError, match="identity does not match"):
+E   Failed: DID NOT RAISE ValueError
+_ test_foreign_event_with_stale_identity_is_rejected[data_json-serialization] __
+tests/test_lifecycle_ledger.py:113: in test_foreign_event_with_stale_identity_is_rejected
+    with pytest.raises(ValueError, match="identity does not match"):
+E   Failed: DID NOT RAISE ValueError
+_____ test_foreign_event_with_stale_identity_is_rejected[data_json-render] _____
+tests/test_lifecycle_ledger.py:113: in test_foreign_event_with_stale_identity_is_rejected
+    with pytest.raises(ValueError, match="identity does not match"):
+E   Failed: DID NOT RAISE ValueError
+__ test_exported_budget_mutation_cannot_grant_extra_model_calls[events-False] __
+tests/test_lifecycle_ledger.py:168: in test_exported_budget_mutation_cannot_grant_extra_model_calls
+    assert (assessment.decision.outcome, assessment.decision.limit) == ("exhausted", 3)
+E   AssertionError: assert ('granted', 99) == ('exhausted', 3)
+E
+E     At index 0 diff: 'granted' != 'exhausted'
+E     Use -v to get more diff
+__ test_exported_budget_mutation_cannot_grant_extra_model_calls[commit-False] __
+tests/test_lifecycle_ledger.py:168: in test_exported_budget_mutation_cannot_grant_extra_model_calls
+    assert (assessment.decision.outcome, assessment.decision.limit) == ("exhausted", 3)
+E   AssertionError: assert ('granted', 99) == ('exhausted', 3)
+E
+E     At index 0 diff: 'granted' != 'exhausted'
+E     Use -v to get more diff
+__ test_exported_budget_mutation_cannot_grant_extra_model_calls[replay-False] __
+tests/test_lifecycle_ledger.py:168: in test_exported_budget_mutation_cannot_grant_extra_model_calls
+    assert (assessment.decision.outcome, assessment.decision.limit) == ("exhausted", 3)
+E   AssertionError: assert ('granted', 99) == ('exhausted', 3)
+E
+E     At index 0 diff: 'granted' != 'exhausted'
+E     Use -v to get more diff
+=========================== short test summary info ============================
+FAILED tests/test_lifecycle_ledger.py::test_public_event_exports_do_not_alias_ledger_authority[events]
+FAILED tests/test_lifecycle_ledger.py::test_public_event_exports_do_not_alias_ledger_authority[replay]
+FAILED tests/test_lifecycle_ledger.py::test_public_event_exports_do_not_alias_ledger_authority[commit]
+FAILED tests/test_lifecycle_ledger.py::test_foreign_event_with_stale_identity_is_rejected[event_type-data]
+FAILED tests/test_lifecycle_ledger.py::test_foreign_event_with_stale_identity_is_rejected[event_type-serialization]
+FAILED tests/test_lifecycle_ledger.py::test_foreign_event_with_stale_identity_is_rejected[event_type-render]
+FAILED tests/test_lifecycle_ledger.py::test_foreign_event_with_stale_identity_is_rejected[data_json-data]
+FAILED tests/test_lifecycle_ledger.py::test_foreign_event_with_stale_identity_is_rejected[data_json-serialization]
+FAILED tests/test_lifecycle_ledger.py::test_foreign_event_with_stale_identity_is_rejected[data_json-render]
+FAILED tests/test_lifecycle_ledger.py::test_exported_budget_mutation_cannot_grant_extra_model_calls[events-False]
+FAILED tests/test_lifecycle_ledger.py::test_exported_budget_mutation_cannot_grant_extra_model_calls[commit-False]
+FAILED tests/test_lifecycle_ledger.py::test_exported_budget_mutation_cannot_grant_extra_model_calls[replay-False]
+12 failed, 5 passed, 10 deselected in 0.33s

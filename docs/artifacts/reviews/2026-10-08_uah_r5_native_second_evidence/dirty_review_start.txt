@@ -1,0 +1,381 @@
+ M CONTEXT.md
+ M docs/README.md
+ M docs/architecture/observatory_contract.html
+ M docs/architecture/observatory_contract.md
+ M docs/architecture/universal_agentic_harness_foundation.html
+ M docs/architecture/universal_agentic_harness_foundation.md
+ M docs/artifacts/decisions/2026-09-08_uah_identity_environment_and_memory_grill.html
+ M docs/artifacts/decisions/2026-09-08_uah_identity_environment_and_memory_grill.md
+ M docs/gtm/investor_handoff/README.html
+ M docs/gtm/investor_handoff/README.md
+ M docs/gtm/investor_handoff/executive_brief.html
+ M docs/gtm/investor_handoff/executive_brief.md
+ M docs/gtm/investor_handoff/gtm_and_investment_case.html
+ M docs/gtm/investor_handoff/gtm_and_investment_case.md
+ M docs/gtm/investor_handoff/technical_diligence.html
+ M docs/gtm/investor_handoff/technical_diligence.md
+ M docs/plans/universal_agentic_harness_development_log.html
+ M docs/plans/universal_agentic_harness_development_log.md
+ M docs/plans/universal_agentic_harness_masterplan.html
+ M docs/plans/universal_agentic_harness_masterplan.md
+ M docs/research/uah_h0_h1_seam_deepening.md
+ M scripts/render_agentic_harness_docs.py
+ M src/ab_harness/__init__.py
+ M src/ab_harness/domain_contracts.py
+ M src/ab_harness/domain_lifecycle.py
+ M src/ab_harness/environment.py
+ M src/ab_harness/environment_ingress.py
+ M src/ab_harness/lifecycle.py
+ M src/ab_harness/proposal_admission.py
+ M src/ab_harness/task_compiler.py
+ M src/ab_harness/task_registry.py
+ M src/ab_harness_nao/qualification.py
+ M src/ab_harness_nao/smoke.py
+ M tests/test_cli_smoke.py
+ M tests/test_environment_ingress.py
+ M tests/test_lifecycle_ledger.py
+ M tests/test_recorded_nao_qualification.py
+ M tests/test_task_compiler.py
+ M tests/test_two_stage_admission.py
+?? .codex/skills/uah-stack-iteration-loop/SKILL.md
+?? REVIEW.md
+?? docs/agents/uah_review_workflow.md
+?? docs/artifacts/observatory/o1_h1_agent_lifecycle.html
+?? docs/artifacts/observatory/o1_recorded_nao_canary.html
+?? docs/artifacts/research/2026-10-08_uah_owner_local_oracle_eval.json
+?? docs/artifacts/research/2026-10-08_uah_r2_uniichat_context_and_ab_index.md
+?? docs/artifacts/research/2026-10-08_uah_r2_uniichat_context_and_ab_index_evidence/baseline.sha256
+?? docs/artifacts/research/2026-10-08_uah_r2_uniichat_context_and_ab_index_evidence/closeout.sha256
+?? docs/artifacts/research/2026-10-08_uah_r2_uniichat_context_and_ab_index_evidence/dashboard_handoff.md
+?? docs/artifacts/research/2026-10-08_uah_r2_uniichat_context_and_ab_index_evidence/end.sha256
+?? docs/artifacts/research/2026-10-08_uah_r2_uniichat_context_and_ab_index_evidence/experiment_cards.json
+?? docs/artifacts/research/2026-10-08_uah_r2_uniichat_context_and_ab_index_evidence/metric_contract.md
+?? docs/artifacts/research/2026-10-08_uah_r2_uniichat_context_and_ab_index_evidence/optchat.md
+?? docs/artifacts/research/2026-10-08_uah_r2_uniichat_context_and_ab_index_evidence/primary_sources.json
+?? docs/artifacts/research/2026-10-08_uah_r2_uniichat_context_and_ab_index_evidence/research_audit.md
+?? docs/artifacts/research/2026-10-08_uah_r2_uniichat_context_and_ab_index_evidence/source_manifest.json
+?? docs/artifacts/research/2026-10-08_uah_r2_uniichat_context_and_ab_index_evidence/static_probe.json
+?? docs/artifacts/research/2026-10-08_uah_r2_uniichat_context_and_ab_index_evidence/validation.json
+?? docs/artifacts/research/2026-10-08_uah_research_catalog_round.md
+?? docs/artifacts/research/2026-10-08_uah_task_oracle_contract_handoff.md
+?? docs/artifacts/research/README.md
+?? docs/artifacts/reviews/2026-10-05_uah_h0_h1_independent_review.md
+?? docs/artifacts/reviews/2026-10-05_uah_h0_h1_review_scope.md
+?? docs/artifacts/reviews/2026-10-05_uah_review_repros/README.md
+?? docs/artifacts/reviews/2026-10-05_uah_review_repros/observatory_probes.py
+?? docs/artifacts/reviews/2026-10-05_uah_review_repros/prompt_scope_probe.py
+?? docs/artifacts/reviews/2026-10-05_uah_review_repros/spec_probes.py
+?? docs/artifacts/reviews/2026-10-05_uah_review_repros/standards_domain_tamper.py
+?? docs/artifacts/reviews/2026-10-05_uah_review_repros/standards_event_tamper.py
+?? docs/artifacts/reviews/2026-10-05_uah_review_repros/standards_push_cache.py
+?? docs/artifacts/reviews/2026-10-08_uah_arch01_end.sha256
+?? docs/artifacts/reviews/2026-10-08_uah_arch01_primary_control.md
+?? docs/artifacts/reviews/2026-10-08_uah_arch01_primary_inputs.md
+?? docs/artifacts/reviews/2026-10-08_uah_arch01_primary_probe.py
+?? docs/artifacts/reviews/2026-10-08_uah_arch01_primary_probe_final.json
+?? docs/artifacts/reviews/2026-10-08_uah_arch01_primary_probe_results.json
+?? docs/artifacts/reviews/2026-10-08_uah_arch01_primary_review.md
+?? docs/artifacts/reviews/2026-10-08_uah_arch01_primary_stateful_tests.md
+?? docs/artifacts/reviews/2026-10-08_uah_arch01_second_review.md
+?? docs/artifacts/reviews/2026-10-08_uah_arch01_second_review_evidence/before.json
+?? docs/artifacts/reviews/2026-10-08_uah_arch01_second_review_evidence/comparison.json
+?? docs/artifacts/reviews/2026-10-08_uah_arch01_second_review_evidence/current.json
+?? docs/artifacts/reviews/2026-10-08_uah_arch01_second_review_evidence/initial_before.txt
+?? docs/artifacts/reviews/2026-10-08_uah_arch01_second_review_evidence/initial_current.txt
+?? docs/artifacts/reviews/2026-10-08_uah_arch01_second_review_evidence/inputs.md
+?? docs/artifacts/reviews/2026-10-08_uah_arch01_second_review_evidence/paths_before.txt
+?? docs/artifacts/reviews/2026-10-08_uah_arch01_second_review_evidence/paths_current.txt
+?? docs/artifacts/reviews/2026-10-08_uah_arch01_second_review_evidence/probe.py
+?? docs/artifacts/reviews/2026-10-08_uah_arch01_second_review_evidence/tests_before.txt
+?? docs/artifacts/reviews/2026-10-08_uah_arch01_second_review_evidence/tests_current.txt
+?? docs/artifacts/reviews/2026-10-08_uah_arch01_static_eligibility.md
+?? docs/artifacts/reviews/2026-10-08_uah_arch01_static_eligibility_evidence/arch01_original_probe.txt
+?? docs/artifacts/reviews/2026-10-08_uah_arch01_static_eligibility_evidence/catalog_admission_companion.txt
+?? docs/artifacts/reviews/2026-10-08_uah_arch01_static_eligibility_evidence/dirty_before.sha256
+?? docs/artifacts/reviews/2026-10-08_uah_arch01_static_eligibility_evidence/oct5_catalog_replay.txt
+?? docs/artifacts/reviews/2026-10-08_uah_arch01_static_eligibility_evidence/prompt_compiler.py.before
+?? docs/artifacts/reviews/2026-10-08_uah_arch01_static_eligibility_evidence/proposal_admission.py.before
+?? docs/artifacts/reviews/2026-10-08_uah_arch01_static_eligibility_evidence/public_green.txt
+?? docs/artifacts/reviews/2026-10-08_uah_arch01_static_eligibility_evidence/public_red.txt
+?? docs/artifacts/reviews/2026-10-08_uah_arch01_static_eligibility_evidence/r2_after_admission_replay.txt
+?? docs/artifacts/reviews/2026-10-08_uah_arch01_static_eligibility_evidence/r4_original_controls.txt
+?? docs/artifacts/reviews/2026-10-08_uah_arch01_static_eligibility_evidence/source_frozen.sha256
+?? docs/artifacts/reviews/2026-10-08_uah_arch01_static_eligibility_evidence/test_prompt_compiler.py.before
+?? docs/artifacts/reviews/2026-10-08_uah_o1_conformance_fix.md
+?? docs/artifacts/reviews/2026-10-08_uah_o1_conformance_fix_end.sha256
+?? docs/artifacts/reviews/2026-10-08_uah_o1_conformance_fix_evidence/dirty_before.sha256
+?? docs/artifacts/reviews/2026-10-08_uah_o1_conformance_fix_evidence/lifecycle.py.before
+?? docs/artifacts/reviews/2026-10-08_uah_o1_conformance_fix_evidence/observatory.py.before
+?? docs/artifacts/reviews/2026-10-08_uah_o1_conformance_fix_evidence/public_green.log
+?? docs/artifacts/reviews/2026-10-08_uah_o1_conformance_fix_evidence/public_red.log
+?? docs/artifacts/reviews/2026-10-08_uah_o1_conformance_fix_evidence/test_observatory_raw_identity.py.before
+?? docs/artifacts/reviews/2026-10-08_uah_o1_conformance_fix_primary_before_results.json
+?? docs/artifacts/reviews/2026-10-08_uah_o1_conformance_fix_primary_current_results.json
+?? docs/artifacts/reviews/2026-10-08_uah_o1_conformance_fix_primary_probe.py
+?? docs/artifacts/reviews/2026-10-08_uah_o1_conformance_fix_primary_review.md
+?? docs/artifacts/reviews/2026-10-08_uah_o1_conformance_fix_primary_review_inputs.md
+?? docs/artifacts/reviews/2026-10-08_uah_o1_conformance_fix_second_before_results.json
+?? docs/artifacts/reviews/2026-10-08_uah_o1_conformance_fix_second_current_results.json
+?? docs/artifacts/reviews/2026-10-08_uah_o1_conformance_fix_second_probe.py
+?? docs/artifacts/reviews/2026-10-08_uah_o1_conformance_fix_second_review.md
+?? docs/artifacts/reviews/2026-10-08_uah_o1_raw_identity.md
+?? docs/artifacts/reviews/2026-10-08_uah_o1_raw_identity_end.sha256
+?? docs/artifacts/reviews/2026-10-08_uah_o1_raw_identity_evidence/observatory.py.before
+?? docs/artifacts/reviews/2026-10-08_uah_o1_raw_identity_evidence/original_residual_after.log
+?? docs/artifacts/reviews/2026-10-08_uah_o1_raw_identity_evidence/public_green.log
+?? docs/artifacts/reviews/2026-10-08_uah_o1_raw_identity_evidence/public_red.log
+?? docs/artifacts/reviews/2026-10-08_uah_o1_raw_identity_evidence/shared_tree_at_freeze.sha256
+?? docs/artifacts/reviews/2026-10-08_uah_o1_raw_identity_evidence/test_observatory.py.before
+?? docs/artifacts/reviews/2026-10-08_uah_o1_raw_identity_primary_review.md
+?? docs/artifacts/reviews/2026-10-08_uah_o1_raw_identity_second_after.json
+?? docs/artifacts/reviews/2026-10-08_uah_o1_raw_identity_second_before.json
+?? docs/artifacts/reviews/2026-10-08_uah_o1_raw_identity_second_dependencies.sha256
+?? docs/artifacts/reviews/2026-10-08_uah_o1_raw_identity_second_probe.py
+?? docs/artifacts/reviews/2026-10-08_uah_o1_raw_identity_second_review.md
+?? docs/artifacts/reviews/2026-10-08_uah_r0_baseline_and_skill_handoff.md
+?? docs/artifacts/reviews/2026-10-08_uah_r0_skill_review/baseline_walkthrough.md
+?? docs/artifacts/reviews/2026-10-08_uah_r0_skill_review/candidate_walkthrough.md
+?? docs/artifacts/reviews/2026-10-08_uah_r0_skill_review/locked_holdouts.json
+?? docs/artifacts/reviews/2026-10-08_uah_r0_skill_review/primary_review.md
+?? docs/artifacts/reviews/2026-10-08_uah_r0_skill_review/second_model_review.md
+?? docs/artifacts/reviews/2026-10-08_uah_r0_skill_review/static_checks.json
+?? docs/artifacts/reviews/2026-10-08_uah_r0_start.sha256
+?? docs/artifacts/reviews/2026-10-08_uah_r1_domain_pack_identity.md
+?? docs/artifacts/reviews/2026-10-08_uah_r1_domain_pack_identity.patch
+?? docs/artifacts/reviews/2026-10-08_uah_r1_domain_pack_primary_review.md
+?? docs/artifacts/reviews/2026-10-08_uah_r1_domain_pack_second_review.md
+?? docs/artifacts/reviews/2026-10-08_uah_r1_end.sha256
+?? docs/artifacts/reviews/2026-10-08_uah_r1_report_provenance_check.md
+?? docs/artifacts/reviews/2026-10-08_uah_r1_start.sha256
+?? docs/artifacts/reviews/2026-10-08_uah_r2_catalog_end.sha256
+?? docs/artifacts/reviews/2026-10-08_uah_r2_catalog_primary_review.md
+?? docs/artifacts/reviews/2026-10-08_uah_r2_catalog_repros/owner_after_admission_probe.py
+?? docs/artifacts/reviews/2026-10-08_uah_r2_catalog_round_close.md
+?? docs/artifacts/reviews/2026-10-08_uah_r2_catalog_second_review.md
+?? docs/artifacts/reviews/2026-10-08_uah_r2_catalog_semantic_fencing.md
+?? docs/artifacts/reviews/2026-10-08_uah_r2_catalog_semantic_fencing.patch
+?? docs/artifacts/reviews/2026-10-08_uah_r2_catalog_start.sha256
+?? docs/artifacts/reviews/2026-10-08_uah_r2_navigation_amendment.sha256
+?? docs/artifacts/reviews/2026-10-08_uah_r3_ledger_end.sha256
+?? docs/artifacts/reviews/2026-10-08_uah_r3_ledger_integrity.md
+?? docs/artifacts/reviews/2026-10-08_uah_r3_ledger_integrity_evidence/baseline_red.log
+?? docs/artifacts/reviews/2026-10-08_uah_r3_ledger_integrity_evidence/dirty_before.sha256
+?? docs/artifacts/reviews/2026-10-08_uah_r3_ledger_integrity_evidence/focused_green.log
+?? docs/artifacts/reviews/2026-10-08_uah_r3_ledger_integrity_evidence/full_green.log
+?? docs/artifacts/reviews/2026-10-08_uah_r3_ledger_integrity_evidence/implementation.sha256
+?? docs/artifacts/reviews/2026-10-08_uah_r3_ledger_integrity_evidence/lifecycle.delta.patch
+?? docs/artifacts/reviews/2026-10-08_uah_r3_ledger_integrity_evidence/lifecycle.py.before
+?? docs/artifacts/reviews/2026-10-08_uah_r3_ledger_integrity_evidence/original_probe_green.log
+?? docs/artifacts/reviews/2026-10-08_uah_r3_ledger_integrity_evidence/raw_iterable_o1_residual.py
+?? docs/artifacts/reviews/2026-10-08_uah_r3_ledger_integrity_evidence/residual_probe.log
+?? docs/artifacts/reviews/2026-10-08_uah_r3_ledger_integrity_evidence/test_lifecycle_ledger.py.before
+?? docs/artifacts/reviews/2026-10-08_uah_r3_ledger_integrity_evidence/tests.delta.patch
+?? docs/artifacts/reviews/2026-10-08_uah_r3_ledger_primary_replacement_review.md
+?? docs/artifacts/reviews/2026-10-08_uah_r3_ledger_primary_review.md
+?? docs/artifacts/reviews/2026-10-08_uah_r3_ledger_second_review.md
+?? docs/artifacts/reviews/2026-10-08_uah_r4_admitted_object_snapshot.md
+?? docs/artifacts/reviews/2026-10-08_uah_r4_admitted_object_snapshot_evidence/author_validation.log
+?? docs/artifacts/reviews/2026-10-08_uah_r4_admitted_object_snapshot_evidence/dirty_before.sha256
+?? docs/artifacts/reviews/2026-10-08_uah_r4_admitted_object_snapshot_evidence/domain_lifecycle.py.before
+?? docs/artifacts/reviews/2026-10-08_uah_r4_admitted_object_snapshot_evidence/environment.py.before
+?? docs/artifacts/reviews/2026-10-08_uah_r4_admitted_object_snapshot_evidence/environment.py.delta.patch
+?? docs/artifacts/reviews/2026-10-08_uah_r4_admitted_object_snapshot_evidence/implementation.sha256
+?? docs/artifacts/reviews/2026-10-08_uah_r4_admitted_object_snapshot_evidence/inputs.sha256
+?? docs/artifacts/reviews/2026-10-08_uah_r4_admitted_object_snapshot_evidence/legacy_v2_control.fixture
+?? docs/artifacts/reviews/2026-10-08_uah_r4_admitted_object_snapshot_evidence/legacy_v2_control.jsonl.lock
+?? docs/artifacts/reviews/2026-10-08_uah_r4_admitted_object_snapshot_evidence/lifecycle.py.before
+?? docs/artifacts/reviews/2026-10-08_uah_r4_admitted_object_snapshot_evidence/lifecycle.py.delta.patch
+?? docs/artifacts/reviews/2026-10-08_uah_r4_admitted_object_snapshot_evidence/proposal_admission.py.before
+?? docs/artifacts/reviews/2026-10-08_uah_r4_admitted_object_snapshot_evidence/proposal_admission.py.delta.patch
+?? docs/artifacts/reviews/2026-10-08_uah_r4_admitted_object_snapshot_evidence/r4_holdout_green.log
+?? docs/artifacts/reviews/2026-10-08_uah_r4_admitted_object_snapshot_evidence/r4_legacy_restart.log
+?? docs/artifacts/reviews/2026-10-08_uah_r4_admitted_object_snapshot_evidence/r4_original_after.log
+?? docs/artifacts/reviews/2026-10-08_uah_r4_admitted_object_snapshot_evidence/r4_original_before.log
+?? docs/artifacts/reviews/2026-10-08_uah_r4_admitted_object_snapshot_evidence/r4_owner_green.log
+?? docs/artifacts/reviews/2026-10-08_uah_r4_admitted_object_snapshot_evidence/r4_owner_red.log
+?? docs/artifacts/reviews/2026-10-08_uah_r4_admitted_object_snapshot_evidence/r4_record_green.log
+?? docs/artifacts/reviews/2026-10-08_uah_r4_admitted_object_snapshot_evidence/r4_record_red.log
+?? docs/artifacts/reviews/2026-10-08_uah_r4_admitted_object_snapshot_evidence/r4_ruff.log
+?? docs/artifacts/reviews/2026-10-08_uah_r4_admitted_object_snapshot_evidence/r4_snapshot_primary_history_probe.py
+?? docs/artifacts/reviews/2026-10-08_uah_r4_admitted_object_snapshot_evidence/r4_wire_green.log
+?? docs/artifacts/reviews/2026-10-08_uah_r4_admitted_object_snapshot_evidence/r4_wire_red.log
+?? docs/artifacts/reviews/2026-10-08_uah_r4_admitted_object_snapshot_evidence/second_review_freeze.txt
+?? docs/artifacts/reviews/2026-10-08_uah_r4_admitted_object_snapshot_evidence/second_review_predeclared.md
+?? docs/artifacts/reviews/2026-10-08_uah_r4_admitted_object_snapshot_evidence/second_review_probes.py
+?? docs/artifacts/reviews/2026-10-08_uah_r4_admitted_object_snapshot_evidence/test_two_stage_admission.py.before
+?? docs/artifacts/reviews/2026-10-08_uah_r4_end.sha256
+?? docs/artifacts/reviews/2026-10-08_uah_r4_fix.md
+?? docs/artifacts/reviews/2026-10-08_uah_r4_fix_end.sha256
+?? docs/artifacts/reviews/2026-10-08_uah_r4_fix_evidence/authentic_v2_admitted.fixture
+?? docs/artifacts/reviews/2026-10-08_uah_r4_fix_evidence/authentic_v2_leased.fixture
+?? docs/artifacts/reviews/2026-10-08_uah_r4_fix_evidence/dirty_before.sha256
+?? docs/artifacts/reviews/2026-10-08_uah_r4_fix_evidence/dirty_before.txt
+?? docs/artifacts/reviews/2026-10-08_uah_r4_fix_evidence/domain_lifecycle.py.before
+?? docs/artifacts/reviews/2026-10-08_uah_r4_fix_evidence/domain_lifecycle.py.delta.patch
+?? docs/artifacts/reviews/2026-10-08_uah_r4_fix_evidence/environment.py.before
+?? docs/artifacts/reviews/2026-10-08_uah_r4_fix_evidence/environment.py.delta.patch
+?? docs/artifacts/reviews/2026-10-08_uah_r4_fix_evidence/implementation.sha256
+?? docs/artifacts/reviews/2026-10-08_uah_r4_fix_evidence/inputs.sha256
+?? docs/artifacts/reviews/2026-10-08_uah_r4_fix_evidence/lifecycle.py.before
+?? docs/artifacts/reviews/2026-10-08_uah_r4_fix_evidence/lifecycle.py.delta.patch
+?? docs/artifacts/reviews/2026-10-08_uah_r4_fix_evidence/primary_partial_serializer_probe.py
+?? docs/artifacts/reviews/2026-10-08_uah_r4_fix_evidence/proposal_admission.py.before
+?? docs/artifacts/reviews/2026-10-08_uah_r4_fix_evidence/proposal_admission.py.delta.patch
+?? docs/artifacts/reviews/2026-10-08_uah_r4_fix_evidence/r4fix_focus.log
+?? docs/artifacts/reviews/2026-10-08_uah_r4_fix_evidence/r4fix_full2.log
+?? docs/artifacts/reviews/2026-10-08_uah_r4_fix_evidence/r4fix_holdouts.log
+?? docs/artifacts/reviews/2026-10-08_uah_r4_fix_evidence/r4fix_old_test_green.log
+?? docs/artifacts/reviews/2026-10-08_uah_r4_fix_evidence/r4fix_old_test_red.log
+?? docs/artifacts/reviews/2026-10-08_uah_r4_fix_evidence/r4fix_old_test_red_actual.log
+?? docs/artifacts/reviews/2026-10-08_uah_r4_fix_evidence/r4fix_original_primary_final.log
+?? docs/artifacts/reviews/2026-10-08_uah_r4_fix_evidence/r4fix_original_primary_red.log
+?? docs/artifacts/reviews/2026-10-08_uah_r4_fix_evidence/r4fix_original_second_final.log
+?? docs/artifacts/reviews/2026-10-08_uah_r4_fix_evidence/r4fix_original_second_red.log
+?? docs/artifacts/reviews/2026-10-08_uah_r4_fix_evidence/r4fix_receipt_red.log
+?? docs/artifacts/reviews/2026-10-08_uah_r4_fix_evidence/r4fix_repo_full.log
+?? docs/artifacts/reviews/2026-10-08_uah_r4_fix_evidence/r4fix_strip_green.log
+?? docs/artifacts/reviews/2026-10-08_uah_r4_fix_evidence/r4fix_strip_red.log
+?? docs/artifacts/reviews/2026-10-08_uah_r4_fix_evidence/r4fix_write_green.log
+?? docs/artifacts/reviews/2026-10-08_uah_r4_fix_evidence/r4fix_write_red.log
+?? docs/artifacts/reviews/2026-10-08_uah_r4_fix_evidence/test_admitted_object_snapshot.py.before
+?? docs/artifacts/reviews/2026-10-08_uah_r4_fix_primary_partial.md
+?? docs/artifacts/reviews/2026-10-08_uah_r4_fix_second_before.xml
+?? docs/artifacts/reviews/2026-10-08_uah_r4_fix_second_current.xml
+?? docs/artifacts/reviews/2026-10-08_uah_r4_fix_second_probe.py
+?? docs/artifacts/reviews/2026-10-08_uah_r4_fix_second_review.md
+?? docs/artifacts/reviews/2026-10-08_uah_r4_fix_second_review_inputs.md
+?? docs/artifacts/reviews/2026-10-08_uah_r4_nested_owner.md
+?? docs/artifacts/reviews/2026-10-08_uah_r4_nested_owner_end.sha256
+?? docs/artifacts/reviews/2026-10-08_uah_r4_nested_owner_evidence/detached_dispatch_green.txt
+?? docs/artifacts/reviews/2026-10-08_uah_r4_nested_owner_evidence/detached_dispatch_red.txt
+?? docs/artifacts/reviews/2026-10-08_uah_r4_nested_owner_evidence/dirty_before.sha256
+?? docs/artifacts/reviews/2026-10-08_uah_r4_nested_owner_evidence/dirty_before.txt
+?? docs/artifacts/reviews/2026-10-08_uah_r4_nested_owner_evidence/domain_lifecycle.py.before
+?? docs/artifacts/reviews/2026-10-08_uah_r4_nested_owner_evidence/environment.py.before
+?? docs/artifacts/reviews/2026-10-08_uah_r4_nested_owner_evidence/focused_final.txt
+?? docs/artifacts/reviews/2026-10-08_uah_r4_nested_owner_evidence/full_shared_tree.txt
+?? docs/artifacts/reviews/2026-10-08_uah_r4_nested_owner_evidence/inputs.sha256
+?? docs/artifacts/reviews/2026-10-08_uah_r4_nested_owner_evidence/ledger_record_green.txt
+?? docs/artifacts/reviews/2026-10-08_uah_r4_nested_owner_evidence/ledger_record_red.txt
+?? docs/artifacts/reviews/2026-10-08_uah_r4_nested_owner_evidence/lifecycle.py.before
+?? docs/artifacts/reviews/2026-10-08_uah_r4_nested_owner_evidence/new_tests_final.txt
+?? docs/artifacts/reviews/2026-10-08_uah_r4_nested_owner_evidence/original_second_review_controls.txt
+?? docs/artifacts/reviews/2026-10-08_uah_r4_nested_owner_evidence/proposal_admission.py.before
+?? docs/artifacts/reviews/2026-10-08_uah_r4_nested_owner_evidence/serializer_green.txt
+?? docs/artifacts/reviews/2026-10-08_uah_r4_nested_owner_evidence/serializer_red.txt
+?? docs/artifacts/reviews/2026-10-08_uah_r4_nested_owner_evidence/source_delta.patch
+?? docs/artifacts/reviews/2026-10-08_uah_r4_nested_owner_evidence/source_frozen.sha256
+?? docs/artifacts/reviews/2026-10-08_uah_r4_nested_owner_primary_inputs.md
+?? docs/artifacts/reviews/2026-10-08_uah_r4_nested_owner_primary_probe.py
+?? docs/artifacts/reviews/2026-10-08_uah_r4_nested_owner_primary_review.md
+?? docs/artifacts/reviews/2026-10-08_uah_r4_nested_owner_second_before_matrix.json
+?? docs/artifacts/reviews/2026-10-08_uah_r4_nested_owner_second_current_matrix.json
+?? docs/artifacts/reviews/2026-10-08_uah_r4_nested_owner_second_inputs.md
+?? docs/artifacts/reviews/2026-10-08_uah_r4_nested_owner_second_probe.py
+?? docs/artifacts/reviews/2026-10-08_uah_r4_nested_owner_second_review.md
+?? docs/artifacts/reviews/2026-10-08_uah_r4_snapshot_primary_review.md
+?? docs/artifacts/reviews/2026-10-08_uah_r4_snapshot_second_review.md
+?? docs/artifacts/reviews/2026-10-08_uah_r5_native_second_evidence/dirty_review_start.txt
+?? docs/artifacts/reviews/2026-10-08_uah_r5_native_second_evidence/initial_control.py
+?? docs/artifacts/reviews/2026-10-08_uah_r5_native_second_evidence/initial_current.txt
+?? docs/artifacts/reviews/2026-10-08_uah_r5_native_second_evidence/predeclared_inputs.md
+?? docs/artifacts/reviews/2026-10-08_uah_r5_owner_local_evidence/dirty_before.sha256
+?? docs/artifacts/reviews/2026-10-08_uah_r5_owner_local_evidence/public_green.txt
+?? docs/artifacts/reviews/2026-10-08_uah_r5_owner_local_evidence/public_red.txt
+?? docs/artifacts/reviews/2026-10-08_uah_r5_owner_local_evidence/source_frozen.sha256
+?? docs/artifacts/reviews/2026-10-08_uah_r5_owner_local_foundation.md
+?? docs/artifacts/reviews/2026-10-08_uah_research_dashboard_final.md
+?? docs/artifacts/reviews/2026-10-08_uah_research_dashboard_final_end.sha256
+?? docs/artifacts/reviews/2026-10-08_uah_research_dashboard_final_evidence/dfinal_date_green.log
+?? docs/artifacts/reviews/2026-10-08_uah_research_dashboard_final_evidence/dfinal_date_red.log
+?? docs/artifacts/reviews/2026-10-08_uah_research_dashboard_final_evidence/dfinal_entity_green.log
+?? docs/artifacts/reviews/2026-10-08_uah_research_dashboard_final_evidence/dfinal_entity_probe.log
+?? docs/artifacts/reviews/2026-10-08_uah_research_dashboard_final_evidence/dfinal_entity_red.log
+?? docs/artifacts/reviews/2026-10-08_uah_research_dashboard_final_evidence/dfinal_filters.log
+?? docs/artifacts/reviews/2026-10-08_uah_research_dashboard_final_evidence/dfinal_review_probe.log
+?? docs/artifacts/reviews/2026-10-08_uah_research_dashboard_final_evidence/dfinal_suite2.log
+?? docs/artifacts/reviews/2026-10-08_uah_research_dashboard_final_evidence/dfinal_top_red.log
+?? docs/artifacts/reviews/2026-10-08_uah_research_dashboard_final_evidence/dirty_at_freeze.sha256
+?? docs/artifacts/reviews/2026-10-08_uah_research_dashboard_final_evidence/dirty_before.txt
+?? docs/artifacts/reviews/2026-10-08_uah_research_dashboard_final_evidence/implementation.sha256
+?? docs/artifacts/reviews/2026-10-08_uah_research_dashboard_final_evidence/inputs.sha256
+?? docs/artifacts/reviews/2026-10-08_uah_research_dashboard_final_evidence/render_research_dashboard.py.before
+?? docs/artifacts/reviews/2026-10-08_uah_research_dashboard_final_evidence/render_research_dashboard.py.delta.patch
+?? docs/artifacts/reviews/2026-10-08_uah_research_dashboard_final_evidence/test_research_dashboard.py.before
+?? docs/artifacts/reviews/2026-10-08_uah_research_dashboard_final_evidence/test_research_dashboard.py.delta.patch
+?? docs/artifacts/reviews/2026-10-08_uah_research_dashboard_final_evidence/uah_research_dashboard.html.before
+?? docs/artifacts/reviews/2026-10-08_uah_research_dashboard_final_evidence/uah_research_dashboard.md.before
+?? docs/artifacts/reviews/2026-10-08_uah_research_dashboard_final_primary_probe.log
+?? docs/artifacts/reviews/2026-10-08_uah_research_dashboard_final_primary_probe.py
+?? docs/artifacts/reviews/2026-10-08_uah_research_dashboard_final_primary_review.md
+?? docs/artifacts/reviews/2026-10-08_uah_research_dashboard_final_second_review.md
+?? docs/artifacts/reviews/2026-10-08_uah_research_dashboard_fix.md
+?? docs/artifacts/reviews/2026-10-08_uah_research_dashboard_fix_evidence/date_green.log
+?? docs/artifacts/reviews/2026-10-08_uah_research_dashboard_fix_evidence/date_red.log
+?? docs/artifacts/reviews/2026-10-08_uah_research_dashboard_fix_evidence/dirty_before.sha256
+?? docs/artifacts/reviews/2026-10-08_uah_research_dashboard_fix_evidence/filter_real.log
+?? docs/artifacts/reviews/2026-10-08_uah_research_dashboard_fix_evidence/filter_separator.log
+?? docs/artifacts/reviews/2026-10-08_uah_research_dashboard_fix_evidence/fix_primary_probe.py
+?? docs/artifacts/reviews/2026-10-08_uah_research_dashboard_fix_evidence/focused_green.log
+?? docs/artifacts/reviews/2026-10-08_uah_research_dashboard_fix_evidence/full_green.log
+?? docs/artifacts/reviews/2026-10-08_uah_research_dashboard_fix_evidence/implementation.sha256
+?? docs/artifacts/reviews/2026-10-08_uah_research_dashboard_fix_evidence/literal_green.log
+?? docs/artifacts/reviews/2026-10-08_uah_research_dashboard_fix_evidence/literal_red.log
+?? docs/artifacts/reviews/2026-10-08_uah_research_dashboard_fix_evidence/markdown.delta.patch
+?? docs/artifacts/reviews/2026-10-08_uah_research_dashboard_fix_evidence/render_research_dashboard.py.before
+?? docs/artifacts/reviews/2026-10-08_uah_research_dashboard_fix_evidence/renderer.delta.patch
+?? docs/artifacts/reviews/2026-10-08_uah_research_dashboard_fix_evidence/reviewer_public_repro.log
+?? docs/artifacts/reviews/2026-10-08_uah_research_dashboard_fix_evidence/separator_green.log
+?? docs/artifacts/reviews/2026-10-08_uah_research_dashboard_fix_evidence/separator_red.log
+?? docs/artifacts/reviews/2026-10-08_uah_research_dashboard_fix_evidence/test_research_dashboard.py.before
+?? docs/artifacts/reviews/2026-10-08_uah_research_dashboard_fix_evidence/tests.delta.patch
+?? docs/artifacts/reviews/2026-10-08_uah_research_dashboard_fix_evidence/uah_dashboard_second_dom.cjs
+?? docs/artifacts/reviews/2026-10-08_uah_research_dashboard_fix_evidence/uah_dashboard_second_probe.py
+?? docs/artifacts/reviews/2026-10-08_uah_research_dashboard_fix_evidence/uah_research_dashboard.html.before
+?? docs/artifacts/reviews/2026-10-08_uah_research_dashboard_fix_evidence/uah_research_dashboard.md.before
+?? docs/artifacts/reviews/2026-10-08_uah_research_dashboard_fix_primary_review.md
+?? docs/artifacts/reviews/2026-10-08_uah_research_dashboard_fix_second_review.md
+?? docs/artifacts/reviews/2026-10-08_uah_research_dashboard_primary_review.md
+?? docs/artifacts/reviews/2026-10-08_uah_research_dashboard_review_closeout.md
+?? docs/artifacts/reviews/2026-10-08_uah_research_dashboard_second_review.md
+?? docs/artifacts/reviews/2026-10-08_uah_review_followup_status.md
+?? docs/plans/synthetic_notes_integration_contract.md
+?? docs/research/2026-10-08_uah_r0_exit_contracts_and_provider_routes.md
+?? docs/research/2026-10-08_uah_r1_effect_evidence_and_trace_contracts.md
+?? docs/research/README.md
+?? docs/research/experiment_registry.json
+?? docs/research/uah_research_dashboard.html
+?? docs/research/uah_research_dashboard.md
+?? scripts/render_agent_runtime_example.py
+?? scripts/render_observatory_example.py
+?? scripts/render_research_dashboard.py
+?? src/ab_harness/agent_configuration.py
+?? src/ab_harness/agent_identity.py
+?? src/ab_harness/agent_lifecycle.py
+?? src/ab_harness/model_allocator.py
+?? src/ab_harness/model_invocation.py
+?? src/ab_harness/observatory.py
+?? src/ab_harness/operation_edges.py
+?? src/ab_harness/prompt_compiler.py
+?? src/ab_harness/runtime_controls.py
+?? src/ab_harness/schema_validation.py
+?? src/ab_harness/task_ingress_authority.py
+?? src/ab_harness_synthetic/__init__.py
+?? src/ab_harness_synthetic/notes.py
+?? tests/test_admission_active_provenance.py
+?? tests/test_admitted_object_snapshot.py
+?? tests/test_agent_configuration.py
+?? tests/test_agent_identity.py
+?? tests/test_agent_runtime.py
+?? tests/test_agent_runtime_example.py
+?? tests/test_argument_schema_validation.py
+?? tests/test_content_identity_compatibility.py
+?? tests/test_model_invocation.py
+?? tests/test_nested_admission_owner.py
+?? tests/test_observatory.py
+?? tests/test_observatory_raw_identity.py
+?? tests/test_prompt_compiler.py
+?? tests/test_research_dashboard.py
+?? tests/test_runtime_budget_contracts.py
+?? tests/test_synthetic_notes_owner.py
+?? uv.lock

@@ -1,0 +1,57 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+______ test_authentic_old_concrete_admission_cannot_obtain_current_lease _______
+
+tmp_path = PosixPath('/tmp/pytest-of-juanbeck/pytest-127/test_authentic_old_concrete_ad0')
+
+    def test_authentic_old_concrete_admission_cannot_obtain_current_lease(tmp_path):
+        _, _, environment, ledger, _, _ = authority_fixture(tmp_path)
+        before = len(ledger.events())
+        admitted = authentic_old_admitted()
+        assert admitted.schema_version == "uah.admitted_operation/v2"
+        admitted.verify_identity()
+        with pytest.raises(ValueError, match="current|supported|artifact"):
+            DomainLifecycleAdmission(
+                environment_run=environment, environment_id="nao_fake", lifecycle_ledger=ledger,
+>           ).request_execution(admitted)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_admission_active_provenance.py:48:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+src/ab_harness/domain_lifecycle.py:305: in request_execution
+    self._require_exact_recorded_lease(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+lease = ExecutionLease(execution_lease_id='execution-lease:sha256:d775369b863557a48a5dc63b3d54b22a860bebfb6b7d43096c027bf28786...ent_attestation_id='environment-attestation:admission-001', scope='operation', schema_version='uah.execution_lease/v1')
+
+    @staticmethod
+    def _require_exact_recorded_lease(
+        lease: ExecutionLease,
+        *,
+        recorded_lease: tuple[str, str],
+    ) -> None:
+        if recorded_lease != (lease.admission_id, lease.execution_lease_id):
+>           raise ValueError("leased operation requires the exact admitted operation")
+E           ValueError: leased operation requires the exact admitted operation
+
+src/ab_harness/domain_lifecycle.py:373: ValueError
+
+During handling of the above exception, another exception occurred:
+
+tmp_path = PosixPath('/tmp/pytest-of-juanbeck/pytest-127/test_authentic_old_concrete_ad0')
+
+    def test_authentic_old_concrete_admission_cannot_obtain_current_lease(tmp_path):
+        _, _, environment, ledger, _, _ = authority_fixture(tmp_path)
+        before = len(ledger.events())
+        admitted = authentic_old_admitted()
+        assert admitted.schema_version == "uah.admitted_operation/v2"
+        admitted.verify_identity()
+>       with pytest.raises(ValueError, match="current|supported|artifact"):
+E       AssertionError: Regex pattern did not match.
+E         Expected regex: 'current|supported|artifact'
+E         Actual message: 'leased operation requires the exact admitted operation'
+
+tests/test_admission_active_provenance.py:45: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_admission_active_provenance.py::test_authentic_old_concrete_admission_cannot_obtain_current_lease
+1 failed in 0.17s

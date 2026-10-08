@@ -1,0 +1,21 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+______ test_reconciliation_field_cannot_be_in_an_authored_prose_paragraph ______
+
+tmp_path = PosixPath('/tmp/pytest-of-juanbeck/pytest-120/test_reconciliation_field_cann0')
+
+    def test_reconciliation_field_cannot_be_in_an_authored_prose_paragraph(tmp_path):
+        _, registry_path, markdown, _ = fixture(tmp_path)
+        markdown.write_text(markdown.read_text().replace(
+            "Reconciled: 2026-10-08.", "Authored paragraph.\n\nReconciled: 2026-10-08."
+        ))
+        before = markdown.read_bytes()
+>       assert run(tmp_path, registry_path, markdown).returncode == 1
+E       AssertionError: assert 0 == 1
+E        +  where 0 = CompletedProcess(args=['/home/juanbeck/RESEARCH-GLOBAL/.venv/bin/python', '/home/juanbeck/universal-agentic-harness/sc...docs/research/dashboard.md', '--as-of', '2026-10-08'], returncode=0, stdout='Rendered 1 metadata records\n', stderr='').returncode
+E        +    where CompletedProcess(args=['/home/juanbeck/RESEARCH-GLOBAL/.venv/bin/python', '/home/juanbeck/universal-agentic-harness/sc...docs/research/dashboard.md', '--as-of', '2026-10-08'], returncode=0, stdout='Rendered 1 metadata records\n', stderr='') = run(PosixPath('/tmp/pytest-of-juanbeck/pytest-120/test_reconciliation_field_cann0'), PosixPath('/tmp/pytest-of-juanbeck/pytest-120/test_reconciliation_field_cann0/registry.json'), PosixPath('/tmp/pytest-of-juanbeck/pytest-120/test_reconciliation_field_cann0/docs/research/dashboard.md'))
+
+tests/test_research_dashboard.py:256: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_research_dashboard.py::test_reconciliation_field_cannot_be_in_an_authored_prose_paragraph
+1 failed, 51 deselected in 0.14s

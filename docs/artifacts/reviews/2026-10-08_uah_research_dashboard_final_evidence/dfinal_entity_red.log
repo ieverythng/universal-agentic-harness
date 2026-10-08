@@ -1,0 +1,22 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+____________ test_authored_code_entities_survive_metadata_rendering ____________
+
+tmp_path = PosixPath('/tmp/pytest-of-juanbeck/pytest-117/test_authored_code_entities_su0')
+
+    def test_authored_code_entities_survive_metadata_rendering(tmp_path):
+        registry, registry_path, markdown, _ = fixture(tmp_path)
+        registry["records"][0].update(title="<literal> # ' &amp;", summary="[no link](javascript:x)")
+        registry_path.write_text(json.dumps(registry))
+        example = "```text\n&#35; &#60; &#39; &amp;\n```\n\n"
+        markdown.write_text(markdown.read_text().replace("## Catalog", example + "## Catalog"))
+        assert run(tmp_path, registry_path, markdown).returncode == 0
+        assert example in markdown.read_text()
+        page = markdown.with_suffix(".html").read_text()
+>       assert "&amp;#35; &amp;#60; &amp;#39; &amp;amp;" in page
+E       assert '&amp;#35; &amp;#60; &amp;#39; &amp;amp;' in '<!DOCTYPE html>\n<html lang="en">\n<head>\n  <meta charset="utf-8" />\n  <meta name="viewport" content="width=device-...stener(\'input\', apply);\n  gate.addEventListener(\'change\', apply);\n  apply();\n})();\n</script></body>\n</html>\n'
+
+tests/test_research_dashboard.py:228: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_research_dashboard.py::test_authored_code_entities_survive_metadata_rendering
+1 failed, 39 deselected in 0.12s

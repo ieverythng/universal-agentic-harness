@@ -1,0 +1,16 @@
+{"path":"docs/research/uah_research_dashboard.html","initial":"12 catalog records"}
+{"kind":"all","count":"12 catalog records"}
+{"kind":"investigation","count":"4 catalog records"}
+{"kind":"proposed_experiment","count":"1 catalog records"}
+{"kind":"executed_probe","count":"2 catalog records"}
+{"kind":"reviewed_outcome","count":"2 catalog records"}
+{"kind":"h_series_dependency","count":"3 catalog records"}
+{"gate":"H0","count":"7 catalog records"}
+{"gate":"H1","count":"9 catalog records"}
+{"gate":"H2","count":"3 catalog records"}
+{"gate":"H3","count":"4 catalog records"}
+{"gate":"H4","count":"2 catalog records"}
+{"gate":"H5","count":"No matching catalog records."}
+{"gate":"H6","count":"No matching catalog records."}
+{"query":"no-match-unreal-string","count":"No matching catalog records."}
+{"query":"Vendor claims","count":"No matching catalog records.","summaryExists":true}

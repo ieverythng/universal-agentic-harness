@@ -1,7 +1,8 @@
 # Observatory Contract
 
-**Status:** O1 API and identity grammar frozen; O2 implementation deferred
-**Date:** 2026-09-08
+**Status:** O1 environment/task/trace index and explicit actor rendering implemented;
+complete configuration comparison and O2 deferred
+**Date:** 2026-10-04
 **Applies to:** UAH H0-H6 and NeuralWorkbench H3+
 
 ## 1. Decision
@@ -24,35 +25,42 @@ access only through an explicit, task-scoped, read-only frame projection.
 ```mermaid
 %% uah-render: Figure 1. Admission, execution, and Observatory data flow
 flowchart TB
-    Prompt["Model-facing Prompt + Schemas<br/>PromptCompiler planned"]:::projection
+    Prompt["Model-facing Prompt + Schemas<br/>immutable compiled artifact"]:::projection
     Model["Model Output<br/>raw immutable artifact"]:::model
+    Normalize["Proposal normalization<br/>proposal or typed rejection"]:::compiler
     Proposal["TypedProposal<br/>operation request"]:::proposal
     Semantic["UAH Semantic Admission<br/>role + frame + object + binding"]:::gate
     Admitted["AdmittedOperation<br/>immutable semantic value"]:::gate
     Domain["Domain Lifecycle Admission<br/>readiness + dedupe + fencing"]:::domain
     Lease["ExecutionLease<br/>owner-granted authority"]:::execution
+    Control["H1 Runtime Control<br/>budget + cancellation + timeout"]:::gate
     Owner["Environment Owner<br/>native execution"]:::execution
-    Evidence["Terminal Result + EffectEvidence<br/>owner-issued"]:::evidence
+    Evidence["Result + Evidence Decision<br/>accepted or rejected"]:::evidence
+    Acceptance["Task Acceptance<br/>explicit terminal authority"]:::gate
     Ledger["Lifecycle Ledger<br/>append-only events + artifacts"]:::trace
     Observatory["Observatory O1/O2<br/>read-only views"]:::observatory
     Workbench["NeuralWorkbench H3+<br/>candidate analysis only"]:::compiler
     Prompt --> Model
-    Model --> Proposal
+    Model --> Normalize
+    Normalize --> Proposal
     Proposal --> Semantic
     Semantic -->|accepted| Admitted
     Admitted --> Domain
     Domain -->|leased| Lease
-    Lease --> Owner
+    Lease --> Control
+    Control --> Owner
     Owner --> Evidence
-    Evidence --> Ledger
+    Evidence --> Acceptance
+    Acceptance --> Ledger
     Ledger --> Observatory
     Ledger --> Workbench
 ```
 
-The diagram shows the target accepted path. The current ledger records the
-accepted authority chain and execution failure; complete normalization,
-admission, evidence, timeout, cancellation, and retry rejection branches remain
-open. Neither Observatory nor NeuralWorkbench sits in the execution call chain.
+The diagram shows the authority order. The current ledger records accepted and
+rejected proposal, admission, evidence, control, obligation, and terminal task
+facts. Semantic rejection is appended explicitly by the coordinating caller;
+domain rejection is appended by the domain lifecycle owner. Neither
+Observatory nor NeuralWorkbench sits in the execution call chain.
 
 ## 3. Layered Visualization Contract
 
@@ -65,8 +73,8 @@ open. Neither Observatory nor NeuralWorkbench sits in the execution call chain.
 
 ## 4. O1 API
 
-O1 accepts immutable, JSON-compatible inputs and returns a self-contained review
-document:
+The complete O1 contract accepts immutable, JSON-compatible inputs and returns
+a self-contained review document:
 
 ```text
 render_observatory(
@@ -87,6 +95,32 @@ render_observatory(
   owner, gate outcome, event type, and failure stage;
 - ordered event cards with inspectable raw payloads;
 - graph data embedded as inert JSON for later O2 reuse.
+
+The implemented 2026-10-04 slice is narrower:
+
+```text
+render_observatory(
+  validated_ledger_or_event_collection,
+  title = optional,
+  data_label = inferred
+) -> ObservatoryDocument
+```
+
+It retains the global ordered event collection and indexes immutable
+`TraceEvent` values as `environment_run_id -> task_id -> trace_id`, with
+separate actor views keyed by explicit `agent_run_id`. An environment with only
+actor events remains visible without a fabricated task or trace. The projection
+verifies consistent task, trace, and actor environment lineage and derives
+terminal task status only from explicit terminal facts,
+retains nonterminal failure stages, escapes displayed payloads, and embeds an
+inert graph payload. Graph JSON contains lifecycle-event nodes, explicit
+operation nodes, `ledger_parent_event` edges, and only recorded operation
+relations. A `recorded` label requires a validated `LifecycleLedger`;
+an arbitrary event collection defaults to `synthetic`. Configuration comparison
+and the remaining identity facets are not implemented. Static index links,
+search, and event-type filtering cover recorded actor event cards alongside
+task trace cards. A v1 task event is not assigned to an actor by matching names
+or nearby events.
 
 ### Target mandatory identity envelope
 
@@ -144,6 +178,10 @@ domain_admission_leased | domain_admission_rejected
 execution_started | execution_feedback
 execution_completed | execution_failed | execution_cancelled
 evidence_issued | evidence_rejected
+operation_edge_recorded
+budget_granted | budget_exhausted
+task_timeout_recorded
+retry_approved | retry_not_retryable | retry_exhausted
 effect_obligation_satisfied | effect_obligation_failed | effect_obligation_pending
 task_suspended | terminal_task_accepted | terminal_task_accepted_with_deficit | terminal_task_rejected
 model_lease_released
@@ -163,7 +201,7 @@ validation, append, and `fsync` through an OS advisory lock. Crash recovery for
 an interrupted multi-event append still rejects the incomplete commit rather
 than repairing it automatically.
 
-The exact current envelope is:
+The v1 task envelope remains:
 
 ```text
 schema_version, event_id, sequence,
@@ -173,47 +211,100 @@ environment_run_id, task_id, trace_id, operation_id,
 parent_event_id, artifact_refs, data_json
 ```
 
-`data_json` is a canonical JSON object serialized as a string. Agent, handle,
-model, provider, prompt, and operation-edge identities remain H1/H2 additions.
+`uah.trace_event/v2` adds explicit `event_scope` and `agent_run_id` to that
+envelope. Agent-scoped facts use null task and trace identities and no operation
+identity. New task-scoped invocation facts preserve real task/trace lineage and
+carry the actor. Older v1 events retain their serialized identity and have no
+inferred actor. `data_json` remains a canonical JSON object serialized as a
+string. Attachment embeds the pinned manifest, handle revision, environment
+profile, and attestation; model allocation and startup events preserve exact
+leases, resource snapshots, and owner readiness reports. Dynamic provider pool
+and scheduler identities remain H3 work. Operation nodes and
+`uah.operation_edge/v1` identities are emitted when their source facts are
+recorded.
 
-O1 implementation begins during final H0 lifecycle closure. The first static
-renderer covers the accepted path plus the first typed semantic and domain
-rejection families. Later cancellation, timeout, retry, stale-evidence, and
-false-completion views follow their replay-stable event contracts. This order
+The O1 static renderer now covers environment/task/trace grouping, ordered actor
+cards, explicit terminal
+status, failure-stage visibility, searchable event cards, and inert graph JSON
+for accepted, rejected, actor, control, and operation-edge families. Later
+configuration, stale-evidence, and false-completion views follow their
+replay-stable event contracts. This order
 keeps traceability available during H1 development without making Observatory a
 writer or a prerequisite for ledger correctness.
+
+The committed recorded-NAO page is a qualification artifact rendered through the
+O1 static index. Validated records are indexed as `environment_run_id -> task_id
+-> trace_id`, and each trace can be inspected independently. Actor events use
+their explicit activation IDs and remain outside fabricated task traces. Domain
+or environment-profile navigation likewise requires explicit recorded identity;
+the renderer must not infer either value from a title, adapter package, or trace
+payload. Live filtering, graph exploration, comparison, and cross-environment
+navigation remain O2 work.
 
 The implemented `uah.domain_contract_pack/v1` revision covers its role/task
 allowlists, ingress rules, effect-to-object and evidence-owner rules, failure
 policy, and prohibited effects. `uah.environment_ingress/v1` and
 `uah.task_ingress_decision/v1` are also content-addressed, and the decision
-binds the ingress artifact identity. Compilation requires the exact accepted
-task start to be present in the lifecycle ledger, preventing a caller-authored
-decision from creating task authority. The task-start event preserves the
+binds the ingress artifact identity. Compilation requires matching task-start
+fields in the lifecycle ledger. SPEC-02 remains open because public raw facts
+can populate those fields without authentic admitted-ingress provenance. A
+content hash or matching fields alone cannot close that authority gap.
+The task-start event preserves the
 ingress artifact ID, decision ID, and domain-pack revision; the registry does
-not expose a raw task-start mutation method.
+not expose a raw task-start mutation method; the common ledger still accepts
+raw `TaskStartedFact` values, which is the separately tracked SPEC-02 gap.
 
 The H0 `CompiledTask` is now a content-addressed artifact binding start-task
 ingress, task and trace lineage, role, frame, registry, DomainContractPack,
 closed interaction projection, effect obligations, prohibited effects, and
-declared budgets. No runtime budget enforcement is implemented. The accepted
+retry-aware budgets. Tool-call consumption is enforced atomically at dispatch,
+and model-call consumption is atomic with provider invocation start. The accepted
 tracer records its `task_compiled` event separately from proposal, admission,
-lease, evidence, and terminal judgment. Prompt compilation is a planned event,
-not part of the current tracer.
+lease, evidence, and terminal judgment. The recorded NAO tracer does not invoke
+a provider. The new H1 invocation fixture records the compiled prompt inside
+the exact invocation request, then preserves typed raw-output completion or
+failure. A standalone `prompt_compiled` event remains a target family rather
+than an emitted fact.
 
 The current H0 authority slice also emits content-addressed
-`uah.typed_proposal/v1`, `uah.admitted_operation/v1`, and
-`uah.execution_lease/v1` artifacts with typed rejection reasons. Accepted
-values are appended as distinct proposal, semantic-admission, and
-domain-admission events. The environment owner accepts only the exact lease,
+`uah.typed_proposal/v1`, `uah.admitted_operation/v3`,
+`uah.execution_lease/v1`, and `uah.operation_edge/v1` artifacts.
+`AdmittedOperation` pins the reviewed input-schema identity and the exact
+frame-relative object snapshot. Its full current artifact is recorded for
+identity verification on replay. Historical metadata-only events remain
+readable. Original R4 probes exposed replay downgrade and active old-object
+consumer gaps. The separately reviewed [nested-owner gate](../artifacts/reviews/2026-10-08_uah_r4_nested_owner.md)
+now approves the concrete-artifact correction and its historical read-only
+controls. This does not establish release-wide provenance or causal completeness.
+Accepted values are appended as distinct proposal,
+semantic-admission, and domain-admission events. Semantic rejection is appended
+by the coordinating caller; the domain owner appends its own rejection. The
+environment owner accepts only the exact lease,
 records execution start before native dispatch, and emits a content-addressed
 receipt containing separate native result and normalized evidence artifacts.
 Replay verifies receipt admission, object, binding, and evidence-owner lineage.
 Terminal acceptance must reference the complete recorded evidence set rather
 than a caller-selected subset.
-Acceptance and best-effort-deficit traces replay into a deterministic
-`VerifiedTraceDigest`. Rejection, timeout, cancellation, retry, and stale
-evidence events remain incomplete. O1 must not infer absent failure events.
+Accepted, best-effort-deficit, and required-effect-rejected traces replay into
+deterministic `VerifiedTraceDigest` values. Proposal, semantic, domain, and
+evidence rejection remain nonterminal operation facts. Budget exhaustion,
+pre-dispatch cancellation, recorded timeout, and retry outcomes are visible
+without inventing terminal task status. Stale evidence and false-completion
+events remain incomplete. O1 does not infer absent failure or terminal events.
+
+The current raw-iterable conformance repair reconstructs detached `TraceEvent`
+values through the existing owner's constructor before ordering, actor grouping
+and status derivation. It validates both versioned shape and content identity.
+The earlier identity-only repair returned CHANGES because v1 actor/scope fields
+are excluded from its hash but prohibited by its constructor. Valid raw
+illustrative inputs remain distinct from validated ledger-origin records.
+Content identity alone proves neither causal prerequisites nor measured/reviewed
+provenance; ARCH-02 label conformance remains open. Both fresh independent
+reviews approve this bounded repair at its frozen source/dependency bytes,
+as recorded in the [O1 conformance receipt](../artifacts/reviews/2026-10-08_uah_o1_conformance_fix.md).
+Current integration also passes after inspection of the concurrent lifecycle
+diff, which leaves TraceEvent's constructor, schema, identity and export
+contracts unchanged. Approval does not establish the complete O1 exit.
 
 This is the common startup-to-task order, not a rule that every lease ends with
 one task. A lease may be invocation-, task-, or run-scoped; its declared scope
@@ -295,6 +386,13 @@ frame, target role or handle, closed input artifact, expected output artifact,
 and authority boundary. `continues_with` records ordered workflow progression
 without claiming abstraction decomposition.
 
+The v1 ledger accepts an edge only after both endpoint operations have been
+normalized and semantically admitted with matching frame identities. It
+rejects duplicate pairs, cycles, a second structural parent, and edges recorded
+after the target lease. Same-frame decomposition and continuation are
+executable. Cross-frame delegation remains fail-closed until the target has a
+separately compiled projection and explicit artifact contract.
+
 ## 6. Metrics and Honesty Rules
 
 Every metric is keyed by the complete content-addressed configuration. Model
@@ -315,6 +413,10 @@ evidence.
 
 ## 7. O1 Exit Gate
 
+The renderer does not yet satisfy this exit gate. Static environment/task/trace
+and actor views exist; complete configuration comparison, artifact-separated
+prompt/model views, and the H2 parity trace remain open.
+
 O1 is complete when one accepted and one rejected H1 lifecycle plus the H2 NAO
 planner parity run can be rendered with:
 
@@ -333,8 +435,8 @@ planner parity run can be rendered with:
 
 ## 8. O2 Deferred Scope
 
-O2 may add a domain index that drills into environment runs, tasks, actor runs,
-and operation graphs; live streaming; multi-run comparison; interactive
+O2 may add a domain index above the O1 environment-run hierarchy, actor-run and
+operation-graph exploration, live streaming, multi-run comparison, interactive
 AB/evidence graphs; Watson/Bonsai overlays; replay controls; counterfactual
 controls; Workbench review queues; promotion/rollback inspection; and
 cross-domain navigation.

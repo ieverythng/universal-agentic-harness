@@ -1,0 +1,11 @@
+Traceback (most recent call last):
+  File "/home/juanbeck/universal-agentic-harness/docs/artifacts/reviews/2026-10-08_uah_r3_ledger_integrity_evidence/raw_iterable_o1_residual.py", line 50, in <module>
+    main()
+  File "/home/juanbeck/universal-agentic-harness/docs/artifacts/reviews/2026-10-08_uah_r3_ledger_integrity_evidence/raw_iterable_o1_residual.py", line 30, in main
+    residual = project_observatory(events).traces[0].status.value
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/juanbeck/universal-agentic-harness/src/ab_harness/observatory.py", line 242, in project_observatory
+    event.verify_identity()
+  File "/home/juanbeck/universal-agentic-harness/src/ab_harness/lifecycle.py", line 166, in verify_identity
+    raise ValueError("trace event identity does not match content")
+ValueError: trace event identity does not match content

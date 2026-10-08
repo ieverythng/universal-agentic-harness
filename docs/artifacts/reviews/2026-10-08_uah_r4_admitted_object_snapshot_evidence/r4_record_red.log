@@ -1,0 +1,10 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_ test_recorded_admission_retains_exact_versioned_object_snapshot_after_restart _
+tests/test_admitted_object_snapshot.py:97: in test_recorded_admission_retains_exact_versioned_object_snapshot_after_restart
+    assert event.data["schema_version"] == "uah.admitted_operation/v3"
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   KeyError: 'schema_version'
+=========================== short test summary info ============================
+FAILED tests/test_admitted_object_snapshot.py::test_recorded_admission_retains_exact_versioned_object_snapshot_after_restart
+1 failed, 1 deselected in 0.17s

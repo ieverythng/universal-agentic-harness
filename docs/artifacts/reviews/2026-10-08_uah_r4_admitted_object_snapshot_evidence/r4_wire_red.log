@@ -1,0 +1,9 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_______ test_rehashed_trace_event_cannot_replace_admitted_snapshot_bytes _______
+tests/test_admitted_object_snapshot.py:197: in test_rehashed_trace_event_cannot_replace_admitted_snapshot_bytes
+    with pytest.raises(ValueError, match="snapshot|identity|admitted"):
+E   Failed: DID NOT RAISE ValueError
+=========================== short test summary info ============================
+FAILED tests/test_admitted_object_snapshot.py::test_rehashed_trace_event_cannot_replace_admitted_snapshot_bytes
+1 failed, 24 deselected in 0.15s

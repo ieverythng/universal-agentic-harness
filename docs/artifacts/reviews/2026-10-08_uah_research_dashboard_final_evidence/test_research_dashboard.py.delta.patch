@@ -1,0 +1,116 @@
+--- docs/artifacts/reviews/2026-10-08_uah_research_dashboard_final_evidence/test_research_dashboard.py.before	2026-10-08 17:20:44.770582314 +0200
++++ tests/test_research_dashboard.py	2026-10-08 17:22:43.918624967 +0200
+@@ -39,7 +39,7 @@
+     markdown = tmp_path / "docs/research/dashboard.md"
+     markdown.parent.mkdir(parents=True)
+     markdown.write_text(
+-        "# Research dashboard\n\n## Catalog\n\n"
++        "# Research dashboard\n\nReconciled: 2026-10-08.\n\n## Catalog\n\n"
+         "<!-- research-records:start -->\n<!-- research-records:end -->\n",
+         encoding="utf-8",
+     )
+@@ -191,7 +191,7 @@
+ def test_registry_owns_reconciliation_date_in_both_outputs(tmp_path):
+     registry, registry_path, markdown, _ = fixture(tmp_path)
+     markdown.write_text(
+-        markdown.read_text().replace("## Catalog", "Reconciled: 2026-10-07.\n\n## Catalog")
++        markdown.read_text().replace("Reconciled: 2026-10-08.", "Reconciled: 2026-10-07.")
+     )
+     assert run(tmp_path, registry_path, markdown).returncode == 0
+     assert "Reconciled: 2026-10-08." in markdown.read_text()
+@@ -206,6 +206,95 @@
+     assert run(tmp_path, registry_path, markdown, *args, "--check").returncode == 0
+
+
++def test_reconciliation_preserves_authored_fenced_history(tmp_path):
++    _, registry_path, markdown, _ = fixture(tmp_path)
++    historical = "```text\nReconciled: 2024-02-29.\n```\n\n"
++    markdown.write_text(markdown.read_text().replace("## Catalog", historical + "## Catalog"))
++    assert run(tmp_path, registry_path, markdown).returncode == 0
++    assert historical in markdown.read_text()
++    assert "Reconciled: 2024-02-29." in markdown.with_suffix(".html").read_text()
++    assert run(tmp_path, registry_path, markdown, "--check").returncode == 0
++
++
++def test_authored_code_entities_survive_metadata_rendering(tmp_path):
++    registry, registry_path, markdown, _ = fixture(tmp_path)
++    registry["records"][0].update(title="<literal> # ' &amp;", summary="[no link](javascript:x)")
++    registry_path.write_text(json.dumps(registry))
++    example = "```text\n&#35; &#60; &#39; &amp;\n```\n\n"
++    markdown.write_text(markdown.read_text().replace("## Catalog", example + "## Catalog"))
++    assert run(tmp_path, registry_path, markdown).returncode == 0
++    assert example in markdown.read_text()
++    page = markdown.with_suffix(".html").read_text()
++    assert "&amp;#35; &amp;#60; &amp;#39; &amp;amp;" in page
++    assert "&lt;literal&gt; # &#x27; &amp;amp;" in page
++    assert 'href="javascript:' not in page
++    assert run(tmp_path, registry_path, markdown, "--check").returncode == 0
++
++
++@pytest.mark.parametrize("metadata", [
++    "", "Reconciled: 2026-10-08.\nReconciled: 2026-10-08.",
++    "Reconciled: 2026-10-08.\n\nReconciled: 2026-10-07.",
++    "Reconciled: 2026-10-07T23:00:00+02:00.",
++    "Reconciled: 2025-02-29.", "Reconciled: 2026-10-08.extra",
++])
++def test_missing_repeated_or_malformed_top_metadata_rejects_without_write(tmp_path, metadata):
++    _, registry_path, markdown, _ = fixture(tmp_path)
++    markdown.write_text(markdown.read_text().replace("Reconciled: 2026-10-08.", metadata))
++    before = markdown.read_bytes()
++    result = run(tmp_path, registry_path, markdown)
++    assert result.returncode == 1, result.stdout
++    assert markdown.read_bytes() == before
++    assert not markdown.with_suffix(".html").exists()
++
++
++def test_reconciliation_field_cannot_be_in_an_authored_prose_paragraph(tmp_path):
++    _, registry_path, markdown, _ = fixture(tmp_path)
++    markdown.write_text(markdown.read_text().replace(
++        "Reconciled: 2026-10-08.", "Authored paragraph.\n\nReconciled: 2026-10-08."
++    ))
++    before = markdown.read_bytes()
++    assert run(tmp_path, registry_path, markdown).returncode == 1
++    assert markdown.read_bytes() == before
++
++
++@pytest.mark.parametrize("variant", ["missing", "repeat", "reverse", "spaced"])
++def test_generated_delimiter_variants_reject_without_write(tmp_path, variant):
++    _, registry_path, markdown, _ = fixture(tmp_path)
++    start, end = "<!-- research-records:start -->", "<!-- research-records:end -->"
++    text = markdown.read_text()
++    if variant == "missing":
++        text = text.replace(end, "")
++    elif variant == "repeat":
++        text += start
++    elif variant == "reverse":
++        text = text.replace(start + "\n" + end, end + "\n" + start)
++    else:
++        text = text.replace(start, "<!--  research-records:start -->")
++    markdown.write_text(text)
++    assert run(tmp_path, registry_path, markdown).returncode == 1
++    assert markdown.read_text() == text
++    assert not markdown.with_suffix(".html").exists()
++
++
++def test_authored_prose_and_trailing_code_remain_independent_and_idempotent(tmp_path):
++    _, registry_path, markdown, source = fixture(tmp_path)
++    authored = "\n## Historical example\n\nReconciled: 2024-02-29.\n\n" \
++        "Ordinary prose says &#35; and &amp;.\n\n~~~text\n&#60; &#39;\n~~~\n"
++    markdown.write_text(markdown.read_text() + authored)
++    source_before = source.read_bytes()
++    assert run(tmp_path, registry_path, markdown).returncode == 0
++    assert markdown.read_text().endswith(authored)
++    html_before = markdown.with_suffix(".html").read_bytes()
++    assert b"&amp;#35; and &amp;amp;" in html_before
++    assert b"&amp;#60; &amp;#39;" in html_before
++    assert html_before.count(b"<td>") == 6
++    assert html_before.count(b"Catalog ID:") == 1
++    assert run(tmp_path, registry_path, markdown, "--check").returncode == 0
++    assert run(tmp_path, registry_path, markdown).returncode == 0
++    assert markdown.with_suffix(".html").read_bytes() == html_before
++    assert source.read_bytes() == source_before
++
++
+ @pytest.mark.parametrize("literal", [
+     "<!-- research-records:start -->", "<!-- research-records:end -->",
+     '<img src=x onerror=alert(1)>',

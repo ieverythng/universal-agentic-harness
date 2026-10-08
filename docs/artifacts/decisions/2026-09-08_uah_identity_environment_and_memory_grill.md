@@ -1,7 +1,7 @@
 # UAH Identity, Environment, and Memory Design Grill
 
 **Date:** 2026-09-08
-**Status:** Architecture decisions accepted; grill closed; first TDD seam implemented
+**Status:** Architecture decisions accepted; grill closed; H0 authority and H1 fixed activation seams implemented in part
 **Scope:** H0-H2 contracts, with H3-H5 compatibility seams only
 
 ## 1. Purpose
@@ -104,10 +104,12 @@ readiness from discovery alone.
 task or model call?
 
 **Decision:** No. Approved bindings normalize input into immutable
-`EnvironmentIngress`. Deterministic `TaskIngressPolicy` classifies each item as
-an environment state update, new task, resumed task, notification to an
-existing task, or rejection. A model may interpret admitted task content but
-cannot rewrite the assigned task or trace lineage.
+`EnvironmentIngress`. Deterministic `TaskIngressAuthority` classifies and
+admits each item as an environment state update, new task, resumed task,
+notification to an existing task, or rejection. It is the only public writer
+for accepted task-bearing ingress; the task registry is a read-only ledger
+projection. A model may interpret admitted task content but cannot rewrite the
+assigned task or trace lineage.
 
 Domain task IDs retain native meaning. NAO goal, request, plan, version, and
 step IDs cross the UAH boundary unchanged. UAH identities supplement this
@@ -560,3 +562,143 @@ The final H0 lifecycle slices and Observatory O1 now proceed in parallel. O1 is
 a read-only replay projection and static review surface over the common ledger.
 It cannot append events, issue evidence, repair traces, or promote memory. Each
 failure family enters O1 only after its restart-replay contract is stable.
+
+## 24. Executable-Seam Continuation on 2026-10-01
+
+The public task-ingress authority is implemented. It snapshots primitive
+DomainContractPack rule values, owns accepted task-bearing ledger writes, and
+refreshes its read-only task projection before duplicate and terminal checks.
+State updates and rejected ingress still require an environment-scoped event
+family before they can claim durable replay.
+
+Semantic admission now validates canonical arguments through a reviewed,
+content-addressed portable object-schema subset. The subset covers required
+fields, top-level JSON types, and additional-property policy. Executable
+callable validators were removed because a source-revision string did not make
+captured callable state deterministic. `uah.admitted_operation/v2` records the
+validated input-schema identity.
+
+`uah.semantic_admission_rejection/v1` and
+`uah.domain_admission_rejection/v1` are immutable operation-scoped facts. The
+semantic coordinator appends the returned semantic rejection; the domain
+lifecycle owner appends its own rejection. Replay exposes either as a
+nonterminal failure stage. Only explicit task-acceptance authority may make the
+trace terminal. Repeated requests for an already issued domain lease return the
+same deterministic lease and do not append a contradictory rejection.
+
+Initial H1 identity registries now implement content-addressed `AgentManifest`,
+one-time `AgentHandleRevision` registration, and roster-bound `AgentRun`
+attachment in `attached_standby`. The handle registry refuses rebinding because
+the required fidelity evaluator is H3 work. These registries are in-memory and
+do not emit lifecycle events, perform preflight, allocate a model, persist run
+state, or invoke a provider.
+
+The initial O1 implementation projects validated ledger events into immutable
+trace views and static searchable HTML. It derives terminal status only from
+explicit terminal facts, retains operation failure stages, escapes raw payloads,
+and embeds inert graph JSON. Arbitrary event collections default to
+`synthetic`; the `recorded` label requires a validated `LifecycleLedger`. The
+full actor, configuration, provider, comparison, and Workbench views remain
+open.
+
+The next ordered seams are `OperationEdge`, typed normalization and evidence
+rejection, terminal required-effect counterexample replay, scoped activation
+events, fixed-instance model leases and preflights, then `PromptCompiler` and a
+provider-neutral invocation port.
+
+## 25. Operation, Counterexample, Control, and O1 Continuation on 2026-10-02
+
+`uah.operation_edge/v1` is the immutable relationship artifact for
+`decomposes_to`, `continues_with`, and `delegates_to`. The ledger accepts an
+edge only when both endpoint operations and their semantic admissions exist,
+the recorded frames match the edge, the target has no lease, and the edge does
+not create a duplicate pair, second structural parent, or cycle. Same-frame
+decomposition and continuation are executable. Cross-frame delegation remains
+fail-closed until the target has its own compiled projection and artifact
+contract.
+
+Proposal normalization owns malformed or noncanonical model output rejection.
+The environment evidence adapter owns rejection of a valid native result that
+cannot become accepted evidence. A valid negative owner result is not an
+evidence rejection. It may reach the task acceptance evaluator, fail a required
+obligation, emit `terminal_task_rejected`, and derive a rejected
+`VerifiedTraceDigest`. Operation rejection remains nonterminal unless explicit
+task acceptance closes the trace.
+
+`uah.task_spec/v2` and `uah.compiled_task/v2` add `retry_attempts`. Tool-call
+budget grants and execution start share one atomic ledger commit. Budget
+subjects are idempotent and cannot change units. Cancellation is
+owner-authorized and pre-dispatch only. Timeout decisions derive task start
+from the recorded ledger and retain the observed time; they do not imply an
+asynchronous scheduler. Retry decisions validate the failure disposition,
+compiled limit, ordinal, and fresh target identity. They grant no proposal or
+execution authority. Model-call accounting has no provider consumer yet.
+
+O1 remains a read-only projection. Its graph contains lifecycle-event nodes,
+explicit operation nodes, ledger-parent edges, and only recorded operation
+relations. Control and rejection events expose failure stages but do not create
+terminal status. The committed recorded-canary HTML contains one accepted
+trace, one open semantic rejection, and one terminal required-effect rejection.
+
+## 26. Activation, Fixed Allocation, and O1 Continuation on 2026-10-04
+
+This pass implements Decisions 2, 3, 4, 6, and 9. The architecture grill remains
+closed; fixed-runtime behavior is exercised through the confirmed public
+registry, lease, readiness, and Observatory seams.
+
+**Question resolved:** Does registration reserve hardware or establish model
+capability?
+
+**Executable decision:** Role/model registries and `RegistrationPreflight` check
+frozen references, declared capability names, context, and provider policy.
+Registration invokes no provider and reserves no resource. The result records
+declaration compatibility only.
+
+**Question resolved:** What survives model release and process restart?
+
+**Executable decision:** The common lifecycle ledger records attached agent
+identity and pins its manifest, handle revision, environment profile, and owner
+attestation. Exclusive roster checks prevent a second live actor for one
+environment handle. Fixed allocation, bounded owner startup report, release,
+standby, and termination replay without inventing task IDs. Termination releases
+an idle lease and records termination atomically; an outstanding invocation
+blocks termination. This preserves logical activation continuity; durable
+conversation/context storage remains unimplemented.
+
+**Question resolved:** How far does hardware awareness extend in H1?
+
+**Executable decision:** `FixedModelAllocator` accepts one declared instance of
+the exact model configuration, owner-issued RAM/VRAM/context capacity no older
+than 30 seconds, and exclusive host/instance occupancy within the common ledger.
+An active identical request returns the same lease; a released request cannot
+be reused. Startup evaluates owner evidence for the exact lease, instance, and
+model, capped at two attempts over ten seconds with 30-second freshness.
+Failure and release share an atomic commit. The allocator performs no live
+probe, model loading, eviction, or dynamic scheduling. H3 retains those wider
+allocation mechanisms.
+
+**Question resolved:** Can O1 inspect agents before tasks exist?
+
+**Executable decision:** Yes. `uah.trace_event/v2` carries explicit actor scope
+and `agent_run_id`; agent facts use null task/trace IDs. O1 keeps environments
+with actor events visible and indexes real tasks and traces separately. New
+task-scoped invocation events carry actor identity; earlier v1 task events
+retain their serialized identity and receive no inferred actor assignment.
+Static actor cards, hierarchy links, and inert graph data consume one ordered
+event stream. Observatory writes no authority, and H2 multi-actor parity remains
+unqualified.
+
+The next vertical slice now implements `PromptCompiler`, versioned prompt packs,
+and the provider-neutral invocation port. The compiler uses the recorded
+`CompiledTask`, frozen role, and reviewed argument schemas to produce one direct
+typed-operation schema and content-addressed prompt. The call port requires an
+exact ready actor and unexpired lease and atomically appends model-call grant
+plus invocation start before invoking a fake provider. It retains distinct raw
+output or typed failure and prevents task judgment while a call is outstanding.
+Raw finite JSON is untrusted input to proposal normalization and cannot become
+admission or effect evidence by itself.
+
+Stale-effect-evidence and false-completion policy remain H0 closure work. Live
+ZeroTier transport, durable context, and NAO H2 parity remain unqualified. A fake
+or real provider-connectivity probe does not prove domain admission or execution
+effects.

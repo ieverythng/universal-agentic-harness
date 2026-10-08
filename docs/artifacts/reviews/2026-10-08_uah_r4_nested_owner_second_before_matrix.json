@@ -1,0 +1,667 @@
+{
+  "failed": 98,
+  "failures": [
+    {
+      "error": "altered authority accepted",
+      "name": "tamper:proposal:proposal_id:wire:hooks=True",
+      "status": "fail",
+      "type": "AssertionError"
+    },
+    {
+      "error": "altered authority accepted",
+      "name": "tamper:proposal:proposal_id:record_proposal:hooks=True",
+      "status": "fail",
+      "type": "AssertionError"
+    },
+    {
+      "error": "altered authority accepted",
+      "name": "tamper:proposal:compiled_task_id:wire:hooks=True",
+      "status": "fail",
+      "type": "AssertionError"
+    },
+    {
+      "error": "['verifier']",
+      "name": "tamper:proposal:compiled_task_id:record_proposal:hooks=True",
+      "status": "fail",
+      "type": "AssertionError"
+    },
+    {
+      "error": "altered authority accepted",
+      "name": "tamper:proposal:environment_run_id:wire:hooks=True",
+      "status": "fail",
+      "type": "AssertionError"
+    },
+    {
+      "error": "['verifier']",
+      "name": "tamper:proposal:environment_run_id:record_proposal:hooks=True",
+      "status": "fail",
+      "type": "AssertionError"
+    },
+    {
+      "error": "altered authority accepted",
+      "name": "tamper:proposal:task_id:wire:hooks=True",
+      "status": "fail",
+      "type": "AssertionError"
+    },
+    {
+      "error": "['verifier']",
+      "name": "tamper:proposal:task_id:record_proposal:hooks=True",
+      "status": "fail",
+      "type": "AssertionError"
+    },
+    {
+      "error": "altered authority accepted",
+      "name": "tamper:proposal:trace_id:wire:hooks=True",
+      "status": "fail",
+      "type": "AssertionError"
+    },
+    {
+      "error": "['verifier']",
+      "name": "tamper:proposal:trace_id:record_proposal:hooks=True",
+      "status": "fail",
+      "type": "AssertionError"
+    },
+    {
+      "error": "altered authority accepted",
+      "name": "tamper:proposal:operation_id:wire:hooks=True",
+      "status": "fail",
+      "type": "AssertionError"
+    },
+    {
+      "error": "altered authority accepted",
+      "name": "tamper:proposal:operation_id:record_proposal:hooks=True",
+      "status": "fail",
+      "type": "AssertionError"
+    },
+    {
+      "error": "altered authority accepted",
+      "name": "tamper:proposal:raw_output_artifact_id:wire:hooks=True",
+      "status": "fail",
+      "type": "AssertionError"
+    },
+    {
+      "error": "altered authority accepted",
+      "name": "tamper:proposal:raw_output_artifact_id:record_proposal:hooks=True",
+      "status": "fail",
+      "type": "AssertionError"
+    },
+    {
+      "error": "altered authority accepted",
+      "name": "tamper:proposal:output_type:wire:hooks=True",
+      "status": "fail",
+      "type": "AssertionError"
+    },
+    {
+      "error": "altered authority accepted",
+      "name": "tamper:proposal:output_type:record_proposal:hooks=True",
+      "status": "fail",
+      "type": "AssertionError"
+    },
+    {
+      "error": "altered authority accepted",
+      "name": "tamper:proposal:object_id:wire:hooks=True",
+      "status": "fail",
+      "type": "AssertionError"
+    },
+    {
+      "error": "altered authority accepted",
+      "name": "tamper:proposal:object_id:record_proposal:hooks=True",
+      "status": "fail",
+      "type": "AssertionError"
+    },
+    {
+      "error": "altered authority accepted",
+      "name": "tamper:proposal:arguments_json:wire:hooks=True",
+      "status": "fail",
+      "type": "AssertionError"
+    },
+    {
+      "error": "altered authority accepted",
+      "name": "tamper:proposal:arguments_json:record_proposal:hooks=True",
+      "status": "fail",
+      "type": "AssertionError"
+    },
+    {
+      "error": "altered authority accepted",
+      "name": "tamper:proposal:schema_version:wire:hooks=True",
+      "status": "fail",
+      "type": "AssertionError"
+    },
+    {
+      "error": "altered authority accepted",
+      "name": "tamper:proposal:schema_version:record_proposal:hooks=True",
+      "status": "fail",
+      "type": "AssertionError"
+    },
+    {
+      "error": "altered authority accepted",
+      "name": "tamper:snapshot:object_id:wire:hooks=True",
+      "status": "fail",
+      "type": "AssertionError"
+    },
+    {
+      "error": "altered authority accepted",
+      "name": "tamper:snapshot:ab_level:wire:hooks=True",
+      "status": "fail",
+      "type": "AssertionError"
+    },
+    {
+      "error": "altered authority accepted",
+      "name": "tamper:snapshot:kind:wire:hooks=True",
+      "status": "fail",
+      "type": "AssertionError"
+    },
+    {
+      "error": "altered authority accepted",
+      "name": "tamper:snapshot:category:wire:hooks=True",
+      "status": "fail",
+      "type": "AssertionError"
+    },
+    {
+      "error": "altered authority accepted",
+      "name": "tamper:snapshot:owner_package:wire:hooks=True",
+      "status": "fail",
+      "type": "AssertionError"
+    },
+    {
+      "error": "altered authority accepted",
+      "name": "tamper:snapshot:expected_effects:wire:hooks=True",
+      "status": "fail",
+      "type": "AssertionError"
+    },
+    {
+      "error": "altered authority accepted",
+      "name": "tamper:snapshot:observable_success:wire:hooks=True",
+      "status": "fail",
+      "type": "AssertionError"
+    },
+    {
+      "error": "altered authority accepted",
+      "name": "tamper:snapshot:decomposes_to:wire:hooks=True",
+      "status": "fail",
+      "type": "AssertionError"
+    },
+    {
+      "error": "altered authority accepted",
+      "name": "tamper:snapshot:runtime_callable:wire:hooks=True",
+      "status": "fail",
+      "type": "AssertionError"
+    },
+    {
+      "error": "altered authority accepted",
+      "name": "tamper:admitted:admission_id:wire:hooks=True",
+      "status": "fail",
+      "type": "AssertionError"
+    },
+    {
+      "error": "altered authority accepted",
+      "name": "tamper:admitted:frame_id:wire:hooks=True",
+      "status": "fail",
+      "type": "AssertionError"
+    },
+    {
+      "error": "altered authority accepted",
+      "name": "tamper:admitted:ab_level:wire:hooks=True",
+      "status": "fail",
+      "type": "AssertionError"
+    },
+    {
+      "error": "altered authority accepted",
+      "name": "tamper:admitted:binding_id:wire:hooks=True",
+      "status": "fail",
+      "type": "AssertionError"
+    },
+    {
+      "error": "altered authority accepted",
+      "name": "tamper:admitted:binding_source_revision:wire:hooks=True",
+      "status": "fail",
+      "type": "AssertionError"
+    },
+    {
+      "error": "altered authority accepted",
+      "name": "tamper:admitted:binding_fingerprint:wire:hooks=True",
+      "status": "fail",
+      "type": "AssertionError"
+    },
+    {
+      "error": "altered authority accepted",
+      "name": "tamper:admitted:binding_owner:wire:hooks=True",
+      "status": "fail",
+      "type": "AssertionError"
+    },
+    {
+      "error": "altered authority accepted",
+      "name": "tamper:admitted:input_schema_ref:wire:hooks=True",
+      "status": "fail",
+      "type": "AssertionError"
+    },
+    {
+      "error": "altered authority accepted",
+      "name": "tamper:admitted:input_schema_id:wire:hooks=True",
+      "status": "fail",
+      "type": "AssertionError"
+    },
+    {
+      "error": "altered authority accepted",
+      "name": "tamper:admitted:output_schema_ref:wire:hooks=True",
+      "status": "fail",
+      "type": "AssertionError"
+    },
+    {
+      "error": "altered authority accepted",
+      "name": "tamper:admitted:evidence_adapter:wire:hooks=True",
+      "status": "fail",
+      "type": "AssertionError"
+    },
+    {
+      "error": "altered authority accepted",
+      "name": "tamper:admitted:environment_id:wire:hooks=True",
+      "status": "fail",
+      "type": "AssertionError"
+    },
+    {
+      "error": "altered authority accepted",
+      "name": "tamper:admitted:runtime_mode:wire:hooks=True",
+      "status": "fail",
+      "type": "AssertionError"
+    },
+    {
+      "error": "altered authority accepted",
+      "name": "tamper:admitted:domain_contract_pack_revision:wire:hooks=True",
+      "status": "fail",
+      "type": "AssertionError"
+    },
+    {
+      "error": "altered authority accepted",
+      "name": "tamper:admitted:effect_obligation_ids:wire:hooks=True",
+      "status": "fail",
+      "type": "AssertionError"
+    },
+    {
+      "error": "altered authority accepted",
+      "name": "tamper:admitted:schema_version:wire:hooks=True",
+      "status": "fail",
+      "type": "AssertionError"
+    },
+    {
+      "error": "altered authority accepted",
+      "name": "tamper:lease:execution_lease_id:wire:hooks=True",
+      "status": "fail",
+      "type": "AssertionError"
+    },
+    {
+      "error": "altered authority accepted",
+      "name": "tamper:lease:lease_owner_id:wire:hooks=True",
+      "status": "fail",
+      "type": "AssertionError"
+    },
+    {
+      "error": "altered authority accepted",
+      "name": "tamper:lease:environment_attestation_id:wire:hooks=True",
+      "status": "fail",
+      "type": "AssertionError"
+    },
+    {
+      "error": "altered authority accepted",
+      "name": "tamper:lease:scope:wire:hooks=True",
+      "status": "fail",
+      "type": "AssertionError"
+    },
+    {
+      "error": "altered authority accepted",
+      "name": "tamper:lease:schema_version:wire:hooks=True",
+      "status": "fail",
+      "type": "AssertionError"
+    },
+    {
+      "error": "altered authority accepted",
+      "name": "combined:missing:wire",
+      "status": "fail",
+      "type": "AssertionError"
+    },
+    {
+      "error": "altered authority accepted",
+      "name": "combined:empty_obligations:wire",
+      "status": "fail",
+      "type": "AssertionError"
+    },
+    {
+      "error": "altered authority accepted",
+      "name": "combined:two_fields:wire",
+      "status": "fail",
+      "type": "AssertionError"
+    },
+    {
+      "error": "altered authority accepted",
+      "name": "valid_nested_rehash:arguments_json:fresh_lease",
+      "status": "fail",
+      "type": "AssertionError"
+    },
+    {
+      "error": "altered authority accepted",
+      "name": "valid_nested_rehash:arguments_json:reuse_lease",
+      "status": "fail",
+      "type": "AssertionError"
+    },
+    {
+      "error": "altered authority accepted",
+      "name": "valid_nested_rehash:arguments_json:provenance",
+      "status": "fail",
+      "type": "AssertionError"
+    },
+    {
+      "error": "[{'label': 'mug'}]",
+      "name": "valid_nested_rehash:arguments_json:dispatch",
+      "status": "fail",
+      "type": "AssertionError"
+    },
+    {
+      "error": "altered authority accepted",
+      "name": "valid_nested_rehash:arguments_json:receipt",
+      "status": "fail",
+      "type": "AssertionError"
+    },
+    {
+      "error": "altered authority accepted",
+      "name": "valid_nested_rehash:arguments_json:rejection",
+      "status": "fail",
+      "type": "AssertionError"
+    },
+    {
+      "error": "altered authority accepted",
+      "name": "valid_nested_rehash:arguments_json:wire",
+      "status": "fail",
+      "type": "AssertionError"
+    },
+    {
+      "error": "altered authority accepted",
+      "name": "valid_nested_rehash:arguments_json:record_lease",
+      "status": "fail",
+      "type": "AssertionError"
+    },
+    {
+      "error": "altered authority accepted",
+      "name": "valid_nested_rehash:raw_output_artifact_id:fresh_lease",
+      "status": "fail",
+      "type": "AssertionError"
+    },
+    {
+      "error": "altered authority accepted",
+      "name": "valid_nested_rehash:raw_output_artifact_id:reuse_lease",
+      "status": "fail",
+      "type": "AssertionError"
+    },
+    {
+      "error": "altered authority accepted",
+      "name": "valid_nested_rehash:raw_output_artifact_id:provenance",
+      "status": "fail",
+      "type": "AssertionError"
+    },
+    {
+      "error": "[{'label': 'cup'}]",
+      "name": "valid_nested_rehash:raw_output_artifact_id:dispatch",
+      "status": "fail",
+      "type": "AssertionError"
+    },
+    {
+      "error": "altered authority accepted",
+      "name": "valid_nested_rehash:raw_output_artifact_id:receipt",
+      "status": "fail",
+      "type": "AssertionError"
+    },
+    {
+      "error": "altered authority accepted",
+      "name": "valid_nested_rehash:raw_output_artifact_id:rejection",
+      "status": "fail",
+      "type": "AssertionError"
+    },
+    {
+      "error": "altered authority accepted",
+      "name": "valid_nested_rehash:raw_output_artifact_id:wire",
+      "status": "fail",
+      "type": "AssertionError"
+    },
+    {
+      "error": "altered authority accepted",
+      "name": "valid_nested_rehash:raw_output_artifact_id:record_lease",
+      "status": "fail",
+      "type": "AssertionError"
+    },
+    {
+      "error": "altered authority accepted",
+      "name": "valid_nested_rehash:output_type:fresh_lease",
+      "status": "fail",
+      "type": "AssertionError"
+    },
+    {
+      "error": "altered authority accepted",
+      "name": "valid_nested_rehash:output_type:reuse_lease",
+      "status": "fail",
+      "type": "AssertionError"
+    },
+    {
+      "error": "altered authority accepted",
+      "name": "valid_nested_rehash:output_type:provenance",
+      "status": "fail",
+      "type": "AssertionError"
+    },
+    {
+      "error": "[{'label': 'cup'}]",
+      "name": "valid_nested_rehash:output_type:dispatch",
+      "status": "fail",
+      "type": "AssertionError"
+    },
+    {
+      "error": "altered authority accepted",
+      "name": "valid_nested_rehash:output_type:receipt",
+      "status": "fail",
+      "type": "AssertionError"
+    },
+    {
+      "error": "altered authority accepted",
+      "name": "valid_nested_rehash:output_type:rejection",
+      "status": "fail",
+      "type": "AssertionError"
+    },
+    {
+      "error": "altered authority accepted",
+      "name": "valid_nested_rehash:output_type:wire",
+      "status": "fail",
+      "type": "AssertionError"
+    },
+    {
+      "error": "altered authority accepted",
+      "name": "valid_nested_rehash:output_type:record_lease",
+      "status": "fail",
+      "type": "AssertionError"
+    },
+    {
+      "error": "['verifier']",
+      "name": "valid_nested_rehash:task_id:fresh_lease",
+      "status": "fail",
+      "type": "AssertionError"
+    },
+    {
+      "error": "altered authority accepted",
+      "name": "valid_nested_rehash:task_id:reuse_lease",
+      "status": "fail",
+      "type": "AssertionError"
+    },
+    {
+      "error": "altered authority accepted",
+      "name": "valid_nested_rehash:task_id:provenance",
+      "status": "fail",
+      "type": "AssertionError"
+    },
+    {
+      "error": "['verifier']",
+      "name": "valid_nested_rehash:task_id:dispatch",
+      "status": "fail",
+      "type": "AssertionError"
+    },
+    {
+      "error": "altered authority accepted",
+      "name": "valid_nested_rehash:task_id:receipt",
+      "status": "fail",
+      "type": "AssertionError"
+    },
+    {
+      "error": "altered authority accepted",
+      "name": "valid_nested_rehash:task_id:rejection",
+      "status": "fail",
+      "type": "AssertionError"
+    },
+    {
+      "error": "altered authority accepted",
+      "name": "valid_nested_rehash:task_id:wire",
+      "status": "fail",
+      "type": "AssertionError"
+    },
+    {
+      "error": "altered authority accepted",
+      "name": "valid_nested_rehash:object_id:wire",
+      "status": "fail",
+      "type": "AssertionError"
+    },
+    {
+      "error": "altered authority accepted",
+      "name": "valid_nested_rehash:operation_id:receipt",
+      "status": "fail",
+      "type": "AssertionError"
+    },
+    {
+      "error": "altered authority accepted",
+      "name": "valid_nested_rehash:operation_id:rejection",
+      "status": "fail",
+      "type": "AssertionError"
+    },
+    {
+      "error": "altered authority accepted",
+      "name": "valid_nested_rehash:operation_id:wire",
+      "status": "fail",
+      "type": "AssertionError"
+    },
+    {
+      "error": "typed proposal identity does not match content",
+      "name": "handler:proposal:bad_effect=False",
+      "status": "fail",
+      "type": "ValueError"
+    },
+    {
+      "error": "typed proposal identity does not match content",
+      "name": "handler:proposal:bad_effect=True",
+      "status": "fail",
+      "type": "ValueError"
+    },
+    {
+      "error": "admitted operation identity does not match content",
+      "name": "handler:snapshot:bad_effect=False",
+      "status": "fail",
+      "type": "ValueError"
+    },
+    {
+      "error": "admitted operation identity does not match content",
+      "name": "handler:snapshot:bad_effect=True",
+      "status": "fail",
+      "type": "ValueError"
+    },
+    {
+      "error": "admitted object snapshot does not match operation lineage",
+      "name": "handler:admitted:bad_effect=False",
+      "status": "fail",
+      "type": "ValueError"
+    },
+    {
+      "error": "admitted object snapshot does not match operation lineage",
+      "name": "handler:admitted:bad_effect=True",
+      "status": "fail",
+      "type": "ValueError"
+    },
+    {
+      "error": "execution lease identity does not match content",
+      "name": "handler:lease:bad_effect=False",
+      "status": "fail",
+      "type": "ValueError"
+    },
+    {
+      "error": "execution lease identity does not match content",
+      "name": "handler:lease:bad_effect=True",
+      "status": "fail",
+      "type": "ValueError"
+    }
+  ],
+  "matrix": {
+    "admitted": [
+      "admission_id",
+      "frame_id",
+      "ab_level",
+      "binding_id",
+      "binding_source_revision",
+      "binding_fingerprint",
+      "binding_owner",
+      "input_schema_ref",
+      "input_schema_id",
+      "output_schema_ref",
+      "evidence_adapter",
+      "environment_id",
+      "runtime_mode",
+      "domain_contract_pack_revision",
+      "effect_obligation_ids",
+      "schema_version"
+    ],
+    "lease": [
+      "execution_lease_id",
+      "lease_owner_id",
+      "environment_attestation_id",
+      "scope",
+      "schema_version"
+    ],
+    "proposal": [
+      "proposal_id",
+      "compiled_task_id",
+      "environment_run_id",
+      "task_id",
+      "trace_id",
+      "operation_id",
+      "raw_output_artifact_id",
+      "output_type",
+      "object_id",
+      "arguments_json",
+      "schema_version"
+    ],
+    "snapshot": [
+      "object_id",
+      "ab_level",
+      "kind",
+      "category",
+      "owner_package",
+      "expected_effects",
+      "observable_success",
+      "decomposes_to",
+      "runtime_callable"
+    ]
+  },
+  "passed": 711,
+  "rejection_messages": {
+    "'AdmittedOperation' object has no attribute 'object_snapshot'": 5,
+    "active execution requires current semantic provenance": 7,
+    "admitted object snapshot does not match operation lineage": 93,
+    "admitted operation identity does not match content": 323,
+    "admitted operation requires an effect obligation": 5,
+    "current admission requires the supported concrete artifact": 1,
+    "current execution requires the supported concrete lease": 1,
+    "execution lease identity does not match content": 27,
+    "execution lease scope must be operation": 9,
+    "lease-bound owner requires an ExecutionLease": 1,
+    "lifecycle event lineage does not match trace": 2,
+    "new active fact requires current semantic provenance": 1,
+    "recorded snapshot does not match admitted operation": 4,
+    "tool dispatch requires current semantic provenance": 1,
+    "typed proposal arguments are not valid JSON": 18,
+    "typed proposal identity does not match content": 167,
+    "unsupported admitted operation schema: uah.admitted_operation/v3:changed": 17,
+    "unsupported execution lease schema: uah.execution_lease/v1:changed": 9,
+    "unsupported typed proposal schema: uah.typed_proposal/v1:changed": 18
+  },
+  "total": 809
+}

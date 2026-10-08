@@ -1,0 +1,26 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_________ test_authentic_old_lease_cannot_issue_current_effect_receipt _________
+
+    def test_authentic_old_lease_cannot_issue_current_effect_receipt():
+>       lease = authentic_old_lease()
+                ^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_admission_active_provenance.py:69:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    def authentic_old_lease():
+        module = old_module("retained_v2_domain_lifecycle", "domain_lifecycle.py.before")
+        event = json.loads((FIX_EVIDENCE / "authentic_v2_leased.fixture").read_text().splitlines()[-1])
+        data = json.loads(event["data_json"])
+        return module.ExecutionLease(
+            execution_lease_id=data["execution_lease_id"], admitted_operation=authentic_old_admitted(),
+>           lease_owner_id=data["lease_owner_id"], environment_attestation_id=data["environment_attestation_id"],
+                                                                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        )
+E       KeyError: 'environment_attestation_id'
+
+tests/test_admission_active_provenance.py:47: KeyError
+=========================== short test summary info ============================
+FAILED tests/test_admission_active_provenance.py::test_authentic_old_lease_cannot_issue_current_effect_receipt
+1 failed, 1 deselected in 0.12s

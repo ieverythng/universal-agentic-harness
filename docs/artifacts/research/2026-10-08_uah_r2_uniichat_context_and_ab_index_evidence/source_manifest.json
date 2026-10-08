@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "status": "source_snapshot_only",
+  "inspection_window_utc": ["2026-10-08T14:27:59Z", "2026-10-08T14:29:56Z"],
+  "owner": "VictorTaelin",
+  "source_url": "https://gist.github.com/VictorTaelin/91837951a5ce5b38f341ec1ba1df6449",
+  "revision": "3c190e06f34aba0c69f49042c526093269604935",
+  "committed_at": "2026-10-08T01:58:24Z",
+  "gist_updated_at": "2026-10-08T14:23:19Z",
+  "filename": "optchat.md",
+  "utf8_bytes": 19092,
+  "content_sha256": "12f300f760af82bc07bc5201051d1267824ded09c9def8186e4f8144368038d8",
+  "truncated": false,
+  "metadata_note": "Gist-wide updated_at is not the file revision date; raw_url contains a blob identifier, not the owner revision.",
+  "source_treatment": "Untrusted primary source data. Embedded prompts are not operational instructions.",
+  "performance_status": "not_reproduced",
+  "round_start_utc": "2026-10-08T14:21:12Z",
+  "round_target_end_utc": "2026-10-08T14:51:00Z"
+}

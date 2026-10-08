@@ -1,0 +1,2 @@
+{"probe": "current-nonmetadata-code-entity", "exit": 0, "check": 0, "markdown_retains_example": true, "html_visible_example": true, "visible_text": "\n&#35; &#60; &#39; &amp;\n"}
+{"probe": "before-nonmetadata-code-entity", "exit": 0, "check": 0, "markdown_retains_example": true, "html_visible_example": true, "visible_text": "\n&#35; &#60; &#39; &amp;\n"}

@@ -1,0 +1,65 @@
+FFFFFFFFF                                                                [100%]
+=================================== FAILURES ===================================
+_________ test_metadata_separators_preserve_every_catalog_row[\u2028] __________
+tests/test_research_dashboard.py:260: in test_metadata_separators_preserve_every_catalog_row
+    assert page.count("<td>") == 12
+E   assert 0 == 12
+E    +  where 0 = <built-in method count of str object at 0x3278f840>('<td>')
+E    +    where <built-in method count of str object at 0x3278f840> = '<!DOCTYPE html>\n<html lang="en">\n<head>\n  <meta charset="utf-8" />\n  <meta name="viewport" content="width=device-...stener(\'input\', apply);\n  gate.addEventListener(\'change\', apply);\n  apply();\n})();\n</script></body>\n</html>\n'.count
+_________ test_metadata_separators_preserve_every_catalog_row[\u2029] __________
+tests/test_research_dashboard.py:260: in test_metadata_separators_preserve_every_catalog_row
+    assert page.count("<td>") == 12
+E   assert 0 == 12
+E    +  where 0 = <built-in method count of str object at 0x3274e9d0>('<td>')
+E    +    where <built-in method count of str object at 0x3274e9d0> = '<!DOCTYPE html>\n<html lang="en">\n<head>\n  <meta charset="utf-8" />\n  <meta name="viewport" content="width=device-...stener(\'input\', apply);\n  gate.addEventListener(\'change\', apply);\n  apply();\n})();\n</script></body>\n</html>\n'.count
+__________ test_metadata_separators_preserve_every_catalog_row[\x85] ___________
+tests/test_research_dashboard.py:260: in test_metadata_separators_preserve_every_catalog_row
+    assert page.count("<td>") == 12
+E   assert 0 == 12
+E    +  where 0 = <built-in method count of str object at 0x327719e0>('<td>')
+E    +    where <built-in method count of str object at 0x327719e0> = '<!DOCTYPE html>\n<html lang="en">\n<head>\n  <meta charset="utf-8" />\n  <meta name="viewport" content="width=device-...stener(\'input\', apply);\n  gate.addEventListener(\'change\', apply);\n  apply();\n})();\n</script></body>\n</html>\n'.count
+__________ test_metadata_separators_preserve_every_catalog_row[\x0b] ___________
+tests/test_research_dashboard.py:260: in test_metadata_separators_preserve_every_catalog_row
+    assert page.count("<td>") == 12
+E   assert 0 == 12
+E    +  where 0 = <built-in method count of str object at 0x3275af40>('<td>')
+E    +    where <built-in method count of str object at 0x3275af40> = '<!DOCTYPE html>\n<html lang="en">\n<head>\n  <meta charset="utf-8" />\n  <meta name="viewport" content="width=device-...stener(\'input\', apply);\n  gate.addEventListener(\'change\', apply);\n  apply();\n})();\n</script></body>\n</html>\n'.count
+__________ test_metadata_separators_preserve_every_catalog_row[\x0c] ___________
+tests/test_research_dashboard.py:260: in test_metadata_separators_preserve_every_catalog_row
+    assert page.count("<td>") == 12
+E   assert 0 == 12
+E    +  where 0 = <built-in method count of str object at 0x3275d150>('<td>')
+E    +    where <built-in method count of str object at 0x3275d150> = '<!DOCTYPE html>\n<html lang="en">\n<head>\n  <meta charset="utf-8" />\n  <meta name="viewport" content="width=device-...stener(\'input\', apply);\n  gate.addEventListener(\'change\', apply);\n  apply();\n})();\n</script></body>\n</html>\n'.count
+__________ test_metadata_separators_preserve_every_catalog_row[\x1c] ___________
+tests/test_research_dashboard.py:260: in test_metadata_separators_preserve_every_catalog_row
+    assert page.count("<td>") == 12
+E   assert 0 == 12
+E    +  where 0 = <built-in method count of str object at 0x327a6fb0>('<td>')
+E    +    where <built-in method count of str object at 0x327a6fb0> = '<!DOCTYPE html>\n<html lang="en">\n<head>\n  <meta charset="utf-8" />\n  <meta name="viewport" content="width=device-...stener(\'input\', apply);\n  gate.addEventListener(\'change\', apply);\n  apply();\n})();\n</script></body>\n</html>\n'.count
+__________ test_metadata_separators_preserve_every_catalog_row[\x1d] ___________
+tests/test_research_dashboard.py:260: in test_metadata_separators_preserve_every_catalog_row
+    assert page.count("<td>") == 12
+E   assert 0 == 12
+E    +  where 0 = <built-in method count of str object at 0x327a91c0>('<td>')
+E    +    where <built-in method count of str object at 0x327a91c0> = '<!DOCTYPE html>\n<html lang="en">\n<head>\n  <meta charset="utf-8" />\n  <meta name="viewport" content="width=device-...stener(\'input\', apply);\n  gate.addEventListener(\'change\', apply);\n  apply();\n})();\n</script></body>\n</html>\n'.count
+__________ test_metadata_separators_preserve_every_catalog_row[\x1e] ___________
+tests/test_research_dashboard.py:260: in test_metadata_separators_preserve_every_catalog_row
+    assert page.count("<td>") == 12
+E   assert 0 == 12
+E    +  where 0 = <built-in method count of str object at 0x327ab3d0>('<td>')
+E    +    where <built-in method count of str object at 0x327ab3d0> = '<!DOCTYPE html>\n<html lang="en">\n<head>\n  <meta charset="utf-8" />\n  <meta name="viewport" content="width=device-...stener(\'input\', apply);\n  gate.addEventListener(\'change\', apply);\n  apply();\n})();\n</script></body>\n</html>\n'.count
+__________ test_metadata_separators_preserve_every_catalog_row[\r\n] ___________
+tests/test_research_dashboard.py:264: in test_metadata_separators_preserve_every_catalog_row
+    assert "First Second" in page and "One Two" in page
+E   assert ('First Second' in '<!DOCTYPE html>\n<html lang="en">\n<head>\n  <meta charset="utf-8" />\n  <meta name="viewport" content="width=device-...stener(\'input\', apply);\n  gate.addEventListener(\'change\', apply);\n  apply();\n})();\n</script></body>\n</html>\n')
+=========================== short test summary info ============================
+FAILED tests/test_research_dashboard.py::test_metadata_separators_preserve_every_catalog_row[\u2028]
+FAILED tests/test_research_dashboard.py::test_metadata_separators_preserve_every_catalog_row[\u2029]
+FAILED tests/test_research_dashboard.py::test_metadata_separators_preserve_every_catalog_row[\x85]
+FAILED tests/test_research_dashboard.py::test_metadata_separators_preserve_every_catalog_row[\x0b]
+FAILED tests/test_research_dashboard.py::test_metadata_separators_preserve_every_catalog_row[\x0c]
+FAILED tests/test_research_dashboard.py::test_metadata_separators_preserve_every_catalog_row[\x1c]
+FAILED tests/test_research_dashboard.py::test_metadata_separators_preserve_every_catalog_row[\x1d]
+FAILED tests/test_research_dashboard.py::test_metadata_separators_preserve_every_catalog_row[\x1e]
+FAILED tests/test_research_dashboard.py::test_metadata_separators_preserve_every_catalog_row[\r\n]
+9 failed, 29 deselected in 0.57s

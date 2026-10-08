@@ -1,0 +1,1550 @@
+[
+  {
+    "case": "empty",
+    "form": "tuple",
+    "api": "project_observatory",
+    "outcome": "accepted",
+    "label": "synthetic",
+    "traces": [],
+    "actors": [],
+    "event_ids": []
+  },
+  {
+    "case": "empty",
+    "form": "tuple",
+    "api": "render_observatory",
+    "outcome": "accepted",
+    "label": "synthetic",
+    "traces": [],
+    "actors": [],
+    "event_ids": [],
+    "graph_nodes": 0
+  },
+  {
+    "case": "empty",
+    "form": "generator",
+    "api": "project_observatory",
+    "outcome": "accepted",
+    "label": "synthetic",
+    "traces": [],
+    "actors": [],
+    "event_ids": []
+  },
+  {
+    "case": "empty",
+    "form": "generator",
+    "api": "render_observatory",
+    "outcome": "accepted",
+    "label": "synthetic",
+    "traces": [],
+    "actors": [],
+    "event_ids": [],
+    "graph_nodes": 0
+  },
+  {
+    "case": "v1",
+    "form": "tuple",
+    "api": "project_observatory",
+    "outcome": "accepted",
+    "label": "synthetic",
+    "traces": [
+      "trace:independent"
+    ],
+    "actors": [],
+    "event_ids": [
+      "trace-event:sha256:35a74869d7ede6e9e92d481edf6fbd4cfe7fab62aad99c34019389c66c7a8e4e"
+    ]
+  },
+  {
+    "case": "v1",
+    "form": "tuple",
+    "api": "render_observatory",
+    "outcome": "accepted",
+    "label": "synthetic",
+    "traces": [
+      "trace:independent"
+    ],
+    "actors": [],
+    "event_ids": [
+      "trace-event:sha256:35a74869d7ede6e9e92d481edf6fbd4cfe7fab62aad99c34019389c66c7a8e4e"
+    ],
+    "graph_nodes": 1
+  },
+  {
+    "case": "v1",
+    "form": "generator",
+    "api": "project_observatory",
+    "outcome": "accepted",
+    "label": "synthetic",
+    "traces": [
+      "trace:independent"
+    ],
+    "actors": [],
+    "event_ids": [
+      "trace-event:sha256:35a74869d7ede6e9e92d481edf6fbd4cfe7fab62aad99c34019389c66c7a8e4e"
+    ]
+  },
+  {
+    "case": "v1",
+    "form": "generator",
+    "api": "render_observatory",
+    "outcome": "accepted",
+    "label": "synthetic",
+    "traces": [
+      "trace:independent"
+    ],
+    "actors": [],
+    "event_ids": [
+      "trace-event:sha256:35a74869d7ede6e9e92d481edf6fbd4cfe7fab62aad99c34019389c66c7a8e4e"
+    ],
+    "graph_nodes": 1
+  },
+  {
+    "case": "v2-actor",
+    "form": "tuple",
+    "api": "project_observatory",
+    "outcome": "accepted",
+    "label": "synthetic",
+    "traces": [],
+    "actors": [
+      "actor:one"
+    ],
+    "event_ids": [
+      "trace-event:sha256:b32a6b5fd574363297db4e96e9e85bf5751b8037e4b9697414568c5ba9b46aa8"
+    ]
+  },
+  {
+    "case": "v2-actor",
+    "form": "tuple",
+    "api": "render_observatory",
+    "outcome": "accepted",
+    "label": "synthetic",
+    "traces": [],
+    "actors": [
+      "actor:one"
+    ],
+    "event_ids": [
+      "trace-event:sha256:b32a6b5fd574363297db4e96e9e85bf5751b8037e4b9697414568c5ba9b46aa8"
+    ],
+    "graph_nodes": 1
+  },
+  {
+    "case": "v2-actor",
+    "form": "generator",
+    "api": "project_observatory",
+    "outcome": "accepted",
+    "label": "synthetic",
+    "traces": [],
+    "actors": [
+      "actor:one"
+    ],
+    "event_ids": [
+      "trace-event:sha256:b32a6b5fd574363297db4e96e9e85bf5751b8037e4b9697414568c5ba9b46aa8"
+    ]
+  },
+  {
+    "case": "v2-actor",
+    "form": "generator",
+    "api": "render_observatory",
+    "outcome": "accepted",
+    "label": "synthetic",
+    "traces": [],
+    "actors": [
+      "actor:one"
+    ],
+    "event_ids": [
+      "trace-event:sha256:b32a6b5fd574363297db4e96e9e85bf5751b8037e4b9697414568c5ba9b46aa8"
+    ],
+    "graph_nodes": 1
+  },
+  {
+    "case": "v2-task",
+    "form": "tuple",
+    "api": "project_observatory",
+    "outcome": "accepted",
+    "label": "synthetic",
+    "traces": [
+      "trace:independent"
+    ],
+    "actors": [
+      "actor:one"
+    ],
+    "event_ids": [
+      "trace-event:sha256:ac27b010257b49d7033d1219eb2a783f78878e7d34f9bb54fa6c51ae0375cc9a"
+    ]
+  },
+  {
+    "case": "v2-task",
+    "form": "tuple",
+    "api": "render_observatory",
+    "outcome": "accepted",
+    "label": "synthetic",
+    "traces": [
+      "trace:independent"
+    ],
+    "actors": [
+      "actor:one"
+    ],
+    "event_ids": [
+      "trace-event:sha256:ac27b010257b49d7033d1219eb2a783f78878e7d34f9bb54fa6c51ae0375cc9a"
+    ],
+    "graph_nodes": 1
+  },
+  {
+    "case": "v2-task",
+    "form": "generator",
+    "api": "project_observatory",
+    "outcome": "accepted",
+    "label": "synthetic",
+    "traces": [
+      "trace:independent"
+    ],
+    "actors": [
+      "actor:one"
+    ],
+    "event_ids": [
+      "trace-event:sha256:ac27b010257b49d7033d1219eb2a783f78878e7d34f9bb54fa6c51ae0375cc9a"
+    ]
+  },
+  {
+    "case": "v2-task",
+    "form": "generator",
+    "api": "render_observatory",
+    "outcome": "accepted",
+    "label": "synthetic",
+    "traces": [
+      "trace:independent"
+    ],
+    "actors": [
+      "actor:one"
+    ],
+    "event_ids": [
+      "trace-event:sha256:ac27b010257b49d7033d1219eb2a783f78878e7d34f9bb54fa6c51ae0375cc9a"
+    ],
+    "graph_nodes": 1
+  },
+  {
+    "case": "mixed-forward",
+    "form": "tuple",
+    "api": "project_observatory",
+    "outcome": "accepted",
+    "label": "synthetic",
+    "traces": [
+      "trace:independent"
+    ],
+    "actors": [
+      "actor:one"
+    ],
+    "event_ids": [
+      "trace-event:sha256:35a74869d7ede6e9e92d481edf6fbd4cfe7fab62aad99c34019389c66c7a8e4e",
+      "trace-event:sha256:4641fe98530ef03c0e302d70850589f2bc4ac2b7218551efe4c09cce2826ef86",
+      "trace-event:sha256:d4b8556a479d96128c2d407fbc2a5218f7730680503aad9d098b39f4be8e3a2a"
+    ]
+  },
+  {
+    "case": "mixed-forward",
+    "form": "tuple",
+    "api": "render_observatory",
+    "outcome": "accepted",
+    "label": "synthetic",
+    "traces": [
+      "trace:independent"
+    ],
+    "actors": [
+      "actor:one"
+    ],
+    "event_ids": [
+      "trace-event:sha256:35a74869d7ede6e9e92d481edf6fbd4cfe7fab62aad99c34019389c66c7a8e4e",
+      "trace-event:sha256:4641fe98530ef03c0e302d70850589f2bc4ac2b7218551efe4c09cce2826ef86",
+      "trace-event:sha256:d4b8556a479d96128c2d407fbc2a5218f7730680503aad9d098b39f4be8e3a2a"
+    ],
+    "graph_nodes": 3
+  },
+  {
+    "case": "mixed-forward",
+    "form": "generator",
+    "api": "project_observatory",
+    "outcome": "accepted",
+    "label": "synthetic",
+    "traces": [
+      "trace:independent"
+    ],
+    "actors": [
+      "actor:one"
+    ],
+    "event_ids": [
+      "trace-event:sha256:35a74869d7ede6e9e92d481edf6fbd4cfe7fab62aad99c34019389c66c7a8e4e",
+      "trace-event:sha256:4641fe98530ef03c0e302d70850589f2bc4ac2b7218551efe4c09cce2826ef86",
+      "trace-event:sha256:d4b8556a479d96128c2d407fbc2a5218f7730680503aad9d098b39f4be8e3a2a"
+    ]
+  },
+  {
+    "case": "mixed-forward",
+    "form": "generator",
+    "api": "render_observatory",
+    "outcome": "accepted",
+    "label": "synthetic",
+    "traces": [
+      "trace:independent"
+    ],
+    "actors": [
+      "actor:one"
+    ],
+    "event_ids": [
+      "trace-event:sha256:35a74869d7ede6e9e92d481edf6fbd4cfe7fab62aad99c34019389c66c7a8e4e",
+      "trace-event:sha256:4641fe98530ef03c0e302d70850589f2bc4ac2b7218551efe4c09cce2826ef86",
+      "trace-event:sha256:d4b8556a479d96128c2d407fbc2a5218f7730680503aad9d098b39f4be8e3a2a"
+    ],
+    "graph_nodes": 3
+  },
+  {
+    "case": "mixed-reverse",
+    "form": "tuple",
+    "api": "project_observatory",
+    "outcome": "accepted",
+    "label": "synthetic",
+    "traces": [
+      "trace:independent"
+    ],
+    "actors": [
+      "actor:one"
+    ],
+    "event_ids": [
+      "trace-event:sha256:35a74869d7ede6e9e92d481edf6fbd4cfe7fab62aad99c34019389c66c7a8e4e",
+      "trace-event:sha256:4641fe98530ef03c0e302d70850589f2bc4ac2b7218551efe4c09cce2826ef86",
+      "trace-event:sha256:d4b8556a479d96128c2d407fbc2a5218f7730680503aad9d098b39f4be8e3a2a"
+    ]
+  },
+  {
+    "case": "mixed-reverse",
+    "form": "tuple",
+    "api": "render_observatory",
+    "outcome": "accepted",
+    "label": "synthetic",
+    "traces": [
+      "trace:independent"
+    ],
+    "actors": [
+      "actor:one"
+    ],
+    "event_ids": [
+      "trace-event:sha256:35a74869d7ede6e9e92d481edf6fbd4cfe7fab62aad99c34019389c66c7a8e4e",
+      "trace-event:sha256:4641fe98530ef03c0e302d70850589f2bc4ac2b7218551efe4c09cce2826ef86",
+      "trace-event:sha256:d4b8556a479d96128c2d407fbc2a5218f7730680503aad9d098b39f4be8e3a2a"
+    ],
+    "graph_nodes": 3
+  },
+  {
+    "case": "mixed-reverse",
+    "form": "generator",
+    "api": "project_observatory",
+    "outcome": "accepted",
+    "label": "synthetic",
+    "traces": [
+      "trace:independent"
+    ],
+    "actors": [
+      "actor:one"
+    ],
+    "event_ids": [
+      "trace-event:sha256:35a74869d7ede6e9e92d481edf6fbd4cfe7fab62aad99c34019389c66c7a8e4e",
+      "trace-event:sha256:4641fe98530ef03c0e302d70850589f2bc4ac2b7218551efe4c09cce2826ef86",
+      "trace-event:sha256:d4b8556a479d96128c2d407fbc2a5218f7730680503aad9d098b39f4be8e3a2a"
+    ]
+  },
+  {
+    "case": "mixed-reverse",
+    "form": "generator",
+    "api": "render_observatory",
+    "outcome": "accepted",
+    "label": "synthetic",
+    "traces": [
+      "trace:independent"
+    ],
+    "actors": [
+      "actor:one"
+    ],
+    "event_ids": [
+      "trace-event:sha256:35a74869d7ede6e9e92d481edf6fbd4cfe7fab62aad99c34019389c66c7a8e4e",
+      "trace-event:sha256:4641fe98530ef03c0e302d70850589f2bc4ac2b7218551efe4c09cce2826ef86",
+      "trace-event:sha256:d4b8556a479d96128c2d407fbc2a5218f7730680503aad9d098b39f4be8e3a2a"
+    ],
+    "graph_nodes": 3
+  },
+  {
+    "case": "v1-actor-only",
+    "form": "tuple",
+    "api": "project_observatory",
+    "outcome": "accepted",
+    "label": "synthetic",
+    "traces": [
+      "trace:independent"
+    ],
+    "actors": [
+      "actor:forged"
+    ],
+    "event_ids": [
+      "trace-event:sha256:35a74869d7ede6e9e92d481edf6fbd4cfe7fab62aad99c34019389c66c7a8e4e"
+    ]
+  },
+  {
+    "case": "v1-actor-only",
+    "form": "tuple",
+    "api": "render_observatory",
+    "outcome": "accepted",
+    "label": "synthetic",
+    "traces": [
+      "trace:independent"
+    ],
+    "actors": [
+      "actor:forged"
+    ],
+    "event_ids": [
+      "trace-event:sha256:35a74869d7ede6e9e92d481edf6fbd4cfe7fab62aad99c34019389c66c7a8e4e"
+    ],
+    "graph_nodes": 1
+  },
+  {
+    "case": "v1-actor-only",
+    "form": "generator",
+    "api": "project_observatory",
+    "outcome": "accepted",
+    "label": "synthetic",
+    "traces": [
+      "trace:independent"
+    ],
+    "actors": [
+      "actor:forged"
+    ],
+    "event_ids": [
+      "trace-event:sha256:35a74869d7ede6e9e92d481edf6fbd4cfe7fab62aad99c34019389c66c7a8e4e"
+    ]
+  },
+  {
+    "case": "v1-actor-only",
+    "form": "generator",
+    "api": "render_observatory",
+    "outcome": "accepted",
+    "label": "synthetic",
+    "traces": [
+      "trace:independent"
+    ],
+    "actors": [
+      "actor:forged"
+    ],
+    "event_ids": [
+      "trace-event:sha256:35a74869d7ede6e9e92d481edf6fbd4cfe7fab62aad99c34019389c66c7a8e4e"
+    ],
+    "graph_nodes": 1
+  },
+  {
+    "case": "v1-scope-only",
+    "form": "tuple",
+    "api": "project_observatory",
+    "outcome": "accepted",
+    "label": "synthetic",
+    "traces": [],
+    "actors": [],
+    "event_ids": [
+      "trace-event:sha256:35a74869d7ede6e9e92d481edf6fbd4cfe7fab62aad99c34019389c66c7a8e4e"
+    ]
+  },
+  {
+    "case": "v1-scope-only",
+    "form": "tuple",
+    "api": "render_observatory",
+    "outcome": "accepted",
+    "label": "synthetic",
+    "traces": [],
+    "actors": [],
+    "event_ids": [
+      "trace-event:sha256:35a74869d7ede6e9e92d481edf6fbd4cfe7fab62aad99c34019389c66c7a8e4e"
+    ],
+    "graph_nodes": 1
+  },
+  {
+    "case": "v1-scope-only",
+    "form": "generator",
+    "api": "project_observatory",
+    "outcome": "accepted",
+    "label": "synthetic",
+    "traces": [],
+    "actors": [],
+    "event_ids": [
+      "trace-event:sha256:35a74869d7ede6e9e92d481edf6fbd4cfe7fab62aad99c34019389c66c7a8e4e"
+    ]
+  },
+  {
+    "case": "v1-scope-only",
+    "form": "generator",
+    "api": "render_observatory",
+    "outcome": "accepted",
+    "label": "synthetic",
+    "traces": [],
+    "actors": [],
+    "event_ids": [
+      "trace-event:sha256:35a74869d7ede6e9e92d481edf6fbd4cfe7fab62aad99c34019389c66c7a8e4e"
+    ],
+    "graph_nodes": 1
+  },
+  {
+    "case": "v1-actor-scope",
+    "form": "tuple",
+    "api": "project_observatory",
+    "outcome": "accepted",
+    "label": "synthetic",
+    "traces": [],
+    "actors": [
+      "actor:forged"
+    ],
+    "event_ids": [
+      "trace-event:sha256:35a74869d7ede6e9e92d481edf6fbd4cfe7fab62aad99c34019389c66c7a8e4e"
+    ]
+  },
+  {
+    "case": "v1-actor-scope",
+    "form": "tuple",
+    "api": "render_observatory",
+    "outcome": "accepted",
+    "label": "synthetic",
+    "traces": [],
+    "actors": [
+      "actor:forged"
+    ],
+    "event_ids": [
+      "trace-event:sha256:35a74869d7ede6e9e92d481edf6fbd4cfe7fab62aad99c34019389c66c7a8e4e"
+    ],
+    "graph_nodes": 1
+  },
+  {
+    "case": "v1-actor-scope",
+    "form": "generator",
+    "api": "project_observatory",
+    "outcome": "accepted",
+    "label": "synthetic",
+    "traces": [],
+    "actors": [
+      "actor:forged"
+    ],
+    "event_ids": [
+      "trace-event:sha256:35a74869d7ede6e9e92d481edf6fbd4cfe7fab62aad99c34019389c66c7a8e4e"
+    ]
+  },
+  {
+    "case": "v1-actor-scope",
+    "form": "generator",
+    "api": "render_observatory",
+    "outcome": "accepted",
+    "label": "synthetic",
+    "traces": [],
+    "actors": [
+      "actor:forged"
+    ],
+    "event_ids": [
+      "trace-event:sha256:35a74869d7ede6e9e92d481edf6fbd4cfe7fab62aad99c34019389c66c7a8e4e"
+    ],
+    "graph_nodes": 1
+  },
+  {
+    "case": "foreign-member",
+    "form": "tuple",
+    "api": "project_observatory",
+    "outcome": "rejected",
+    "error": "TypeError",
+    "message": "Observatory accepts TraceEvent values only"
+  },
+  {
+    "case": "foreign-member",
+    "form": "tuple",
+    "api": "render_observatory",
+    "outcome": "rejected",
+    "error": "TypeError",
+    "message": "Observatory accepts TraceEvent values only"
+  },
+  {
+    "case": "foreign-member",
+    "form": "generator",
+    "api": "project_observatory",
+    "outcome": "rejected",
+    "error": "TypeError",
+    "message": "Observatory accepts TraceEvent values only"
+  },
+  {
+    "case": "foreign-member",
+    "form": "generator",
+    "api": "render_observatory",
+    "outcome": "rejected",
+    "error": "TypeError",
+    "message": "Observatory accepts TraceEvent values only"
+  },
+  {
+    "case": "duplicate",
+    "form": "tuple",
+    "api": "project_observatory",
+    "outcome": "rejected",
+    "error": "ValueError",
+    "message": "Observatory event identities must be unique"
+  },
+  {
+    "case": "duplicate",
+    "form": "tuple",
+    "api": "render_observatory",
+    "outcome": "rejected",
+    "error": "ValueError",
+    "message": "Observatory event identities must be unique"
+  },
+  {
+    "case": "duplicate",
+    "form": "generator",
+    "api": "project_observatory",
+    "outcome": "rejected",
+    "error": "ValueError",
+    "message": "Observatory event identities must be unique"
+  },
+  {
+    "case": "duplicate",
+    "form": "generator",
+    "api": "render_observatory",
+    "outcome": "rejected",
+    "error": "ValueError",
+    "message": "Observatory event identities must be unique"
+  },
+  {
+    "case": "unknown-schema-stale",
+    "form": "tuple",
+    "api": "project_observatory",
+    "outcome": "rejected",
+    "error": "ValueError",
+    "message": "trace event identity does not match content"
+  },
+  {
+    "case": "unknown-schema-stale",
+    "form": "tuple",
+    "api": "render_observatory",
+    "outcome": "rejected",
+    "error": "ValueError",
+    "message": "trace event identity does not match content"
+  },
+  {
+    "case": "unknown-schema-stale",
+    "form": "generator",
+    "api": "project_observatory",
+    "outcome": "rejected",
+    "error": "ValueError",
+    "message": "trace event identity does not match content"
+  },
+  {
+    "case": "unknown-schema-stale",
+    "form": "generator",
+    "api": "render_observatory",
+    "outcome": "rejected",
+    "error": "ValueError",
+    "message": "trace event identity does not match content"
+  },
+  {
+    "case": "unknown-schema-rehashed",
+    "form": "tuple",
+    "api": "project_observatory",
+    "outcome": "accepted",
+    "label": "synthetic",
+    "traces": [
+      "trace:independent"
+    ],
+    "actors": [],
+    "event_ids": [
+      "trace-event:sha256:5dc6ae331a34b5e82ff84ae30ed309fc678ae0214b32d26f10455e6403d129d7"
+    ]
+  },
+  {
+    "case": "unknown-schema-rehashed",
+    "form": "tuple",
+    "api": "render_observatory",
+    "outcome": "accepted",
+    "label": "synthetic",
+    "traces": [
+      "trace:independent"
+    ],
+    "actors": [],
+    "event_ids": [
+      "trace-event:sha256:5dc6ae331a34b5e82ff84ae30ed309fc678ae0214b32d26f10455e6403d129d7"
+    ],
+    "graph_nodes": 1
+  },
+  {
+    "case": "unknown-schema-rehashed",
+    "form": "generator",
+    "api": "project_observatory",
+    "outcome": "accepted",
+    "label": "synthetic",
+    "traces": [
+      "trace:independent"
+    ],
+    "actors": [],
+    "event_ids": [
+      "trace-event:sha256:5dc6ae331a34b5e82ff84ae30ed309fc678ae0214b32d26f10455e6403d129d7"
+    ]
+  },
+  {
+    "case": "unknown-schema-rehashed",
+    "form": "generator",
+    "api": "render_observatory",
+    "outcome": "accepted",
+    "label": "synthetic",
+    "traces": [
+      "trace:independent"
+    ],
+    "actors": [],
+    "event_ids": [
+      "trace-event:sha256:5dc6ae331a34b5e82ff84ae30ed309fc678ae0214b32d26f10455e6403d129d7"
+    ],
+    "graph_nodes": 1
+  },
+  {
+    "case": "noncanonical-json-rehashed",
+    "form": "tuple",
+    "api": "project_observatory",
+    "outcome": "accepted",
+    "label": "synthetic",
+    "traces": [
+      "trace:independent"
+    ],
+    "actors": [],
+    "event_ids": [
+      "trace-event:sha256:447d6483f91e084a235be93d0c8c9734ca0c97b7a72292b1ea559bf7de38ab59"
+    ]
+  },
+  {
+    "case": "noncanonical-json-rehashed",
+    "form": "tuple",
+    "api": "render_observatory",
+    "outcome": "accepted",
+    "label": "synthetic",
+    "traces": [
+      "trace:independent"
+    ],
+    "actors": [],
+    "event_ids": [
+      "trace-event:sha256:447d6483f91e084a235be93d0c8c9734ca0c97b7a72292b1ea559bf7de38ab59"
+    ],
+    "graph_nodes": 1
+  },
+  {
+    "case": "noncanonical-json-rehashed",
+    "form": "generator",
+    "api": "project_observatory",
+    "outcome": "accepted",
+    "label": "synthetic",
+    "traces": [
+      "trace:independent"
+    ],
+    "actors": [],
+    "event_ids": [
+      "trace-event:sha256:447d6483f91e084a235be93d0c8c9734ca0c97b7a72292b1ea559bf7de38ab59"
+    ]
+  },
+  {
+    "case": "noncanonical-json-rehashed",
+    "form": "generator",
+    "api": "render_observatory",
+    "outcome": "accepted",
+    "label": "synthetic",
+    "traces": [
+      "trace:independent"
+    ],
+    "actors": [],
+    "event_ids": [
+      "trace-event:sha256:447d6483f91e084a235be93d0c8c9734ca0c97b7a72292b1ea559bf7de38ab59"
+    ],
+    "graph_nodes": 1
+  },
+  {
+    "case": "array-json-rehashed",
+    "form": "tuple",
+    "api": "project_observatory",
+    "outcome": "accepted",
+    "label": "synthetic",
+    "traces": [
+      "trace:independent"
+    ],
+    "actors": [],
+    "event_ids": [
+      "trace-event:sha256:1d65cd57b51aba23cb8af74f2a3eb4a45dc98d01af4f2d7be5f193b418c21171"
+    ]
+  },
+  {
+    "case": "array-json-rehashed",
+    "form": "tuple",
+    "api": "render_observatory",
+    "outcome": "accepted",
+    "label": "synthetic",
+    "traces": [
+      "trace:independent"
+    ],
+    "actors": [],
+    "event_ids": [
+      "trace-event:sha256:1d65cd57b51aba23cb8af74f2a3eb4a45dc98d01af4f2d7be5f193b418c21171"
+    ],
+    "graph_nodes": 1
+  },
+  {
+    "case": "array-json-rehashed",
+    "form": "generator",
+    "api": "project_observatory",
+    "outcome": "accepted",
+    "label": "synthetic",
+    "traces": [
+      "trace:independent"
+    ],
+    "actors": [],
+    "event_ids": [
+      "trace-event:sha256:1d65cd57b51aba23cb8af74f2a3eb4a45dc98d01af4f2d7be5f193b418c21171"
+    ]
+  },
+  {
+    "case": "array-json-rehashed",
+    "form": "generator",
+    "api": "render_observatory",
+    "outcome": "accepted",
+    "label": "synthetic",
+    "traces": [
+      "trace:independent"
+    ],
+    "actors": [],
+    "event_ids": [
+      "trace-event:sha256:1d65cd57b51aba23cb8af74f2a3eb4a45dc98d01af4f2d7be5f193b418c21171"
+    ],
+    "graph_nodes": 1
+  },
+  {
+    "case": "mutable-reference-list",
+    "form": "tuple",
+    "api": "project_observatory",
+    "outcome": "accepted",
+    "label": "synthetic",
+    "traces": [
+      "trace:independent"
+    ],
+    "actors": [],
+    "event_ids": [
+      "trace-event:sha256:35a74869d7ede6e9e92d481edf6fbd4cfe7fab62aad99c34019389c66c7a8e4e"
+    ]
+  },
+  {
+    "case": "mutable-reference-list",
+    "form": "tuple",
+    "api": "render_observatory",
+    "outcome": "accepted",
+    "label": "synthetic",
+    "traces": [
+      "trace:independent"
+    ],
+    "actors": [],
+    "event_ids": [
+      "trace-event:sha256:35a74869d7ede6e9e92d481edf6fbd4cfe7fab62aad99c34019389c66c7a8e4e"
+    ],
+    "graph_nodes": 1
+  },
+  {
+    "case": "mutable-reference-list",
+    "form": "generator",
+    "api": "project_observatory",
+    "outcome": "accepted",
+    "label": "synthetic",
+    "traces": [
+      "trace:independent"
+    ],
+    "actors": [],
+    "event_ids": [
+      "trace-event:sha256:35a74869d7ede6e9e92d481edf6fbd4cfe7fab62aad99c34019389c66c7a8e4e"
+    ]
+  },
+  {
+    "case": "mutable-reference-list",
+    "form": "generator",
+    "api": "render_observatory",
+    "outcome": "accepted",
+    "label": "synthetic",
+    "traces": [
+      "trace:independent"
+    ],
+    "actors": [],
+    "event_ids": [
+      "trace-event:sha256:35a74869d7ede6e9e92d481edf6fbd4cfe7fab62aad99c34019389c66c7a8e4e"
+    ],
+    "graph_nodes": 1
+  },
+  {
+    "case": "v2-missing-actor-rehashed",
+    "form": "tuple",
+    "api": "project_observatory",
+    "outcome": "accepted",
+    "label": "synthetic",
+    "traces": [
+      "trace:independent"
+    ],
+    "actors": [],
+    "event_ids": [
+      "trace-event:sha256:13332839f2f8a5dc718694029db98119bb8baef13c70909f811d50f5a6442784"
+    ]
+  },
+  {
+    "case": "v2-missing-actor-rehashed",
+    "form": "tuple",
+    "api": "render_observatory",
+    "outcome": "accepted",
+    "label": "synthetic",
+    "traces": [
+      "trace:independent"
+    ],
+    "actors": [],
+    "event_ids": [
+      "trace-event:sha256:13332839f2f8a5dc718694029db98119bb8baef13c70909f811d50f5a6442784"
+    ],
+    "graph_nodes": 1
+  },
+  {
+    "case": "v2-missing-actor-rehashed",
+    "form": "generator",
+    "api": "project_observatory",
+    "outcome": "accepted",
+    "label": "synthetic",
+    "traces": [
+      "trace:independent"
+    ],
+    "actors": [],
+    "event_ids": [
+      "trace-event:sha256:13332839f2f8a5dc718694029db98119bb8baef13c70909f811d50f5a6442784"
+    ]
+  },
+  {
+    "case": "v2-missing-actor-rehashed",
+    "form": "generator",
+    "api": "render_observatory",
+    "outcome": "accepted",
+    "label": "synthetic",
+    "traces": [
+      "trace:independent"
+    ],
+    "actors": [],
+    "event_ids": [
+      "trace-event:sha256:13332839f2f8a5dc718694029db98119bb8baef13c70909f811d50f5a6442784"
+    ],
+    "graph_nodes": 1
+  },
+  {
+    "case": "v2-invalid-scope-rehashed",
+    "form": "tuple",
+    "api": "project_observatory",
+    "outcome": "accepted",
+    "label": "synthetic",
+    "traces": [],
+    "actors": [
+      "actor:one"
+    ],
+    "event_ids": [
+      "trace-event:sha256:f7284b183e6a3a82356b945d2ae862de0c24996bb50054da021db8a8dd238fc4"
+    ]
+  },
+  {
+    "case": "v2-invalid-scope-rehashed",
+    "form": "tuple",
+    "api": "render_observatory",
+    "outcome": "accepted",
+    "label": "synthetic",
+    "traces": [],
+    "actors": [
+      "actor:one"
+    ],
+    "event_ids": [
+      "trace-event:sha256:f7284b183e6a3a82356b945d2ae862de0c24996bb50054da021db8a8dd238fc4"
+    ],
+    "graph_nodes": 1
+  },
+  {
+    "case": "v2-invalid-scope-rehashed",
+    "form": "generator",
+    "api": "project_observatory",
+    "outcome": "accepted",
+    "label": "synthetic",
+    "traces": [],
+    "actors": [
+      "actor:one"
+    ],
+    "event_ids": [
+      "trace-event:sha256:f7284b183e6a3a82356b945d2ae862de0c24996bb50054da021db8a8dd238fc4"
+    ]
+  },
+  {
+    "case": "v2-invalid-scope-rehashed",
+    "form": "generator",
+    "api": "render_observatory",
+    "outcome": "accepted",
+    "label": "synthetic",
+    "traces": [],
+    "actors": [
+      "actor:one"
+    ],
+    "event_ids": [
+      "trace-event:sha256:f7284b183e6a3a82356b945d2ae862de0c24996bb50054da021db8a8dd238fc4"
+    ],
+    "graph_nodes": 1
+  },
+  {
+    "case": "v2-agent-with-task-rehashed",
+    "form": "tuple",
+    "api": "project_observatory",
+    "outcome": "accepted",
+    "label": "synthetic",
+    "traces": [],
+    "actors": [
+      "actor:one"
+    ],
+    "event_ids": [
+      "trace-event:sha256:9330de98b16d6c009a981bb091a39e81fe33adcac63548111a4f203e5826d00d"
+    ]
+  },
+  {
+    "case": "v2-agent-with-task-rehashed",
+    "form": "tuple",
+    "api": "render_observatory",
+    "outcome": "accepted",
+    "label": "synthetic",
+    "traces": [],
+    "actors": [
+      "actor:one"
+    ],
+    "event_ids": [
+      "trace-event:sha256:9330de98b16d6c009a981bb091a39e81fe33adcac63548111a4f203e5826d00d"
+    ],
+    "graph_nodes": 1
+  },
+  {
+    "case": "v2-agent-with-task-rehashed",
+    "form": "generator",
+    "api": "project_observatory",
+    "outcome": "accepted",
+    "label": "synthetic",
+    "traces": [],
+    "actors": [
+      "actor:one"
+    ],
+    "event_ids": [
+      "trace-event:sha256:9330de98b16d6c009a981bb091a39e81fe33adcac63548111a4f203e5826d00d"
+    ]
+  },
+  {
+    "case": "v2-agent-with-task-rehashed",
+    "form": "generator",
+    "api": "render_observatory",
+    "outcome": "accepted",
+    "label": "synthetic",
+    "traces": [],
+    "actors": [
+      "actor:one"
+    ],
+    "event_ids": [
+      "trace-event:sha256:9330de98b16d6c009a981bb091a39e81fe33adcac63548111a4f203e5826d00d"
+    ],
+    "graph_nodes": 1
+  },
+  {
+    "case": "v2-task-missing-trace-rehashed",
+    "form": "tuple",
+    "api": "project_observatory",
+    "outcome": "accepted",
+    "label": "synthetic",
+    "traces": [
+      null
+    ],
+    "actors": [
+      "actor:one"
+    ],
+    "event_ids": [
+      "trace-event:sha256:322bd345ef87cf9baa4e51f13f4ba35f315065c967482e73e06b2e486220c450"
+    ]
+  },
+  {
+    "case": "v2-task-missing-trace-rehashed",
+    "form": "tuple",
+    "api": "render_observatory",
+    "outcome": "rejected",
+    "error": "TypeError",
+    "message": "sequence item 0: expected str instance, NoneType found"
+  },
+  {
+    "case": "v2-task-missing-trace-rehashed",
+    "form": "generator",
+    "api": "project_observatory",
+    "outcome": "accepted",
+    "label": "synthetic",
+    "traces": [
+      null
+    ],
+    "actors": [
+      "actor:one"
+    ],
+    "event_ids": [
+      "trace-event:sha256:322bd345ef87cf9baa4e51f13f4ba35f315065c967482e73e06b2e486220c450"
+    ]
+  },
+  {
+    "case": "v2-task-missing-trace-rehashed",
+    "form": "generator",
+    "api": "render_observatory",
+    "outcome": "rejected",
+    "error": "TypeError",
+    "message": "sequence item 0: expected str instance, NoneType found"
+  },
+  {
+    "case": "stale-event_type",
+    "form": "tuple",
+    "api": "project_observatory",
+    "outcome": "rejected",
+    "error": "ValueError",
+    "message": "trace event identity does not match content"
+  },
+  {
+    "case": "stale-event_type",
+    "form": "tuple",
+    "api": "render_observatory",
+    "outcome": "rejected",
+    "error": "ValueError",
+    "message": "trace event identity does not match content"
+  },
+  {
+    "case": "stale-event_type",
+    "form": "generator",
+    "api": "project_observatory",
+    "outcome": "rejected",
+    "error": "ValueError",
+    "message": "trace event identity does not match content"
+  },
+  {
+    "case": "stale-event_type",
+    "form": "generator",
+    "api": "render_observatory",
+    "outcome": "rejected",
+    "error": "ValueError",
+    "message": "trace event identity does not match content"
+  },
+  {
+    "case": "stale-environment_run_id",
+    "form": "tuple",
+    "api": "project_observatory",
+    "outcome": "rejected",
+    "error": "ValueError",
+    "message": "trace event identity does not match content"
+  },
+  {
+    "case": "stale-environment_run_id",
+    "form": "tuple",
+    "api": "render_observatory",
+    "outcome": "rejected",
+    "error": "ValueError",
+    "message": "trace event identity does not match content"
+  },
+  {
+    "case": "stale-environment_run_id",
+    "form": "generator",
+    "api": "project_observatory",
+    "outcome": "rejected",
+    "error": "ValueError",
+    "message": "trace event identity does not match content"
+  },
+  {
+    "case": "stale-environment_run_id",
+    "form": "generator",
+    "api": "render_observatory",
+    "outcome": "rejected",
+    "error": "ValueError",
+    "message": "trace event identity does not match content"
+  },
+  {
+    "case": "stale-task_id",
+    "form": "tuple",
+    "api": "project_observatory",
+    "outcome": "rejected",
+    "error": "ValueError",
+    "message": "trace event identity does not match content"
+  },
+  {
+    "case": "stale-task_id",
+    "form": "tuple",
+    "api": "render_observatory",
+    "outcome": "rejected",
+    "error": "ValueError",
+    "message": "trace event identity does not match content"
+  },
+  {
+    "case": "stale-task_id",
+    "form": "generator",
+    "api": "project_observatory",
+    "outcome": "rejected",
+    "error": "ValueError",
+    "message": "trace event identity does not match content"
+  },
+  {
+    "case": "stale-task_id",
+    "form": "generator",
+    "api": "render_observatory",
+    "outcome": "rejected",
+    "error": "ValueError",
+    "message": "trace event identity does not match content"
+  },
+  {
+    "case": "stale-trace_id",
+    "form": "tuple",
+    "api": "project_observatory",
+    "outcome": "rejected",
+    "error": "ValueError",
+    "message": "trace event identity does not match content"
+  },
+  {
+    "case": "stale-trace_id",
+    "form": "tuple",
+    "api": "render_observatory",
+    "outcome": "rejected",
+    "error": "ValueError",
+    "message": "trace event identity does not match content"
+  },
+  {
+    "case": "stale-trace_id",
+    "form": "generator",
+    "api": "project_observatory",
+    "outcome": "rejected",
+    "error": "ValueError",
+    "message": "trace event identity does not match content"
+  },
+  {
+    "case": "stale-trace_id",
+    "form": "generator",
+    "api": "render_observatory",
+    "outcome": "rejected",
+    "error": "ValueError",
+    "message": "trace event identity does not match content"
+  },
+  {
+    "case": "stale-sequence",
+    "form": "tuple",
+    "api": "project_observatory",
+    "outcome": "rejected",
+    "error": "ValueError",
+    "message": "trace event identity does not match content"
+  },
+  {
+    "case": "stale-sequence",
+    "form": "tuple",
+    "api": "render_observatory",
+    "outcome": "rejected",
+    "error": "ValueError",
+    "message": "trace event identity does not match content"
+  },
+  {
+    "case": "stale-sequence",
+    "form": "generator",
+    "api": "project_observatory",
+    "outcome": "rejected",
+    "error": "ValueError",
+    "message": "trace event identity does not match content"
+  },
+  {
+    "case": "stale-sequence",
+    "form": "generator",
+    "api": "render_observatory",
+    "outcome": "rejected",
+    "error": "ValueError",
+    "message": "trace event identity does not match content"
+  },
+  {
+    "case": "stale-recorded_at",
+    "form": "tuple",
+    "api": "project_observatory",
+    "outcome": "rejected",
+    "error": "ValueError",
+    "message": "trace event identity does not match content"
+  },
+  {
+    "case": "stale-recorded_at",
+    "form": "tuple",
+    "api": "render_observatory",
+    "outcome": "rejected",
+    "error": "ValueError",
+    "message": "trace event identity does not match content"
+  },
+  {
+    "case": "stale-recorded_at",
+    "form": "generator",
+    "api": "project_observatory",
+    "outcome": "rejected",
+    "error": "ValueError",
+    "message": "trace event identity does not match content"
+  },
+  {
+    "case": "stale-recorded_at",
+    "form": "generator",
+    "api": "render_observatory",
+    "outcome": "rejected",
+    "error": "ValueError",
+    "message": "trace event identity does not match content"
+  },
+  {
+    "case": "stale-artifact_refs",
+    "form": "tuple",
+    "api": "project_observatory",
+    "outcome": "rejected",
+    "error": "ValueError",
+    "message": "trace event identity does not match content"
+  },
+  {
+    "case": "stale-artifact_refs",
+    "form": "tuple",
+    "api": "render_observatory",
+    "outcome": "rejected",
+    "error": "ValueError",
+    "message": "trace event identity does not match content"
+  },
+  {
+    "case": "stale-artifact_refs",
+    "form": "generator",
+    "api": "project_observatory",
+    "outcome": "rejected",
+    "error": "ValueError",
+    "message": "trace event identity does not match content"
+  },
+  {
+    "case": "stale-artifact_refs",
+    "form": "generator",
+    "api": "render_observatory",
+    "outcome": "rejected",
+    "error": "ValueError",
+    "message": "trace event identity does not match content"
+  },
+  {
+    "case": "stale-operation_id",
+    "form": "tuple",
+    "api": "project_observatory",
+    "outcome": "rejected",
+    "error": "ValueError",
+    "message": "trace event identity does not match content"
+  },
+  {
+    "case": "stale-operation_id",
+    "form": "tuple",
+    "api": "render_observatory",
+    "outcome": "rejected",
+    "error": "ValueError",
+    "message": "trace event identity does not match content"
+  },
+  {
+    "case": "stale-operation_id",
+    "form": "generator",
+    "api": "project_observatory",
+    "outcome": "rejected",
+    "error": "ValueError",
+    "message": "trace event identity does not match content"
+  },
+  {
+    "case": "stale-operation_id",
+    "form": "generator",
+    "api": "render_observatory",
+    "outcome": "rejected",
+    "error": "ValueError",
+    "message": "trace event identity does not match content"
+  },
+  {
+    "case": "stale-parent_event_id",
+    "form": "tuple",
+    "api": "project_observatory",
+    "outcome": "rejected",
+    "error": "ValueError",
+    "message": "trace event identity does not match content"
+  },
+  {
+    "case": "stale-parent_event_id",
+    "form": "tuple",
+    "api": "render_observatory",
+    "outcome": "rejected",
+    "error": "ValueError",
+    "message": "trace event identity does not match content"
+  },
+  {
+    "case": "stale-parent_event_id",
+    "form": "generator",
+    "api": "project_observatory",
+    "outcome": "rejected",
+    "error": "ValueError",
+    "message": "trace event identity does not match content"
+  },
+  {
+    "case": "stale-parent_event_id",
+    "form": "generator",
+    "api": "render_observatory",
+    "outcome": "rejected",
+    "error": "ValueError",
+    "message": "trace event identity does not match content"
+  },
+  {
+    "case": "stale-commit_id",
+    "form": "tuple",
+    "api": "project_observatory",
+    "outcome": "rejected",
+    "error": "ValueError",
+    "message": "trace event identity does not match content"
+  },
+  {
+    "case": "stale-commit_id",
+    "form": "tuple",
+    "api": "render_observatory",
+    "outcome": "rejected",
+    "error": "ValueError",
+    "message": "trace event identity does not match content"
+  },
+  {
+    "case": "stale-commit_id",
+    "form": "generator",
+    "api": "project_observatory",
+    "outcome": "rejected",
+    "error": "ValueError",
+    "message": "trace event identity does not match content"
+  },
+  {
+    "case": "stale-commit_id",
+    "form": "generator",
+    "api": "render_observatory",
+    "outcome": "rejected",
+    "error": "ValueError",
+    "message": "trace event identity does not match content"
+  },
+  {
+    "case": "stale-commit_index",
+    "form": "tuple",
+    "api": "project_observatory",
+    "outcome": "rejected",
+    "error": "ValueError",
+    "message": "trace event identity does not match content"
+  },
+  {
+    "case": "stale-commit_index",
+    "form": "tuple",
+    "api": "render_observatory",
+    "outcome": "rejected",
+    "error": "ValueError",
+    "message": "trace event identity does not match content"
+  },
+  {
+    "case": "stale-commit_index",
+    "form": "generator",
+    "api": "project_observatory",
+    "outcome": "rejected",
+    "error": "ValueError",
+    "message": "trace event identity does not match content"
+  },
+  {
+    "case": "stale-commit_index",
+    "form": "generator",
+    "api": "render_observatory",
+    "outcome": "rejected",
+    "error": "ValueError",
+    "message": "trace event identity does not match content"
+  },
+  {
+    "case": "stale-commit_size",
+    "form": "tuple",
+    "api": "project_observatory",
+    "outcome": "rejected",
+    "error": "ValueError",
+    "message": "trace event identity does not match content"
+  },
+  {
+    "case": "stale-commit_size",
+    "form": "tuple",
+    "api": "render_observatory",
+    "outcome": "rejected",
+    "error": "ValueError",
+    "message": "trace event identity does not match content"
+  },
+  {
+    "case": "stale-commit_size",
+    "form": "generator",
+    "api": "project_observatory",
+    "outcome": "rejected",
+    "error": "ValueError",
+    "message": "trace event identity does not match content"
+  },
+  {
+    "case": "stale-commit_size",
+    "form": "generator",
+    "api": "render_observatory",
+    "outcome": "rejected",
+    "error": "ValueError",
+    "message": "trace event identity does not match content"
+  },
+  {
+    "case": "stale-data_json",
+    "form": "tuple",
+    "api": "project_observatory",
+    "outcome": "rejected",
+    "error": "ValueError",
+    "message": "trace event identity does not match content"
+  },
+  {
+    "case": "stale-data_json",
+    "form": "tuple",
+    "api": "render_observatory",
+    "outcome": "rejected",
+    "error": "ValueError",
+    "message": "trace event identity does not match content"
+  },
+  {
+    "case": "stale-data_json",
+    "form": "generator",
+    "api": "project_observatory",
+    "outcome": "rejected",
+    "error": "ValueError",
+    "message": "trace event identity does not match content"
+  },
+  {
+    "case": "stale-data_json",
+    "form": "generator",
+    "api": "render_observatory",
+    "outcome": "rejected",
+    "error": "ValueError",
+    "message": "trace event identity does not match content"
+  },
+  {
+    "case": "incomplete-illustration",
+    "api": "project_observatory",
+    "label": "synthetic",
+    "status": "accepted"
+  },
+  {
+    "case": "incomplete-illustration",
+    "api": "project_observatory",
+    "label": "conceptual",
+    "status": "accepted"
+  },
+  {
+    "case": "incomplete-illustration",
+    "api": "render_observatory",
+    "label": "synthetic",
+    "status": "accepted"
+  },
+  {
+    "case": "incomplete-illustration",
+    "api": "render_observatory",
+    "label": "conceptual",
+    "status": "accepted"
+  },
+  {
+    "case": "post-projection-input-alias",
+    "projection_detached": false,
+    "document_detached": false,
+    "trace_event_same_owned_copy": true
+  },
+  {
+    "case": "ledger-read-only",
+    "unchanged": true,
+    "events_unchanged": true,
+    "label": "recorded"
+  }
+]

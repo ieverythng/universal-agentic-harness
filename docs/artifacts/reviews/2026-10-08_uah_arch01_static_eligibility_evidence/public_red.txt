@@ -1,0 +1,33 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+____ test_prompt_compiler_excludes_an_operation_with_a_forbidden_observable ____
+
+    def test_prompt_compiler_excludes_an_operation_with_a_forbidden_observable():
+        inputs = _inputs(
+            observable_success=("note_written", "unsafe_observable"),
+            prohibited_effects=("unsafe_observable",),
+        )
+        proposal = ProposalNormalizer().normalize(
+            compiled_task=inputs["compiled_task"],
+            operation_id="operation:forbidden",
+            raw_output_artifact_id="raw:forbidden",
+            output=AgentOutput(
+                "operation",
+                {"object_id": "write_note", "arguments": {"text": "A note"}},
+                ("write_note",),
+            ),
+        ).proposal
+        decision = SemanticAdmission(
+            catalog=inputs["binding_catalog"],
+            environment_id=inputs["environment_id"],
+            runtime_mode=inputs["runtime_mode"],
+            schema_validator=InMemoryArgumentSchemaRegistry(inputs["argument_schemas"]),
+        ).admit(inputs["compiled_task"], proposal)
+        assert decision.reason_codes == ("object_effect_prohibited",)
+>       with pytest.raises(ValueError, match="direct proposal"):
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_prompt_compiler.py:375: Failed
+=========================== short test summary info ============================
+FAILED tests/test_prompt_compiler.py::test_prompt_compiler_excludes_an_operation_with_a_forbidden_observable
+1 failed in 0.12s

@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "status": "static_source_and_arithmetic_checks_only",
+  "primary_source_file": "optchat.md",
+  "expected_utf8_bytes": 19092,
+  "expected_sha256": "12f300f760af82bc07bc5201051d1267824ded09c9def8186e4f8144368038d8",
+  "source_hash_match": true,
+  "arithmetic": {
+    "expression": "sum floor(N/2^l) == 2*N-popcount(N)",
+    "checked_range_messages": [
+      1,
+      20000
+    ],
+    "result": "pass",
+    "samples": [
+      {
+        "messages": 1024,
+        "nodes": 2047
+      },
+      {
+        "messages": 10000,
+        "nodes": 19995
+      }
+    ],
+    "scope": "All buildable aligned dyadic nodes including leaves; not author due-rule equivalence."
+  },
+  "command_description": "python -c: compute both forms for every integer N=1..20000 and assert equality",
+  "not_run": [
+    "summary model",
+    "retrieval benchmark",
+    "crash recovery",
+    "concurrent archive writer",
+    "author cache simulation",
+    "provider calls",
+    "SkillOpt model train/holdout"
+  ],
+  "observed_model_metrics": null
+}

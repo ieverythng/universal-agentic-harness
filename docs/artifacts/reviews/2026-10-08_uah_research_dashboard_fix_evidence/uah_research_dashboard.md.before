@@ -1,0 +1,142 @@
+# UAH Research Dashboard
+
+Reconciled: 2026-10-08. Scope: research metadata and source navigation.
+[HTML view](uah_research_dashboard.html), [registry](experiment_registry.json),
+[artifact catalog](../artifacts/research/README.md).
+
+## Authority and recorded boundaries
+
+The [canonical masterplan](../plans/universal_agentic_harness_masterplan.md)
+owns release order and gates. [NeuralWorkbench architecture](../architecture/neural_workbench_adaptive_ab_harness.md)
+owns the adaptive research boundary. Dated investigations and reviews support
+specific claims about their inspected bytes. This index is neither a second
+roadmap nor an Observatory O1 runtime view.
+
+The September Jev note proposes closed-candidate ranking. No executed UAH
+Jev experiment is recorded here. H1 context persistence is an implementation
+dependency named by the masterplan, distinct from H3 candidate context/retrieval
+and H4 quarantined crystallization research. This catalog defines no context
+tree, evidence-freshness rule or AB mapping.
+
+The R0 receipt records executed diagnostics. The R1 review receipts concern a
+compiler-only domain-pack identity repair, not all H0/H1 consumers or H2 parity.
+Their observed values, original finding IDs and reviewed-byte identities remain
+in the linked receipts. Live provider transport, model quality, owner-proven
+effects and release qualification are separate evidence claims.
+
+## Catalog
+
+Record kinds describe document content, not a promotion ladder. A proposal
+does not become an executed probe merely because it contains a test design.
+An executed probe may be unsuccessful; a reviewed outcome may reject a change.
+H-series dependencies are links, not declarations that prerequisites passed.
+Scoring is `not_scored` in this metadata view; consult source receipts for their
+actual observations. No direct comparability is inferred from labels or AB depth.
+
+<!-- research-records:start -->
+| Research record | Kind | Date | H-series dependency | Scoring | Source |
+| --- | --- | --- | --- | --- | --- |
+| Configuration-level evaluation investigation | investigation | 2026-07-30 | H1, H2, H3 | not_scored | [Read source](uah_agent_evaluation_adaptation_runtime_research.md) |
+| Jev and System One investigation | investigation | 2026-09-22 | H3, H4 | not_scored | [Read source](jev_system_one_uah_research.md) |
+| Jev closed-candidate ranking proposal | proposed_experiment | 2026-09-22 | H0, H1, H3 | not_scored | [Read source](jev_system_one_uah_research.md) |
+| R0 exit contracts and provider routes | investigation | 2026-10-08 | H0, H1, H2 | not_scored | [Read source](2026-10-08_uah_r0_exit_contracts_and_provider_routes.md) |
+| R1 effect evidence and trace contract alternatives | investigation | 2026-10-08 | H0, H1, H2 | not_scored | [Read source](2026-10-08_uah_r1_effect_evidence_and_trace_contracts.md) |
+| R0 saved counterexample diagnostics | executed_probe | 2026-10-08 | H0, H1 | not_scored | [Read source](../artifacts/reviews/2026-10-08_uah_r0_baseline_and_skill_handoff.md) |
+| R1 compiler-only domain-pack repair receipt | executed_probe | 2026-10-08 | H0, H1 | not_scored | [Read source](../artifacts/reviews/2026-10-08_uah_r1_domain_pack_identity.md) |
+| R1 compiler-only primary review | reviewed_outcome | 2026-10-08 | H0, H1 | not_scored | [Read source](../artifacts/reviews/2026-10-08_uah_r1_domain_pack_primary_review.md) |
+| R1 compiler-only second review | reviewed_outcome | 2026-10-08 | H0, H1 | not_scored | [Read source](../artifacts/reviews/2026-10-08_uah_r1_domain_pack_second_review.md) |
+| H1 runtime and context-persistence dependency | h_series_dependency | unknown | H1 | not_scored | [Read source](../plans/universal_agentic_harness_masterplan.md) |
+| H3 trace-adaptive search dependency | h_series_dependency | unknown | H3 | not_scored | [Read source](../plans/universal_agentic_harness_masterplan.md) |
+| H4 quarantined crystallization dependency | h_series_dependency | unknown | H4 | not_scored | [Read source](../plans/universal_agentic_harness_masterplan.md) |
+
+### Configuration-level evaluation investigation
+
+Literature and runtime trade-off investigation. No controlled UAH model or adaptive-uplift experiment is established by this note.
+
+Catalog ID: `evaluation-investigation`. Source snapshot SHA-256: `b729cbf7f24dd3d28f0c871c4e0333d11c2face06a313d2a63c8097d4fa2afe4`.
+
+### Jev and System One investigation
+
+Primary-source investigation of closed typed decisions and local substitutes. Vendor claims and capacity estimates are not UAH measurements.
+
+Catalog ID: `jev-investigation`. Source snapshot SHA-256: `27b76bcf3c34604e204c5c347ff5de4ec8b6827f317fbf641290c7bb362183da`.
+
+### Jev closed-candidate ranking proposal
+
+The September note proposes deterministic controls and shadow ranking after H0/H1 closure. No executed Jev experiment, access qualification or calibrated UAH result is recorded.
+
+Catalog ID: `jev-ranking-proposal`. Source snapshot SHA-256: `27b76bcf3c34604e204c5c347ff5de4ec8b6827f317fbf641290c7bb362183da`.
+
+Reference: [Open document](../architecture/neural_workbench_adaptive_ab_harness.md).
+
+### R0 exit contracts and provider routes
+
+Research handoff on exit-contract alternatives and provider routes. Route availability is not execution authority or owner evidence; live qualification remains unscored.
+
+Catalog ID: `r0-exit-investigation`. Source snapshot SHA-256: `3d7d94e38df060428cb2d6a643bf5da3bba699a3c4e4be3e3361706b93545975`.
+
+### R1 effect evidence and trace contract alternatives
+
+Research alternatives for proof meaning, temporal validity and trace representation. The proposed train/holdout fixtures were not executed; no new freshness policy was accepted.
+
+Catalog ID: `r1-evidence-investigation`. Source snapshot SHA-256: `bf5549f3eb3f53efaeb2d9d5c10d6b70f39373131c5b47e9b4a386a4d2548aa5`.
+
+### R0 saved counterexample diagnostics
+
+Completed local diagnostics are recorded in the dated receipt. A zero diagnostic exit does not imply a passing conformance gate, live model quality or release closure.
+
+Catalog ID: `r0-recorded-probes`. Source snapshot SHA-256: `90d99f7e21e6d67e1cef0cadd7c3bef5782fb13546192c7870e683a6d0dbf507`.
+
+### R1 compiler-only domain-pack repair receipt
+
+The receipt records replacement and nested-tamper compiler regressions, an unchanged valid control and scoped review links. It does not close other mechanisms or all H0/H1 deliverables.
+
+Catalog ID: `r1-compiler-repair`. Source snapshot SHA-256: `4408dadc970e75fe2f94d0bdd63478c4e9b9aab0074164c86682a000adf959e8`.
+
+Reference: [Open document](../artifacts/reviews/2026-10-08_uah_r1_domain_pack_primary_review.md).
+
+Reference: [Open document](../artifacts/reviews/2026-10-08_uah_r1_domain_pack_second_review.md).
+
+### R1 compiler-only primary review
+
+Historical APPROVE receipt for the named three-file compiler repair against exact frozen-before bytes. Reviewed runtime hashes inside the source define its scope, not the current checkout.
+
+Catalog ID: `r1-primary-review`. Source snapshot SHA-256: `14da7145ad7a3b3f575d4438a5d959abdbd7923c65655be788ae19f52eb8abab`.
+
+### R1 compiler-only second review
+
+Historical distinct-model APPROVE receipt with a representation-only limitation outside the repair. This source snapshot hash identifies the stored document, not a fresh certification of runtime changes.
+
+Catalog ID: `r1-second-review`. Source snapshot SHA-256: `85a97f05f2ec16668acf7fc310277558908820bcd98d780416fc7ea469c6b284`.
+
+### H1 runtime and context-persistence dependency
+
+Consult the current masterplan H1 section for runtime/context deliverables and open evidence. This unpinned link supplies no release status or context-tree schema.
+
+Catalog ID: `h1-context-dependency`. Source snapshot SHA-256: `unpinned dependency link`.
+
+### H3 trace-adaptive search dependency
+
+Consult the masterplan and architecture for candidate-only search, retrieval and context. These are dependencies, not adopted experiments or a second roadmap.
+
+Catalog ID: `h3-search-dependency`. Source snapshot SHA-256: `unpinned dependency link`.
+
+Reference: [Open document](../architecture/neural_workbench_adaptive_ab_harness.md).
+
+### H4 quarantined crystallization dependency
+
+Consult the canonical H4 gate for reviewed promotion and rollback. Frequency or display labels cannot promote research artifacts or transfer environment-owner authority.
+
+Catalog ID: `h4-crystallization-dependency`. Source snapshot SHA-256: `unpinned dependency link`.
+
+Reference: [Open document](../architecture/neural_workbench_adaptive_ab_harness.md).
+<!-- research-records:end -->
+
+## Using the sources
+
+Consult the source before interpreting a catalog label. A source snapshot hash
+identifies the indexed document bytes; it does not revalidate runtime provenance
+or retrospectively approve other changes. Reference links are navigation only.
+Update metadata only after the source document is complete, retain historical
+evidence and regenerate both files. [Catalog rules](README.md) describe the
+bounded update procedure.

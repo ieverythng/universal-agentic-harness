@@ -1,0 +1,116 @@
+ M CONTEXT.md
+ M docs/README.md
+ M docs/architecture/observatory_contract.html
+ M docs/architecture/observatory_contract.md
+ M docs/architecture/universal_agentic_harness_foundation.html
+ M docs/architecture/universal_agentic_harness_foundation.md
+ M docs/artifacts/decisions/2026-09-08_uah_identity_environment_and_memory_grill.html
+ M docs/artifacts/decisions/2026-09-08_uah_identity_environment_and_memory_grill.md
+ M docs/gtm/investor_handoff/README.html
+ M docs/gtm/investor_handoff/README.md
+ M docs/gtm/investor_handoff/executive_brief.html
+ M docs/gtm/investor_handoff/executive_brief.md
+ M docs/gtm/investor_handoff/gtm_and_investment_case.html
+ M docs/gtm/investor_handoff/gtm_and_investment_case.md
+ M docs/gtm/investor_handoff/technical_diligence.html
+ M docs/gtm/investor_handoff/technical_diligence.md
+ M docs/plans/universal_agentic_harness_development_log.html
+ M docs/plans/universal_agentic_harness_development_log.md
+ M docs/plans/universal_agentic_harness_masterplan.html
+ M docs/plans/universal_agentic_harness_masterplan.md
+ M docs/research/uah_h0_h1_seam_deepening.md
+ M scripts/render_agentic_harness_docs.py
+ M src/ab_harness/__init__.py
+ M src/ab_harness/domain_contracts.py
+ M src/ab_harness/domain_lifecycle.py
+ M src/ab_harness/environment.py
+ M src/ab_harness/environment_ingress.py
+ M src/ab_harness/lifecycle.py
+ M src/ab_harness/proposal_admission.py
+ M src/ab_harness/task_compiler.py
+ M src/ab_harness/task_registry.py
+ M src/ab_harness_nao/qualification.py
+ M src/ab_harness_nao/smoke.py
+ M tests/test_cli_smoke.py
+ M tests/test_environment_ingress.py
+ M tests/test_lifecycle_ledger.py
+ M tests/test_recorded_nao_qualification.py
+ M tests/test_task_compiler.py
+ M tests/test_two_stage_admission.py
+?? .codex/skills/uah-stack-iteration-loop/
+?? REVIEW.md
+?? docs/agents/
+?? docs/artifacts/observatory/
+?? docs/artifacts/research/
+?? docs/artifacts/reviews/2026-10-05_uah_h0_h1_independent_review.md
+?? docs/artifacts/reviews/2026-10-05_uah_h0_h1_review_scope.md
+?? docs/artifacts/reviews/2026-10-05_uah_review_repros/
+?? docs/artifacts/reviews/2026-10-08_uah_r0_baseline_and_skill_handoff.md
+?? docs/artifacts/reviews/2026-10-08_uah_r0_skill_review/
+?? docs/artifacts/reviews/2026-10-08_uah_r0_start.sha256
+?? docs/artifacts/reviews/2026-10-08_uah_r1_domain_pack_identity.md
+?? docs/artifacts/reviews/2026-10-08_uah_r1_domain_pack_identity.patch
+?? docs/artifacts/reviews/2026-10-08_uah_r1_domain_pack_primary_review.md
+?? docs/artifacts/reviews/2026-10-08_uah_r1_domain_pack_second_review.md
+?? docs/artifacts/reviews/2026-10-08_uah_r1_end.sha256
+?? docs/artifacts/reviews/2026-10-08_uah_r1_report_provenance_check.md
+?? docs/artifacts/reviews/2026-10-08_uah_r1_start.sha256
+?? docs/artifacts/reviews/2026-10-08_uah_r2_catalog_end.sha256
+?? docs/artifacts/reviews/2026-10-08_uah_r2_catalog_primary_review.md
+?? docs/artifacts/reviews/2026-10-08_uah_r2_catalog_repros/
+?? docs/artifacts/reviews/2026-10-08_uah_r2_catalog_round_close.md
+?? docs/artifacts/reviews/2026-10-08_uah_r2_catalog_second_review.md
+?? docs/artifacts/reviews/2026-10-08_uah_r2_catalog_semantic_fencing.md
+?? docs/artifacts/reviews/2026-10-08_uah_r2_catalog_semantic_fencing.patch
+?? docs/artifacts/reviews/2026-10-08_uah_r2_catalog_start.sha256
+?? docs/artifacts/reviews/2026-10-08_uah_r2_navigation_amendment.sha256
+?? docs/artifacts/reviews/2026-10-08_uah_r3_ledger_end.sha256
+?? docs/artifacts/reviews/2026-10-08_uah_r3_ledger_integrity.md
+?? docs/artifacts/reviews/2026-10-08_uah_r3_ledger_integrity_evidence/
+?? docs/artifacts/reviews/2026-10-08_uah_r3_ledger_primary_replacement_review.md
+?? docs/artifacts/reviews/2026-10-08_uah_r3_ledger_primary_review.md
+?? docs/artifacts/reviews/2026-10-08_uah_r3_ledger_second_review.md
+?? docs/artifacts/reviews/2026-10-08_uah_r4_admitted_object_snapshot.md
+?? docs/artifacts/reviews/2026-10-08_uah_r4_admitted_object_snapshot_evidence/
+?? docs/artifacts/reviews/2026-10-08_uah_r4_snapshot_primary_review.md
+?? docs/artifacts/reviews/2026-10-08_uah_research_dashboard_fix.md
+?? docs/artifacts/reviews/2026-10-08_uah_research_dashboard_fix_evidence/
+?? docs/artifacts/reviews/2026-10-08_uah_research_dashboard_fix_primary_review.md
+?? docs/artifacts/reviews/2026-10-08_uah_research_dashboard_fix_second_review.md
+?? docs/artifacts/reviews/2026-10-08_uah_research_dashboard_primary_review.md
+?? docs/artifacts/reviews/2026-10-08_uah_research_dashboard_review_closeout.md
+?? docs/artifacts/reviews/2026-10-08_uah_research_dashboard_second_review.md
+?? docs/plans/synthetic_notes_integration_contract.md
+?? docs/research/2026-10-08_uah_r0_exit_contracts_and_provider_routes.md
+?? docs/research/2026-10-08_uah_r1_effect_evidence_and_trace_contracts.md
+?? docs/research/README.md
+?? docs/research/experiment_registry.json
+?? docs/research/uah_research_dashboard.html
+?? docs/research/uah_research_dashboard.md
+?? scripts/render_agent_runtime_example.py
+?? scripts/render_observatory_example.py
+?? scripts/render_research_dashboard.py
+?? src/ab_harness/agent_configuration.py
+?? src/ab_harness/agent_identity.py
+?? src/ab_harness/agent_lifecycle.py
+?? src/ab_harness/model_allocator.py
+?? src/ab_harness/model_invocation.py
+?? src/ab_harness/observatory.py
+?? src/ab_harness/operation_edges.py
+?? src/ab_harness/prompt_compiler.py
+?? src/ab_harness/runtime_controls.py
+?? src/ab_harness/schema_validation.py
+?? src/ab_harness/task_ingress_authority.py
+?? tests/test_admitted_object_snapshot.py
+?? tests/test_agent_configuration.py
+?? tests/test_agent_identity.py
+?? tests/test_agent_runtime.py
+?? tests/test_agent_runtime_example.py
+?? tests/test_argument_schema_validation.py
+?? tests/test_content_identity_compatibility.py
+?? tests/test_model_invocation.py
+?? tests/test_observatory.py
+?? tests/test_prompt_compiler.py
+?? tests/test_research_dashboard.py
+?? tests/test_runtime_budget_contracts.py
+?? uv.lock

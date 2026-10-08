@@ -1,0 +1,86 @@
+--- a/src/ab_harness/proposal_admission.py
++++ b/src/ab_harness/proposal_admission.py
+@@ -826,0 +827,2 @@
++        if self._catalog.object_for(proposal.object_id) != object_view:
++            return reject(("catalog_object_mismatch",))
+--- a/tests/test_two_stage_admission.py
++++ b/tests/test_two_stage_admission.py
+@@ -559,0 +560,78 @@
++def test_semantic_admission_rejects_catalog_effect_drift_before_a_lease(tmp_path):
++    compiled, catalog, environment_run = _admission_fixture()
++    object_view = catalog.object_for("find_object")
++    drifted_object = replace(
++        object_view,
++        expected_effects=(*object_view.expected_effects, "direct_speech"),
++        observable_success=(*object_view.observable_success, "direct_speech"),
++    )
++    drifted_catalog = BindingCatalog(
++        RegistrySnapshot(
++            (drifted_object,),
++            source="synthetic:changed-catalog",
++            version="changed-registry",
++        ),
++        catalog.bindings_for("find_object"),
++    )
++    proposal = _proposal(compiled)
++
++    decision = _semantic_admission(drifted_catalog).admit(compiled, proposal)
++
++    assert decision.admitted_operation is None
++    assert decision.reason_codes == ("catalog_object_mismatch",)
++    ledger = LifecycleLedger(tmp_path / "drift.jsonl")
++    TaskIngressAuthority(
++        environment_profile_id=environment_run.attestation.environment_profile_id,
++        domain_contract_pack=_domain_pack_for_compiled(compiled),
++        lifecycle_ledger=ledger,
++    ).admit(
++        environment_run,
++        EnvironmentIngress(
++            environment_ingress_id=compiled.environment_ingress_id,
++            environment_run_id=compiled.environment_run_id,
++            binding_id="binding:nao.request:v1",
++            ingress_type="user_request",
++            payload_artifact_id="artifact:request:admission-001",
++            native_lineage=(("goal_id", compiled.task_id),),
++            observed_at="2026-09-28T09:00:01Z",
++        ),
++    )
++    ledger.record(compiled)
++    ledger.record(proposal)
++    ledger.record(decision.rejection)
++    replay = LifecycleLedger(tmp_path / "drift.jsonl").replay(compiled.trace_id)
++    assert replay.failure_stage == "semantic_admission"
++    assert replay.terminal_status is None
++    assert not any(
++        event.event_type in {"domain_admission_leased", "execution_started"}
++        for event in replay.events
++    )
++
++
++def test_semantic_admission_allows_reviewed_binding_change_without_object_drift():
++    compiled, catalog, _environment_run = _admission_fixture()
++    binding = replace(
++        catalog.bindings_for("find_object")[0],
++        binding_id="nao_fake.find_object.v2",
++        source_revision="fixture-rev-2",
++        locator="fake_nao.skills_v2:find_object",
++    )
++    compatible_catalog = BindingCatalog(
++        RegistrySnapshot(
++            (catalog.object_for("find_object"),),
++            source="synthetic:reviewed-binding-change",
++            version="different-registry-label",
++        ),
++        (binding,),
++    )
++
++    decision = _semantic_admission(compatible_catalog).admit(
++        compiled, _proposal(compiled)
++    )
++
++    assert decision.reason_codes == ()
++    assert decision.admitted_operation is not None
++    assert decision.admitted_operation.binding_id == "nao_fake.find_object.v2"
++    assert decision.admitted_operation.binding_source_revision == "fixture-rev-2"
++
++

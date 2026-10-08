@@ -1,6 +1,6 @@
 # UAH and NeuralWorkbench GTM and Investment Case
 
-**Prepared:** 2026-09-28
+**Prepared:** 2026-10-04
 
 **Scope:** commercialization hypotheses, customer sequence, packaging,
 milestones, metrics, use of capital, and diligence disclosures
@@ -228,8 +228,8 @@ feature count.
 
 | Gate | Deliverable | Value created | Go or no-go evidence |
 | --- | --- | --- | --- |
-| G1: executable semantic center | Complete failure grammar and cross-process ledger coordination | Extends the implemented accepted/deficit authority path into counterexample-complete replay | Success and failure replay identically without the model |
-| G2: H1 agent runtime | Agent identity, handles, PromptCompiler, provider port, fixed lease, startup preflight | Enables local and remote model trials under stable roles | Frozen suite runs through recorded and live provider modes |
+| G1: executable semantic center | Operation edges, typed evidence/rejection grammar, terminal counterexample, and initial runtime controls | Extends accepted/deficit replay into model-free counterexample and control replay | Success and failure replay identically without the model |
+| G2: H1 agent runtime | Qualify the fake-tested durable activation, fixed lease/readiness, PromptCompiler, and provider port against a real endpoint; add context and failure-suite closure | Enables local and remote model trials under stable roles | Frozen suite runs through recorded and live provider modes |
 | G3: H2 NAO parity | Domain pack, planner adapter, report-result delegation, `legacy | shadow | uah` report | Demonstrates integration with a real multi-owner system | Reviewed parity and failure attribution, no duplicate action or speech |
 | G4: second-domain proof | Watson/software-engineering adapter using unchanged core | Tests portability and onboarding leverage | Measured reuse and same-model comparison |
 | G5: H3 Workbench shadow | Verified trace digest, retrieval, candidate provenance, counterexample-aware memory | Tests adaptive advantage without authority risk | Held-out uplift or recovery improvement with safety/evidence parity |
@@ -319,16 +319,24 @@ a separate sourced deliverable.
 ## 12. Diligence disclosures
 
 - H0 is a tested contract proof, not a production release.
-- H1 agent lifecycle and live provider operation are incomplete.
+- H1 has durable actor activation, fixed allocation, readiness, standby, prompt
+  compilation, and fake-provider invocation; complete context/failure handling
+  and live provider operation remain incomplete.
 - H2 NAO planner parity and model qualification are not complete.
-- Compiled task budgets are immutable declarations; runtime consumption and
-  enforcement are not implemented.
-- The common ledger has atomic commit framing and restart replay but remains a
-  local single-writer store without cross-process coordination.
+- Tool/model budgets are consumed atomically at dispatch/call start, and
+  retry/timeout decisions use compiled limits. Fixed allocation checks fresh
+  owner capacity and exclusive host/instance reservations among cooperating
+  actors sharing one ledger. Token/cost accounting and dynamic allocation
+  remain open; the allocator has no global authority over external consumers.
+- The common ledger has atomic commit framing, restart replay, and advisory-lock
+  coordination among cooperating processes. It remains local JSONL and rejects
+  rather than repairs a crash-truncated commit.
 - NeuralWorkbench improvement is unproven and remains an H3 experiment.
 - The intended NeuralWorkbench revision is documented, but its gitlink is
   absent from the current UAH tree.
-- Observatory has a frozen contract but no complete product renderer.
+- Observatory has static environment/task/trace and explicit actor views;
+  complete configuration, provider comparison, and Workbench product views
+  remain open.
 - Cross-domain universality is not established.
 - There are no customer, revenue, pricing, market-size, compliance, security
   certification, or production-scale claims in the repository.

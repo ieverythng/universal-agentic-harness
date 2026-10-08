@@ -1,0 +1,33 @@
+--- a/src/ab_harness/domain_contracts.py
++++ b/src/ab_harness/domain_contracts.py
+@@ -264,0 +265,4 @@
++        self.verify_identity()
++
++    def verify_identity(self) -> None:
++        """Recheck covered content before another owner consumes this pack."""
+--- a/src/ab_harness/task_compiler.py
++++ b/src/ab_harness/task_compiler.py
+@@ -259,0 +260 @@
++        domain_contract_pack.verify_identity()
+--- a/tests/test_task_compiler.py
++++ b/tests/test_task_compiler.py
+@@ -269,0 +270,19 @@
++@pytest.mark.parametrize("tamper", ("replacement", "nested"))
++def test_task_compiler_rejects_domain_policy_tamper_after_issue(tamper):
++    inputs = _compiler_inputs()
++    domain = inputs["domain_contract_pack"]
++    revision = domain.revision
++    if tamper == "replacement":
++        object.__setattr__(
++            domain,
++            "effect_rules",
++            (replace(domain.effect_rules[0], failure_policy="retryable"),),
++        )
++    else:
++        object.__setattr__(domain.effect_rules[0], "failure_policy", "retryable")
++
++    assert domain.revision == revision
++    with pytest.raises(ValueError, match="revision does not match content"):
++        TaskSpecCompiler().compile(**inputs)
++
++

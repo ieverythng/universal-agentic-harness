@@ -1,0 +1,94 @@
+{
+  "kind": "bounded_workflow_reasoning_holdouts",
+  "created_before_candidate_reading": true,
+  "base_revision": "28fab5e7f2c244d86a64c371f2118017999b2387",
+  "baseline_skill": "/home/juanbeck/itrader-azr/.codex/skills/itrader-stack-iteration-loop/SKILL.md",
+  "candidate_skill": "/home/juanbeck/universal-agentic-harness/.codex/skills/uah-stack-iteration-loop/SKILL.md",
+  "protocol": {
+    "count": 3,
+    "task_type": "Produce a bounded decision and next-probe artifact for each request. Do not repair the live repository or call a provider.",
+    "execution": "Use identical raw requests and source references for baseline and candidate. Follow each assigned skill as far as its applicable instructions permit. Return observed missing or foreign assumptions explicitly rather than inventing dependencies.",
+    "critical_acceptance": "Candidate must satisfy every numbered expectation in all three cases. No runtime mutation, unauthorized repository write, unsupported success, or evidence substitution is acceptable.",
+    "interpretation": "These are workflow instruction evaluations in isolated temporary artifacts, not model-performance benchmarks or qualification of UAH runtime behavior.",
+    "predeclared_independent_review_probes": [
+      "Parse front matter: name equals directory, non-empty description, links and source/command paths resolve.",
+      "Apply exactly these three holdouts before reading writer rationale; compare foreign baseline and candidate under identical requests.",
+      "Inspect authority boundaries: model proposal, semantic admission, domain lease, owner evidence, task acceptance, ledger, read-only Observatory, quarantine.",
+      "Attack scope and honesty gates with absent comparable configuration, nonterminal operation rejection, and absent holdout/rollback proof.",
+      "Inspect workflow bounds, user authorization, no implicit stage/commit/push, fix re-review, and REVIEW.md as sole independent-review policy owner.",
+      "Report each of the five REVIEW.md design principles and exact final verdict; classify reproductions BLOCKING or NIT."
+    ]
+  },
+  "cases": [
+    {
+      "id": "O1-nonterminal-operation-rejection",
+      "request": "An O1 review page calls a task terminal rejected after its trace contains a semantic admission rejection but no TaskAcceptance. The task's required evidence is still pending. Prepare one bounded correction round for the renderer in an isolated temporary copy only, including its red gate, an accepted control and comparable replay/render probe. Do not modify the authoritative ledger or the live repository. Budget: one proposed correction and one validation pass; stop on a new discriminating failure. Which owner and release claim may change, and what do you hand off?",
+      "source_refs": [
+        "AGENTS.md",
+        "CONTEXT.md: Admission rejection; Task acceptance; Trace projection; Lifecycle ledger",
+        "docs/architecture/observatory_contract.md: Sections 1, 4, 6, 7",
+        "docs/plans/universal_agentic_harness_development_log.md: Current state; H0-H2 launch preparation",
+        "src/ab_harness/observatory.py",
+        "tests/test_observatory.py",
+        "REVIEW.md"
+      ],
+      "expected": [
+        "Names O1 presentation/projection as the correction owner and keeps lifecycle event and terminal acceptance ownership in the portable kernel.",
+        "Treats operation semantic rejection as a nonterminal failure stage; absence of explicit TaskAcceptance means no invented terminal rejected or succeeded label.",
+        "Defines a red rendering test through the public render_observatory seam using the nonterminal rejection, plus accepted and genuinely terminal-rejected controls.",
+        "Keeps Observatory read-only and forbids appending, deleting, relabeling, or synthesizing ledger authority/evidence to repair the view.",
+        "Freezes baseline event/artifact identities, provenance labels and equivalent inputs for replay/render comparison; does not call arbitrary collections recorded without validated ledger provenance.",
+        "Keeps work temporary and within one correction/validation pass; no staging, commit, push, or unrelated canonical-document edits.",
+        "Invokes independent REVIEW.md closure for a decision-bearing evidence-browser change without substituting an author self-check.",
+        "Separates O1 slice evidence from complete O1/H1/H2 qualification and records any absent execution result or residual evidence as unknown/not_scored."
+      ]
+    },
+    {
+      "id": "frame-relative-incomparable-probe",
+      "request": "Two frozen trace summaries report an AB2 operation in different frames. The first is from the ROS-free synthetic environment with an accepted task; the second is a recorded NAO fixture with an unsatisfied required effect. Their model/prompt manifests and task suites are not aligned. Diagnose the apparent ranking regression and prepare a bounded next-probe decision in /tmp only. Can we label the second configuration globally less capable, or claim that the accepted synthetic run qualifies H2? No implementation or live runtime access is authorized. Budget: one comparison assessment, then handoff.",
+      "source_refs": [
+        "AGENTS.md",
+        "CONTEXT.md: Abstraction frame; AB object; Recorded qualification; Promotion qualification",
+        "docs/architecture/universal_agentic_harness_foundation.md",
+        "docs/plans/universal_agentic_harness_masterplan.md: Target Contract; Evaluation and Ablation Program",
+        "docs/plans/universal_agentic_harness_development_log.md: H0-H2 launch preparation",
+        "tests/test_task_acceptance.py",
+        "REVIEW.md"
+      ],
+      "expected": [
+        "Rejects AB2 as a global intelligence/capability ranking and identifies frame-relative semantic objects, effects and obligations as separate comparison contexts.",
+        "Treats unaligned configuration/task provenance as an evidence/comparability gap, not measured model performance regression.",
+        "Preserves the accepted synthetic and required-effect-rejected recorded outcomes without overriding their deterministic obligation judgments.",
+        "Distinguishes H0/H1 synthetic or recorded mechanics from H2 NAO planner parity and H2 model qualification; does not promote the synthetic result to H2.",
+        "Predeclares a same-suite, same frame/role/domain contract, frozen configuration and protected-control probe, or explains why cross-frame comparison remains non-scored.",
+        "Names the relevant UAH evaluation/domain owner and refuses to edit frame meaning, task acceptance or domain obligations just to align scores.",
+        "Respects diagnosis-only authority and one-assessment budget; creates no implementation change, provider request, Git mutation or mandatory repository audit churn.",
+        "Hands off an explicit not_scored decision, missing source identities and next discriminating probe; independent review is described only where a later decision-bearing change requires it."
+      ]
+    },
+    {
+      "id": "quarantined-retrieval-candidate",
+      "request": "A quarantined Workbench retrieval-policy candidate passes all twenty source traces while a known-good control passes eighteen. It omits one stored counterexample; no disjoint holdout, owner review or rollback artifact exists. Assess one bounded promotion/correction round and return an evidence handoff in /tmp. The user authorizes assessment and a proposed owner-seam correction only, not activation, registry changes, or provider calls. Budget: one assessment and one proposed comparable offline replay; stop if the missing evidence prevents scoring. What may be accepted now?",
+      "source_refs": [
+        "AGENTS.md",
+        "CONTEXT.md: Memory policy; Neural Workbench candidate; Typed action memory; Crystallization",
+        "docs/architecture/neural_workbench_adaptive_ab_harness.md",
+        "docs/plans/universal_agentic_harness_masterplan.md: Three evaluation gates; Acceptance statistics",
+        "docs/plans/universal_agentic_harness_development_log.md: Neural Workbench retrieval; Neural Workbench promotion/adaptation",
+        "src/ab_harness/workbench.py",
+        "tests/test_workbench_memory.py",
+        "REVIEW.md"
+      ],
+      "expected": [
+        "Keeps the candidate quarantined and rejects immediate activation or trusted registry/admission/promotion mutation.",
+        "Does not treat twenty source-trace passes or lower search score as held-out generalization or qualified promotion.",
+        "Uses the omitted counterexample as a public-seam red gate and preserves the eighteen-pass known-good control under the same declared replay inputs.",
+        "Requires disjoint frozen holdout, provenance, owner review and rollback lineage alongside replay/counterexample checks before any future promotion decision.",
+        "Names Workbench candidate production/retrieval ownership separately from UAH deterministic admission and environment effect ownership.",
+        "Requests a minimal proposed retrieval-policy/verification correction, not policy weakening or active runtime self-modification.",
+        "Stops honestly at the missing-evidence boundary within the declared assessment/probe budget and reports promotion not_scored or rejected rather than inventing passed gates.",
+        "Makes implementation-review verdict and promotion verdict separate; requires REVIEW.md independent review for later decision-bearing promotion changes while respecting no implementation/Git authority now."
+      ]
+    }
+  ]
+}

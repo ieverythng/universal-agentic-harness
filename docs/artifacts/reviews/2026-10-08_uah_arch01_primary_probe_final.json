@@ -1,0 +1,2781 @@
+{
+  "probe_note": "Final repeated deterministic capture uses object-key equality for choice/contract correspondence. The earlier positional check was stricter than the existing sorted source_contracts contract; both original and corrected results are retained. No implementation changes were made. Final capture extends the same 46 consumer probes with four legitimate ingress/ledger/TaskSpecCompiler decomposition probes; 50 rows per variant.",
+  "runs": [
+    {
+      "variant": "current",
+      "exit_code": 0,
+      "imported_admission": "/tmp/uah-arch01-primary.qXMxdY/current/src/ab_harness/proposal_admission.py",
+      "imported_prompt": "/tmp/uah-arch01-primary.qXMxdY/current/src/ab_harness/prompt_compiler.py",
+      "row_count": 50,
+      "rows": [
+        {
+          "accepted": true,
+          "admission_artifact_id": "admission:sha256:5bc9372a5e32bae4e8081607ae3c3ed2f0f5ffbff61a9f927651786fc714f700",
+          "admission_prompt_source_agreement": true,
+          "admitted_binding": "binding:sha256:1dbcb241ec54a54efb680346ece3b00fee2c6919f6070c1778671fa6a5075f02",
+          "admitted_schema": "input-schema:sha256:6704c5ecaa462879c02774fdf7739f2af3ed07bec9d7449322dee0db4f0a0ed2",
+          "choices": [
+            "a"
+          ],
+          "contracts": [
+            [
+              "a",
+              "binding:sha256:1dbcb241ec54a54efb680346ece3b00fee2c6919f6070c1778671fa6a5075f02",
+              "input-schema:sha256:6704c5ecaa462879c02774fdf7739f2af3ed07bec9d7449322dee0db4f0a0ed2"
+            ]
+          ],
+          "examples": [
+            "a"
+          ],
+          "execution_authority": false,
+          "label": "permitted",
+          "metadata_coherent": true,
+          "object": "a",
+          "output_enums": [
+            [
+              "operation"
+            ]
+          ],
+          "output_type": "operation",
+          "private_locator_leaked": false,
+          "projection": [
+            "a"
+          ],
+          "prompt_id": "compiled-prompt:sha256:949852155a534b9d03737941bb124c15a7cab682825ce2197f67cafaf1b54d41",
+          "reasons": []
+        },
+        {
+          "accepted": false,
+          "admission_artifact_id": "semantic-rejection:sha256:ad8a6d21e0d6329360590c42fc89899fd55023aa8eeb8c8094541589fde24a7c",
+          "label": "expected_only",
+          "object": "a",
+          "output_type": "operation",
+          "prompt_error": "compiled task exposes no direct proposal operations",
+          "reasons": [
+            "object_effect_prohibited"
+          ]
+        },
+        {
+          "accepted": false,
+          "admission_artifact_id": "semantic-rejection:sha256:8fd5d1a2db059629be11089596d05534b6cc8f2cb43457499fe52d92ab4ac2c8",
+          "label": "observable_only",
+          "object": "a",
+          "output_type": "operation",
+          "prompt_error": "compiled task exposes no direct proposal operations",
+          "reasons": [
+            "object_effect_prohibited"
+          ]
+        },
+        {
+          "accepted": false,
+          "admission_artifact_id": "semantic-rejection:sha256:e90c0e5e757dc44a1347112977f5045af34a136556bd4b93f8e9f60fd54002ff",
+          "label": "both",
+          "object": "a",
+          "output_type": "operation",
+          "prompt_error": "compiled task exposes no direct proposal operations",
+          "reasons": [
+            "object_effect_prohibited"
+          ]
+        },
+        {
+          "accepted": false,
+          "admission_artifact_id": "semantic-rejection:sha256:459a7e16e56f65ded730757682ad0abc14a11efd9c5c4101d2450d42009417eb",
+          "label": "separate_both",
+          "object": "a",
+          "output_type": "operation",
+          "prompt_error": "compiled task exposes no direct proposal operations",
+          "reasons": [
+            "object_effect_prohibited"
+          ]
+        },
+        {
+          "accepted": false,
+          "admission_artifact_id": "semantic-rejection:sha256:3477d23cd1165bd5ff1a00af48e45cffcbdffe6719cdbcb2794b650c37dc9832",
+          "label": "separate_both_reverse",
+          "object": "a",
+          "output_type": "operation",
+          "prompt_error": "compiled task exposes no direct proposal operations",
+          "reasons": [
+            "object_effect_prohibited"
+          ]
+        },
+        {
+          "accepted": true,
+          "admission_artifact_id": "admission:sha256:9aec436851618df0e865300af02ea95ec7d5726d8490740300751be21f526676",
+          "admission_prompt_source_agreement": true,
+          "admitted_binding": "binding:sha256:1dbcb241ec54a54efb680346ece3b00fee2c6919f6070c1778671fa6a5075f02",
+          "admitted_schema": "input-schema:sha256:6704c5ecaa462879c02774fdf7739f2af3ed07bec9d7449322dee0db4f0a0ed2",
+          "choices": [
+            "a"
+          ],
+          "contracts": [
+            [
+              "a",
+              "binding:sha256:1dbcb241ec54a54efb680346ece3b00fee2c6919f6070c1778671fa6a5075f02",
+              "input-schema:sha256:6704c5ecaa462879c02774fdf7739f2af3ed07bec9d7449322dee0db4f0a0ed2"
+            ]
+          ],
+          "examples": [
+            "a"
+          ],
+          "execution_authority": false,
+          "label": "unrelated_prohibition",
+          "metadata_coherent": true,
+          "object": "a",
+          "output_enums": [
+            [
+              "operation"
+            ]
+          ],
+          "output_type": "operation",
+          "private_locator_leaked": false,
+          "projection": [
+            "a"
+          ],
+          "prompt_id": "compiled-prompt:sha256:453ccb8530658a97d0c16ba143f8cce60b7cc295839eae43dde2440d2948ed59",
+          "reasons": []
+        },
+        {
+          "accepted": true,
+          "admission_artifact_id": "admission:sha256:74a3c55b4bbb45eaca6fa95e83d02bc668c0e8395c222ffb4fb63c6772239bb6",
+          "admission_prompt_source_agreement": true,
+          "admitted_binding": "binding:sha256:1dbcb241ec54a54efb680346ece3b00fee2c6919f6070c1778671fa6a5075f02",
+          "admitted_schema": "input-schema:sha256:6704c5ecaa462879c02774fdf7739f2af3ed07bec9d7449322dee0db4f0a0ed2",
+          "choices": [
+            "a"
+          ],
+          "contracts": [
+            [
+              "a",
+              "binding:sha256:1dbcb241ec54a54efb680346ece3b00fee2c6919f6070c1778671fa6a5075f02",
+              "input-schema:sha256:6704c5ecaa462879c02774fdf7739f2af3ed07bec9d7449322dee0db4f0a0ed2"
+            ]
+          ],
+          "examples": [
+            "a"
+          ],
+          "execution_authority": false,
+          "label": "empty_effect_lists",
+          "metadata_coherent": true,
+          "object": "a",
+          "output_enums": [
+            [
+              "operation"
+            ]
+          ],
+          "output_type": "operation",
+          "private_locator_leaked": false,
+          "projection": [
+            "a"
+          ],
+          "prompt_id": "compiled-prompt:sha256:966ff012c606f971deb43ad7d0b4f8b13dc4d36ab4d8aaa8135b0ef6da4df3e6",
+          "reasons": []
+        },
+        {
+          "accepted": false,
+          "admission_artifact_id": "semantic-rejection:sha256:d5dd2f356c9f13b5e7d99dbb2adbd2961a336aab29bfedee6212aec48ab4362b",
+          "label": "empty_projection",
+          "object": "a",
+          "output_type": "operation",
+          "prompt_error": "compiled task exposes no direct proposal operations",
+          "reasons": [
+            "object_outside_projection",
+            "missing_effect_obligation"
+          ]
+        },
+        {
+          "accepted": false,
+          "admission_artifact_id": "semantic-rejection:sha256:d1c8bb81eb98c03875bf14ae45445f83748f5a710b23812a8eacb38eca837fda",
+          "label": "missing_obligation",
+          "object": "a",
+          "output_type": "operation",
+          "prompt_error": "compiled task exposes no direct proposal operations",
+          "reasons": [
+            "missing_effect_obligation"
+          ]
+        },
+        {
+          "accepted": false,
+          "admission_artifact_id": "semantic-rejection:sha256:4e11d1d12991762e77d3ac07b2c525649cbc0683a3cc0636aa231b2be343da8b",
+          "label": "inspect_only",
+          "object": "a",
+          "output_type": "operation",
+          "prompt_error": "compiled task exposes no direct proposal operations",
+          "reasons": [
+            "object_inspection_only"
+          ]
+        },
+        {
+          "accepted": false,
+          "admission_artifact_id": "semantic-rejection:sha256:55fdd01ea36d2df4535c6ff112246f6f25634a485b5cf6141e136391d806f137",
+          "label": "above_direct_band",
+          "object": "a",
+          "output_type": "operation",
+          "prompt_error": "compiled task exposes no direct proposal operations",
+          "reasons": [
+            "object_inspection_only"
+          ]
+        },
+        {
+          "accepted": false,
+          "admission_artifact_id": "semantic-rejection:sha256:7a7728e4101c14c3d1ccd945d8bbbe2e5ac4927728ceb7f61c328acc5bc95204",
+          "label": "not_callable",
+          "object": "a",
+          "output_type": "operation",
+          "prompt_error": "compiled task exposes no direct proposal operations",
+          "reasons": [
+            "object_not_runtime_callable"
+          ]
+        },
+        {
+          "accepted": true,
+          "admission_artifact_id": "admission:sha256:43ebdc3d85b70b16325eaf00a3079cafdaa5c255b8b061b45da4c10f78cdcb60",
+          "admission_prompt_source_agreement": true,
+          "admitted_binding": "binding:sha256:1dbcb241ec54a54efb680346ece3b00fee2c6919f6070c1778671fa6a5075f02",
+          "admitted_schema": "input-schema:sha256:6704c5ecaa462879c02774fdf7739f2af3ed07bec9d7449322dee0db4f0a0ed2",
+          "choices": [
+            "a",
+            "b"
+          ],
+          "contracts": [
+            [
+              "a",
+              "binding:sha256:1dbcb241ec54a54efb680346ece3b00fee2c6919f6070c1778671fa6a5075f02",
+              "input-schema:sha256:6704c5ecaa462879c02774fdf7739f2af3ed07bec9d7449322dee0db4f0a0ed2"
+            ],
+            [
+              "b",
+              "binding:sha256:5a35c72b3a0934b91e7a3b21f73c8672e0b5b9c3b0568431cf6f493e1413cfb5",
+              "input-schema:sha256:6704c5ecaa462879c02774fdf7739f2af3ed07bec9d7449322dee0db4f0a0ed2"
+            ]
+          ],
+          "examples": [
+            "a",
+            "b"
+          ],
+          "execution_authority": false,
+          "label": "two_permitted_ab",
+          "metadata_coherent": true,
+          "object": "a",
+          "output_enums": [
+            [
+              "operation"
+            ],
+            [
+              "operation"
+            ]
+          ],
+          "output_type": "operation",
+          "private_locator_leaked": false,
+          "projection": [
+            "a",
+            "b"
+          ],
+          "prompt_id": "compiled-prompt:sha256:e4de3f91eb04dcaaa6597e84b68c1662a80981b1d0e39db3810b0e33ad14b86b",
+          "reasons": []
+        },
+        {
+          "accepted": true,
+          "admission_artifact_id": "admission:sha256:60fa1b5f750f379b4d4f5c3122bad5c384dd02eb67bf4c5f31f4b4c1729e3633",
+          "admission_prompt_source_agreement": true,
+          "admitted_binding": "binding:sha256:5a35c72b3a0934b91e7a3b21f73c8672e0b5b9c3b0568431cf6f493e1413cfb5",
+          "admitted_schema": "input-schema:sha256:6704c5ecaa462879c02774fdf7739f2af3ed07bec9d7449322dee0db4f0a0ed2",
+          "choices": [
+            "a",
+            "b"
+          ],
+          "contracts": [
+            [
+              "a",
+              "binding:sha256:1dbcb241ec54a54efb680346ece3b00fee2c6919f6070c1778671fa6a5075f02",
+              "input-schema:sha256:6704c5ecaa462879c02774fdf7739f2af3ed07bec9d7449322dee0db4f0a0ed2"
+            ],
+            [
+              "b",
+              "binding:sha256:5a35c72b3a0934b91e7a3b21f73c8672e0b5b9c3b0568431cf6f493e1413cfb5",
+              "input-schema:sha256:6704c5ecaa462879c02774fdf7739f2af3ed07bec9d7449322dee0db4f0a0ed2"
+            ]
+          ],
+          "examples": [
+            "a",
+            "b"
+          ],
+          "execution_authority": false,
+          "label": "two_permitted_ab_b",
+          "metadata_coherent": true,
+          "object": "b",
+          "output_enums": [
+            [
+              "operation"
+            ],
+            [
+              "operation"
+            ]
+          ],
+          "output_type": "operation",
+          "private_locator_leaked": false,
+          "projection": [
+            "a",
+            "b"
+          ],
+          "prompt_id": "compiled-prompt:sha256:e4de3f91eb04dcaaa6597e84b68c1662a80981b1d0e39db3810b0e33ad14b86b",
+          "reasons": []
+        },
+        {
+          "accepted": true,
+          "admission_artifact_id": "admission:sha256:edb22eefbc0531adafe3a221b5613e7eaa0fb602ed99eb10eea18d4b34d8f39a",
+          "admission_prompt_source_agreement": true,
+          "admitted_binding": "binding:sha256:1dbcb241ec54a54efb680346ece3b00fee2c6919f6070c1778671fa6a5075f02",
+          "admitted_schema": "input-schema:sha256:6704c5ecaa462879c02774fdf7739f2af3ed07bec9d7449322dee0db4f0a0ed2",
+          "choices": [
+            "b",
+            "a"
+          ],
+          "contracts": [
+            [
+              "a",
+              "binding:sha256:1dbcb241ec54a54efb680346ece3b00fee2c6919f6070c1778671fa6a5075f02",
+              "input-schema:sha256:6704c5ecaa462879c02774fdf7739f2af3ed07bec9d7449322dee0db4f0a0ed2"
+            ],
+            [
+              "b",
+              "binding:sha256:5a35c72b3a0934b91e7a3b21f73c8672e0b5b9c3b0568431cf6f493e1413cfb5",
+              "input-schema:sha256:6704c5ecaa462879c02774fdf7739f2af3ed07bec9d7449322dee0db4f0a0ed2"
+            ]
+          ],
+          "examples": [
+            "b",
+            "a"
+          ],
+          "execution_authority": false,
+          "label": "two_permitted_ba",
+          "metadata_coherent": true,
+          "object": "a",
+          "output_enums": [
+            [
+              "operation"
+            ],
+            [
+              "operation"
+            ]
+          ],
+          "output_type": "operation",
+          "private_locator_leaked": false,
+          "projection": [
+            "b",
+            "a"
+          ],
+          "prompt_id": "compiled-prompt:sha256:f5b2428727fd546747b119888a652e958b99575e8840f6f9aa7367a90fd1478b",
+          "reasons": []
+        },
+        {
+          "accepted": true,
+          "admission_artifact_id": "admission:sha256:83b11a977d8b213938ae16fd8c45dd0a7667f9f26cf42209cd5bf9b7d561e2e6",
+          "admission_prompt_source_agreement": true,
+          "admitted_binding": "binding:sha256:5a35c72b3a0934b91e7a3b21f73c8672e0b5b9c3b0568431cf6f493e1413cfb5",
+          "admitted_schema": "input-schema:sha256:6704c5ecaa462879c02774fdf7739f2af3ed07bec9d7449322dee0db4f0a0ed2",
+          "choices": [
+            "b",
+            "a"
+          ],
+          "contracts": [
+            [
+              "a",
+              "binding:sha256:1dbcb241ec54a54efb680346ece3b00fee2c6919f6070c1778671fa6a5075f02",
+              "input-schema:sha256:6704c5ecaa462879c02774fdf7739f2af3ed07bec9d7449322dee0db4f0a0ed2"
+            ],
+            [
+              "b",
+              "binding:sha256:5a35c72b3a0934b91e7a3b21f73c8672e0b5b9c3b0568431cf6f493e1413cfb5",
+              "input-schema:sha256:6704c5ecaa462879c02774fdf7739f2af3ed07bec9d7449322dee0db4f0a0ed2"
+            ]
+          ],
+          "examples": [
+            "b",
+            "a"
+          ],
+          "execution_authority": false,
+          "label": "two_permitted_ba_b",
+          "metadata_coherent": true,
+          "object": "b",
+          "output_enums": [
+            [
+              "operation"
+            ],
+            [
+              "operation"
+            ]
+          ],
+          "output_type": "operation",
+          "private_locator_leaked": false,
+          "projection": [
+            "b",
+            "a"
+          ],
+          "prompt_id": "compiled-prompt:sha256:f5b2428727fd546747b119888a652e958b99575e8840f6f9aa7367a90fd1478b",
+          "reasons": []
+        },
+        {
+          "accepted": true,
+          "admission_artifact_id": "admission:sha256:0686883d8b8fb3753cb887e13bd06609cadd92ec667c735aec2df2386ae54a2c",
+          "admission_prompt_source_agreement": true,
+          "admitted_binding": "binding:sha256:1dbcb241ec54a54efb680346ece3b00fee2c6919f6070c1778671fa6a5075f02",
+          "admitted_schema": "input-schema:sha256:6704c5ecaa462879c02774fdf7739f2af3ed07bec9d7449322dee0db4f0a0ed2",
+          "choices": [
+            "a"
+          ],
+          "contracts": [
+            [
+              "a",
+              "binding:sha256:1dbcb241ec54a54efb680346ece3b00fee2c6919f6070c1778671fa6a5075f02",
+              "input-schema:sha256:6704c5ecaa462879c02774fdf7739f2af3ed07bec9d7449322dee0db4f0a0ed2"
+            ]
+          ],
+          "examples": [
+            "a"
+          ],
+          "execution_authority": false,
+          "label": "mixed_ab",
+          "metadata_coherent": true,
+          "object": "a",
+          "output_enums": [
+            [
+              "operation"
+            ]
+          ],
+          "output_type": "operation",
+          "private_locator_leaked": false,
+          "projection": [
+            "a",
+            "b"
+          ],
+          "prompt_id": "compiled-prompt:sha256:af38c3ec885129dc199efe219cb32ae2ea5ca12405dca9521a2e6f2a2fb7988c",
+          "reasons": []
+        },
+        {
+          "accepted": false,
+          "admission_artifact_id": "semantic-rejection:sha256:505de52da11c6de2041884e8f7886b2ae75dca3f094ed990835226cd284bb325",
+          "choices": [
+            "a"
+          ],
+          "contracts": [
+            [
+              "a",
+              "binding:sha256:1dbcb241ec54a54efb680346ece3b00fee2c6919f6070c1778671fa6a5075f02",
+              "input-schema:sha256:6704c5ecaa462879c02774fdf7739f2af3ed07bec9d7449322dee0db4f0a0ed2"
+            ]
+          ],
+          "examples": [
+            "a"
+          ],
+          "label": "mixed_ab_b",
+          "metadata_coherent": true,
+          "object": "b",
+          "output_enums": [
+            [
+              "operation"
+            ]
+          ],
+          "output_type": "operation",
+          "private_locator_leaked": false,
+          "projection": [
+            "a",
+            "b"
+          ],
+          "prompt_id": "compiled-prompt:sha256:af38c3ec885129dc199efe219cb32ae2ea5ca12405dca9521a2e6f2a2fb7988c",
+          "reasons": [
+            "object_effect_prohibited"
+          ]
+        },
+        {
+          "accepted": true,
+          "admission_artifact_id": "admission:sha256:e1e167d1954eb8fb20fb4a3a715573e15c43fff5d0e121f38412c4d8cd8dc041",
+          "admission_prompt_source_agreement": true,
+          "admitted_binding": "binding:sha256:1dbcb241ec54a54efb680346ece3b00fee2c6919f6070c1778671fa6a5075f02",
+          "admitted_schema": "input-schema:sha256:6704c5ecaa462879c02774fdf7739f2af3ed07bec9d7449322dee0db4f0a0ed2",
+          "choices": [
+            "a"
+          ],
+          "contracts": [
+            [
+              "a",
+              "binding:sha256:1dbcb241ec54a54efb680346ece3b00fee2c6919f6070c1778671fa6a5075f02",
+              "input-schema:sha256:6704c5ecaa462879c02774fdf7739f2af3ed07bec9d7449322dee0db4f0a0ed2"
+            ]
+          ],
+          "examples": [
+            "a"
+          ],
+          "execution_authority": false,
+          "label": "mixed_ba",
+          "metadata_coherent": true,
+          "object": "a",
+          "output_enums": [
+            [
+              "operation"
+            ]
+          ],
+          "output_type": "operation",
+          "private_locator_leaked": false,
+          "projection": [
+            "b",
+            "a"
+          ],
+          "prompt_id": "compiled-prompt:sha256:7bdeec88f357cebb4fe95e0174a996fb67c4ff4f5523add05760e6ef418865e7",
+          "reasons": []
+        },
+        {
+          "accepted": false,
+          "admission_artifact_id": "semantic-rejection:sha256:d272cdd8580a73acfb0083a621a139d177b293357fd8c0c6920f9d1d00d50e1a",
+          "choices": [
+            "a"
+          ],
+          "contracts": [
+            [
+              "a",
+              "binding:sha256:1dbcb241ec54a54efb680346ece3b00fee2c6919f6070c1778671fa6a5075f02",
+              "input-schema:sha256:6704c5ecaa462879c02774fdf7739f2af3ed07bec9d7449322dee0db4f0a0ed2"
+            ]
+          ],
+          "examples": [
+            "a"
+          ],
+          "label": "mixed_ba_b",
+          "metadata_coherent": true,
+          "object": "b",
+          "output_enums": [
+            [
+              "operation"
+            ]
+          ],
+          "output_type": "operation",
+          "private_locator_leaked": false,
+          "projection": [
+            "b",
+            "a"
+          ],
+          "prompt_id": "compiled-prompt:sha256:7bdeec88f357cebb4fe95e0174a996fb67c4ff4f5523add05760e6ef418865e7",
+          "reasons": [
+            "object_effect_prohibited"
+          ]
+        },
+        {
+          "accepted": true,
+          "admission_artifact_id": "admission:sha256:dd25ab5d960ba7ace0b62c10726e3e083cbf6a66050f99550473b7acfc14fde7",
+          "admission_prompt_source_agreement": true,
+          "admitted_binding": "binding:sha256:1dbcb241ec54a54efb680346ece3b00fee2c6919f6070c1778671fa6a5075f02",
+          "admitted_schema": "input-schema:sha256:6704c5ecaa462879c02774fdf7739f2af3ed07bec9d7449322dee0db4f0a0ed2",
+          "choices": [
+            "a"
+          ],
+          "contracts": [
+            [
+              "a",
+              "binding:sha256:1dbcb241ec54a54efb680346ece3b00fee2c6919f6070c1778671fa6a5075f02",
+              "input-schema:sha256:6704c5ecaa462879c02774fdf7739f2af3ed07bec9d7449322dee0db4f0a0ed2"
+            ]
+          ],
+          "examples": [
+            "a"
+          ],
+          "execution_authority": false,
+          "label": "missing_second_ab",
+          "metadata_coherent": true,
+          "object": "a",
+          "output_enums": [
+            [
+              "operation"
+            ]
+          ],
+          "output_type": "operation",
+          "private_locator_leaked": false,
+          "projection": [
+            "a",
+            "b"
+          ],
+          "prompt_id": "compiled-prompt:sha256:44cdfbfdb898dd0756fb4363b9ad9698319fae13c1409957a683851ea930b638",
+          "reasons": []
+        },
+        {
+          "accepted": false,
+          "admission_artifact_id": "semantic-rejection:sha256:1aef8c2ea18fb3eb4cf4f54376ca0edcd32b9412915eececb1f481f186ef18cb",
+          "choices": [
+            "a"
+          ],
+          "contracts": [
+            [
+              "a",
+              "binding:sha256:1dbcb241ec54a54efb680346ece3b00fee2c6919f6070c1778671fa6a5075f02",
+              "input-schema:sha256:6704c5ecaa462879c02774fdf7739f2af3ed07bec9d7449322dee0db4f0a0ed2"
+            ]
+          ],
+          "examples": [
+            "a"
+          ],
+          "label": "missing_second_ab_b",
+          "metadata_coherent": true,
+          "object": "b",
+          "output_enums": [
+            [
+              "operation"
+            ]
+          ],
+          "output_type": "operation",
+          "private_locator_leaked": false,
+          "projection": [
+            "a",
+            "b"
+          ],
+          "prompt_id": "compiled-prompt:sha256:44cdfbfdb898dd0756fb4363b9ad9698319fae13c1409957a683851ea930b638",
+          "reasons": [
+            "missing_effect_obligation"
+          ]
+        },
+        {
+          "accepted": true,
+          "admission_artifact_id": "admission:sha256:61d8f9390efd480246ce9539e73b84fca1a00180da5dcf8e104e7c6aed71f16e",
+          "admission_prompt_source_agreement": true,
+          "admitted_binding": "binding:sha256:1dbcb241ec54a54efb680346ece3b00fee2c6919f6070c1778671fa6a5075f02",
+          "admitted_schema": "input-schema:sha256:6704c5ecaa462879c02774fdf7739f2af3ed07bec9d7449322dee0db4f0a0ed2",
+          "choices": [
+            "a"
+          ],
+          "contracts": [
+            [
+              "a",
+              "binding:sha256:1dbcb241ec54a54efb680346ece3b00fee2c6919f6070c1778671fa6a5075f02",
+              "input-schema:sha256:6704c5ecaa462879c02774fdf7739f2af3ed07bec9d7449322dee0db4f0a0ed2"
+            ]
+          ],
+          "examples": [
+            "a"
+          ],
+          "execution_authority": false,
+          "label": "missing_second_ba",
+          "metadata_coherent": true,
+          "object": "a",
+          "output_enums": [
+            [
+              "operation"
+            ]
+          ],
+          "output_type": "operation",
+          "private_locator_leaked": false,
+          "projection": [
+            "b",
+            "a"
+          ],
+          "prompt_id": "compiled-prompt:sha256:ac15fdc4b97c4bc475b0fb4196809a7935e7bc65eb489367090a0b7ef02d42b4",
+          "reasons": []
+        },
+        {
+          "accepted": false,
+          "admission_artifact_id": "semantic-rejection:sha256:c166a852be6f7f924046997755eb3279a1ea9f8cbf23fe5fdd889b1627b61957",
+          "choices": [
+            "a"
+          ],
+          "contracts": [
+            [
+              "a",
+              "binding:sha256:1dbcb241ec54a54efb680346ece3b00fee2c6919f6070c1778671fa6a5075f02",
+              "input-schema:sha256:6704c5ecaa462879c02774fdf7739f2af3ed07bec9d7449322dee0db4f0a0ed2"
+            ]
+          ],
+          "examples": [
+            "a"
+          ],
+          "label": "missing_second_ba_b",
+          "metadata_coherent": true,
+          "object": "b",
+          "output_enums": [
+            [
+              "operation"
+            ]
+          ],
+          "output_type": "operation",
+          "private_locator_leaked": false,
+          "projection": [
+            "b",
+            "a"
+          ],
+          "prompt_id": "compiled-prompt:sha256:ac15fdc4b97c4bc475b0fb4196809a7935e7bc65eb489367090a0b7ef02d42b4",
+          "reasons": [
+            "missing_effect_obligation"
+          ]
+        },
+        {
+          "accepted": false,
+          "admission_artifact_id": "semantic-rejection:sha256:7d6168cf2e0f1cd674bf18a814afd4c413d62f7dfdbdaf5b7b402ebe715b3c5d",
+          "label": "all_static_reasons",
+          "object": "a",
+          "output_type": "operation",
+          "prompt_error": "compiled task exposes no direct proposal operations",
+          "reasons": [
+            "object_inspection_only",
+            "object_not_runtime_callable",
+            "object_effect_prohibited",
+            "missing_effect_obligation"
+          ]
+        },
+        {
+          "accepted": false,
+          "admission_artifact_id": "semantic-rejection:sha256:0f84627b17b1dd0ca1699eb6328bc1e5ee2ddb476d911887082263db3b96e1a1",
+          "label": "all_static_reasons_bad_output",
+          "object": "a",
+          "output_type": "foreign",
+          "prompt_error": "compiled task exposes no direct proposal operations",
+          "reasons": [
+            "role_output_type_forbidden",
+            "object_inspection_only",
+            "object_not_runtime_callable",
+            "object_effect_prohibited",
+            "missing_effect_obligation"
+          ]
+        },
+        {
+          "accepted": false,
+          "admission_artifact_id": "semantic-rejection:sha256:3f3ea550ab4336c4057025ee5d9232d89e98ab2bb5cd579fb55996d83bbdff29",
+          "choices": [
+            "a"
+          ],
+          "contracts": [
+            [
+              "a",
+              "binding:sha256:1dbcb241ec54a54efb680346ece3b00fee2c6919f6070c1778671fa6a5075f02",
+              "input-schema:sha256:6704c5ecaa462879c02774fdf7739f2af3ed07bec9d7449322dee0db4f0a0ed2"
+            ]
+          ],
+          "examples": [
+            "a"
+          ],
+          "label": "outside_projection",
+          "metadata_coherent": true,
+          "object": "unknown",
+          "output_enums": [
+            [
+              "operation"
+            ]
+          ],
+          "output_type": "operation",
+          "private_locator_leaked": false,
+          "projection": [
+            "a"
+          ],
+          "prompt_id": "compiled-prompt:sha256:949852155a534b9d03737941bb124c15a7cab682825ce2197f67cafaf1b54d41",
+          "reasons": [
+            "object_outside_projection",
+            "missing_effect_obligation"
+          ]
+        },
+        {
+          "accepted": false,
+          "admission_artifact_id": "semantic-rejection:sha256:05b5b7fafa08798451c2aaf77c1495d15fe578e75bda39ec34106f0156f10acf",
+          "choices": [
+            "a"
+          ],
+          "contracts": [
+            [
+              "a",
+              "binding:sha256:1dbcb241ec54a54efb680346ece3b00fee2c6919f6070c1778671fa6a5075f02",
+              "input-schema:sha256:6704c5ecaa462879c02774fdf7739f2af3ed07bec9d7449322dee0db4f0a0ed2"
+            ]
+          ],
+          "examples": [
+            "a"
+          ],
+          "label": "outside_and_output",
+          "metadata_coherent": true,
+          "object": "unknown",
+          "output_enums": [
+            [
+              "operation"
+            ]
+          ],
+          "output_type": "foreign",
+          "private_locator_leaked": false,
+          "projection": [
+            "a"
+          ],
+          "prompt_id": "compiled-prompt:sha256:949852155a534b9d03737941bb124c15a7cab682825ce2197f67cafaf1b54d41",
+          "reasons": [
+            "role_output_type_forbidden",
+            "object_outside_projection",
+            "missing_effect_obligation"
+          ]
+        },
+        {
+          "accepted": false,
+          "admission_artifact_id": "semantic-rejection:sha256:35de67239796d2742266c8c8e22ad5b76c0ea5a56066df81140283ce8e53b794",
+          "choices": [
+            "a"
+          ],
+          "contracts": [
+            [
+              "a",
+              "binding:sha256:1dbcb241ec54a54efb680346ece3b00fee2c6919f6070c1778671fa6a5075f02",
+              "input-schema:sha256:6704c5ecaa462879c02774fdf7739f2af3ed07bec9d7449322dee0db4f0a0ed2"
+            ]
+          ],
+          "examples": [
+            "a"
+          ],
+          "label": "output_'foreign'",
+          "metadata_coherent": true,
+          "object": "a",
+          "output_enums": [
+            [
+              "operation"
+            ]
+          ],
+          "output_type": "foreign",
+          "private_locator_leaked": false,
+          "projection": [
+            "a"
+          ],
+          "prompt_id": "compiled-prompt:sha256:949852155a534b9d03737941bb124c15a7cab682825ce2197f67cafaf1b54d41",
+          "reasons": [
+            "role_output_type_forbidden"
+          ]
+        },
+        {
+          "accepted": false,
+          "admission_artifact_id": "semantic-rejection:sha256:f37445c43bc737e48374e512eaa1480ae35d6db3c3baed9d37e2e2eb772a149c",
+          "choices": [
+            "a"
+          ],
+          "contracts": [
+            [
+              "a",
+              "binding:sha256:1dbcb241ec54a54efb680346ece3b00fee2c6919f6070c1778671fa6a5075f02",
+              "input-schema:sha256:6704c5ecaa462879c02774fdf7739f2af3ed07bec9d7449322dee0db4f0a0ed2"
+            ]
+          ],
+          "examples": [
+            "a"
+          ],
+          "label": "output_' operation'",
+          "metadata_coherent": true,
+          "object": "a",
+          "output_enums": [
+            [
+              "operation"
+            ]
+          ],
+          "output_type": " operation",
+          "private_locator_leaked": false,
+          "projection": [
+            "a"
+          ],
+          "prompt_id": "compiled-prompt:sha256:949852155a534b9d03737941bb124c15a7cab682825ce2197f67cafaf1b54d41",
+          "reasons": [
+            "role_output_type_forbidden"
+          ]
+        },
+        {
+          "choices": [
+            "a"
+          ],
+          "contracts": [
+            [
+              "a",
+              "binding:sha256:1dbcb241ec54a54efb680346ece3b00fee2c6919f6070c1778671fa6a5075f02",
+              "input-schema:sha256:6704c5ecaa462879c02774fdf7739f2af3ed07bec9d7449322dee0db4f0a0ed2"
+            ]
+          ],
+          "examples": [
+            "a"
+          ],
+          "label": "output_''",
+          "metadata_coherent": true,
+          "normalization_reasons": [
+            "missing_output_type"
+          ],
+          "object": "a",
+          "output_enums": [
+            [
+              "operation"
+            ]
+          ],
+          "output_type": "",
+          "private_locator_leaked": false,
+          "projection": [
+            "a"
+          ],
+          "prompt_id": "compiled-prompt:sha256:949852155a534b9d03737941bb124c15a7cab682825ce2197f67cafaf1b54d41"
+        },
+        {
+          "choices": [
+            "a"
+          ],
+          "contracts": [
+            [
+              "a",
+              "binding:sha256:1dbcb241ec54a54efb680346ece3b00fee2c6919f6070c1778671fa6a5075f02",
+              "input-schema:sha256:6704c5ecaa462879c02774fdf7739f2af3ed07bec9d7449322dee0db4f0a0ed2"
+            ]
+          ],
+          "examples": [
+            "a"
+          ],
+          "label": "output_17",
+          "metadata_coherent": true,
+          "normalization_reasons": [
+            "invalid_output_type"
+          ],
+          "object": "a",
+          "output_enums": [
+            [
+              "operation"
+            ]
+          ],
+          "output_type": 17,
+          "private_locator_leaked": false,
+          "projection": [
+            "a"
+          ],
+          "prompt_id": "compiled-prompt:sha256:949852155a534b9d03737941bb124c15a7cab682825ce2197f67cafaf1b54d41"
+        },
+        {
+          "accepted": false,
+          "admission_artifact_id": "semantic-rejection:sha256:ac6ffb57c571491bf13dbc983f8f28378f97f8dd67101194cca68fcf01d612e1",
+          "choices": [
+            "a"
+          ],
+          "contracts": [
+            [
+              "a",
+              "binding:sha256:1dbcb241ec54a54efb680346ece3b00fee2c6919f6070c1778671fa6a5075f02",
+              "input-schema:sha256:6704c5ecaa462879c02774fdf7739f2af3ed07bec9d7449322dee0db4f0a0ed2"
+            ]
+          ],
+          "examples": [
+            "a"
+          ],
+          "label": "bad_argument",
+          "metadata_coherent": true,
+          "object": "a",
+          "output_enums": [
+            [
+              "operation"
+            ]
+          ],
+          "output_type": "operation",
+          "private_locator_leaked": false,
+          "projection": [
+            "a"
+          ],
+          "prompt_id": "compiled-prompt:sha256:949852155a534b9d03737941bb124c15a7cab682825ce2197f67cafaf1b54d41",
+          "reasons": [
+            "proposal_arguments_schema_invalid"
+          ]
+        },
+        {
+          "admission_error": "compiled task does not match proposal lineage",
+          "choices": [
+            "a"
+          ],
+          "contracts": [
+            [
+              "a",
+              "binding:sha256:1dbcb241ec54a54efb680346ece3b00fee2c6919f6070c1778671fa6a5075f02",
+              "input-schema:sha256:6704c5ecaa462879c02774fdf7739f2af3ed07bec9d7449322dee0db4f0a0ed2"
+            ]
+          ],
+          "examples": [
+            "a"
+          ],
+          "label": "foreign_lineage",
+          "metadata_coherent": true,
+          "object": "a",
+          "output_enums": [
+            [
+              "operation"
+            ]
+          ],
+          "output_type": "operation",
+          "private_locator_leaked": false,
+          "projection": [
+            "a"
+          ],
+          "prompt_id": "compiled-prompt:sha256:949852155a534b9d03737941bb124c15a7cab682825ce2197f67cafaf1b54d41"
+        },
+        {
+          "accepted": false,
+          "admission_artifact_id": "semantic-rejection:sha256:a67dd110c4a55ce6d86b6f9af2a1fe91155251bb4d22a947bdc57da6e3d908a9",
+          "label": "candidate_binding",
+          "object": "a",
+          "output_type": "operation",
+          "prompt_error": "no approved binding for AB object: a",
+          "reasons": [
+            "binding_unavailable"
+          ]
+        },
+        {
+          "accepted": false,
+          "admission_artifact_id": "semantic-rejection:sha256:377e5d7a7a2786f615ec7cff2ef38a542d376519f70e9413bdd46cc7dc2833de",
+          "label": "disabled_binding",
+          "object": "a",
+          "output_type": "operation",
+          "prompt_error": "no approved binding for AB object: a",
+          "reasons": [
+            "binding_unavailable"
+          ]
+        },
+        {
+          "accepted": false,
+          "admission_artifact_id": "semantic-rejection:sha256:4f553b1ddad7a0647bc3e5eb68bf20f1bf5cca54fe0c49bd9370df24cfdd0561",
+          "label": "owner_mismatch",
+          "object": "a",
+          "output_type": "operation",
+          "prompt_error": "binding owner does not match projected object owner",
+          "reasons": [
+            "binding_owner_mismatch"
+          ]
+        },
+        {
+          "accepted": false,
+          "admission_artifact_id": "semantic-rejection:sha256:67c348b8092d4b96fc8ab75b398f998104483d437c78c5b8898a1eeb7e5d7aed",
+          "choices": [
+            "a"
+          ],
+          "contracts": [
+            [
+              "a",
+              "binding:sha256:5a61d966798195090a333ec3fa7c95957397da5428f4d02546c08b983c75f308",
+              "input-schema:sha256:6704c5ecaa462879c02774fdf7739f2af3ed07bec9d7449322dee0db4f0a0ed2"
+            ]
+          ],
+          "examples": [
+            "a"
+          ],
+          "label": "missing_output_schema",
+          "metadata_coherent": true,
+          "object": "a",
+          "output_enums": [
+            [
+              "operation"
+            ]
+          ],
+          "output_type": "operation",
+          "private_locator_leaked": false,
+          "projection": [
+            "a"
+          ],
+          "prompt_id": "compiled-prompt:sha256:47eaa1d7785244b9675a7868ec48b47e384473d599ae3e5889ab6f160a5e945a",
+          "reasons": [
+            "binding_contract_incomplete"
+          ]
+        },
+        {
+          "accepted": false,
+          "admission_artifact_id": "semantic-rejection:sha256:bec9f912ad4cf00ae8349e5924a0ddabec0053cdbb3056c113f4638087bc2f38",
+          "choices": [
+            "a"
+          ],
+          "contracts": [
+            [
+              "a",
+              "binding:sha256:76c446ec130a20929935eddc3b1c1678aa8c6ad878e96018ce46e3779faa7930",
+              "input-schema:sha256:6704c5ecaa462879c02774fdf7739f2af3ed07bec9d7449322dee0db4f0a0ed2"
+            ]
+          ],
+          "examples": [
+            "a"
+          ],
+          "label": "missing_evidence_adapter",
+          "metadata_coherent": true,
+          "object": "a",
+          "output_enums": [
+            [
+              "operation"
+            ]
+          ],
+          "output_type": "operation",
+          "private_locator_leaked": false,
+          "projection": [
+            "a"
+          ],
+          "prompt_id": "compiled-prompt:sha256:c8bc70d19f781a6e91347156096700776e5a7ac489ececf3564151a328206306",
+          "reasons": [
+            "binding_contract_incomplete"
+          ]
+        },
+        {
+          "accepted": false,
+          "admission_artifact_id": "semantic-rejection:sha256:a41b2ff0d569c0d70ec7dddfa25cfa4923ef2a5bb1d8b34d06b7b866b4118543",
+          "label": "binding_environment",
+          "object": "a",
+          "output_type": "operation",
+          "prompt_error": "no approved binding for AB object: a",
+          "reasons": [
+            "binding_unavailable"
+          ]
+        },
+        {
+          "accepted": false,
+          "admission_artifact_id": "semantic-rejection:sha256:d576e599ec85f86736e7109e7d3a0931990ee556d093efbde300b6a5adb5c431",
+          "label": "binding_runtime",
+          "object": "a",
+          "output_type": "operation",
+          "prompt_error": "no approved binding for runtime mode fake: a",
+          "reasons": [
+            "binding_unavailable"
+          ]
+        },
+        {
+          "accepted": false,
+          "admission_artifact_id": "semantic-rejection:sha256:4d08be7a85ab90f24d510ba8f2edf787c82a5b90b2506b507fd1a04063578ee3",
+          "label": "ambiguous_binding",
+          "object": "a",
+          "output_type": "operation",
+          "prompt_error": "ambiguous approved bindings for AB object a in runtime mode fake",
+          "reasons": [
+            "binding_unavailable"
+          ]
+        },
+        {
+          "accepted": false,
+          "admission_artifact_id": "semantic-rejection:sha256:b1f53f88ba9c5a109d7b5aebe8d7a5b411ad0520493dfdfa0bc8cf1d0e8ef4d7",
+          "label": "missing_schema",
+          "object": "a",
+          "output_type": "operation",
+          "prompt_error": "binding argument schema is not registered",
+          "reasons": [
+            "input_schema_unavailable"
+          ]
+        },
+        {
+          "accepted": false,
+          "admission_artifact_id": "semantic-rejection:sha256:d0b1840b7c12f7680c2fa716dd3e70aad778cfbe0edac4673a841de3b2b31623",
+          "label": "catalog_drift",
+          "object": "a",
+          "output_type": "operation",
+          "prompt_error": "binding catalog object does not match task projection",
+          "reasons": [
+            "catalog_object_mismatch"
+          ]
+        },
+        {
+          "early_error": "compiled task identity does not match content",
+          "label": "tampered_compiled_identity"
+        },
+        {
+          "accepted": true,
+          "admission_artifact_id": "admission:sha256:8d78af7a01e372827a4e18a69a592ad99bc0f6700d10e9cde0bed8a76cae77a6",
+          "admission_prompt_source_agreement": true,
+          "admitted_binding": "binding:sha256:1dbcb241ec54a54efb680346ece3b00fee2c6919f6070c1778671fa6a5075f02",
+          "admitted_schema": "input-schema:sha256:6704c5ecaa462879c02774fdf7739f2af3ed07bec9d7449322dee0db4f0a0ed2",
+          "choices": [
+            "a"
+          ],
+          "contracts": [
+            [
+              "a",
+              "binding:sha256:1dbcb241ec54a54efb680346ece3b00fee2c6919f6070c1778671fa6a5075f02",
+              "input-schema:sha256:6704c5ecaa462879c02774fdf7739f2af3ed07bec9d7449322dee0db4f0a0ed2"
+            ]
+          ],
+          "examples": [
+            "a"
+          ],
+          "execution_authority": false,
+          "label": "compiler_missing_child_obligation_parent",
+          "metadata_coherent": true,
+          "object": "a",
+          "output_enums": [
+            [
+              "operation"
+            ]
+          ],
+          "output_type": "operation",
+          "private_locator_leaked": false,
+          "projection": [
+            "a",
+            "b"
+          ],
+          "prompt_id": "compiled-prompt:sha256:67f2c9e9c3e658c529be8223d9e23c86ec2f8ce449175c287fdd0f0d3c8e3c39",
+          "reasons": []
+        },
+        {
+          "accepted": false,
+          "admission_artifact_id": "semantic-rejection:sha256:f7eceb485d1d5005e68bed2cbfa92247e878e0019abaa41b62b66909e5b5672c",
+          "choices": [
+            "a"
+          ],
+          "contracts": [
+            [
+              "a",
+              "binding:sha256:1dbcb241ec54a54efb680346ece3b00fee2c6919f6070c1778671fa6a5075f02",
+              "input-schema:sha256:6704c5ecaa462879c02774fdf7739f2af3ed07bec9d7449322dee0db4f0a0ed2"
+            ]
+          ],
+          "examples": [
+            "a"
+          ],
+          "label": "compiler_missing_child_obligation_child",
+          "metadata_coherent": true,
+          "object": "b",
+          "output_enums": [
+            [
+              "operation"
+            ]
+          ],
+          "output_type": "operation",
+          "private_locator_leaked": false,
+          "projection": [
+            "a",
+            "b"
+          ],
+          "prompt_id": "compiled-prompt:sha256:67f2c9e9c3e658c529be8223d9e23c86ec2f8ce449175c287fdd0f0d3c8e3c39",
+          "reasons": [
+            "missing_effect_obligation"
+          ]
+        },
+        {
+          "accepted": true,
+          "admission_artifact_id": "admission:sha256:462822a2847a612ba7b2624ccfb3864aea9e7780b65b6b0572f7f84720ebabc9",
+          "admission_prompt_source_agreement": true,
+          "admitted_binding": "binding:sha256:1dbcb241ec54a54efb680346ece3b00fee2c6919f6070c1778671fa6a5075f02",
+          "admitted_schema": "input-schema:sha256:6704c5ecaa462879c02774fdf7739f2af3ed07bec9d7449322dee0db4f0a0ed2",
+          "choices": [
+            "a"
+          ],
+          "contracts": [
+            [
+              "a",
+              "binding:sha256:1dbcb241ec54a54efb680346ece3b00fee2c6919f6070c1778671fa6a5075f02",
+              "input-schema:sha256:6704c5ecaa462879c02774fdf7739f2af3ed07bec9d7449322dee0db4f0a0ed2"
+            ]
+          ],
+          "examples": [
+            "a"
+          ],
+          "execution_authority": false,
+          "label": "compiler_missing_child_and_forbidden_observable_parent",
+          "metadata_coherent": true,
+          "object": "a",
+          "output_enums": [
+            [
+              "operation"
+            ]
+          ],
+          "output_type": "operation",
+          "private_locator_leaked": false,
+          "projection": [
+            "a",
+            "b"
+          ],
+          "prompt_id": "compiled-prompt:sha256:6b8d3669707a1a65b3dd154fa688dbbeca50fa7b7e305a67f6512f424504b072",
+          "reasons": []
+        },
+        {
+          "accepted": false,
+          "admission_artifact_id": "semantic-rejection:sha256:0045c3966e9a3ee7a639f01cc3066698245800d5019a61aef56cbe075b3207b0",
+          "choices": [
+            "a"
+          ],
+          "contracts": [
+            [
+              "a",
+              "binding:sha256:1dbcb241ec54a54efb680346ece3b00fee2c6919f6070c1778671fa6a5075f02",
+              "input-schema:sha256:6704c5ecaa462879c02774fdf7739f2af3ed07bec9d7449322dee0db4f0a0ed2"
+            ]
+          ],
+          "examples": [
+            "a"
+          ],
+          "label": "compiler_missing_child_and_forbidden_observable_child",
+          "metadata_coherent": true,
+          "object": "b",
+          "output_enums": [
+            [
+              "operation"
+            ]
+          ],
+          "output_type": "operation",
+          "private_locator_leaked": false,
+          "projection": [
+            "a",
+            "b"
+          ],
+          "prompt_id": "compiled-prompt:sha256:6b8d3669707a1a65b3dd154fa688dbbeca50fa7b7e305a67f6512f424504b072",
+          "reasons": [
+            "object_effect_prohibited",
+            "missing_effect_obligation"
+          ]
+        }
+      ]
+    },
+    {
+      "variant": "before",
+      "exit_code": 0,
+      "imported_admission": "/tmp/uah-arch01-primary.qXMxdY/before/src/ab_harness/proposal_admission.py",
+      "imported_prompt": "/tmp/uah-arch01-primary.qXMxdY/before/src/ab_harness/prompt_compiler.py",
+      "row_count": 50,
+      "rows": [
+        {
+          "accepted": true,
+          "admission_artifact_id": "admission:sha256:5bc9372a5e32bae4e8081607ae3c3ed2f0f5ffbff61a9f927651786fc714f700",
+          "admission_prompt_source_agreement": true,
+          "admitted_binding": "binding:sha256:1dbcb241ec54a54efb680346ece3b00fee2c6919f6070c1778671fa6a5075f02",
+          "admitted_schema": "input-schema:sha256:6704c5ecaa462879c02774fdf7739f2af3ed07bec9d7449322dee0db4f0a0ed2",
+          "choices": [
+            "a"
+          ],
+          "contracts": [
+            [
+              "a",
+              "binding:sha256:1dbcb241ec54a54efb680346ece3b00fee2c6919f6070c1778671fa6a5075f02",
+              "input-schema:sha256:6704c5ecaa462879c02774fdf7739f2af3ed07bec9d7449322dee0db4f0a0ed2"
+            ]
+          ],
+          "examples": [
+            "a"
+          ],
+          "execution_authority": false,
+          "label": "permitted",
+          "metadata_coherent": true,
+          "object": "a",
+          "output_enums": [
+            [
+              "operation"
+            ]
+          ],
+          "output_type": "operation",
+          "private_locator_leaked": false,
+          "projection": [
+            "a"
+          ],
+          "prompt_id": "compiled-prompt:sha256:949852155a534b9d03737941bb124c15a7cab682825ce2197f67cafaf1b54d41",
+          "reasons": []
+        },
+        {
+          "accepted": false,
+          "admission_artifact_id": "semantic-rejection:sha256:ad8a6d21e0d6329360590c42fc89899fd55023aa8eeb8c8094541589fde24a7c",
+          "label": "expected_only",
+          "object": "a",
+          "output_type": "operation",
+          "prompt_error": "compiled task exposes no direct proposal operations",
+          "reasons": [
+            "object_effect_prohibited"
+          ]
+        },
+        {
+          "accepted": false,
+          "admission_artifact_id": "semantic-rejection:sha256:8fd5d1a2db059629be11089596d05534b6cc8f2cb43457499fe52d92ab4ac2c8",
+          "choices": [
+            "a"
+          ],
+          "contracts": [
+            [
+              "a",
+              "binding:sha256:1dbcb241ec54a54efb680346ece3b00fee2c6919f6070c1778671fa6a5075f02",
+              "input-schema:sha256:6704c5ecaa462879c02774fdf7739f2af3ed07bec9d7449322dee0db4f0a0ed2"
+            ]
+          ],
+          "examples": [
+            "a"
+          ],
+          "label": "observable_only",
+          "metadata_coherent": true,
+          "object": "a",
+          "output_enums": [
+            [
+              "operation"
+            ]
+          ],
+          "output_type": "operation",
+          "private_locator_leaked": false,
+          "projection": [
+            "a"
+          ],
+          "prompt_id": "compiled-prompt:sha256:c01ff1f43651d4f4b108b02dc41eef363209cffa7d02b206c911206235e34fd9",
+          "reasons": [
+            "object_effect_prohibited"
+          ]
+        },
+        {
+          "accepted": false,
+          "admission_artifact_id": "semantic-rejection:sha256:e90c0e5e757dc44a1347112977f5045af34a136556bd4b93f8e9f60fd54002ff",
+          "label": "both",
+          "object": "a",
+          "output_type": "operation",
+          "prompt_error": "compiled task exposes no direct proposal operations",
+          "reasons": [
+            "object_effect_prohibited"
+          ]
+        },
+        {
+          "accepted": false,
+          "admission_artifact_id": "semantic-rejection:sha256:459a7e16e56f65ded730757682ad0abc14a11efd9c5c4101d2450d42009417eb",
+          "label": "separate_both",
+          "object": "a",
+          "output_type": "operation",
+          "prompt_error": "compiled task exposes no direct proposal operations",
+          "reasons": [
+            "object_effect_prohibited"
+          ]
+        },
+        {
+          "accepted": false,
+          "admission_artifact_id": "semantic-rejection:sha256:3477d23cd1165bd5ff1a00af48e45cffcbdffe6719cdbcb2794b650c37dc9832",
+          "label": "separate_both_reverse",
+          "object": "a",
+          "output_type": "operation",
+          "prompt_error": "compiled task exposes no direct proposal operations",
+          "reasons": [
+            "object_effect_prohibited"
+          ]
+        },
+        {
+          "accepted": true,
+          "admission_artifact_id": "admission:sha256:9aec436851618df0e865300af02ea95ec7d5726d8490740300751be21f526676",
+          "admission_prompt_source_agreement": true,
+          "admitted_binding": "binding:sha256:1dbcb241ec54a54efb680346ece3b00fee2c6919f6070c1778671fa6a5075f02",
+          "admitted_schema": "input-schema:sha256:6704c5ecaa462879c02774fdf7739f2af3ed07bec9d7449322dee0db4f0a0ed2",
+          "choices": [
+            "a"
+          ],
+          "contracts": [
+            [
+              "a",
+              "binding:sha256:1dbcb241ec54a54efb680346ece3b00fee2c6919f6070c1778671fa6a5075f02",
+              "input-schema:sha256:6704c5ecaa462879c02774fdf7739f2af3ed07bec9d7449322dee0db4f0a0ed2"
+            ]
+          ],
+          "examples": [
+            "a"
+          ],
+          "execution_authority": false,
+          "label": "unrelated_prohibition",
+          "metadata_coherent": true,
+          "object": "a",
+          "output_enums": [
+            [
+              "operation"
+            ]
+          ],
+          "output_type": "operation",
+          "private_locator_leaked": false,
+          "projection": [
+            "a"
+          ],
+          "prompt_id": "compiled-prompt:sha256:453ccb8530658a97d0c16ba143f8cce60b7cc295839eae43dde2440d2948ed59",
+          "reasons": []
+        },
+        {
+          "accepted": true,
+          "admission_artifact_id": "admission:sha256:74a3c55b4bbb45eaca6fa95e83d02bc668c0e8395c222ffb4fb63c6772239bb6",
+          "admission_prompt_source_agreement": true,
+          "admitted_binding": "binding:sha256:1dbcb241ec54a54efb680346ece3b00fee2c6919f6070c1778671fa6a5075f02",
+          "admitted_schema": "input-schema:sha256:6704c5ecaa462879c02774fdf7739f2af3ed07bec9d7449322dee0db4f0a0ed2",
+          "choices": [
+            "a"
+          ],
+          "contracts": [
+            [
+              "a",
+              "binding:sha256:1dbcb241ec54a54efb680346ece3b00fee2c6919f6070c1778671fa6a5075f02",
+              "input-schema:sha256:6704c5ecaa462879c02774fdf7739f2af3ed07bec9d7449322dee0db4f0a0ed2"
+            ]
+          ],
+          "examples": [
+            "a"
+          ],
+          "execution_authority": false,
+          "label": "empty_effect_lists",
+          "metadata_coherent": true,
+          "object": "a",
+          "output_enums": [
+            [
+              "operation"
+            ]
+          ],
+          "output_type": "operation",
+          "private_locator_leaked": false,
+          "projection": [
+            "a"
+          ],
+          "prompt_id": "compiled-prompt:sha256:966ff012c606f971deb43ad7d0b4f8b13dc4d36ab4d8aaa8135b0ef6da4df3e6",
+          "reasons": []
+        },
+        {
+          "accepted": false,
+          "admission_artifact_id": "semantic-rejection:sha256:d5dd2f356c9f13b5e7d99dbb2adbd2961a336aab29bfedee6212aec48ab4362b",
+          "label": "empty_projection",
+          "object": "a",
+          "output_type": "operation",
+          "prompt_error": "compiled task exposes no direct proposal operations",
+          "reasons": [
+            "object_outside_projection",
+            "missing_effect_obligation"
+          ]
+        },
+        {
+          "accepted": false,
+          "admission_artifact_id": "semantic-rejection:sha256:d1c8bb81eb98c03875bf14ae45445f83748f5a710b23812a8eacb38eca837fda",
+          "choices": [
+            "a"
+          ],
+          "contracts": [
+            [
+              "a",
+              "binding:sha256:1dbcb241ec54a54efb680346ece3b00fee2c6919f6070c1778671fa6a5075f02",
+              "input-schema:sha256:6704c5ecaa462879c02774fdf7739f2af3ed07bec9d7449322dee0db4f0a0ed2"
+            ]
+          ],
+          "examples": [
+            "a"
+          ],
+          "label": "missing_obligation",
+          "metadata_coherent": true,
+          "object": "a",
+          "output_enums": [
+            [
+              "operation"
+            ]
+          ],
+          "output_type": "operation",
+          "private_locator_leaked": false,
+          "projection": [
+            "a"
+          ],
+          "prompt_id": "compiled-prompt:sha256:5aad4f6941640ef635ea06d754f69c12f75e6fcdb7b88623fe1e251b46faad41",
+          "reasons": [
+            "missing_effect_obligation"
+          ]
+        },
+        {
+          "accepted": false,
+          "admission_artifact_id": "semantic-rejection:sha256:4e11d1d12991762e77d3ac07b2c525649cbc0683a3cc0636aa231b2be343da8b",
+          "label": "inspect_only",
+          "object": "a",
+          "output_type": "operation",
+          "prompt_error": "compiled task exposes no direct proposal operations",
+          "reasons": [
+            "object_inspection_only"
+          ]
+        },
+        {
+          "accepted": false,
+          "admission_artifact_id": "semantic-rejection:sha256:55fdd01ea36d2df4535c6ff112246f6f25634a485b5cf6141e136391d806f137",
+          "label": "above_direct_band",
+          "object": "a",
+          "output_type": "operation",
+          "prompt_error": "compiled task exposes no direct proposal operations",
+          "reasons": [
+            "object_inspection_only"
+          ]
+        },
+        {
+          "accepted": false,
+          "admission_artifact_id": "semantic-rejection:sha256:7a7728e4101c14c3d1ccd945d8bbbe2e5ac4927728ceb7f61c328acc5bc95204",
+          "label": "not_callable",
+          "object": "a",
+          "output_type": "operation",
+          "prompt_error": "compiled task exposes no direct proposal operations",
+          "reasons": [
+            "object_not_runtime_callable"
+          ]
+        },
+        {
+          "accepted": true,
+          "admission_artifact_id": "admission:sha256:43ebdc3d85b70b16325eaf00a3079cafdaa5c255b8b061b45da4c10f78cdcb60",
+          "admission_prompt_source_agreement": true,
+          "admitted_binding": "binding:sha256:1dbcb241ec54a54efb680346ece3b00fee2c6919f6070c1778671fa6a5075f02",
+          "admitted_schema": "input-schema:sha256:6704c5ecaa462879c02774fdf7739f2af3ed07bec9d7449322dee0db4f0a0ed2",
+          "choices": [
+            "a",
+            "b"
+          ],
+          "contracts": [
+            [
+              "a",
+              "binding:sha256:1dbcb241ec54a54efb680346ece3b00fee2c6919f6070c1778671fa6a5075f02",
+              "input-schema:sha256:6704c5ecaa462879c02774fdf7739f2af3ed07bec9d7449322dee0db4f0a0ed2"
+            ],
+            [
+              "b",
+              "binding:sha256:5a35c72b3a0934b91e7a3b21f73c8672e0b5b9c3b0568431cf6f493e1413cfb5",
+              "input-schema:sha256:6704c5ecaa462879c02774fdf7739f2af3ed07bec9d7449322dee0db4f0a0ed2"
+            ]
+          ],
+          "examples": [
+            "a",
+            "b"
+          ],
+          "execution_authority": false,
+          "label": "two_permitted_ab",
+          "metadata_coherent": true,
+          "object": "a",
+          "output_enums": [
+            [
+              "operation"
+            ],
+            [
+              "operation"
+            ]
+          ],
+          "output_type": "operation",
+          "private_locator_leaked": false,
+          "projection": [
+            "a",
+            "b"
+          ],
+          "prompt_id": "compiled-prompt:sha256:e4de3f91eb04dcaaa6597e84b68c1662a80981b1d0e39db3810b0e33ad14b86b",
+          "reasons": []
+        },
+        {
+          "accepted": true,
+          "admission_artifact_id": "admission:sha256:60fa1b5f750f379b4d4f5c3122bad5c384dd02eb67bf4c5f31f4b4c1729e3633",
+          "admission_prompt_source_agreement": true,
+          "admitted_binding": "binding:sha256:5a35c72b3a0934b91e7a3b21f73c8672e0b5b9c3b0568431cf6f493e1413cfb5",
+          "admitted_schema": "input-schema:sha256:6704c5ecaa462879c02774fdf7739f2af3ed07bec9d7449322dee0db4f0a0ed2",
+          "choices": [
+            "a",
+            "b"
+          ],
+          "contracts": [
+            [
+              "a",
+              "binding:sha256:1dbcb241ec54a54efb680346ece3b00fee2c6919f6070c1778671fa6a5075f02",
+              "input-schema:sha256:6704c5ecaa462879c02774fdf7739f2af3ed07bec9d7449322dee0db4f0a0ed2"
+            ],
+            [
+              "b",
+              "binding:sha256:5a35c72b3a0934b91e7a3b21f73c8672e0b5b9c3b0568431cf6f493e1413cfb5",
+              "input-schema:sha256:6704c5ecaa462879c02774fdf7739f2af3ed07bec9d7449322dee0db4f0a0ed2"
+            ]
+          ],
+          "examples": [
+            "a",
+            "b"
+          ],
+          "execution_authority": false,
+          "label": "two_permitted_ab_b",
+          "metadata_coherent": true,
+          "object": "b",
+          "output_enums": [
+            [
+              "operation"
+            ],
+            [
+              "operation"
+            ]
+          ],
+          "output_type": "operation",
+          "private_locator_leaked": false,
+          "projection": [
+            "a",
+            "b"
+          ],
+          "prompt_id": "compiled-prompt:sha256:e4de3f91eb04dcaaa6597e84b68c1662a80981b1d0e39db3810b0e33ad14b86b",
+          "reasons": []
+        },
+        {
+          "accepted": true,
+          "admission_artifact_id": "admission:sha256:edb22eefbc0531adafe3a221b5613e7eaa0fb602ed99eb10eea18d4b34d8f39a",
+          "admission_prompt_source_agreement": true,
+          "admitted_binding": "binding:sha256:1dbcb241ec54a54efb680346ece3b00fee2c6919f6070c1778671fa6a5075f02",
+          "admitted_schema": "input-schema:sha256:6704c5ecaa462879c02774fdf7739f2af3ed07bec9d7449322dee0db4f0a0ed2",
+          "choices": [
+            "b",
+            "a"
+          ],
+          "contracts": [
+            [
+              "a",
+              "binding:sha256:1dbcb241ec54a54efb680346ece3b00fee2c6919f6070c1778671fa6a5075f02",
+              "input-schema:sha256:6704c5ecaa462879c02774fdf7739f2af3ed07bec9d7449322dee0db4f0a0ed2"
+            ],
+            [
+              "b",
+              "binding:sha256:5a35c72b3a0934b91e7a3b21f73c8672e0b5b9c3b0568431cf6f493e1413cfb5",
+              "input-schema:sha256:6704c5ecaa462879c02774fdf7739f2af3ed07bec9d7449322dee0db4f0a0ed2"
+            ]
+          ],
+          "examples": [
+            "b",
+            "a"
+          ],
+          "execution_authority": false,
+          "label": "two_permitted_ba",
+          "metadata_coherent": true,
+          "object": "a",
+          "output_enums": [
+            [
+              "operation"
+            ],
+            [
+              "operation"
+            ]
+          ],
+          "output_type": "operation",
+          "private_locator_leaked": false,
+          "projection": [
+            "b",
+            "a"
+          ],
+          "prompt_id": "compiled-prompt:sha256:f5b2428727fd546747b119888a652e958b99575e8840f6f9aa7367a90fd1478b",
+          "reasons": []
+        },
+        {
+          "accepted": true,
+          "admission_artifact_id": "admission:sha256:83b11a977d8b213938ae16fd8c45dd0a7667f9f26cf42209cd5bf9b7d561e2e6",
+          "admission_prompt_source_agreement": true,
+          "admitted_binding": "binding:sha256:5a35c72b3a0934b91e7a3b21f73c8672e0b5b9c3b0568431cf6f493e1413cfb5",
+          "admitted_schema": "input-schema:sha256:6704c5ecaa462879c02774fdf7739f2af3ed07bec9d7449322dee0db4f0a0ed2",
+          "choices": [
+            "b",
+            "a"
+          ],
+          "contracts": [
+            [
+              "a",
+              "binding:sha256:1dbcb241ec54a54efb680346ece3b00fee2c6919f6070c1778671fa6a5075f02",
+              "input-schema:sha256:6704c5ecaa462879c02774fdf7739f2af3ed07bec9d7449322dee0db4f0a0ed2"
+            ],
+            [
+              "b",
+              "binding:sha256:5a35c72b3a0934b91e7a3b21f73c8672e0b5b9c3b0568431cf6f493e1413cfb5",
+              "input-schema:sha256:6704c5ecaa462879c02774fdf7739f2af3ed07bec9d7449322dee0db4f0a0ed2"
+            ]
+          ],
+          "examples": [
+            "b",
+            "a"
+          ],
+          "execution_authority": false,
+          "label": "two_permitted_ba_b",
+          "metadata_coherent": true,
+          "object": "b",
+          "output_enums": [
+            [
+              "operation"
+            ],
+            [
+              "operation"
+            ]
+          ],
+          "output_type": "operation",
+          "private_locator_leaked": false,
+          "projection": [
+            "b",
+            "a"
+          ],
+          "prompt_id": "compiled-prompt:sha256:f5b2428727fd546747b119888a652e958b99575e8840f6f9aa7367a90fd1478b",
+          "reasons": []
+        },
+        {
+          "accepted": true,
+          "admission_artifact_id": "admission:sha256:0686883d8b8fb3753cb887e13bd06609cadd92ec667c735aec2df2386ae54a2c",
+          "admission_prompt_source_agreement": true,
+          "admitted_binding": "binding:sha256:1dbcb241ec54a54efb680346ece3b00fee2c6919f6070c1778671fa6a5075f02",
+          "admitted_schema": "input-schema:sha256:6704c5ecaa462879c02774fdf7739f2af3ed07bec9d7449322dee0db4f0a0ed2",
+          "choices": [
+            "a",
+            "b"
+          ],
+          "contracts": [
+            [
+              "a",
+              "binding:sha256:1dbcb241ec54a54efb680346ece3b00fee2c6919f6070c1778671fa6a5075f02",
+              "input-schema:sha256:6704c5ecaa462879c02774fdf7739f2af3ed07bec9d7449322dee0db4f0a0ed2"
+            ],
+            [
+              "b",
+              "binding:sha256:5a35c72b3a0934b91e7a3b21f73c8672e0b5b9c3b0568431cf6f493e1413cfb5",
+              "input-schema:sha256:6704c5ecaa462879c02774fdf7739f2af3ed07bec9d7449322dee0db4f0a0ed2"
+            ]
+          ],
+          "examples": [
+            "a",
+            "b"
+          ],
+          "execution_authority": false,
+          "label": "mixed_ab",
+          "metadata_coherent": true,
+          "object": "a",
+          "output_enums": [
+            [
+              "operation"
+            ],
+            [
+              "operation"
+            ]
+          ],
+          "output_type": "operation",
+          "private_locator_leaked": false,
+          "projection": [
+            "a",
+            "b"
+          ],
+          "prompt_id": "compiled-prompt:sha256:62ce79f80af6156d5bd16849873b261cdecddedd4f45d63c78805db14dff243f",
+          "reasons": []
+        },
+        {
+          "accepted": false,
+          "admission_artifact_id": "semantic-rejection:sha256:505de52da11c6de2041884e8f7886b2ae75dca3f094ed990835226cd284bb325",
+          "choices": [
+            "a",
+            "b"
+          ],
+          "contracts": [
+            [
+              "a",
+              "binding:sha256:1dbcb241ec54a54efb680346ece3b00fee2c6919f6070c1778671fa6a5075f02",
+              "input-schema:sha256:6704c5ecaa462879c02774fdf7739f2af3ed07bec9d7449322dee0db4f0a0ed2"
+            ],
+            [
+              "b",
+              "binding:sha256:5a35c72b3a0934b91e7a3b21f73c8672e0b5b9c3b0568431cf6f493e1413cfb5",
+              "input-schema:sha256:6704c5ecaa462879c02774fdf7739f2af3ed07bec9d7449322dee0db4f0a0ed2"
+            ]
+          ],
+          "examples": [
+            "a",
+            "b"
+          ],
+          "label": "mixed_ab_b",
+          "metadata_coherent": true,
+          "object": "b",
+          "output_enums": [
+            [
+              "operation"
+            ],
+            [
+              "operation"
+            ]
+          ],
+          "output_type": "operation",
+          "private_locator_leaked": false,
+          "projection": [
+            "a",
+            "b"
+          ],
+          "prompt_id": "compiled-prompt:sha256:62ce79f80af6156d5bd16849873b261cdecddedd4f45d63c78805db14dff243f",
+          "reasons": [
+            "object_effect_prohibited"
+          ]
+        },
+        {
+          "accepted": true,
+          "admission_artifact_id": "admission:sha256:e1e167d1954eb8fb20fb4a3a715573e15c43fff5d0e121f38412c4d8cd8dc041",
+          "admission_prompt_source_agreement": true,
+          "admitted_binding": "binding:sha256:1dbcb241ec54a54efb680346ece3b00fee2c6919f6070c1778671fa6a5075f02",
+          "admitted_schema": "input-schema:sha256:6704c5ecaa462879c02774fdf7739f2af3ed07bec9d7449322dee0db4f0a0ed2",
+          "choices": [
+            "b",
+            "a"
+          ],
+          "contracts": [
+            [
+              "a",
+              "binding:sha256:1dbcb241ec54a54efb680346ece3b00fee2c6919f6070c1778671fa6a5075f02",
+              "input-schema:sha256:6704c5ecaa462879c02774fdf7739f2af3ed07bec9d7449322dee0db4f0a0ed2"
+            ],
+            [
+              "b",
+              "binding:sha256:5a35c72b3a0934b91e7a3b21f73c8672e0b5b9c3b0568431cf6f493e1413cfb5",
+              "input-schema:sha256:6704c5ecaa462879c02774fdf7739f2af3ed07bec9d7449322dee0db4f0a0ed2"
+            ]
+          ],
+          "examples": [
+            "b",
+            "a"
+          ],
+          "execution_authority": false,
+          "label": "mixed_ba",
+          "metadata_coherent": true,
+          "object": "a",
+          "output_enums": [
+            [
+              "operation"
+            ],
+            [
+              "operation"
+            ]
+          ],
+          "output_type": "operation",
+          "private_locator_leaked": false,
+          "projection": [
+            "b",
+            "a"
+          ],
+          "prompt_id": "compiled-prompt:sha256:fab9cb8f5c807efa90fb4c4fde66e691e9d5da91c3bdc2b29a5c2f2f3266b50d",
+          "reasons": []
+        },
+        {
+          "accepted": false,
+          "admission_artifact_id": "semantic-rejection:sha256:d272cdd8580a73acfb0083a621a139d177b293357fd8c0c6920f9d1d00d50e1a",
+          "choices": [
+            "b",
+            "a"
+          ],
+          "contracts": [
+            [
+              "a",
+              "binding:sha256:1dbcb241ec54a54efb680346ece3b00fee2c6919f6070c1778671fa6a5075f02",
+              "input-schema:sha256:6704c5ecaa462879c02774fdf7739f2af3ed07bec9d7449322dee0db4f0a0ed2"
+            ],
+            [
+              "b",
+              "binding:sha256:5a35c72b3a0934b91e7a3b21f73c8672e0b5b9c3b0568431cf6f493e1413cfb5",
+              "input-schema:sha256:6704c5ecaa462879c02774fdf7739f2af3ed07bec9d7449322dee0db4f0a0ed2"
+            ]
+          ],
+          "examples": [
+            "b",
+            "a"
+          ],
+          "label": "mixed_ba_b",
+          "metadata_coherent": true,
+          "object": "b",
+          "output_enums": [
+            [
+              "operation"
+            ],
+            [
+              "operation"
+            ]
+          ],
+          "output_type": "operation",
+          "private_locator_leaked": false,
+          "projection": [
+            "b",
+            "a"
+          ],
+          "prompt_id": "compiled-prompt:sha256:fab9cb8f5c807efa90fb4c4fde66e691e9d5da91c3bdc2b29a5c2f2f3266b50d",
+          "reasons": [
+            "object_effect_prohibited"
+          ]
+        },
+        {
+          "accepted": true,
+          "admission_artifact_id": "admission:sha256:dd25ab5d960ba7ace0b62c10726e3e083cbf6a66050f99550473b7acfc14fde7",
+          "admission_prompt_source_agreement": true,
+          "admitted_binding": "binding:sha256:1dbcb241ec54a54efb680346ece3b00fee2c6919f6070c1778671fa6a5075f02",
+          "admitted_schema": "input-schema:sha256:6704c5ecaa462879c02774fdf7739f2af3ed07bec9d7449322dee0db4f0a0ed2",
+          "choices": [
+            "a",
+            "b"
+          ],
+          "contracts": [
+            [
+              "a",
+              "binding:sha256:1dbcb241ec54a54efb680346ece3b00fee2c6919f6070c1778671fa6a5075f02",
+              "input-schema:sha256:6704c5ecaa462879c02774fdf7739f2af3ed07bec9d7449322dee0db4f0a0ed2"
+            ],
+            [
+              "b",
+              "binding:sha256:5a35c72b3a0934b91e7a3b21f73c8672e0b5b9c3b0568431cf6f493e1413cfb5",
+              "input-schema:sha256:6704c5ecaa462879c02774fdf7739f2af3ed07bec9d7449322dee0db4f0a0ed2"
+            ]
+          ],
+          "examples": [
+            "a",
+            "b"
+          ],
+          "execution_authority": false,
+          "label": "missing_second_ab",
+          "metadata_coherent": true,
+          "object": "a",
+          "output_enums": [
+            [
+              "operation"
+            ],
+            [
+              "operation"
+            ]
+          ],
+          "output_type": "operation",
+          "private_locator_leaked": false,
+          "projection": [
+            "a",
+            "b"
+          ],
+          "prompt_id": "compiled-prompt:sha256:049aeb1006259016e5bb267f8fe75cf474682f091b9136e3eb67062a58ee6c6d",
+          "reasons": []
+        },
+        {
+          "accepted": false,
+          "admission_artifact_id": "semantic-rejection:sha256:1aef8c2ea18fb3eb4cf4f54376ca0edcd32b9412915eececb1f481f186ef18cb",
+          "choices": [
+            "a",
+            "b"
+          ],
+          "contracts": [
+            [
+              "a",
+              "binding:sha256:1dbcb241ec54a54efb680346ece3b00fee2c6919f6070c1778671fa6a5075f02",
+              "input-schema:sha256:6704c5ecaa462879c02774fdf7739f2af3ed07bec9d7449322dee0db4f0a0ed2"
+            ],
+            [
+              "b",
+              "binding:sha256:5a35c72b3a0934b91e7a3b21f73c8672e0b5b9c3b0568431cf6f493e1413cfb5",
+              "input-schema:sha256:6704c5ecaa462879c02774fdf7739f2af3ed07bec9d7449322dee0db4f0a0ed2"
+            ]
+          ],
+          "examples": [
+            "a",
+            "b"
+          ],
+          "label": "missing_second_ab_b",
+          "metadata_coherent": true,
+          "object": "b",
+          "output_enums": [
+            [
+              "operation"
+            ],
+            [
+              "operation"
+            ]
+          ],
+          "output_type": "operation",
+          "private_locator_leaked": false,
+          "projection": [
+            "a",
+            "b"
+          ],
+          "prompt_id": "compiled-prompt:sha256:049aeb1006259016e5bb267f8fe75cf474682f091b9136e3eb67062a58ee6c6d",
+          "reasons": [
+            "missing_effect_obligation"
+          ]
+        },
+        {
+          "accepted": true,
+          "admission_artifact_id": "admission:sha256:61d8f9390efd480246ce9539e73b84fca1a00180da5dcf8e104e7c6aed71f16e",
+          "admission_prompt_source_agreement": true,
+          "admitted_binding": "binding:sha256:1dbcb241ec54a54efb680346ece3b00fee2c6919f6070c1778671fa6a5075f02",
+          "admitted_schema": "input-schema:sha256:6704c5ecaa462879c02774fdf7739f2af3ed07bec9d7449322dee0db4f0a0ed2",
+          "choices": [
+            "b",
+            "a"
+          ],
+          "contracts": [
+            [
+              "a",
+              "binding:sha256:1dbcb241ec54a54efb680346ece3b00fee2c6919f6070c1778671fa6a5075f02",
+              "input-schema:sha256:6704c5ecaa462879c02774fdf7739f2af3ed07bec9d7449322dee0db4f0a0ed2"
+            ],
+            [
+              "b",
+              "binding:sha256:5a35c72b3a0934b91e7a3b21f73c8672e0b5b9c3b0568431cf6f493e1413cfb5",
+              "input-schema:sha256:6704c5ecaa462879c02774fdf7739f2af3ed07bec9d7449322dee0db4f0a0ed2"
+            ]
+          ],
+          "examples": [
+            "b",
+            "a"
+          ],
+          "execution_authority": false,
+          "label": "missing_second_ba",
+          "metadata_coherent": true,
+          "object": "a",
+          "output_enums": [
+            [
+              "operation"
+            ],
+            [
+              "operation"
+            ]
+          ],
+          "output_type": "operation",
+          "private_locator_leaked": false,
+          "projection": [
+            "b",
+            "a"
+          ],
+          "prompt_id": "compiled-prompt:sha256:4d4202f2e66c37b4c51cec91ae14c4ddaf10f7b7d5dde767bcd35ad28368da2c",
+          "reasons": []
+        },
+        {
+          "accepted": false,
+          "admission_artifact_id": "semantic-rejection:sha256:c166a852be6f7f924046997755eb3279a1ea9f8cbf23fe5fdd889b1627b61957",
+          "choices": [
+            "b",
+            "a"
+          ],
+          "contracts": [
+            [
+              "a",
+              "binding:sha256:1dbcb241ec54a54efb680346ece3b00fee2c6919f6070c1778671fa6a5075f02",
+              "input-schema:sha256:6704c5ecaa462879c02774fdf7739f2af3ed07bec9d7449322dee0db4f0a0ed2"
+            ],
+            [
+              "b",
+              "binding:sha256:5a35c72b3a0934b91e7a3b21f73c8672e0b5b9c3b0568431cf6f493e1413cfb5",
+              "input-schema:sha256:6704c5ecaa462879c02774fdf7739f2af3ed07bec9d7449322dee0db4f0a0ed2"
+            ]
+          ],
+          "examples": [
+            "b",
+            "a"
+          ],
+          "label": "missing_second_ba_b",
+          "metadata_coherent": true,
+          "object": "b",
+          "output_enums": [
+            [
+              "operation"
+            ],
+            [
+              "operation"
+            ]
+          ],
+          "output_type": "operation",
+          "private_locator_leaked": false,
+          "projection": [
+            "b",
+            "a"
+          ],
+          "prompt_id": "compiled-prompt:sha256:4d4202f2e66c37b4c51cec91ae14c4ddaf10f7b7d5dde767bcd35ad28368da2c",
+          "reasons": [
+            "missing_effect_obligation"
+          ]
+        },
+        {
+          "accepted": false,
+          "admission_artifact_id": "semantic-rejection:sha256:7d6168cf2e0f1cd674bf18a814afd4c413d62f7dfdbdaf5b7b402ebe715b3c5d",
+          "label": "all_static_reasons",
+          "object": "a",
+          "output_type": "operation",
+          "prompt_error": "compiled task exposes no direct proposal operations",
+          "reasons": [
+            "object_inspection_only",
+            "object_not_runtime_callable",
+            "object_effect_prohibited",
+            "missing_effect_obligation"
+          ]
+        },
+        {
+          "accepted": false,
+          "admission_artifact_id": "semantic-rejection:sha256:0f84627b17b1dd0ca1699eb6328bc1e5ee2ddb476d911887082263db3b96e1a1",
+          "label": "all_static_reasons_bad_output",
+          "object": "a",
+          "output_type": "foreign",
+          "prompt_error": "compiled task exposes no direct proposal operations",
+          "reasons": [
+            "role_output_type_forbidden",
+            "object_inspection_only",
+            "object_not_runtime_callable",
+            "object_effect_prohibited",
+            "missing_effect_obligation"
+          ]
+        },
+        {
+          "accepted": false,
+          "admission_artifact_id": "semantic-rejection:sha256:3f3ea550ab4336c4057025ee5d9232d89e98ab2bb5cd579fb55996d83bbdff29",
+          "choices": [
+            "a"
+          ],
+          "contracts": [
+            [
+              "a",
+              "binding:sha256:1dbcb241ec54a54efb680346ece3b00fee2c6919f6070c1778671fa6a5075f02",
+              "input-schema:sha256:6704c5ecaa462879c02774fdf7739f2af3ed07bec9d7449322dee0db4f0a0ed2"
+            ]
+          ],
+          "examples": [
+            "a"
+          ],
+          "label": "outside_projection",
+          "metadata_coherent": true,
+          "object": "unknown",
+          "output_enums": [
+            [
+              "operation"
+            ]
+          ],
+          "output_type": "operation",
+          "private_locator_leaked": false,
+          "projection": [
+            "a"
+          ],
+          "prompt_id": "compiled-prompt:sha256:949852155a534b9d03737941bb124c15a7cab682825ce2197f67cafaf1b54d41",
+          "reasons": [
+            "object_outside_projection",
+            "missing_effect_obligation"
+          ]
+        },
+        {
+          "accepted": false,
+          "admission_artifact_id": "semantic-rejection:sha256:05b5b7fafa08798451c2aaf77c1495d15fe578e75bda39ec34106f0156f10acf",
+          "choices": [
+            "a"
+          ],
+          "contracts": [
+            [
+              "a",
+              "binding:sha256:1dbcb241ec54a54efb680346ece3b00fee2c6919f6070c1778671fa6a5075f02",
+              "input-schema:sha256:6704c5ecaa462879c02774fdf7739f2af3ed07bec9d7449322dee0db4f0a0ed2"
+            ]
+          ],
+          "examples": [
+            "a"
+          ],
+          "label": "outside_and_output",
+          "metadata_coherent": true,
+          "object": "unknown",
+          "output_enums": [
+            [
+              "operation"
+            ]
+          ],
+          "output_type": "foreign",
+          "private_locator_leaked": false,
+          "projection": [
+            "a"
+          ],
+          "prompt_id": "compiled-prompt:sha256:949852155a534b9d03737941bb124c15a7cab682825ce2197f67cafaf1b54d41",
+          "reasons": [
+            "role_output_type_forbidden",
+            "object_outside_projection",
+            "missing_effect_obligation"
+          ]
+        },
+        {
+          "accepted": false,
+          "admission_artifact_id": "semantic-rejection:sha256:35de67239796d2742266c8c8e22ad5b76c0ea5a56066df81140283ce8e53b794",
+          "choices": [
+            "a"
+          ],
+          "contracts": [
+            [
+              "a",
+              "binding:sha256:1dbcb241ec54a54efb680346ece3b00fee2c6919f6070c1778671fa6a5075f02",
+              "input-schema:sha256:6704c5ecaa462879c02774fdf7739f2af3ed07bec9d7449322dee0db4f0a0ed2"
+            ]
+          ],
+          "examples": [
+            "a"
+          ],
+          "label": "output_'foreign'",
+          "metadata_coherent": true,
+          "object": "a",
+          "output_enums": [
+            [
+              "operation"
+            ]
+          ],
+          "output_type": "foreign",
+          "private_locator_leaked": false,
+          "projection": [
+            "a"
+          ],
+          "prompt_id": "compiled-prompt:sha256:949852155a534b9d03737941bb124c15a7cab682825ce2197f67cafaf1b54d41",
+          "reasons": [
+            "role_output_type_forbidden"
+          ]
+        },
+        {
+          "accepted": false,
+          "admission_artifact_id": "semantic-rejection:sha256:f37445c43bc737e48374e512eaa1480ae35d6db3c3baed9d37e2e2eb772a149c",
+          "choices": [
+            "a"
+          ],
+          "contracts": [
+            [
+              "a",
+              "binding:sha256:1dbcb241ec54a54efb680346ece3b00fee2c6919f6070c1778671fa6a5075f02",
+              "input-schema:sha256:6704c5ecaa462879c02774fdf7739f2af3ed07bec9d7449322dee0db4f0a0ed2"
+            ]
+          ],
+          "examples": [
+            "a"
+          ],
+          "label": "output_' operation'",
+          "metadata_coherent": true,
+          "object": "a",
+          "output_enums": [
+            [
+              "operation"
+            ]
+          ],
+          "output_type": " operation",
+          "private_locator_leaked": false,
+          "projection": [
+            "a"
+          ],
+          "prompt_id": "compiled-prompt:sha256:949852155a534b9d03737941bb124c15a7cab682825ce2197f67cafaf1b54d41",
+          "reasons": [
+            "role_output_type_forbidden"
+          ]
+        },
+        {
+          "choices": [
+            "a"
+          ],
+          "contracts": [
+            [
+              "a",
+              "binding:sha256:1dbcb241ec54a54efb680346ece3b00fee2c6919f6070c1778671fa6a5075f02",
+              "input-schema:sha256:6704c5ecaa462879c02774fdf7739f2af3ed07bec9d7449322dee0db4f0a0ed2"
+            ]
+          ],
+          "examples": [
+            "a"
+          ],
+          "label": "output_''",
+          "metadata_coherent": true,
+          "normalization_reasons": [
+            "missing_output_type"
+          ],
+          "object": "a",
+          "output_enums": [
+            [
+              "operation"
+            ]
+          ],
+          "output_type": "",
+          "private_locator_leaked": false,
+          "projection": [
+            "a"
+          ],
+          "prompt_id": "compiled-prompt:sha256:949852155a534b9d03737941bb124c15a7cab682825ce2197f67cafaf1b54d41"
+        },
+        {
+          "choices": [
+            "a"
+          ],
+          "contracts": [
+            [
+              "a",
+              "binding:sha256:1dbcb241ec54a54efb680346ece3b00fee2c6919f6070c1778671fa6a5075f02",
+              "input-schema:sha256:6704c5ecaa462879c02774fdf7739f2af3ed07bec9d7449322dee0db4f0a0ed2"
+            ]
+          ],
+          "examples": [
+            "a"
+          ],
+          "label": "output_17",
+          "metadata_coherent": true,
+          "normalization_reasons": [
+            "invalid_output_type"
+          ],
+          "object": "a",
+          "output_enums": [
+            [
+              "operation"
+            ]
+          ],
+          "output_type": 17,
+          "private_locator_leaked": false,
+          "projection": [
+            "a"
+          ],
+          "prompt_id": "compiled-prompt:sha256:949852155a534b9d03737941bb124c15a7cab682825ce2197f67cafaf1b54d41"
+        },
+        {
+          "accepted": false,
+          "admission_artifact_id": "semantic-rejection:sha256:ac6ffb57c571491bf13dbc983f8f28378f97f8dd67101194cca68fcf01d612e1",
+          "choices": [
+            "a"
+          ],
+          "contracts": [
+            [
+              "a",
+              "binding:sha256:1dbcb241ec54a54efb680346ece3b00fee2c6919f6070c1778671fa6a5075f02",
+              "input-schema:sha256:6704c5ecaa462879c02774fdf7739f2af3ed07bec9d7449322dee0db4f0a0ed2"
+            ]
+          ],
+          "examples": [
+            "a"
+          ],
+          "label": "bad_argument",
+          "metadata_coherent": true,
+          "object": "a",
+          "output_enums": [
+            [
+              "operation"
+            ]
+          ],
+          "output_type": "operation",
+          "private_locator_leaked": false,
+          "projection": [
+            "a"
+          ],
+          "prompt_id": "compiled-prompt:sha256:949852155a534b9d03737941bb124c15a7cab682825ce2197f67cafaf1b54d41",
+          "reasons": [
+            "proposal_arguments_schema_invalid"
+          ]
+        },
+        {
+          "admission_error": "compiled task does not match proposal lineage",
+          "choices": [
+            "a"
+          ],
+          "contracts": [
+            [
+              "a",
+              "binding:sha256:1dbcb241ec54a54efb680346ece3b00fee2c6919f6070c1778671fa6a5075f02",
+              "input-schema:sha256:6704c5ecaa462879c02774fdf7739f2af3ed07bec9d7449322dee0db4f0a0ed2"
+            ]
+          ],
+          "examples": [
+            "a"
+          ],
+          "label": "foreign_lineage",
+          "metadata_coherent": true,
+          "object": "a",
+          "output_enums": [
+            [
+              "operation"
+            ]
+          ],
+          "output_type": "operation",
+          "private_locator_leaked": false,
+          "projection": [
+            "a"
+          ],
+          "prompt_id": "compiled-prompt:sha256:949852155a534b9d03737941bb124c15a7cab682825ce2197f67cafaf1b54d41"
+        },
+        {
+          "accepted": false,
+          "admission_artifact_id": "semantic-rejection:sha256:a67dd110c4a55ce6d86b6f9af2a1fe91155251bb4d22a947bdc57da6e3d908a9",
+          "label": "candidate_binding",
+          "object": "a",
+          "output_type": "operation",
+          "prompt_error": "no approved binding for AB object: a",
+          "reasons": [
+            "binding_unavailable"
+          ]
+        },
+        {
+          "accepted": false,
+          "admission_artifact_id": "semantic-rejection:sha256:377e5d7a7a2786f615ec7cff2ef38a542d376519f70e9413bdd46cc7dc2833de",
+          "label": "disabled_binding",
+          "object": "a",
+          "output_type": "operation",
+          "prompt_error": "no approved binding for AB object: a",
+          "reasons": [
+            "binding_unavailable"
+          ]
+        },
+        {
+          "accepted": false,
+          "admission_artifact_id": "semantic-rejection:sha256:4f553b1ddad7a0647bc3e5eb68bf20f1bf5cca54fe0c49bd9370df24cfdd0561",
+          "label": "owner_mismatch",
+          "object": "a",
+          "output_type": "operation",
+          "prompt_error": "binding owner does not match projected object owner",
+          "reasons": [
+            "binding_owner_mismatch"
+          ]
+        },
+        {
+          "accepted": false,
+          "admission_artifact_id": "semantic-rejection:sha256:67c348b8092d4b96fc8ab75b398f998104483d437c78c5b8898a1eeb7e5d7aed",
+          "choices": [
+            "a"
+          ],
+          "contracts": [
+            [
+              "a",
+              "binding:sha256:5a61d966798195090a333ec3fa7c95957397da5428f4d02546c08b983c75f308",
+              "input-schema:sha256:6704c5ecaa462879c02774fdf7739f2af3ed07bec9d7449322dee0db4f0a0ed2"
+            ]
+          ],
+          "examples": [
+            "a"
+          ],
+          "label": "missing_output_schema",
+          "metadata_coherent": true,
+          "object": "a",
+          "output_enums": [
+            [
+              "operation"
+            ]
+          ],
+          "output_type": "operation",
+          "private_locator_leaked": false,
+          "projection": [
+            "a"
+          ],
+          "prompt_id": "compiled-prompt:sha256:47eaa1d7785244b9675a7868ec48b47e384473d599ae3e5889ab6f160a5e945a",
+          "reasons": [
+            "binding_contract_incomplete"
+          ]
+        },
+        {
+          "accepted": false,
+          "admission_artifact_id": "semantic-rejection:sha256:bec9f912ad4cf00ae8349e5924a0ddabec0053cdbb3056c113f4638087bc2f38",
+          "choices": [
+            "a"
+          ],
+          "contracts": [
+            [
+              "a",
+              "binding:sha256:76c446ec130a20929935eddc3b1c1678aa8c6ad878e96018ce46e3779faa7930",
+              "input-schema:sha256:6704c5ecaa462879c02774fdf7739f2af3ed07bec9d7449322dee0db4f0a0ed2"
+            ]
+          ],
+          "examples": [
+            "a"
+          ],
+          "label": "missing_evidence_adapter",
+          "metadata_coherent": true,
+          "object": "a",
+          "output_enums": [
+            [
+              "operation"
+            ]
+          ],
+          "output_type": "operation",
+          "private_locator_leaked": false,
+          "projection": [
+            "a"
+          ],
+          "prompt_id": "compiled-prompt:sha256:c8bc70d19f781a6e91347156096700776e5a7ac489ececf3564151a328206306",
+          "reasons": [
+            "binding_contract_incomplete"
+          ]
+        },
+        {
+          "accepted": false,
+          "admission_artifact_id": "semantic-rejection:sha256:a41b2ff0d569c0d70ec7dddfa25cfa4923ef2a5bb1d8b34d06b7b866b4118543",
+          "label": "binding_environment",
+          "object": "a",
+          "output_type": "operation",
+          "prompt_error": "no approved binding for AB object: a",
+          "reasons": [
+            "binding_unavailable"
+          ]
+        },
+        {
+          "accepted": false,
+          "admission_artifact_id": "semantic-rejection:sha256:d576e599ec85f86736e7109e7d3a0931990ee556d093efbde300b6a5adb5c431",
+          "label": "binding_runtime",
+          "object": "a",
+          "output_type": "operation",
+          "prompt_error": "no approved binding for runtime mode fake: a",
+          "reasons": [
+            "binding_unavailable"
+          ]
+        },
+        {
+          "accepted": false,
+          "admission_artifact_id": "semantic-rejection:sha256:4d08be7a85ab90f24d510ba8f2edf787c82a5b90b2506b507fd1a04063578ee3",
+          "label": "ambiguous_binding",
+          "object": "a",
+          "output_type": "operation",
+          "prompt_error": "ambiguous approved bindings for AB object a in runtime mode fake",
+          "reasons": [
+            "binding_unavailable"
+          ]
+        },
+        {
+          "accepted": false,
+          "admission_artifact_id": "semantic-rejection:sha256:b1f53f88ba9c5a109d7b5aebe8d7a5b411ad0520493dfdfa0bc8cf1d0e8ef4d7",
+          "label": "missing_schema",
+          "object": "a",
+          "output_type": "operation",
+          "prompt_error": "binding argument schema is not registered",
+          "reasons": [
+            "input_schema_unavailable"
+          ]
+        },
+        {
+          "accepted": false,
+          "admission_artifact_id": "semantic-rejection:sha256:d0b1840b7c12f7680c2fa716dd3e70aad778cfbe0edac4673a841de3b2b31623",
+          "label": "catalog_drift",
+          "object": "a",
+          "output_type": "operation",
+          "prompt_error": "binding catalog object does not match task projection",
+          "reasons": [
+            "catalog_object_mismatch"
+          ]
+        },
+        {
+          "early_error": "compiled task identity does not match content",
+          "label": "tampered_compiled_identity"
+        },
+        {
+          "accepted": true,
+          "admission_artifact_id": "admission:sha256:8d78af7a01e372827a4e18a69a592ad99bc0f6700d10e9cde0bed8a76cae77a6",
+          "admission_prompt_source_agreement": true,
+          "admitted_binding": "binding:sha256:1dbcb241ec54a54efb680346ece3b00fee2c6919f6070c1778671fa6a5075f02",
+          "admitted_schema": "input-schema:sha256:6704c5ecaa462879c02774fdf7739f2af3ed07bec9d7449322dee0db4f0a0ed2",
+          "choices": [
+            "a",
+            "b"
+          ],
+          "contracts": [
+            [
+              "a",
+              "binding:sha256:1dbcb241ec54a54efb680346ece3b00fee2c6919f6070c1778671fa6a5075f02",
+              "input-schema:sha256:6704c5ecaa462879c02774fdf7739f2af3ed07bec9d7449322dee0db4f0a0ed2"
+            ],
+            [
+              "b",
+              "binding:sha256:5a35c72b3a0934b91e7a3b21f73c8672e0b5b9c3b0568431cf6f493e1413cfb5",
+              "input-schema:sha256:6704c5ecaa462879c02774fdf7739f2af3ed07bec9d7449322dee0db4f0a0ed2"
+            ]
+          ],
+          "examples": [
+            "a",
+            "b"
+          ],
+          "execution_authority": false,
+          "label": "compiler_missing_child_obligation_parent",
+          "metadata_coherent": true,
+          "object": "a",
+          "output_enums": [
+            [
+              "operation"
+            ],
+            [
+              "operation"
+            ]
+          ],
+          "output_type": "operation",
+          "private_locator_leaked": false,
+          "projection": [
+            "a",
+            "b"
+          ],
+          "prompt_id": "compiled-prompt:sha256:68efe1e6403b17eb4de479ea5e3567f24d463cbaac76efce5f8dd43713562169",
+          "reasons": []
+        },
+        {
+          "accepted": false,
+          "admission_artifact_id": "semantic-rejection:sha256:f7eceb485d1d5005e68bed2cbfa92247e878e0019abaa41b62b66909e5b5672c",
+          "choices": [
+            "a",
+            "b"
+          ],
+          "contracts": [
+            [
+              "a",
+              "binding:sha256:1dbcb241ec54a54efb680346ece3b00fee2c6919f6070c1778671fa6a5075f02",
+              "input-schema:sha256:6704c5ecaa462879c02774fdf7739f2af3ed07bec9d7449322dee0db4f0a0ed2"
+            ],
+            [
+              "b",
+              "binding:sha256:5a35c72b3a0934b91e7a3b21f73c8672e0b5b9c3b0568431cf6f493e1413cfb5",
+              "input-schema:sha256:6704c5ecaa462879c02774fdf7739f2af3ed07bec9d7449322dee0db4f0a0ed2"
+            ]
+          ],
+          "examples": [
+            "a",
+            "b"
+          ],
+          "label": "compiler_missing_child_obligation_child",
+          "metadata_coherent": true,
+          "object": "b",
+          "output_enums": [
+            [
+              "operation"
+            ],
+            [
+              "operation"
+            ]
+          ],
+          "output_type": "operation",
+          "private_locator_leaked": false,
+          "projection": [
+            "a",
+            "b"
+          ],
+          "prompt_id": "compiled-prompt:sha256:68efe1e6403b17eb4de479ea5e3567f24d463cbaac76efce5f8dd43713562169",
+          "reasons": [
+            "missing_effect_obligation"
+          ]
+        },
+        {
+          "accepted": true,
+          "admission_artifact_id": "admission:sha256:462822a2847a612ba7b2624ccfb3864aea9e7780b65b6b0572f7f84720ebabc9",
+          "admission_prompt_source_agreement": true,
+          "admitted_binding": "binding:sha256:1dbcb241ec54a54efb680346ece3b00fee2c6919f6070c1778671fa6a5075f02",
+          "admitted_schema": "input-schema:sha256:6704c5ecaa462879c02774fdf7739f2af3ed07bec9d7449322dee0db4f0a0ed2",
+          "choices": [
+            "a",
+            "b"
+          ],
+          "contracts": [
+            [
+              "a",
+              "binding:sha256:1dbcb241ec54a54efb680346ece3b00fee2c6919f6070c1778671fa6a5075f02",
+              "input-schema:sha256:6704c5ecaa462879c02774fdf7739f2af3ed07bec9d7449322dee0db4f0a0ed2"
+            ],
+            [
+              "b",
+              "binding:sha256:5a35c72b3a0934b91e7a3b21f73c8672e0b5b9c3b0568431cf6f493e1413cfb5",
+              "input-schema:sha256:6704c5ecaa462879c02774fdf7739f2af3ed07bec9d7449322dee0db4f0a0ed2"
+            ]
+          ],
+          "examples": [
+            "a",
+            "b"
+          ],
+          "execution_authority": false,
+          "label": "compiler_missing_child_and_forbidden_observable_parent",
+          "metadata_coherent": true,
+          "object": "a",
+          "output_enums": [
+            [
+              "operation"
+            ],
+            [
+              "operation"
+            ]
+          ],
+          "output_type": "operation",
+          "private_locator_leaked": false,
+          "projection": [
+            "a",
+            "b"
+          ],
+          "prompt_id": "compiled-prompt:sha256:0b3a1c0a8ce6b08028e131aa91d90974a8b8a4c23b33d54849754eaee722502e",
+          "reasons": []
+        },
+        {
+          "accepted": false,
+          "admission_artifact_id": "semantic-rejection:sha256:0045c3966e9a3ee7a639f01cc3066698245800d5019a61aef56cbe075b3207b0",
+          "choices": [
+            "a",
+            "b"
+          ],
+          "contracts": [
+            [
+              "a",
+              "binding:sha256:1dbcb241ec54a54efb680346ece3b00fee2c6919f6070c1778671fa6a5075f02",
+              "input-schema:sha256:6704c5ecaa462879c02774fdf7739f2af3ed07bec9d7449322dee0db4f0a0ed2"
+            ],
+            [
+              "b",
+              "binding:sha256:5a35c72b3a0934b91e7a3b21f73c8672e0b5b9c3b0568431cf6f493e1413cfb5",
+              "input-schema:sha256:6704c5ecaa462879c02774fdf7739f2af3ed07bec9d7449322dee0db4f0a0ed2"
+            ]
+          ],
+          "examples": [
+            "a",
+            "b"
+          ],
+          "label": "compiler_missing_child_and_forbidden_observable_child",
+          "metadata_coherent": true,
+          "object": "b",
+          "output_enums": [
+            [
+              "operation"
+            ],
+            [
+              "operation"
+            ]
+          ],
+          "output_type": "operation",
+          "private_locator_leaked": false,
+          "projection": [
+            "a",
+            "b"
+          ],
+          "prompt_id": "compiled-prompt:sha256:0b3a1c0a8ce6b08028e131aa91d90974a8b8a4c23b33d54849754eaee722502e",
+          "reasons": [
+            "object_effect_prohibited",
+            "missing_effect_obligation"
+          ]
+        }
+      ]
+    }
+  ]
+}

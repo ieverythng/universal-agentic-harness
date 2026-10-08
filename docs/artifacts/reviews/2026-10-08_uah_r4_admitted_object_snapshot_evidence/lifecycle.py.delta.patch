@@ -1,0 +1,52 @@
+--- docs/artifacts/reviews/2026-10-08_uah_r4_admitted_object_snapshot_evidence/lifecycle.py.before	2026-10-08 17:03:05.006540009 +0200
++++ src/ab_harness/lifecycle.py	2026-10-08 17:13:24.010017971 +0200
+@@ -1136,6 +1136,9 @@
+                 artifact_refs=(fact.admission_id, fact.proposal_id),
+                 data={
+                     "admission_id": fact.admission_id,
++                    "schema_version": fact.schema_version,
++                    "object_snapshot": asdict(fact.object_snapshot),
++                    "admitted_operation": fact.to_dict(),
+                     "proposal_id": fact.proposal_id,
+                     "object_id": fact.object_id,
+                     "binding_id": fact.binding_id,
+@@ -1869,6 +1872,39 @@
+     operation_id: str,
+     data: dict[str, object],
+ ) -> None:
++    from ab_harness.proposal_admission import AdmittedOperation
++    from ab_harness.proposal_admission import ADMITTED_OPERATION_SCHEMA
++
++    if any(
++        name in data for name in ("admitted_operation", "object_snapshot", "schema_version")
++    ):
++        if data.get("schema_version") != ADMITTED_OPERATION_SCHEMA:
++            raise ValueError("unsupported recorded admitted operation schema")
++        admitted = AdmittedOperation.from_dict(data.get("admitted_operation"))
++        aliases = {
++            "admission_id": admitted.admission_id,
++            "proposal_id": admitted.proposal_id,
++            "object_id": admitted.object_id,
++            "binding_id": admitted.binding_id,
++            "binding_owner": admitted.binding_owner,
++            "input_schema_id": admitted.input_schema_id,
++            "ab_level": admitted.ab_level,
++            "frame_id": admitted.frame_id,
++            "object_snapshot": admitted.to_dict()["object_snapshot"],
++        }
++        if any(
++            _canonical_json(data.get(name)) != _canonical_json(value)
++            for name, value in aliases.items()
++        ):
++            raise ValueError("recorded snapshot does not match admitted operation")
++        if (
++            admitted.compiled_task_id != state.compiled_task_id
++            or admitted.environment_run_id != state.environment_run_id
++            or admitted.task_id != state.task_id
++            or admitted.trace_id != state.trace_id
++            or admitted.operation_id != operation_id
++        ):
++            raise ValueError("recorded admitted operation does not match trace lineage")
+     if data["proposal_id"] != state.proposal_by_operation.get(operation_id):
+         raise ValueError("semantic admission does not match operation proposal")
+     if operation_id in state.admission_by_operation:

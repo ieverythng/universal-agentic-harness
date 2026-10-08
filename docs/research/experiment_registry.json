@@ -1,0 +1,208 @@
+{
+  "schema_version": 1,
+  "reconciled_at": "2026-10-08",
+  "records": [
+    {
+      "id": "evaluation-investigation",
+      "title": "Configuration-level evaluation investigation",
+      "kind": "investigation",
+      "date": "2026-07-30",
+      "summary": "Literature and runtime trade-off investigation. No controlled UAH model or adaptive-uplift experiment is established by this note.",
+      "h_series_dependencies": [
+        "H1",
+        "H2",
+        "H3"
+      ],
+      "source": {
+        "path": "docs/research/uah_agent_evaluation_adaptation_runtime_research.md",
+        "sha256": "b729cbf7f24dd3d28f0c871c4e0333d11c2face06a313d2a63c8097d4fa2afe4"
+      },
+      "references": []
+    },
+    {
+      "id": "jev-investigation",
+      "title": "Jev and System One investigation",
+      "kind": "investigation",
+      "date": "2026-09-22",
+      "summary": "Primary-source investigation of closed typed decisions and local substitutes. Vendor claims and capacity estimates are not UAH measurements.",
+      "h_series_dependencies": [
+        "H3",
+        "H4"
+      ],
+      "source": {
+        "path": "docs/research/jev_system_one_uah_research.md",
+        "sha256": "27b76bcf3c34604e204c5c347ff5de4ec8b6827f317fbf641290c7bb362183da"
+      },
+      "references": []
+    },
+    {
+      "id": "jev-ranking-proposal",
+      "title": "Jev closed-candidate ranking proposal",
+      "kind": "proposed_experiment",
+      "date": "2026-09-22",
+      "summary": "The September note proposes deterministic controls and shadow ranking after H0/H1 closure. No executed Jev experiment, access qualification or calibrated UAH result is recorded.",
+      "h_series_dependencies": [
+        "H0",
+        "H1",
+        "H3"
+      ],
+      "source": {
+        "path": "docs/research/jev_system_one_uah_research.md",
+        "sha256": "27b76bcf3c34604e204c5c347ff5de4ec8b6827f317fbf641290c7bb362183da"
+      },
+      "references": [
+        "docs/architecture/neural_workbench_adaptive_ab_harness.md"
+      ]
+    },
+    {
+      "id": "r0-exit-investigation",
+      "title": "R0 exit contracts and provider routes",
+      "kind": "investigation",
+      "date": "2026-10-08",
+      "summary": "Research handoff on exit-contract alternatives and provider routes. Route availability is not execution authority or owner evidence; live qualification remains unscored.",
+      "h_series_dependencies": [
+        "H0",
+        "H1",
+        "H2"
+      ],
+      "source": {
+        "path": "docs/research/2026-10-08_uah_r0_exit_contracts_and_provider_routes.md",
+        "sha256": "3d7d94e38df060428cb2d6a643bf5da3bba699a3c4e4be3e3361706b93545975"
+      },
+      "references": []
+    },
+    {
+      "id": "r1-evidence-investigation",
+      "title": "R1 effect evidence and trace contract alternatives",
+      "kind": "investigation",
+      "date": "2026-10-08",
+      "summary": "Research alternatives for proof meaning, temporal validity and trace representation. The proposed train/holdout fixtures were not executed; no new freshness policy was accepted.",
+      "h_series_dependencies": [
+        "H0",
+        "H1",
+        "H2"
+      ],
+      "source": {
+        "path": "docs/research/2026-10-08_uah_r1_effect_evidence_and_trace_contracts.md",
+        "sha256": "bf5549f3eb3f53efaeb2d9d5c10d6b70f39373131c5b47e9b4a386a4d2548aa5"
+      },
+      "references": []
+    },
+    {
+      "id": "r0-recorded-probes",
+      "title": "R0 saved counterexample diagnostics",
+      "kind": "executed_probe",
+      "date": "2026-10-08",
+      "summary": "Completed local diagnostics are recorded in the dated receipt. A zero diagnostic exit does not imply a passing conformance gate, live model quality or release closure.",
+      "h_series_dependencies": [
+        "H0",
+        "H1"
+      ],
+      "source": {
+        "path": "docs/artifacts/reviews/2026-10-08_uah_r0_baseline_and_skill_handoff.md",
+        "sha256": "90d99f7e21e6d67e1cef0cadd7c3bef5782fb13546192c7870e683a6d0dbf507"
+      },
+      "references": []
+    },
+    {
+      "id": "r1-compiler-repair",
+      "title": "R1 compiler-only domain-pack repair receipt",
+      "kind": "executed_probe",
+      "date": "2026-10-08",
+      "summary": "The receipt records replacement and nested-tamper compiler regressions, an unchanged valid control and scoped review links. It does not close other mechanisms or all H0/H1 deliverables.",
+      "h_series_dependencies": [
+        "H0",
+        "H1"
+      ],
+      "source": {
+        "path": "docs/artifacts/reviews/2026-10-08_uah_r1_domain_pack_identity.md",
+        "sha256": "4408dadc970e75fe2f94d0bdd63478c4e9b9aab0074164c86682a000adf959e8"
+      },
+      "references": [
+        "docs/artifacts/reviews/2026-10-08_uah_r1_domain_pack_primary_review.md",
+        "docs/artifacts/reviews/2026-10-08_uah_r1_domain_pack_second_review.md"
+      ]
+    },
+    {
+      "id": "r1-primary-review",
+      "title": "R1 compiler-only primary review",
+      "kind": "reviewed_outcome",
+      "date": "2026-10-08",
+      "summary": "Historical APPROVE receipt for the named three-file compiler repair against exact frozen-before bytes. Reviewed runtime hashes inside the source define its scope, not the current checkout.",
+      "h_series_dependencies": [
+        "H0",
+        "H1"
+      ],
+      "source": {
+        "path": "docs/artifacts/reviews/2026-10-08_uah_r1_domain_pack_primary_review.md",
+        "sha256": "14da7145ad7a3b3f575d4438a5d959abdbd7923c65655be788ae19f52eb8abab"
+      },
+      "references": []
+    },
+    {
+      "id": "r1-second-review",
+      "title": "R1 compiler-only second review",
+      "kind": "reviewed_outcome",
+      "date": "2026-10-08",
+      "summary": "Historical distinct-model APPROVE receipt with a representation-only limitation outside the repair. This source snapshot hash identifies the stored document, not a fresh certification of runtime changes.",
+      "h_series_dependencies": [
+        "H0",
+        "H1"
+      ],
+      "source": {
+        "path": "docs/artifacts/reviews/2026-10-08_uah_r1_domain_pack_second_review.md",
+        "sha256": "85a97f05f2ec16668acf7fc310277558908820bcd98d780416fc7ea469c6b284"
+      },
+      "references": []
+    },
+    {
+      "id": "h1-context-dependency",
+      "title": "H1 runtime and context-persistence dependency",
+      "kind": "h_series_dependency",
+      "date": null,
+      "summary": "Consult the current masterplan H1 section for runtime/context deliverables and open evidence. This unpinned link supplies no release status or context-tree schema.",
+      "h_series_dependencies": [
+        "H1"
+      ],
+      "source": {
+        "path": "docs/plans/universal_agentic_harness_masterplan.md",
+        "sha256": null
+      },
+      "references": []
+    },
+    {
+      "id": "h3-search-dependency",
+      "title": "H3 trace-adaptive search dependency",
+      "kind": "h_series_dependency",
+      "date": null,
+      "summary": "Consult the masterplan and architecture for candidate-only search, retrieval and context. These are dependencies, not adopted experiments or a second roadmap.",
+      "h_series_dependencies": [
+        "H3"
+      ],
+      "source": {
+        "path": "docs/plans/universal_agentic_harness_masterplan.md",
+        "sha256": null
+      },
+      "references": [
+        "docs/architecture/neural_workbench_adaptive_ab_harness.md"
+      ]
+    },
+    {
+      "id": "h4-crystallization-dependency",
+      "title": "H4 quarantined crystallization dependency",
+      "kind": "h_series_dependency",
+      "date": null,
+      "summary": "Consult the canonical H4 gate for reviewed promotion and rollback. Frequency or display labels cannot promote research artifacts or transfer environment-owner authority.",
+      "h_series_dependencies": [
+        "H4"
+      ],
+      "source": {
+        "path": "docs/plans/universal_agentic_harness_masterplan.md",
+        "sha256": null
+      },
+      "references": [
+        "docs/architecture/neural_workbench_adaptive_ab_harness.md"
+      ]
+    }
+  ]
+}

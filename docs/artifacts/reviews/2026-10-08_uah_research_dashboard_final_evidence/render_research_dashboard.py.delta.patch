@@ -1,0 +1,59 @@
+--- docs/artifacts/reviews/2026-10-08_uah_research_dashboard_final_evidence/render_research_dashboard.py.before	2026-10-08 17:20:44.770406525 +0200
++++ scripts/render_research_dashboard.py	2026-10-08 17:22:44.270626658 +0200
+@@ -207,6 +207,24 @@
+     return "\n".join(lines)
+
+
++def reconcile_header(before: str, reconciled_at: str) -> str:
++    boundary = re.search(r"(?m)^(?:#{2,6} | {0,3}(?:`{3,}|~{3,}))", before)
++    header_end = boundary.start() if boundary else len(before)
++    header = before[:header_end]
++    fields = list(re.finditer(r"(?m)^Reconciled:.*$", header))
++    if len(fields) != 1:
++        raise ValueError("dashboard requires one top reconciliation field")
++    field = fields[0]
++    title = re.match(r"\A# [^\n]+\n(?:[ \t]*\n)+", header)
++    if title is None or field.start() != title.end():
++        raise ValueError("reconciliation field must follow the dashboard title")
++    value = re.fullmatch(r"Reconciled: (\d{4}-\d{2}-\d{2})\.(.*)", field[0])
++    if value is None or (value[2] and not value[2].startswith(" ")):
++        raise ValueError("malformed top reconciliation field")
++    date.fromisoformat(value[1])
++    return before[:field.start()] + f"Reconciled: {reconciled_at}." + value[2] + before[field.end():]
++
++
+ def main(argv: list[str] | None = None) -> int:
+     parser = argparse.ArgumentParser(description=__doc__)
+     parser.add_argument("--repo-root", type=Path, default=ROOT)
+@@ -226,21 +244,22 @@
+             raise ValueError("dashboard must contain one ordered generated record region")
+         before, region = original.split(START)
+         _, after = region.split(END)
+-        before = re.sub(
+-            r"(?m)^Reconciled: \d{4}-\d{2}-\d{2}",
+-            f"Reconciled: {registry['reconciled_at']}", before,
+-        )
+-        expected_md = before + START + "\n" + render_records(
++        before = reconcile_header(before, registry["reconciled_at"])
++        records_md = render_records(
+             registry["records"], markdown_path, root
+-        ) + "\n" + END + after
+-        title, body = render_markdown(expected_md.replace(START, "").replace(END, ""))
++        )
++        expected_md = before + START + "\n" + records_md + "\n" + END + after
++        title, before_body = render_markdown(before)
++        _, records_body = render_markdown(records_md)
++        _, after_body = render_markdown(after)
+         literal_punctuation = {
+             str(ord(character)): html.escape(character) for character in string.punctuation
+         }
+-        body = re.sub(
++        records_body = re.sub(
+             r"&amp;#([0-9]+);",
+-            lambda match: literal_punctuation.get(match[1], match[0]), body,
++            lambda match: literal_punctuation.get(match[1], match[0]), records_body,
+         )
++        body = "\n".join(part for part in (before_body, records_body, after_body) if part)
+         assets = Path(os.path.relpath(root / "docs/assets", output.parent)).as_posix()
+         expected_html = build_html(title, body)
+         tabs = '<button type="button" data-kind="all" aria-pressed="true">All records</button>'

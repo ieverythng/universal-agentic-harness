@@ -1,0 +1,181 @@
+[
+  {
+    "name": "exact",
+    "status": "PASS",
+    "detail": {
+      "expected": "review note\n",
+      "actual": "review note\n",
+      "closure_matches": true
+    }
+  },
+  {
+    "name": "wrong",
+    "status": "PASS",
+    "detail": {
+      "expected": "review note\n",
+      "actual": "wrong\n",
+      "closure_matches": false
+    }
+  },
+  {
+    "name": "empty",
+    "status": "PASS",
+    "detail": {
+      "expected": "",
+      "actual": "",
+      "closure_matches": true
+    }
+  },
+  {
+    "name": "unicode_exact",
+    "status": "PASS",
+    "detail": {
+      "expected": "Caf\u00e9\n",
+      "actual": "Caf\u00e9\n",
+      "closure_matches": true
+    }
+  },
+  {
+    "name": "unicode_decomposed",
+    "status": "PASS",
+    "detail": {
+      "expected": "Caf\u00e9\n",
+      "actual": "Cafe\u0301\n",
+      "closure_matches": false
+    }
+  },
+  {
+    "name": "newline_crlf",
+    "status": "PASS",
+    "detail": {
+      "expected": "review note\n",
+      "actual": "review note\r\n",
+      "closure_matches": false
+    }
+  },
+  {
+    "name": "newline_missing",
+    "status": "PASS",
+    "detail": {
+      "expected": "review note\n",
+      "actual": "review note",
+      "closure_matches": false
+    }
+  },
+  {
+    "name": "newline_extra",
+    "status": "PASS",
+    "detail": {
+      "expected": "review note\n",
+      "actual": "review note\n\n",
+      "closure_matches": false
+    }
+  },
+  {
+    "name": "bom",
+    "status": "PASS",
+    "detail": {
+      "expected": "review note\n",
+      "actual": "\ufeffreview note\n",
+      "closure_matches": false
+    }
+  },
+  {
+    "name": "nul",
+    "status": "PASS",
+    "detail": {
+      "expected": "review note\n",
+      "actual": "review\u0000note\n",
+      "closure_matches": false
+    }
+  },
+  {
+    "name": "missing_empty_oracle",
+    "status": "PASS",
+    "detail": "Absent file differs from an empty file; callback completion is not acceptance."
+  },
+  {
+    "name": "no_owner_write_preexisting_content",
+    "status": "PASS",
+    "detail": "Preexisting exact content yields only closure-content effect, no write occurrence."
+  },
+  {
+    "name": "invalid_utf8",
+    "status": "PASS",
+    "detail": [
+      "UnicodeEncodeError: 'utf-8' codec can't encode character '\\ud800' in position 0: surrogates not allowed",
+      "UnicodeEncodeError: 'utf-8' codec can't encode character '\\ud800' in position 0: surrogates not allowed",
+      "Invalid native bytes retained and mismatch."
+    ]
+  },
+  {
+    "name": "task_owner_source_and_observation_identity",
+    "status": "PASS",
+    "detail": {
+      "rejections": 27,
+      "messages": [
+        "ValueError: oracle does not belong to this task and owner",
+        "ValueError: oracle does not belong to this task and owner",
+        "ValueError: oracle identity does not match source body",
+        "ValueError: oracle identity does not match source body",
+        "ValueError: unsupported owner-local evaluator",
+        "ValueError: oracle requires the complete compiled task body",
+        "ValueError: retained oracle reference mismatch",
+        "ValueError: oracle identity does not match source body",
+        "ValueError: oracle identity does not match source body",
+        "ValueError: oracle identity does not match source body",
+        "ValueError: oracle identity does not match source body",
+        "ValueError: missing or invalid retained oracle body",
+        "ValueError: missing or invalid retained oracle body",
+        "ValueError: missing or invalid retained oracle body",
+        "ValueError: missing or invalid retained oracle body",
+        "ValueError: missing or invalid retained oracle body",
+        "ValueError: observation does not belong to this oracle",
+        "ValueError: missing or invalid retained observation body",
+        "ValueError: missing or invalid retained observation body",
+        "ValueError: missing or invalid retained observation body",
+        "ValueError: missing or invalid retained observation body",
+        "ValueError: missing or invalid retained observation body",
+        "ValueError: observation identity does not match source body",
+        "ValueError: observation identity does not match source body",
+        "ValueError: observation identity does not match source body",
+        "ValueError: observation does not belong to this oracle",
+        "ValueError: retained observation reference mismatch"
+      ]
+    }
+  },
+  {
+    "name": "alias_and_reconstruction",
+    "status": "PASS",
+    "detail": "Detached caller task/oracle and exports; complete restoration after file deletion."
+  },
+  {
+    "name": "duplicates_and_operation_names",
+    "status": "PASS",
+    "detail": "Duplicate/unnamed write and closure IDs reject without mutation."
+  },
+  {
+    "name": "callback_mutation_and_failure",
+    "status": "PASS",
+    "detail": "Reentrant mutation/closure rejected; exception preserved; failure remains fenced."
+  },
+  {
+    "name": "concurrent_same_owner",
+    "status": "PASS",
+    "detail": [
+      true,
+      "ValueError: owner writes are fenced after closure starts"
+    ]
+  },
+  {
+    "name": "second_owner_same_workspace_fence",
+    "status": "FAIL",
+    "detail": "AssertionError({'competitor_write_succeeded': True, 'closure_matches': True, 'live_bytes_during_callback': '77726f6e67', 'phase': 'callback_completed'})"
+  },
+  {
+    "name": "preexisting_symlink_and_hardlink",
+    "status": "FAIL",
+    "detail": "AssertionError({'outside_bytes': '726576696577206e6f74650a', 'write_succeeded': True})"
+  }
+]
+SUMMARY 20 cases; 2 failures

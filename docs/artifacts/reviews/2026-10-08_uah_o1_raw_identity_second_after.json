@@ -1,0 +1,730 @@
+{
+  "module": "/tmp/uah-o1-second-review-20261008/after/src/ab_harness/observatory.py",
+  "module_sha256": "aec50ca2e77d5c5bbe187ae08e6700797dee28bf7a703ac35f593de884ecb878",
+  "results": [
+    {
+      "case": "task/event_type/tuple/project_observatory",
+      "expected": "ValueError: trace event identity does not match content",
+      "actual": "ValueError: trace event identity does not match content"
+    },
+    {
+      "case": "task/event_type/tuple/render_observatory",
+      "expected": "ValueError: trace event identity does not match content",
+      "actual": "ValueError: trace event identity does not match content"
+    },
+    {
+      "case": "task/event_type/generator/project_observatory",
+      "expected": "ValueError: trace event identity does not match content",
+      "actual": "ValueError: trace event identity does not match content"
+    },
+    {
+      "case": "task/event_type/generator/render_observatory",
+      "expected": "ValueError: trace event identity does not match content",
+      "actual": "ValueError: trace event identity does not match content"
+    },
+    {
+      "case": "task/sequence/tuple/project_observatory",
+      "expected": "ValueError: trace event identity does not match content",
+      "actual": "ValueError: trace event identity does not match content"
+    },
+    {
+      "case": "task/sequence/tuple/render_observatory",
+      "expected": "ValueError: trace event identity does not match content",
+      "actual": "ValueError: trace event identity does not match content"
+    },
+    {
+      "case": "task/sequence/generator/project_observatory",
+      "expected": "ValueError: trace event identity does not match content",
+      "actual": "ValueError: trace event identity does not match content"
+    },
+    {
+      "case": "task/sequence/generator/render_observatory",
+      "expected": "ValueError: trace event identity does not match content",
+      "actual": "ValueError: trace event identity does not match content"
+    },
+    {
+      "case": "task/environment_run_id/tuple/project_observatory",
+      "expected": "ValueError: trace event identity does not match content",
+      "actual": "ValueError: trace event identity does not match content"
+    },
+    {
+      "case": "task/environment_run_id/tuple/render_observatory",
+      "expected": "ValueError: trace event identity does not match content",
+      "actual": "ValueError: trace event identity does not match content"
+    },
+    {
+      "case": "task/environment_run_id/generator/project_observatory",
+      "expected": "ValueError: trace event identity does not match content",
+      "actual": "ValueError: trace event identity does not match content"
+    },
+    {
+      "case": "task/environment_run_id/generator/render_observatory",
+      "expected": "ValueError: trace event identity does not match content",
+      "actual": "ValueError: trace event identity does not match content"
+    },
+    {
+      "case": "task/data_json/tuple/project_observatory",
+      "expected": "ValueError: trace event identity does not match content",
+      "actual": "ValueError: trace event identity does not match content"
+    },
+    {
+      "case": "task/data_json/tuple/render_observatory",
+      "expected": "ValueError: trace event identity does not match content",
+      "actual": "ValueError: trace event identity does not match content"
+    },
+    {
+      "case": "task/data_json/generator/project_observatory",
+      "expected": "ValueError: trace event identity does not match content",
+      "actual": "ValueError: trace event identity does not match content"
+    },
+    {
+      "case": "task/data_json/generator/render_observatory",
+      "expected": "ValueError: trace event identity does not match content",
+      "actual": "ValueError: trace event identity does not match content"
+    },
+    {
+      "case": "task/recorded_at/tuple/project_observatory",
+      "expected": "ValueError: trace event identity does not match content",
+      "actual": "ValueError: trace event identity does not match content"
+    },
+    {
+      "case": "task/recorded_at/tuple/render_observatory",
+      "expected": "ValueError: trace event identity does not match content",
+      "actual": "ValueError: trace event identity does not match content"
+    },
+    {
+      "case": "task/recorded_at/generator/project_observatory",
+      "expected": "ValueError: trace event identity does not match content",
+      "actual": "ValueError: trace event identity does not match content"
+    },
+    {
+      "case": "task/recorded_at/generator/render_observatory",
+      "expected": "ValueError: trace event identity does not match content",
+      "actual": "ValueError: trace event identity does not match content"
+    },
+    {
+      "case": "task/artifact_refs/tuple/project_observatory",
+      "expected": "ValueError: trace event identity does not match content",
+      "actual": "ValueError: trace event identity does not match content"
+    },
+    {
+      "case": "task/artifact_refs/tuple/render_observatory",
+      "expected": "ValueError: trace event identity does not match content",
+      "actual": "ValueError: trace event identity does not match content"
+    },
+    {
+      "case": "task/artifact_refs/generator/project_observatory",
+      "expected": "ValueError: trace event identity does not match content",
+      "actual": "ValueError: trace event identity does not match content"
+    },
+    {
+      "case": "task/artifact_refs/generator/render_observatory",
+      "expected": "ValueError: trace event identity does not match content",
+      "actual": "ValueError: trace event identity does not match content"
+    },
+    {
+      "case": "task/parent_event_id/tuple/project_observatory",
+      "expected": "ValueError: trace event identity does not match content",
+      "actual": "ValueError: trace event identity does not match content"
+    },
+    {
+      "case": "task/parent_event_id/tuple/render_observatory",
+      "expected": "ValueError: trace event identity does not match content",
+      "actual": "ValueError: trace event identity does not match content"
+    },
+    {
+      "case": "task/parent_event_id/generator/project_observatory",
+      "expected": "ValueError: trace event identity does not match content",
+      "actual": "ValueError: trace event identity does not match content"
+    },
+    {
+      "case": "task/parent_event_id/generator/render_observatory",
+      "expected": "ValueError: trace event identity does not match content",
+      "actual": "ValueError: trace event identity does not match content"
+    },
+    {
+      "case": "task/commit_id/tuple/project_observatory",
+      "expected": "ValueError: trace event identity does not match content",
+      "actual": "ValueError: trace event identity does not match content"
+    },
+    {
+      "case": "task/commit_id/tuple/render_observatory",
+      "expected": "ValueError: trace event identity does not match content",
+      "actual": "ValueError: trace event identity does not match content"
+    },
+    {
+      "case": "task/commit_id/generator/project_observatory",
+      "expected": "ValueError: trace event identity does not match content",
+      "actual": "ValueError: trace event identity does not match content"
+    },
+    {
+      "case": "task/commit_id/generator/render_observatory",
+      "expected": "ValueError: trace event identity does not match content",
+      "actual": "ValueError: trace event identity does not match content"
+    },
+    {
+      "case": "v2_agent/event_type/tuple/project_observatory",
+      "expected": "ValueError: trace event identity does not match content",
+      "actual": "ValueError: trace event identity does not match content"
+    },
+    {
+      "case": "v2_agent/event_type/tuple/render_observatory",
+      "expected": "ValueError: trace event identity does not match content",
+      "actual": "ValueError: trace event identity does not match content"
+    },
+    {
+      "case": "v2_agent/event_type/generator/project_observatory",
+      "expected": "ValueError: trace event identity does not match content",
+      "actual": "ValueError: trace event identity does not match content"
+    },
+    {
+      "case": "v2_agent/event_type/generator/render_observatory",
+      "expected": "ValueError: trace event identity does not match content",
+      "actual": "ValueError: trace event identity does not match content"
+    },
+    {
+      "case": "v2_agent/sequence/tuple/project_observatory",
+      "expected": "ValueError: trace event identity does not match content",
+      "actual": "ValueError: trace event identity does not match content"
+    },
+    {
+      "case": "v2_agent/sequence/tuple/render_observatory",
+      "expected": "ValueError: trace event identity does not match content",
+      "actual": "ValueError: trace event identity does not match content"
+    },
+    {
+      "case": "v2_agent/sequence/generator/project_observatory",
+      "expected": "ValueError: trace event identity does not match content",
+      "actual": "ValueError: trace event identity does not match content"
+    },
+    {
+      "case": "v2_agent/sequence/generator/render_observatory",
+      "expected": "ValueError: trace event identity does not match content",
+      "actual": "ValueError: trace event identity does not match content"
+    },
+    {
+      "case": "v2_agent/environment_run_id/tuple/project_observatory",
+      "expected": "ValueError: trace event identity does not match content",
+      "actual": "ValueError: trace event identity does not match content"
+    },
+    {
+      "case": "v2_agent/environment_run_id/tuple/render_observatory",
+      "expected": "ValueError: trace event identity does not match content",
+      "actual": "ValueError: trace event identity does not match content"
+    },
+    {
+      "case": "v2_agent/environment_run_id/generator/project_observatory",
+      "expected": "ValueError: trace event identity does not match content",
+      "actual": "ValueError: trace event identity does not match content"
+    },
+    {
+      "case": "v2_agent/environment_run_id/generator/render_observatory",
+      "expected": "ValueError: trace event identity does not match content",
+      "actual": "ValueError: trace event identity does not match content"
+    },
+    {
+      "case": "v2_agent/data_json/tuple/project_observatory",
+      "expected": "ValueError: trace event identity does not match content",
+      "actual": "ValueError: trace event identity does not match content"
+    },
+    {
+      "case": "v2_agent/data_json/tuple/render_observatory",
+      "expected": "ValueError: trace event identity does not match content",
+      "actual": "ValueError: trace event identity does not match content"
+    },
+    {
+      "case": "v2_agent/data_json/generator/project_observatory",
+      "expected": "ValueError: trace event identity does not match content",
+      "actual": "ValueError: trace event identity does not match content"
+    },
+    {
+      "case": "v2_agent/data_json/generator/render_observatory",
+      "expected": "ValueError: trace event identity does not match content",
+      "actual": "ValueError: trace event identity does not match content"
+    },
+    {
+      "case": "v2_agent/recorded_at/tuple/project_observatory",
+      "expected": "ValueError: trace event identity does not match content",
+      "actual": "ValueError: trace event identity does not match content"
+    },
+    {
+      "case": "v2_agent/recorded_at/tuple/render_observatory",
+      "expected": "ValueError: trace event identity does not match content",
+      "actual": "ValueError: trace event identity does not match content"
+    },
+    {
+      "case": "v2_agent/recorded_at/generator/project_observatory",
+      "expected": "ValueError: trace event identity does not match content",
+      "actual": "ValueError: trace event identity does not match content"
+    },
+    {
+      "case": "v2_agent/recorded_at/generator/render_observatory",
+      "expected": "ValueError: trace event identity does not match content",
+      "actual": "ValueError: trace event identity does not match content"
+    },
+    {
+      "case": "v2_agent/artifact_refs/tuple/project_observatory",
+      "expected": "ValueError: trace event identity does not match content",
+      "actual": "ValueError: trace event identity does not match content"
+    },
+    {
+      "case": "v2_agent/artifact_refs/tuple/render_observatory",
+      "expected": "ValueError: trace event identity does not match content",
+      "actual": "ValueError: trace event identity does not match content"
+    },
+    {
+      "case": "v2_agent/artifact_refs/generator/project_observatory",
+      "expected": "ValueError: trace event identity does not match content",
+      "actual": "ValueError: trace event identity does not match content"
+    },
+    {
+      "case": "v2_agent/artifact_refs/generator/render_observatory",
+      "expected": "ValueError: trace event identity does not match content",
+      "actual": "ValueError: trace event identity does not match content"
+    },
+    {
+      "case": "v2_agent/parent_event_id/tuple/project_observatory",
+      "expected": "ValueError: trace event identity does not match content",
+      "actual": "ValueError: trace event identity does not match content"
+    },
+    {
+      "case": "v2_agent/parent_event_id/tuple/render_observatory",
+      "expected": "ValueError: trace event identity does not match content",
+      "actual": "ValueError: trace event identity does not match content"
+    },
+    {
+      "case": "v2_agent/parent_event_id/generator/project_observatory",
+      "expected": "ValueError: trace event identity does not match content",
+      "actual": "ValueError: trace event identity does not match content"
+    },
+    {
+      "case": "v2_agent/parent_event_id/generator/render_observatory",
+      "expected": "ValueError: trace event identity does not match content",
+      "actual": "ValueError: trace event identity does not match content"
+    },
+    {
+      "case": "v2_agent/commit_id/tuple/project_observatory",
+      "expected": "ValueError: trace event identity does not match content",
+      "actual": "ValueError: trace event identity does not match content"
+    },
+    {
+      "case": "v2_agent/commit_id/tuple/render_observatory",
+      "expected": "ValueError: trace event identity does not match content",
+      "actual": "ValueError: trace event identity does not match content"
+    },
+    {
+      "case": "v2_agent/commit_id/generator/project_observatory",
+      "expected": "ValueError: trace event identity does not match content",
+      "actual": "ValueError: trace event identity does not match content"
+    },
+    {
+      "case": "v2_agent/commit_id/generator/render_observatory",
+      "expected": "ValueError: trace event identity does not match content",
+      "actual": "ValueError: trace event identity does not match content"
+    },
+    {
+      "case": "v2_task/event_type/tuple/project_observatory",
+      "expected": "ValueError: trace event identity does not match content",
+      "actual": "ValueError: trace event identity does not match content"
+    },
+    {
+      "case": "v2_task/event_type/tuple/render_observatory",
+      "expected": "ValueError: trace event identity does not match content",
+      "actual": "ValueError: trace event identity does not match content"
+    },
+    {
+      "case": "v2_task/event_type/generator/project_observatory",
+      "expected": "ValueError: trace event identity does not match content",
+      "actual": "ValueError: trace event identity does not match content"
+    },
+    {
+      "case": "v2_task/event_type/generator/render_observatory",
+      "expected": "ValueError: trace event identity does not match content",
+      "actual": "ValueError: trace event identity does not match content"
+    },
+    {
+      "case": "v2_task/sequence/tuple/project_observatory",
+      "expected": "ValueError: trace event identity does not match content",
+      "actual": "ValueError: trace event identity does not match content"
+    },
+    {
+      "case": "v2_task/sequence/tuple/render_observatory",
+      "expected": "ValueError: trace event identity does not match content",
+      "actual": "ValueError: trace event identity does not match content"
+    },
+    {
+      "case": "v2_task/sequence/generator/project_observatory",
+      "expected": "ValueError: trace event identity does not match content",
+      "actual": "ValueError: trace event identity does not match content"
+    },
+    {
+      "case": "v2_task/sequence/generator/render_observatory",
+      "expected": "ValueError: trace event identity does not match content",
+      "actual": "ValueError: trace event identity does not match content"
+    },
+    {
+      "case": "v2_task/environment_run_id/tuple/project_observatory",
+      "expected": "ValueError: trace event identity does not match content",
+      "actual": "ValueError: trace event identity does not match content"
+    },
+    {
+      "case": "v2_task/environment_run_id/tuple/render_observatory",
+      "expected": "ValueError: trace event identity does not match content",
+      "actual": "ValueError: trace event identity does not match content"
+    },
+    {
+      "case": "v2_task/environment_run_id/generator/project_observatory",
+      "expected": "ValueError: trace event identity does not match content",
+      "actual": "ValueError: trace event identity does not match content"
+    },
+    {
+      "case": "v2_task/environment_run_id/generator/render_observatory",
+      "expected": "ValueError: trace event identity does not match content",
+      "actual": "ValueError: trace event identity does not match content"
+    },
+    {
+      "case": "v2_task/data_json/tuple/project_observatory",
+      "expected": "ValueError: trace event identity does not match content",
+      "actual": "ValueError: trace event identity does not match content"
+    },
+    {
+      "case": "v2_task/data_json/tuple/render_observatory",
+      "expected": "ValueError: trace event identity does not match content",
+      "actual": "ValueError: trace event identity does not match content"
+    },
+    {
+      "case": "v2_task/data_json/generator/project_observatory",
+      "expected": "ValueError: trace event identity does not match content",
+      "actual": "ValueError: trace event identity does not match content"
+    },
+    {
+      "case": "v2_task/data_json/generator/render_observatory",
+      "expected": "ValueError: trace event identity does not match content",
+      "actual": "ValueError: trace event identity does not match content"
+    },
+    {
+      "case": "v2_task/recorded_at/tuple/project_observatory",
+      "expected": "ValueError: trace event identity does not match content",
+      "actual": "ValueError: trace event identity does not match content"
+    },
+    {
+      "case": "v2_task/recorded_at/tuple/render_observatory",
+      "expected": "ValueError: trace event identity does not match content",
+      "actual": "ValueError: trace event identity does not match content"
+    },
+    {
+      "case": "v2_task/recorded_at/generator/project_observatory",
+      "expected": "ValueError: trace event identity does not match content",
+      "actual": "ValueError: trace event identity does not match content"
+    },
+    {
+      "case": "v2_task/recorded_at/generator/render_observatory",
+      "expected": "ValueError: trace event identity does not match content",
+      "actual": "ValueError: trace event identity does not match content"
+    },
+    {
+      "case": "v2_task/artifact_refs/tuple/project_observatory",
+      "expected": "ValueError: trace event identity does not match content",
+      "actual": "ValueError: trace event identity does not match content"
+    },
+    {
+      "case": "v2_task/artifact_refs/tuple/render_observatory",
+      "expected": "ValueError: trace event identity does not match content",
+      "actual": "ValueError: trace event identity does not match content"
+    },
+    {
+      "case": "v2_task/artifact_refs/generator/project_observatory",
+      "expected": "ValueError: trace event identity does not match content",
+      "actual": "ValueError: trace event identity does not match content"
+    },
+    {
+      "case": "v2_task/artifact_refs/generator/render_observatory",
+      "expected": "ValueError: trace event identity does not match content",
+      "actual": "ValueError: trace event identity does not match content"
+    },
+    {
+      "case": "v2_task/parent_event_id/tuple/project_observatory",
+      "expected": "ValueError: trace event identity does not match content",
+      "actual": "ValueError: trace event identity does not match content"
+    },
+    {
+      "case": "v2_task/parent_event_id/tuple/render_observatory",
+      "expected": "ValueError: trace event identity does not match content",
+      "actual": "ValueError: trace event identity does not match content"
+    },
+    {
+      "case": "v2_task/parent_event_id/generator/project_observatory",
+      "expected": "ValueError: trace event identity does not match content",
+      "actual": "ValueError: trace event identity does not match content"
+    },
+    {
+      "case": "v2_task/parent_event_id/generator/render_observatory",
+      "expected": "ValueError: trace event identity does not match content",
+      "actual": "ValueError: trace event identity does not match content"
+    },
+    {
+      "case": "v2_task/commit_id/tuple/project_observatory",
+      "expected": "ValueError: trace event identity does not match content",
+      "actual": "ValueError: trace event identity does not match content"
+    },
+    {
+      "case": "v2_task/commit_id/tuple/render_observatory",
+      "expected": "ValueError: trace event identity does not match content",
+      "actual": "ValueError: trace event identity does not match content"
+    },
+    {
+      "case": "v2_task/commit_id/generator/project_observatory",
+      "expected": "ValueError: trace event identity does not match content",
+      "actual": "ValueError: trace event identity does not match content"
+    },
+    {
+      "case": "v2_task/commit_id/generator/render_observatory",
+      "expected": "ValueError: trace event identity does not match content",
+      "actual": "ValueError: trace event identity does not match content"
+    },
+    {
+      "case": "v1-fixed-field/agent_run_id/tuple/project_observatory",
+      "expected": "reject incompatible v1 shape",
+      "actual": {
+        "accepted": true,
+        "schema": "uah.trace_event/v1",
+        "traces": [
+          "trace:one"
+        ],
+        "actors": [
+          "agent:forged"
+        ],
+        "ledger_actors": [],
+        "ledger_traces": [
+          "trace:one"
+        ],
+        "serialization_has_actor": false,
+        "graph_actor": null
+      }
+    },
+    {
+      "case": "v1-fixed-field/agent_run_id/tuple/render_observatory",
+      "expected": "reject incompatible v1 shape",
+      "actual": {
+        "accepted": true,
+        "schema": "uah.trace_event/v1",
+        "traces": [
+          "trace:one"
+        ],
+        "actors": [
+          "agent:forged"
+        ],
+        "ledger_actors": [],
+        "ledger_traces": [
+          "trace:one"
+        ],
+        "serialization_has_actor": false,
+        "graph_actor": "agent:forged"
+      }
+    },
+    {
+      "case": "v1-fixed-field/agent_run_id/generator/project_observatory",
+      "expected": "reject incompatible v1 shape",
+      "actual": {
+        "accepted": true,
+        "schema": "uah.trace_event/v1",
+        "traces": [
+          "trace:one"
+        ],
+        "actors": [
+          "agent:forged"
+        ],
+        "ledger_actors": [],
+        "ledger_traces": [
+          "trace:one"
+        ],
+        "serialization_has_actor": false,
+        "graph_actor": null
+      }
+    },
+    {
+      "case": "v1-fixed-field/agent_run_id/generator/render_observatory",
+      "expected": "reject incompatible v1 shape",
+      "actual": {
+        "accepted": true,
+        "schema": "uah.trace_event/v1",
+        "traces": [
+          "trace:one"
+        ],
+        "actors": [
+          "agent:forged"
+        ],
+        "ledger_actors": [],
+        "ledger_traces": [
+          "trace:one"
+        ],
+        "serialization_has_actor": false,
+        "graph_actor": "agent:forged"
+      }
+    },
+    {
+      "case": "v1-fixed-field/event_scope/tuple/project_observatory",
+      "expected": "reject incompatible v1 shape",
+      "actual": {
+        "accepted": true,
+        "schema": "uah.trace_event/v1",
+        "traces": [],
+        "actors": [],
+        "ledger_actors": [],
+        "ledger_traces": [
+          "trace:one"
+        ],
+        "serialization_has_actor": false,
+        "graph_actor": null
+      }
+    },
+    {
+      "case": "v1-fixed-field/event_scope/tuple/render_observatory",
+      "expected": "reject incompatible v1 shape",
+      "actual": {
+        "accepted": true,
+        "schema": "uah.trace_event/v1",
+        "traces": [],
+        "actors": [],
+        "ledger_actors": [],
+        "ledger_traces": [
+          "trace:one"
+        ],
+        "serialization_has_actor": false,
+        "graph_actor": null
+      }
+    },
+    {
+      "case": "v1-fixed-field/event_scope/generator/project_observatory",
+      "expected": "reject incompatible v1 shape",
+      "actual": {
+        "accepted": true,
+        "schema": "uah.trace_event/v1",
+        "traces": [],
+        "actors": [],
+        "ledger_actors": [],
+        "ledger_traces": [
+          "trace:one"
+        ],
+        "serialization_has_actor": false,
+        "graph_actor": null
+      }
+    },
+    {
+      "case": "v1-fixed-field/event_scope/generator/render_observatory",
+      "expected": "reject incompatible v1 shape",
+      "actual": {
+        "accepted": true,
+        "schema": "uah.trace_event/v1",
+        "traces": [],
+        "actors": [],
+        "ledger_actors": [],
+        "ledger_traces": [
+          "trace:one"
+        ],
+        "serialization_has_actor": false,
+        "graph_actor": null
+      }
+    },
+    {
+      "case": "v2_agent/agent_run_id",
+      "expected": "ValueError: trace event identity does not match content",
+      "actual": "ValueError: trace event identity does not match content"
+    },
+    {
+      "case": "v2_agent/event_scope",
+      "expected": "ValueError: trace event identity does not match content",
+      "actual": "ValueError: trace event identity does not match content"
+    },
+    {
+      "case": "v2_task/agent_run_id",
+      "expected": "ValueError: trace event identity does not match content",
+      "actual": "ValueError: trace event identity does not match content"
+    },
+    {
+      "case": "v2_task/event_scope",
+      "expected": "ValueError: trace event identity does not match content",
+      "actual": "ValueError: trace event identity does not match content"
+    },
+    {
+      "case": "foreign/False/NoneType",
+      "expected": "TypeError: Observatory accepts TraceEvent values only",
+      "actual": "TypeError: Observatory accepts TraceEvent values only"
+    },
+    {
+      "case": "foreign/False/dict",
+      "expected": "TypeError: Observatory accepts TraceEvent values only",
+      "actual": "TypeError: Observatory accepts TraceEvent values only"
+    },
+    {
+      "case": "foreign/False/object",
+      "expected": "TypeError: Observatory accepts TraceEvent values only",
+      "actual": "TypeError: Observatory accepts TraceEvent values only"
+    },
+    {
+      "case": "duplicate/False",
+      "expected": "ValueError: Observatory event identities must be unique",
+      "actual": "ValueError: Observatory event identities must be unique"
+    },
+    {
+      "case": "valid-incomplete-multiple/False",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "case": "stale-multiple/False",
+      "expected": "ValueError: trace event identity does not match content",
+      "actual": "ValueError: trace event identity does not match content"
+    },
+    {
+      "case": "foreign/True/NoneType",
+      "expected": "TypeError: Observatory accepts TraceEvent values only",
+      "actual": "TypeError: Observatory accepts TraceEvent values only"
+    },
+    {
+      "case": "foreign/True/dict",
+      "expected": "TypeError: Observatory accepts TraceEvent values only",
+      "actual": "TypeError: Observatory accepts TraceEvent values only"
+    },
+    {
+      "case": "foreign/True/object",
+      "expected": "TypeError: Observatory accepts TraceEvent values only",
+      "actual": "TypeError: Observatory accepts TraceEvent values only"
+    },
+    {
+      "case": "duplicate/True",
+      "expected": "ValueError: Observatory event identities must be unique",
+      "actual": "ValueError: Observatory event identities must be unique"
+    },
+    {
+      "case": "valid-incomplete-multiple/True",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "case": "stale-multiple/True",
+      "expected": "ValueError: trace event identity does not match content",
+      "actual": "ValueError: trace event identity does not match content"
+    },
+    {
+      "case": "iterator-error",
+      "expected": "RuntimeError: iterator sentinel",
+      "actual": "RuntimeError: iterator sentinel"
+    },
+    {
+      "case": "empty",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "case": "raw-recorded-label",
+      "expected": "ValueError: recorded Observatory data requires a validated ledger",
+      "actual": "ValueError: recorded Observatory data requires a validated ledger"
+    },
+    {
+      "case": "file-backed-read-only",
+      "expected": true,
+      "actual": true
+    }
+  ]
+}

@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>UAH Research Dashboard</title>
+  <style>
+    @page {
+      size: A4;
+      margin: 2.6cm 2.2cm 2.4cm 2.2cm;
+    }
+    :root {
+      --ink: #111;
+      --muted: #3a3a3a;
+      --line: #1f1f1f;
+      --soft: #f3f3f3;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: #fff;
+      font-family: "Liberation Serif", "Times New Roman", Times, serif;
+      font-size: 11.5pt;
+      line-height: 1.42;
+    }
+    .doc {
+      max-width: 172mm;
+      margin: 0 auto;
+      padding: 0;
+    }
+    .title-page {
+      min-height: 247mm;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      page-break-after: always;
+    }
+    .title-top {
+      text-align: center;
+      margin-top: 18mm;
+    }
+    .title-top h1 {
+      font-size: 20pt;
+      line-height: 1.28;
+      margin: 20mm 0 8mm;
+      font-weight: 700;
+    }
+    .title-top h2 {
+      font-size: 13pt;
+      margin: 0 0 3mm;
+      font-weight: 600;
+      border-bottom: 0;
+    }
+    .title-top p {
+      margin: 2mm 0;
+      color: var(--muted);
+    }
+    .title-meta {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 0 auto 20mm;
+      font-size: 11pt;
+    }
+    .title-meta td {
+      padding: 2.5mm 0;
+      vertical-align: top;
+      border: 0;
+    }
+    .title-meta td:first-child {
+      width: 38mm;
+      font-weight: 700;
+    }
+    .small { font-size: 10.3pt; color: #222; }
+    h1, h2, h3 {
+      margin: 0 0 3mm;
+      line-height: 1.28;
+      font-weight: 700;
+    }
+    h1 { font-size: 16.5pt; margin-top: 0; }
+    h2 {
+      font-size: 13pt;
+      margin-top: 9mm;
+      border-bottom: 0.5pt solid var(--line);
+      padding-bottom: 1.5mm;
+    }
+    h3 {
+      font-size: 11.8pt;
+      margin-top: 6mm;
+    }
+    p { margin: 2.2mm 0; }
+    ul, ol { margin: 2.5mm 0 2.5mm 6mm; padding: 0; }
+    li { margin: 1.4mm 0; }
+    pre {
+      margin: 2.5mm 0 4mm;
+      background: var(--soft);
+      border: 0.6pt solid #666;
+      padding: 2.6mm 2.8mm;
+      overflow-x: auto;
+      white-space: pre;
+      font-family: "Liberation Mono", "Courier New", monospace;
+      font-size: 9.2pt;
+      line-height: 1.3;
+    }
+    code {
+      font-family: "Liberation Mono", "Courier New", monospace;
+      background: #efefef;
+      padding: 0.2mm 1mm;
+      border: 0.4pt solid #d7d7d7;
+      border-radius: 2px;
+      font-size: 10.3pt;
+    }
+    pre code {
+      background: transparent;
+      padding: 0;
+      border: 0;
+      font-size: inherit;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 3mm 0 4mm;
+      font-size: 10.8pt;
+    }
+    th, td {
+      border: 0.6pt solid #333;
+      padding: 2.2mm 2.3mm;
+      vertical-align: top;
+      overflow-wrap: anywhere;
+      hyphens: auto;
+    }
+    th {
+      background: #fafafa;
+      text-align: left;
+      font-weight: 700;
+    }
+    .diagram {
+      margin: 4mm 0 5mm;
+      border: 0.6pt solid #777;
+      padding: 2mm;
+      background: #fff;
+    }
+    .diagram pre {
+      margin: 0;
+      border: 0;
+      background: #fcfcfc;
+      font-size: 10.2pt;
+      white-space: pre-wrap;
+    }
+    .diagram svg {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+    .diagram-labels {
+      font-family: "Liberation Serif", "Times New Roman", Times, serif;
+      font-size: 25px;
+      font-weight: 700;
+      fill: #111;
+    }
+    .lifelines {
+      stroke: #999;
+      stroke-dasharray: 4 4;
+    }
+    .messages {
+      stroke: #111;
+      stroke-width: 1.35;
+      fill: none;
+    }
+    .messages text {
+      stroke: none;
+      fill: #111;
+      font-family: "Liberation Serif", "Times New Roman", Times, serif;
+      font-size: 22px;
+    }
+    .caption {
+      margin-top: 2mm;
+      font-size: 10.5pt;
+      color: #222;
+      font-style: italic;
+      text-align: center;
+    }
+    blockquote {
+      border: 0.6pt solid #333;
+      background: #fcfcfc;
+      margin: 3mm 0;
+      padding: 2.6mm 3mm;
+      color: var(--muted);
+    }
+    a { color: #111; }
+  </style>
+<link rel="stylesheet" href="../assets/harness-theme.css" />
+<script defer src="../assets/harness-theme.js"></script>
+<style>
+.doc code { overflow-wrap: anywhere; }
+.research-controls { margin: 1rem 0; padding: 1rem; border: 1px solid var(--line);
+  border-radius: 18px; background: var(--card); }
+.research-controls button, .research-controls input, .research-controls select {
+  color: var(--ink); background: var(--paper); border: 1px solid var(--line);
+  border-radius: 8px; padding: .55rem .7rem; margin: .2rem; font: inherit; }
+.research-controls button { cursor: pointer; }
+.research-controls button[aria-pressed="true"] { background: var(--blue); color: white; }
+.research-controls label { display: inline-block; margin-top: .7rem; }
+@media print { .research-controls { display: none; } [hidden] { display: table-row; } }
+</style></head>
+<body>
+  <main class="doc">
+
+<h1>UAH Research Dashboard</h1>
+<p>Reconciled: 2026-10-08. Scope: research metadata and source navigation. <a href="uah_research_dashboard.html">HTML view</a>, <a href="experiment_registry.json">registry</a>, <a href="../artifacts/research/README.md">artifact catalog</a>.</p>
+<h2>Authority and recorded boundaries</h2>
+<p>The <a href="../plans/universal_agentic_harness_masterplan.md">canonical masterplan</a> owns release order and gates. <a href="../architecture/neural_workbench_adaptive_ab_harness.md">NeuralWorkbench architecture</a> owns the adaptive research boundary. Dated investigations and reviews support specific claims about their inspected bytes. This index is neither a second roadmap nor an Observatory O1 runtime view.</p>
+<p>The September Jev note proposes closed-candidate ranking. No executed UAH Jev experiment is recorded here. H1 context persistence is an implementation dependency named by the masterplan, distinct from H3 candidate context/retrieval and H4 quarantined crystallization research. This catalog defines no context tree, evidence-freshness rule or AB mapping.</p>
+<p>The R0 receipt records executed diagnostics. The R1 review receipts concern a compiler-only domain-pack identity repair, not all H0/H1 consumers or H2 parity. Their observed values, original finding IDs and reviewed-byte identities remain in the linked receipts. Live provider transport, model quality, owner-proven effects and release qualification are separate evidence claims.</p>
+<h2>Catalog</h2>
+<p>Record kinds describe document content, not a promotion ladder. A proposal does not become an executed probe merely because it contains a test design. An executed probe may be unsuccessful; a reviewed outcome may reject a change. H-series dependencies are links, not declarations that prerequisites passed. Scoring is <code>not_scored</code> in this metadata view; consult source receipts for their actual observations. No direct comparability is inferred from labels or AB depth.</p>
+<div class="research-controls" aria-label="Research catalog filters">
+<div id="research-tabs" aria-label="Record kind filters"><button type="button" data-kind="all" aria-pressed="true">All records</button><button type="button" data-kind="investigation" aria-pressed="false">Investigation</button><button type="button" data-kind="proposed_experiment" aria-pressed="false">Proposed experiment</button><button type="button" data-kind="executed_probe" aria-pressed="false">Executed probe</button><button type="button" data-kind="reviewed_outcome" aria-pressed="false">Reviewed outcome</button><button type="button" data-kind="h_series_dependency" aria-pressed="false">H series dependency</button></div>
+<label>Search <input id="research-search" type="search" /></label>
+<label>Dependency <select id="research-gate"><option value="all">All H-series</option>
+<option value="H0">H0</option><option value="H1">H1</option><option value="H2">H2</option><option value="H3">H3</option><option value="H4">H4</option><option value="H5">H5</option><option value="H6">H6</option></select></label><p id="research-count" aria-live="polite"></p></div><table><thead><tr>
+<th>Research record</th>
+<th>Kind</th>
+<th>Date</th>
+<th>H-series dependency</th>
+<th>Scoring</th>
+<th>Source</th>
+</tr></thead><tbody>
+<tr>
+<td>Configuration-level evaluation investigation</td>
+<td>investigation</td>
+<td>2026-07-30</td>
+<td>H1, H2, H3</td>
+<td>not_scored</td>
+<td><a href="uah_agent_evaluation_adaptation_runtime_research.md">Read source</a></td>
+</tr>
+<tr>
+<td>Jev and System One investigation</td>
+<td>investigation</td>
+<td>2026-09-22</td>
+<td>H3, H4</td>
+<td>not_scored</td>
+<td><a href="jev_system_one_uah_research.md">Read source</a></td>
+</tr>
+<tr>
+<td>Jev closed-candidate ranking proposal</td>
+<td>proposed_experiment</td>
+<td>2026-09-22</td>
+<td>H0, H1, H3</td>
+<td>not_scored</td>
+<td><a href="jev_system_one_uah_research.md">Read source</a></td>
+</tr>
+<tr>
+<td>R0 exit contracts and provider routes</td>
+<td>investigation</td>
+<td>2026-10-08</td>
+<td>H0, H1, H2</td>
+<td>not_scored</td>
+<td><a href="2026-10-08_uah_r0_exit_contracts_and_provider_routes.md">Read source</a></td>
+</tr>
+<tr>
+<td>R1 effect evidence and trace contract alternatives</td>
+<td>investigation</td>
+<td>2026-10-08</td>
+<td>H0, H1, H2</td>
+<td>not_scored</td>
+<td><a href="2026-10-08_uah_r1_effect_evidence_and_trace_contracts.md">Read source</a></td>
+</tr>
+<tr>
+<td>R0 saved counterexample diagnostics</td>
+<td>executed_probe</td>
+<td>2026-10-08</td>
+<td>H0, H1</td>
+<td>not_scored</td>
+<td><a href="../artifacts/reviews/2026-10-08_uah_r0_baseline_and_skill_handoff.md">Read source</a></td>
+</tr>
+<tr>
+<td>R1 compiler-only domain-pack repair receipt</td>
+<td>executed_probe</td>
+<td>2026-10-08</td>
+<td>H0, H1</td>
+<td>not_scored</td>
+<td><a href="../artifacts/reviews/2026-10-08_uah_r1_domain_pack_identity.md">Read source</a></td>
+</tr>
+<tr>
+<td>R1 compiler-only primary review</td>
+<td>reviewed_outcome</td>
+<td>2026-10-08</td>
+<td>H0, H1</td>
+<td>not_scored</td>
+<td><a href="../artifacts/reviews/2026-10-08_uah_r1_domain_pack_primary_review.md">Read source</a></td>
+</tr>
+<tr>
+<td>R1 compiler-only second review</td>
+<td>reviewed_outcome</td>
+<td>2026-10-08</td>
+<td>H0, H1</td>
+<td>not_scored</td>
+<td><a href="../artifacts/reviews/2026-10-08_uah_r1_domain_pack_second_review.md">Read source</a></td>
+</tr>
+<tr>
+<td>H1 runtime and context-persistence dependency</td>
+<td>h_series_dependency</td>
+<td>unknown</td>
+<td>H1</td>
+<td>not_scored</td>
+<td><a href="../plans/universal_agentic_harness_masterplan.md">Read source</a></td>
+</tr>
+<tr>
+<td>H3 trace-adaptive search dependency</td>
+<td>h_series_dependency</td>
+<td>unknown</td>
+<td>H3</td>
+<td>not_scored</td>
+<td><a href="../plans/universal_agentic_harness_masterplan.md">Read source</a></td>
+</tr>
+<tr>
+<td>H4 quarantined crystallization dependency</td>
+<td>h_series_dependency</td>
+<td>unknown</td>
+<td>H4</td>
+<td>not_scored</td>
+<td><a href="../plans/universal_agentic_harness_masterplan.md">Read source</a></td>
+</tr>
+</tbody></table>
+<h3>Configuration-level evaluation investigation</h3>
+<p>Literature and runtime trade-off investigation. No controlled UAH model or adaptive-uplift experiment is established by this note.</p>
+<p>Catalog ID: <code>evaluation-investigation</code>. Source snapshot SHA-256: <code>b729cbf7f24dd3d28f0c871c4e0333d11c2face06a313d2a63c8097d4fa2afe4</code>.</p>
+<h3>Jev and System One investigation</h3>
+<p>Primary-source investigation of closed typed decisions and local substitutes. Vendor claims and capacity estimates are not UAH measurements.</p>
+<p>Catalog ID: <code>jev-investigation</code>. Source snapshot SHA-256: <code>27b76bcf3c34604e204c5c347ff5de4ec8b6827f317fbf641290c7bb362183da</code>.</p>
+<h3>Jev closed-candidate ranking proposal</h3>
+<p>The September note proposes deterministic controls and shadow ranking after H0/H1 closure. No executed Jev experiment, access qualification or calibrated UAH result is recorded.</p>
+<p>Catalog ID: <code>jev-ranking-proposal</code>. Source snapshot SHA-256: <code>27b76bcf3c34604e204c5c347ff5de4ec8b6827f317fbf641290c7bb362183da</code>.</p>
+<p>Reference: <a href="../architecture/neural_workbench_adaptive_ab_harness.md">Open document</a>.</p>
+<h3>R0 exit contracts and provider routes</h3>
+<p>Research handoff on exit-contract alternatives and provider routes. Route availability is not execution authority or owner evidence; live qualification remains unscored.</p>
+<p>Catalog ID: <code>r0-exit-investigation</code>. Source snapshot SHA-256: <code>3d7d94e38df060428cb2d6a643bf5da3bba699a3c4e4be3e3361706b93545975</code>.</p>
+<h3>R1 effect evidence and trace contract alternatives</h3>
+<p>Research alternatives for proof meaning, temporal validity and trace representation. The proposed train/holdout fixtures were not executed; no new freshness policy was accepted.</p>
+<p>Catalog ID: <code>r1-evidence-investigation</code>. Source snapshot SHA-256: <code>bf5549f3eb3f53efaeb2d9d5c10d6b70f39373131c5b47e9b4a386a4d2548aa5</code>.</p>
+<h3>R0 saved counterexample diagnostics</h3>
+<p>Completed local diagnostics are recorded in the dated receipt. A zero diagnostic exit does not imply a passing conformance gate, live model quality or release closure.</p>
+<p>Catalog ID: <code>r0-recorded-probes</code>. Source snapshot SHA-256: <code>90d99f7e21e6d67e1cef0cadd7c3bef5782fb13546192c7870e683a6d0dbf507</code>.</p>
+<h3>R1 compiler-only domain-pack repair receipt</h3>
+<p>The receipt records replacement and nested-tamper compiler regressions, an unchanged valid control and scoped review links. It does not close other mechanisms or all H0/H1 deliverables.</p>
+<p>Catalog ID: <code>r1-compiler-repair</code>. Source snapshot SHA-256: <code>4408dadc970e75fe2f94d0bdd63478c4e9b9aab0074164c86682a000adf959e8</code>.</p>
+<p>Reference: <a href="../artifacts/reviews/2026-10-08_uah_r1_domain_pack_primary_review.md">Open document</a>.</p>
+<p>Reference: <a href="../artifacts/reviews/2026-10-08_uah_r1_domain_pack_second_review.md">Open document</a>.</p>
+<h3>R1 compiler-only primary review</h3>
+<p>Historical APPROVE receipt for the named three-file compiler repair against exact frozen-before bytes. Reviewed runtime hashes inside the source define its scope, not the current checkout.</p>
+<p>Catalog ID: <code>r1-primary-review</code>. Source snapshot SHA-256: <code>14da7145ad7a3b3f575d4438a5d959abdbd7923c65655be788ae19f52eb8abab</code>.</p>
+<h3>R1 compiler-only second review</h3>
+<p>Historical distinct-model APPROVE receipt with a representation-only limitation outside the repair. This source snapshot hash identifies the stored document, not a fresh certification of runtime changes.</p>
+<p>Catalog ID: <code>r1-second-review</code>. Source snapshot SHA-256: <code>85a97f05f2ec16668acf7fc310277558908820bcd98d780416fc7ea469c6b284</code>.</p>
+<h3>H1 runtime and context-persistence dependency</h3>
+<p>Consult the current masterplan H1 section for runtime/context deliverables and open evidence. This unpinned link supplies no release status or context-tree schema.</p>
+<p>Catalog ID: <code>h1-context-dependency</code>. Source snapshot SHA-256: <code>unpinned dependency link</code>.</p>
+<h3>H3 trace-adaptive search dependency</h3>
+<p>Consult the masterplan and architecture for candidate-only search, retrieval and context. These are dependencies, not adopted experiments or a second roadmap.</p>
+<p>Catalog ID: <code>h3-search-dependency</code>. Source snapshot SHA-256: <code>unpinned dependency link</code>.</p>
+<p>Reference: <a href="../architecture/neural_workbench_adaptive_ab_harness.md">Open document</a>.</p>
+<h3>H4 quarantined crystallization dependency</h3>
+<p>Consult the canonical H4 gate for reviewed promotion and rollback. Frequency or display labels cannot promote research artifacts or transfer environment-owner authority.</p>
+<p>Catalog ID: <code>h4-crystallization-dependency</code>. Source snapshot SHA-256: <code>unpinned dependency link</code>.</p>
+<p>Reference: <a href="../architecture/neural_workbench_adaptive_ab_harness.md">Open document</a>.</p>
+<h2>Using the sources</h2>
+<p>Consult the source before interpreting a catalog label. A source snapshot hash identifies the indexed document bytes; it does not revalidate runtime provenance or retrospectively approve other changes. Reference links are navigation only. Update metadata only after the source document is complete, retain historical evidence and regenerate both files. <a href="README.md">Catalog rules</a> describe the bounded update procedure.</p>
+  </main>
+<script>
+(() => {
+  const table = [...document.querySelectorAll('table')].find(
+    item => item.querySelector('th')?.textContent === 'Research record');
+  if (!table) return;
+  const controls = document.getElementById('research-tabs');
+  const search = document.getElementById('research-search');
+  const gate = document.getElementById('research-gate');
+  const count = document.getElementById('research-count');
+  const rows = [...table.querySelectorAll('tbody tr')];
+  let selected = 'all';
+  function apply() {
+    const query = search.value.trim().toLowerCase();
+    let visible = 0;
+    rows.forEach(row => {
+      const cells = row.querySelectorAll('td');
+      const kind = cells[1].textContent.trim();
+      const dependencies = cells[3].textContent.split(',').map(item => item.trim());
+      const matches = (selected === 'all' || kind === selected)
+        && (gate.value === 'all' || dependencies.includes(gate.value))
+        && row.textContent.toLowerCase().includes(query);
+      row.hidden = !matches;
+      if (matches) visible += 1;
+    });
+    count.textContent = visible ? `${visible} catalog records` : 'No matching catalog records.';
+  }
+  controls.querySelectorAll('button').forEach(button => {
+    button.addEventListener('click', () => {
+      selected = button.dataset.kind;
+      controls.querySelectorAll('button').forEach(other =>
+        other.setAttribute('aria-pressed', String(other === button)));
+      apply();
+    });
+  });
+  search.addEventListener('input', apply);
+  gate.addEventListener('change', apply);
+  apply();
+})();
+</script></body>
+</html>

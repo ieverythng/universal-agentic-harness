@@ -1,0 +1,10 @@
+Command: PYTHONPATH=src:tests .venv/bin/python docs/artifacts/reviews/2026-10-05_uah_review_repros/prompt_scope_probe.py
+Exit: 1
+
+Traceback (most recent call last):
+  File "/home/juanbeck/universal-agentic-harness/docs/artifacts/reviews/2026-10-05_uah_review_repros/prompt_scope_probe.py", line 27, in <module>
+    prompt = PromptCompiler().compile(**inputs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/juanbeck/universal-agentic-harness/src/ab_harness/prompt_compiler.py", line 403, in compile
+    raise ValueError("compiled task exposes no direct proposal operations")
+ValueError: compiled task exposes no direct proposal operations

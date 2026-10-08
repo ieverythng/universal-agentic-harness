@@ -1,0 +1,98 @@
+{
+  "schema_version": 1,
+  "round": "R2",
+  "status": "research_complete_no_runtime_qualification",
+  "completed_utc": "2026-10-08T14:48:34Z",
+  "started_utc": "2026-10-08T14:21:12Z",
+  "target_stop_utc": "2026-10-08T14:51:00Z",
+  "validation_snapshot_utc": "2026-10-08T14:46:25Z",
+  "head": "28fab5e7f2c244d86a64c371f2118017999b2387",
+  "source_retention": {
+    "path": "optchat.md",
+    "utf8_bytes": 19092,
+    "sha256": "12f300f760af82bc07bc5201051d1267824ded09c9def8186e4f8144368038d8",
+    "match": true
+  },
+  "checks": [
+    {
+      "command": "./scripts/run_precommit.sh",
+      "status": "pass",
+      "scope": "Earlier observed tree at about 14:43 UTC passed; not the later concurrently edited tree, a clean release or memory qualification"
+    },
+    {
+      "command": "pre_commit run --files (explicit R2 report/source/cards/metric/metadata files)",
+      "status": "pass",
+      "scope": "Earlier explicit check passed before concurrent R3 test additions"
+    },
+    {
+      "command": "scripts/render_agentic_harness_docs.py --check",
+      "status": "pass",
+      "scope": "12 current dashboard metadata records; R2 intentionally not yet added to frozen DEV catalog"
+    },
+    {
+      "command": "git diff --check",
+      "status": "pass"
+    },
+    {
+      "command": "jq empty *_evidence/*.json",
+      "status": "pass"
+    },
+    {
+      "command": "local dyadic-node arithmetic assertion N=1..20000",
+      "status": "pass",
+      "scope": "Mathematical count only, not source merge-rule reproduction"
+    },
+    {
+      "command": "Final pre_commit run --files R2 report and entire evidence directory",
+      "status": "failed_concurrent_dev_tests",
+      "observed_utc": "2026-10-08T14:46:25Z",
+      "passed_tests": 377,
+      "failed_tests": 8,
+      "failure": "New test_exported_budget_mutation_cannot_grant_extra_model_calls variants call nonexistent TaskBudgetAuthority.request at tests/test_lifecycle_ledger.py:135 before mutation probe logic",
+      "research_hygiene": "pass",
+      "generated_docs": "pass",
+      "action": "Notified DEV and main; no runtime or test changes by RESEARCH. Does not prove the intended mutation counterexample."
+    }
+  ],
+  "transient_validation_issue": "Initial explicit generated-doc check overlapped DEV canonical masterplan/development-log edits and failed. DEV synchronized its own pages; later full hooks and explicit check passed. RESEARCH did not regenerate them.",
+  "source_drift": {
+    "stable_relevant_sources": [
+      "CONTEXT.md",
+      "prompt_compiler.py",
+      "workbench.py",
+      "model_invocation.py"
+    ],
+    "concurrent_dev_changes": [
+      "proposal_admission.py",
+      "masterplan.md",
+      "development_log.md",
+      "tests/test_lifecycle_ledger.py",
+      "lifecycle.py"
+    ],
+    "attribution": "Existing/concurrent user and DEV changes are preserved and not certified by this report.",
+    "hash_pointers": [
+      "baseline.sha256",
+      "end.sha256",
+      "closeout.sha256"
+    ]
+  },
+  "research_audit": "research_audit.md; source and contract lanes, not formal distinct-model runtime approval",
+  "executed_model_or_retrieval_experiments": 0,
+  "observed_model_metrics": null,
+  "fixture_status": "reserved recipes only; corpus/oracle/partition hashes unresolved",
+  "remaining_gates": [
+    "GRILL context scope/retention acceptance",
+    "Exact fixture/model/tokenizer/source freeze",
+    "DEV implementation and public negative/restart tests",
+    "Qualified held-out comparisons and owner review"
+  ],
+  "not_actions": [
+    "runtime edits",
+    "normative architecture edits",
+    "dashboard implementation",
+    "paid calls",
+    "live providers",
+    "personal-history import",
+    "git stage/commit/push"
+  ]
+}

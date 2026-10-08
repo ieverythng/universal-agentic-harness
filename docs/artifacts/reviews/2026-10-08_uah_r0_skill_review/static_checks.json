@@ -1,0 +1,44 @@
+[
+  {
+    "check": "candidate metadata",
+    "cmd": ".venv/bin/python /home/juanbeck/.codex/skills/.system/skill-creator/scripts/quick_validate.py .codex/skills/uah-stack-iteration-loop",
+    "exit_code": 1,
+    "output": "Traceback (most recent call last):\n  File \"/home/juanbeck/.codex/skills/.system/skill-creator/scripts/quick_validate.py\", line 10, in <module>\n    import yaml\nModuleNotFoundError: No module named 'yaml'\n"
+  },
+  {
+    "check": "baseline metadata",
+    "cmd": ".venv/bin/python /home/juanbeck/.codex/skills/.system/skill-creator/scripts/quick_validate.py /home/juanbeck/itrader-azr/.codex/skills/itrader-stack-iteration-loop",
+    "exit_code": 1,
+    "output": "Traceback (most recent call last):\n  File \"/home/juanbeck/.codex/skills/.system/skill-creator/scripts/quick_validate.py\", line 10, in <module>\n    import yaml\nModuleNotFoundError: No module named 'yaml'\n"
+  },
+  {
+    "check": "candidate whitespace",
+    "cmd": "git diff --no-index --check /dev/null .codex/skills/uah-stack-iteration-loop/SKILL.md",
+    "exit_code": 1,
+    "output": ""
+  },
+  {
+    "check": "baseline whitespace",
+    "cmd": "git diff --no-index --check /dev/null /home/juanbeck/itrader-azr/.codex/skills/itrader-stack-iteration-loop/SKILL.md",
+    "exit_code": 1,
+    "output": ""
+  },
+  {
+    "check": "candidate links and commands",
+    "cmd": "for p in .codex/skills/uah-guardrails/SKILL.md REVIEW.md docs/agents/uah_review_workflow.md /home/juanbeck/.agents/skills/tdd/SKILL.md /home/juanbeck/nao-ros4hri-bridge/.codex/skills/seam-hypothesis-audit/SKILL.md /home/juanbeck/.codex/skills/skillopt-skill-iteration/SKILL.md /home/juanbeck/itrader-azr/.codex/skills/itrader-stack-iteration-loop/SKILL.md scripts/run_precommit.sh; do if test -f \"$p\"; then printf 'OK %s\\n' \"$p\"; else printf 'MISSING %s\\n' \"$p\"; fi; done",
+    "exit_code": 0,
+    "output": "OK .codex/skills/uah-guardrails/SKILL.md\nOK REVIEW.md\nOK docs/agents/uah_review_workflow.md\nOK /home/juanbeck/.agents/skills/tdd/SKILL.md\nOK /home/juanbeck/nao-ros4hri-bridge/.codex/skills/seam-hypothesis-audit/SKILL.md\nOK /home/juanbeck/.codex/skills/skillopt-skill-iteration/SKILL.md\nOK /home/juanbeck/itrader-azr/.codex/skills/itrader-stack-iteration-loop/SKILL.md\nOK scripts/run_precommit.sh\n"
+  },
+  {
+    "check": "candidate metadata fallback",
+    "cmd": "python3 /home/juanbeck/.codex/skills/.system/skill-creator/scripts/quick_validate.py .codex/skills/uah-stack-iteration-loop",
+    "exit_code": 0,
+    "output": "Skill is valid!\n"
+  },
+  {
+    "check": "baseline metadata fallback",
+    "cmd": "python3 /home/juanbeck/.codex/skills/.system/skill-creator/scripts/quick_validate.py /home/juanbeck/itrader-azr/.codex/skills/itrader-stack-iteration-loop",
+    "exit_code": 0,
+    "output": "Skill is valid!\n"
+  }
+]

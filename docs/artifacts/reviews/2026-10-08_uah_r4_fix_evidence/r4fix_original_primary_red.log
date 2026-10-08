@@ -1,0 +1,40 @@
+{
+  "current_artifact_against_old_authority": {
+    "error": "ValueError",
+    "message": "execution lease does not match semantic admission",
+    "outcome": "rejected"
+  },
+  "current_deserialize_old": {
+    "error": "ValueError",
+    "message": "invalid admitted operation fields",
+    "outcome": "rejected"
+  },
+  "exact_old_object_complete_evidence": {
+    "outcome": "accepted",
+    "value": 2
+  },
+  "exact_old_object_dispatch": {
+    "error": "AttributeError",
+    "message": "'AdmittedOperation' object has no attribute 'object_snapshot'",
+    "outcome": "rejected"
+  },
+  "exact_old_object_evidence_issue": {
+    "outcome": "accepted",
+    "value": "uah.execution_receipt/v1"
+  },
+  "exact_old_object_lease_request": {
+    "outcome": "accepted",
+    "value": true
+  },
+  "exact_old_object_replay": {
+    "outcome": "accepted",
+    "value": 9
+  },
+  "historical_read": {
+    "outcome": "accepted",
+    "value": {
+      "events": 4,
+      "stage": null
+    }
+  }
+}

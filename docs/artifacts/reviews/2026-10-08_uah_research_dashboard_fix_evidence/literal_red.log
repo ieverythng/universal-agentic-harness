@@ -1,0 +1,48 @@
+FFFFF                                                                    [100%]
+=================================== FAILURES ===================================
+_ test_metadata_remains_literal_in_both_presentations[<!-- research-records:start -->] _
+tests/test_research_dashboard.py:223: in test_metadata_remains_literal_in_both_presentations
+    assert generated.count("<!-- research-records:start -->") == 1
+E   AssertionError: assert 4 == 1
+E    +  where 4 = <built-in method count of str object at 0x37274bb0>('<!-- research-records:start -->')
+E    +    where <built-in method count of str object at 0x37274bb0> = '# Research dashboard\n\n## Catalog\n\n<!-- research-records:start -->\n| Research record | Kind | Date | H-series dep...snapshot SHA-256: `e5f82fe88597cb751d622285efc0588ee1ee582255333f2aa9f90e6371e3bd6d`.\n<!-- research-records:end -->\n'.count
+_ test_metadata_remains_literal_in_both_presentations[<!-- research-records:end -->] _
+tests/test_research_dashboard.py:224: in test_metadata_remains_literal_in_both_presentations
+    assert generated.count("<!-- research-records:end -->") == 1
+E   AssertionError: assert 4 == 1
+E    +  where 4 = <built-in method count of str object at 0x3737cd80>('<!-- research-records:end -->')
+E    +    where <built-in method count of str object at 0x3737cd80> = '# Research dashboard\n\n## Catalog\n\n<!-- research-records:start -->\n| Research record | Kind | Date | H-series dep...snapshot SHA-256: `e5f82fe88597cb751d622285efc0588ee1ee582255333f2aa9f90e6371e3bd6d`.\n<!-- research-records:end -->\n'.count
+_ test_metadata_remains_literal_in_both_presentations[<img src=x onerror=alert(1)>] _
+tests/test_research_dashboard.py:225: in test_metadata_remains_literal_in_both_presentations
+    assert '<img src=x' not in generated
+E   AssertionError: assert '<img src=x' not in '# Research ...ds:end -->\n'
+E
+E     '<img src=x' is contained here:
+E       | --- |
+E       | <img src=x onerror=alert(1)> | proposed_experiment | 2026-10-08 | H3 | not_scored | [Read source](../artifacts/research/proposal.md) |
+E     ?   ++++++++++
+E
+E       ### <img src=x onerror=alert(1)>...
+E
+E     ...Full output truncated (5 lines hidden), use '-vv' to show
+_ test_metadata_remains_literal_in_both_presentations[A [literal] *title* `value` | separator & &#91; </script>] _
+tests/test_research_dashboard.py:242: in test_metadata_remains_literal_in_both_presentations
+    assert literal in "".join(parsed.text)
+E   assert 'A [literal] *title* `value` | separator & &#91; </script>' in "\n\n\n  \n  \n  Research dashboard\n  \n    @page {\n      size: A4;\n      margin: 2.6cm 2.2cm 2.4cm 2.2cm;\n    }\n...n  });\n  search.addEventListener('input', apply);\n  gate.addEventListener('change', apply);\n  apply();\n})();\n\n\n"
+E    +  where "\n\n\n  \n  \n  Research dashboard\n  \n    @page {\n      size: A4;\n      margin: 2.6cm 2.2cm 2.4cm 2.2cm;\n    }\n...n  });\n  search.addEventListener('input', apply);\n  gate.addEventListener('change', apply);\n  apply();\n})();\n\n\n" = <built-in method join of str object at 0xb3c3f0>(['\n', '\n', '\n  ', '\n  ', '\n  ', 'Research dashboard', ...])
+E    +    where <built-in method join of str object at 0xb3c3f0> = ''.join
+E    +    and   ['\n', '\n', '\n  ', '\n  ', '\n  ', 'Research dashboard', ...] = <test_research_dashboard.test_metadata_remains_literal_in_both_presentations.<locals>.Text object at 0x79954f083e00>.text
+_ test_metadata_remains_literal_in_both_presentations[# Heading _emphasis_ [click](javascript:alert(1))] _
+tests/test_research_dashboard.py:242: in test_metadata_remains_literal_in_both_presentations
+    assert literal in "".join(parsed.text)
+E   assert '# Heading _emphasis_ [click](javascript:alert(1))' in "\n\n\n  \n  \n  Research dashboard\n  \n    @page {\n      size: A4;\n      margin: 2.6cm 2.2cm 2.4cm 2.2cm;\n    }\n...n  });\n  search.addEventListener('input', apply);\n  gate.addEventListener('change', apply);\n  apply();\n})();\n\n\n"
+E    +  where "\n\n\n  \n  \n  Research dashboard\n  \n    @page {\n      size: A4;\n      margin: 2.6cm 2.2cm 2.4cm 2.2cm;\n    }\n...n  });\n  search.addEventListener('input', apply);\n  gate.addEventListener('change', apply);\n  apply();\n})();\n\n\n" = <built-in method join of str object at 0xb3c3f0>(['\n', '\n', '\n  ', '\n  ', '\n  ', 'Research dashboard', ...])
+E    +    where <built-in method join of str object at 0xb3c3f0> = ''.join
+E    +    and   ['\n', '\n', '\n  ', '\n  ', '\n  ', 'Research dashboard', ...] = <test_research_dashboard.test_metadata_remains_literal_in_both_presentations.<locals>.Text object at 0x79954f082c60>.text
+=========================== short test summary info ============================
+FAILED tests/test_research_dashboard.py::test_metadata_remains_literal_in_both_presentations[<!-- research-records:start -->]
+FAILED tests/test_research_dashboard.py::test_metadata_remains_literal_in_both_presentations[<!-- research-records:end -->]
+FAILED tests/test_research_dashboard.py::test_metadata_remains_literal_in_both_presentations[<img src=x onerror=alert(1)>]
+FAILED tests/test_research_dashboard.py::test_metadata_remains_literal_in_both_presentations[A [literal] *title* `value` | separator & &#91; </script>]
+FAILED tests/test_research_dashboard.py::test_metadata_remains_literal_in_both_presentations[# Heading _emphasis_ [click](javascript:alert(1))]
+5 failed, 24 deselected in 0.39s

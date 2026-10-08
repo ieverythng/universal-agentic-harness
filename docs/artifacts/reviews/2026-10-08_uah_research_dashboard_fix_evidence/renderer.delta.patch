@@ -1,0 +1,44 @@
+--- docs/artifacts/reviews/2026-10-08_uah_research_dashboard_fix_evidence/render_research_dashboard.py.before	2026-10-08 16:53:24.113414716 +0200
++++ scripts/render_research_dashboard.py	2026-10-08 16:54:29.309847538 +0200
+@@ -11,6 +11,7 @@
+ import os
+ from pathlib import Path
+ import re
++import string
+ import sys
+ from urllib.parse import quote
+
+@@ -175,9 +176,8 @@
+
+ def metadata_text(value: str) -> str:
+     """Prevent metadata from becoming Markdown-authored links or formatting."""
+-    for character in "[]`*|":
+-        value = value.replace(character, f"&#{ord(character)};")
+-    return value.replace("\n", " ").replace("\r", " ")
++    value = value.translate({ord(character): f"&#{ord(character)};" for character in string.punctuation})
++    return " ".join(value.splitlines())
+
+
+ def render_records(records: list[dict], markdown_path: Path, root: Path) -> str:
+@@ -226,10 +226,21 @@
+             raise ValueError("dashboard must contain one ordered generated record region")
+         before, region = original.split(START)
+         _, after = region.split(END)
++        before = re.sub(
++            r"(?m)^Reconciled: \d{4}-\d{2}-\d{2}",
++            f"Reconciled: {registry['reconciled_at']}", before,
++        )
+         expected_md = before + START + "\n" + render_records(
+             registry["records"], markdown_path, root
+         ) + "\n" + END + after
+         title, body = render_markdown(expected_md.replace(START, "").replace(END, ""))
++        literal_punctuation = {
++            str(ord(character)): html.escape(character) for character in string.punctuation
++        }
++        body = re.sub(
++            r"&amp;#([0-9]+);",
++            lambda match: literal_punctuation.get(match[1], match[0]), body,
++        )
+         assets = Path(os.path.relpath(root / "docs/assets", output.parent)).as_posix()
+         expected_html = build_html(title, body)
+         tabs = '<button type="button" data-kind="all" aria-pressed="true">All records</button>'

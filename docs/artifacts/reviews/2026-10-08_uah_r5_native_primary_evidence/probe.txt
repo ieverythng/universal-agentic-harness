@@ -1,0 +1,313 @@
+"""Independent predeclared native R5 probes. Execute with python -S."""
+import sys
+import os
+import json
+import hashlib
+import tempfile
+from dataclasses import replace
+from pathlib import Path
+
+root = Path(__file__).parent
+sys.path[:0] = [str(root / "after/src"), str(root / "after/tests")]
+from ab_harness_synthetic import ExactNoteOracle, NativeNotesOwner, NoteObservation
+from test_prompt_compiler import _inputs
+from ab_harness.bindings import BindingCatalog
+from ab_harness.contracts import AbstractionFrame
+from ab_harness.domain_contracts import DomainContractPack, DomainEffectRule, TaskIngressRule
+from ab_harness.environment_ingress import EnvironmentIngress
+from ab_harness.environment_runs import EnvironmentRun, EnvironmentRunAttestation
+from ab_harness.lifecycle import LifecycleLedger
+from ab_harness.registry import RegistrySnapshot
+from ab_harness.task_compiler import TaskSpecCompiler
+from ab_harness.task_ingress_authority import TaskIngressAuthority
+from ab_harness.task_registry import EnvironmentTaskRegistry
+
+RESULTS = []
+def canonical(body):
+    return json.dumps(body, sort_keys=True, separators=(",", ":"), allow_nan=False)
+
+def fixture(label="1"):
+    template = _inputs()["compiled_task"]
+    module = template.interaction_module
+    registry = RegistrySnapshot(module.objects, source="synthetic:registry", version="registry:v1")
+    domain = DomainContractPack.issue(
+        domain_contract_pack_id="domain:notes", frame_id=module.frame.frame_id,
+        registry_version=module.frame.registry_version,
+        allowed_role_ids=(module.role.role_id,), supported_task_type_ids=("write_note",),
+        ingress_rules=(TaskIngressRule("request:notes", "request", "start_task", "request_id"),),
+        effect_rules=(DomainEffectRule("note_written", "write_note", "notes", "terminal"),),
+    )
+    ledger = LifecycleLedger()
+    environment = EnvironmentRun(EnvironmentRunAttestation(
+        environment_run_id="environment-run:review:" + label,
+        environment_profile_id="profile:notes",
+        domain_contract_pack_revision=domain.revision,
+        native_runtime_revision="runtime:v1", environment_owner_id="notes",
+        attestation_id="attestation:review:" + label,
+        started_at="2026-10-08T16:00:00Z", readiness_evidence_refs=("ready:review:" + label,),
+    ))
+    decision = TaskIngressAuthority(
+        environment_profile_id="profile:notes", domain_contract_pack=domain, lifecycle_ledger=ledger,
+    ).admit(environment, EnvironmentIngress(
+        "ingress:review:" + label, environment.environment_run_id, "request:notes", "request",
+        "request-artifact:review:" + label, (("request_id", "task:review:" + label),),
+        "2026-10-08T16:00:01Z",
+    ))
+    task = TaskSpecCompiler().compile(
+        task_ingress_decision=decision,
+        task_spec=replace(template.task_spec, task_id=decision.task_id, trace_id=decision.trace_id),
+        role=module.role, frame=module.frame, registry=registry,
+        domain_contract_pack=domain, task_registry=EnvironmentTaskRegistry(ledger),
+    )
+    return task
+
+def rejects(fn):
+    try:
+        fn()
+    except (ValueError, TypeError, UnicodeError):
+        return True
+    return False
+
+def run(name, fn):
+    try:
+        observed = fn()
+        RESULTS.append({"case": name, "status": "PASS", "observed": observed})
+    except AssertionError as exc:
+        RESULTS.append({"case": name, "status": "FAIL", "observed": str(exc)})
+    except BaseException as exc:
+        RESULTS.append({"case": name, "status": "ERROR", "observed": type(exc).__name__ + ": " + str(exc)})
+
+def setup(path, text="review note\n", label="1"):
+    task = fixture(label)
+    oracle = ExactNoteOracle.issue(task, expected_text=text, owner_id="notes")
+    owner = NativeNotesOwner(path, task=task, oracle=oracle, owner_id="notes")
+    return task, oracle, owner
+
+def exact(text):
+    with tempfile.TemporaryDirectory(dir=root) as temp:
+        path = Path(temp)
+        _, oracle, owner = setup(path, text)
+        write = owner.write_note("write", text)
+        closure = owner.finalize("closure", lambda _: None)
+        assert write.observed_bytes == text.encode("utf-8")
+        assert write.owner_result().observed_effects == ("note_written",)
+        assert closure.owner_result().observed_effects == ("note_content_matches",)
+        assert owner.phase == "callback_completed"
+        assert json.loads(oracle.compiled_task_json)["compiled_task_id"]
+        assert json.loads(write.oracle_json) == oracle.to_dict()
+        return {"bytes": write.observed_hex, "phase": owner.phase}
+
+for text in ("review note\n", "", "é\n", "Cafe\u0301\n", "null\x00byte\n"):
+    run("exact " + repr(text), lambda text=text: exact(text))
+
+def wrong(text):
+    with tempfile.TemporaryDirectory(dir=root) as temp:
+        _, _, owner = setup(Path(temp), "Café\n")
+        write = owner.write_note("write", text)
+        closure = owner.finalize("closure", lambda _: None)
+        assert write.owner_result().succeeded
+        assert not closure.owner_result().succeeded
+        assert closure.owner_result().observed_effects == ()
+        return {"write": write.owner_result().succeeded, "closure": closure.owner_result().succeeded}
+for text in ("wrong", "Café", "Café\r\n", "Café\n\n", "\ufeffCafé\n", "Cafe\u0301\n", ""):
+    run("wrong " + repr(text), lambda text=text: wrong(text))
+
+def no_mutation(preexisting):
+    with tempfile.TemporaryDirectory(dir=root) as temp:
+        path = Path(temp)
+        _, _, owner = setup(path)
+        if preexisting:
+            (path / "note.txt").write_bytes(b"review note\n")
+        closure = owner.finalize("closure", lambda _: None)
+        assert closure.kind == "closure_content"
+        assert ("note_written" not in closure.owner_result().observed_effects)
+        assert closure.owner_result().succeeded == preexisting
+        return {"closure": closure.owner_result().succeeded, "effect": closure.owner_result().observed_effects}
+for preexisting in (False, True):
+    run("no native write; preexisting=" + str(preexisting), lambda p=preexisting: no_mutation(p))
+
+def invalid_utf8():
+    with tempfile.TemporaryDirectory(dir=root) as temp:
+        path = Path(temp)
+        task, _, owner = setup(path)
+        assert rejects(lambda: ExactNoteOracle.issue(task, expected_text="\ud800", owner_id="notes"))
+        assert rejects(lambda: owner.write_note("write", "\ud800"))
+        assert not (path / "note.txt").exists()
+        (path / "note.txt").write_bytes(b"\xff")
+        closure = owner.finalize("closure", lambda _: None)
+        assert not closure.owner_result().succeeded
+        return closure.observed_hex
+run("strict UTF8 source and invalid current bytes", invalid_utf8)
+
+def historical(change):
+    with tempfile.TemporaryDirectory(dir=root) as temp:
+        path = Path(temp)
+        _, oracle, owner = setup(path)
+        write = owner.write_note("write", "review note\n")
+        if change == "deleted":
+            (path / "note.txt").unlink()
+        else:
+            (path / "note.txt").write_bytes(b"wrong")
+        closure = owner.finalize("closure", lambda _: None)
+        assert write.owner_result().succeeded
+        assert not closure.owner_result().succeeded
+        restored_oracle = ExactNoteOracle.from_dict(json.loads(canonical(oracle.to_dict())), expected_id=oracle.oracle_id)
+        restored = NoteObservation.from_dict(json.loads(canonical(closure.to_dict())), oracle=restored_oracle, expected_id=closure.observation_id)
+        (path / "note.txt").write_bytes(b"review note\n")
+        assert restored.owner_result() == closure.owner_result()
+        return {"historical_hex": write.observed_hex, "closure_hex": closure.observed_hex}
+for change in ("wrong", "deleted"):
+    run("history then " + change + "; reconstruct", lambda c=change: historical(c))
+
+def source_tamper(field):
+    with tempfile.TemporaryDirectory(dir=root) as temp:
+        task, oracle, _ = setup(Path(temp))
+        body = oracle.to_dict()
+        if field == "missing":
+            del body["expected_text"]
+        elif field == "compiled_task_json":
+            compiled = json.loads(body[field]); compiled["task_spec"]["goal"] = "altered"
+            body[field] = canonical(compiled)
+        elif field == "oracle_id":
+            body[field] = ""
+        else:
+            body[field] = "foreign"
+        assert rejects(lambda: ExactNoteOracle.from_dict(body, expected_id=oracle.oracle_id))
+        return "rejected"
+for field in ("missing", "expected_text", "owner_id", "evaluator_version", "compiled_task_json", "oracle_id"):
+    run("source tamper " + field, lambda f=field: source_tamper(f))
+
+def foreign(order):
+    tasks = [fixture("A"), fixture("B")]
+    if order:
+        tasks.reverse()
+    with tempfile.TemporaryDirectory(dir=root) as temp:
+        path = Path(temp)
+        oracle = ExactNoteOracle.issue(tasks[0], expected_text="review note\n", owner_id="notes")
+        assert rejects(lambda: NativeNotesOwner(path, task=tasks[1], oracle=oracle, owner_id="notes"))
+        assert rejects(lambda: NativeNotesOwner(path, task=tasks[0], oracle=oracle, owner_id="foreign"))
+        return [task.task_id for task in tasks]
+for order in (False, True):
+    run("independent public task association reverse=" + str(order), lambda o=order: foreign(o))
+
+def original_task_tamper(field):
+    with tempfile.TemporaryDirectory(dir=root) as temp:
+        task, oracle, _ = setup(Path(temp))
+        if field in ("task_id", "trace_id"):
+            object.__setattr__(task.task_spec, field, "foreign")
+        elif field == "goal":
+            object.__setattr__(task.task_spec, field, "wrong")
+        else:
+            object.__setattr__(task, field, "foreign")
+        assert rejects(lambda: NativeNotesOwner(Path(temp), task=task, oracle=oracle, owner_id="notes"))
+        return "rejected"
+for field in ("compiled_task_id", "environment_run_id", "task_id", "trace_id", "goal"):
+    run("tampered concrete task " + field, lambda f=field: original_task_tamper(f))
+
+def replay_alias(field):
+    with tempfile.TemporaryDirectory(dir=root) as temp:
+        task, oracle, owner = setup(Path(temp))
+        write = owner.write_note("write", "review note\n")
+        body = write.to_dict()
+        body[field] = {"operation_id":"other", "observed_hex":"77726f6e67", "kind":"closure_content", "observation_id":""}[field]
+        assert rejects(lambda: NoteObservation.from_dict(body, oracle=oracle, expected_id=write.observation_id))
+        return "rejected"
+for field in ("operation_id", "observed_hex", "kind", "observation_id"):
+    run("retained observation alias " + field, lambda f=field: replay_alias(f))
+
+def foreign_observation(order):
+    with tempfile.TemporaryDirectory(dir=root) as temp:
+        p = Path(temp)
+        dirs = [p / "A", p / "B"]
+        for d in dirs: d.mkdir()
+        states = [setup(d, label=label) for d,label in zip(dirs,("A","B"))]
+        if order: states.reverse()
+        _, oracle_a, owner_a = states[0]; _, oracle_b, owner_b = states[1]
+        a = owner_a.write_note("same-operation", "review note\n")
+        b = owner_b.write_note("same-operation", "review note\n")
+        assert a.observation_id != b.observation_id
+        assert rejects(lambda: NoteObservation.from_dict(a.to_dict(), oracle=oracle_b, expected_id=a.observation_id))
+        assert rejects(lambda: NoteObservation.from_dict(b.to_dict(), oracle=oracle_a, expected_id=b.observation_id))
+        return "foreign sources rejected; same operation remains task-local"
+for order in (False, True):
+    run("two owner/task foreign observation reverse=" + str(order), lambda o=order: foreign_observation(o))
+
+def duplicate(kind):
+    with tempfile.TemporaryDirectory(dir=root) as temp:
+        path = Path(temp); _, _, owner = setup(path)
+        owner.write_note("same", "review note\n")
+        if kind == "write":
+            assert rejects(lambda: owner.write_note("same", "wrong"))
+        else:
+            assert rejects(lambda: owner.finalize("same", lambda _: None))
+        assert owner.phase == "active"
+        assert (path / "note.txt").read_bytes() == b"review note\n"
+        return "rejected, no mutation"
+for kind in ("write", "closure"):
+    run("duplicate operation " + kind, lambda k=kind: duplicate(k))
+
+def callback(error):
+    with tempfile.TemporaryDirectory(dir=root) as temp:
+        path = Path(temp); _, _, owner = setup(path)
+        owner.write_note("write", "review note\n")
+        captured = []
+        def finish(observed):
+            captured.append(observed)
+            assert owner.phase == "closing"
+            assert rejects(lambda: owner.write_note("during", "wrong"))
+            assert rejects(lambda: owner.finalize("reentrant", lambda _: None))
+            if error: raise error("review callback failure")
+        try: owner.finalize("closure", finish)
+        except BaseException as exc:
+            assert error and isinstance(exc,error)
+        assert owner.phase == ("callback_failed" if error else "callback_completed")
+        assert rejects(lambda: owner.write_note("after", "wrong"))
+        assert (path / "note.txt").read_bytes() == b"review note\n"
+        assert len(captured) == 1
+        return owner.phase
+for error in (None, RuntimeError, KeyboardInterrupt, SystemExit):
+    run("closing fence callback " + (error.__name__ if error else "return"), lambda e=error: callback(e))
+
+def second_owner():
+    with tempfile.TemporaryDirectory(dir=root) as temp:
+        path=Path(temp); task, oracle, first=setup(path)
+        first.write_note("write", "review note\n")
+        second=NativeNotesOwner(path, task=task, oracle=oracle, owner_id="notes")
+        outcome = {}
+        def finish(observed):
+            outcome["closure_succeeded"] = observed.owner_result().succeeded
+            try:
+                second.write_note("write", "wrong")
+                outcome["second_write"] = "allowed"
+            except ValueError:
+                outcome["second_write"] = "rejected"
+        first.finalize("closure", finish)
+        outcome["phase"] = first.phase
+        outcome["actual_hex"] = (path/"note.txt").read_bytes().hex()
+        print("DETAIL second-owner", canonical(outcome))
+        assert outcome["second_write"] == "rejected", canonical(outcome)
+        return outcome
+run("same workspace second native owner during closure", second_owner)
+
+def inner_compiled_hash(field):
+    task = fixture()
+    compiled = task.to_dict()
+    if field in ("goal", "task_id", "trace_id"):
+        compiled["task_spec"][field] = "foreign"
+    else:
+        compiled[field] = "foreign"
+    frozen = canonical(compiled)
+    try:
+        oracle = ExactNoteOracle(frozen, "review note\n", "notes")
+    except ValueError:
+        return "rejected stale compiled-task association"
+    observation = NoteObservation(canonical(oracle.to_dict()), "closure", "closure_content", b"review note\n".hex())
+    restored_oracle = ExactNoteOracle.from_dict(oracle.to_dict(), expected_id=oracle.oracle_id)
+    restored = NoteObservation.from_dict(observation.to_dict(), oracle=restored_oracle, expected_id=observation.observation_id)
+    detail = {"stale_compiled_id": task.compiled_task_id, "field": field, "reconstructed_success": restored.owner_result().succeeded, "oracle_id":oracle.oracle_id}
+    print("DETAIL inner-compiled-hash",canonical(detail))
+    assert False, canonical(detail)
+for field in ("goal", "environment_run_id", "task_id", "trace_id", "compiled_task_id"):
+    run("serialized oracle nested compiled hash " + field, lambda f=field: inner_compiled_hash(f))
+
+print(canonical({"total": len(RESULTS), "passed": sum(r["status"]=="PASS" for r in RESULTS), "failed": sum(r["status"]=="FAIL" for r in RESULTS), "results": RESULTS}))

@@ -1,0 +1,68 @@
+{
+  "scope": "standalone public evaluator mechanics only; no owner predicate or ledger integration",
+  "cases": [
+    {
+      "case": "none",
+      "actual": "suspended",
+      "expected": "suspended"
+    },
+    {
+      "case": "write_only",
+      "actual": "suspended",
+      "expected": "suspended"
+    },
+    {
+      "case": "closure_only",
+      "actual": "suspended",
+      "expected": "suspended"
+    },
+    {
+      "case": "both",
+      "actual": "accepted",
+      "expected": "accepted"
+    },
+    {
+      "case": "write_then_bad_closure",
+      "actual": "rejected",
+      "expected": "rejected"
+    },
+    {
+      "case": "foreign_owner_closure",
+      "actual": "suspended",
+      "expected": "suspended"
+    }
+  ],
+  "existing_acceptance_tests": {
+    "path": "tests/test_task_acceptance.py",
+    "passed": 4
+  },
+  "not_qualification": [
+    "owner-local equality",
+    "ledger path",
+    "mounted domain frame",
+    "integration",
+    "H1 closure"
+  ],
+  "observed_utc": "2026-10-08T14:58:58Z",
+  "pass_start_utc": "2026-10-08T14:56:15Z",
+  "target_stop_utc": "2026-10-08T15:06:15Z",
+  "validation": {
+    "source_tests": "4 existing acceptance tests passed",
+    "standalone_cases": "6 passed",
+    "full_hooks": "passed at about15:02 UTC",
+    "explicit_supplement_hooks": "passed",
+    "claim": "No owner predicate or integration implementation; no independent R3/R4 gate approval"
+  },
+  "source_sha256": {
+    "contracts": "bacb7c0098851ffd4235000005a86dc3d519cf099ee9f9e86633f29e0419047d",
+    "acceptance": "0d26d594f073ef1fc89061703b3149ce670ac8b3e58350d10b15e9f66961ac4a",
+    "environment": "55d9a470fe9012b4225a21f6b209dac4d96611b36e3b5e9d8856eaf875b867f8",
+    "lifecycle": "01a5523a438c6142385df8ffa241e225dfbb0394076082cbd609070c02503f81",
+    "task_compiler": "b11625e4cb5a64f74327e2112a6e182b48e45ce9821135a5af39a9f36f92e9bf"
+  },
+  "initial_handoff_utc": "2026-10-08T15:03:29Z",
+  "pass_end_utc": "2026-10-08T15:05:59Z",
+  "final_clarification_utc": "2026-10-08T15:05:07Z",
+  "latest_shared_tree_hooks": "1 concurrent R4 snapshot test failed, 403 passed; generated-docs passed; no RESEARCH code changes",
+  "closure_cutoff": "terminal ledger commit under an explicit synthetic-owner exclusive closing phase; earlier read alone does not prove terminal state"
+}

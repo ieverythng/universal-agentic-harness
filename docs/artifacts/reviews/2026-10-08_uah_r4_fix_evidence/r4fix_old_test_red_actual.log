@@ -1,0 +1,23 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+______ test_authentic_old_concrete_admission_cannot_obtain_current_lease _______
+
+tmp_path = PosixPath('/tmp/pytest-of-juanbeck/pytest-128/test_authentic_old_concrete_ad0')
+
+    def test_authentic_old_concrete_admission_cannot_obtain_current_lease(tmp_path):
+        _, _, environment, _, _, _ = authority_fixture(tmp_path)
+        rows = (FIX_EVIDENCE / "authentic_v2_leased.fixture").read_text().splitlines()
+        path = tmp_path / "historical.jsonl"
+        path.write_text("\n".join(rows[:-1]) + "\n")
+        ledger = LifecycleLedger(path)
+        before = len(ledger.events())
+        admitted = authentic_old_admitted()
+        assert admitted.schema_version == "uah.admitted_operation/v2"
+        admitted.verify_identity()
+>       with pytest.raises(ValueError, match="current|supported|artifact"):
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/test_admission_active_provenance.py:49: Failed
+=========================== short test summary info ============================
+FAILED tests/test_admission_active_provenance.py::test_authentic_old_concrete_admission_cannot_obtain_current_lease
+1 failed in 0.15s

@@ -1,0 +1,15 @@
+--- docs/artifacts/reviews/2026-10-08_uah_r4_fix_evidence/proposal_admission.py.before	2026-10-08 17:29:32.317529441 +0200
++++ src/ab_harness/proposal_admission.py	2026-10-08 17:31:17.546225542 +0200
+@@ -497,8 +497,10 @@
+         self.verify_identity()
+
+     def verify_identity(self) -> None:
+-        self.proposal.verify_identity()
+-        if not isinstance(self.object_snapshot, ABObjectView):
++        if type(self) is not AdmittedOperation or type(self.proposal) is not TypedProposal:
++            raise ValueError("current admission requires the supported concrete artifact")
++        TypedProposal.verify_identity(self.proposal)
++        if type(self.object_snapshot) is not ABObjectView:
+             raise ValueError("admitted operation requires an AB object snapshot")
+         snapshot = self.object_snapshot
+         if (

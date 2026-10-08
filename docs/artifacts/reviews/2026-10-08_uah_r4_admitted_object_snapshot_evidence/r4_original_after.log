@@ -1,0 +1,9 @@
+Traceback (most recent call last):
+  File "/home/juanbeck/universal-agentic-harness/docs/artifacts/reviews/2026-10-08_uah_r2_catalog_repros/owner_after_admission_probe.py", line 103, in <module>
+    run_case(
+  File "/home/juanbeck/universal-agentic-harness/docs/artifacts/reviews/2026-10-08_uah_r2_catalog_repros/owner_after_admission_probe.py", line 82, in run_case
+    ).execute(lease)
+      ^^^^^^^^^^^^^^
+  File "/home/juanbeck/universal-agentic-harness/src/ab_harness/environment.py", line 486, in execute
+    raise ValueError("execution lease object semantics no longer match the catalog")
+ValueError: execution lease object semantics no longer match the catalog

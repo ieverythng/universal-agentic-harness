@@ -1,0 +1,1777 @@
+{
+  "mismatches": 0,
+  "results": [
+    {
+      "actual": {
+        "actors": [],
+        "environments": [
+          "environment:independent"
+        ],
+        "events": [
+          "trace-event:sha256:8f27aa86ddf54a785dba685c5e3c615e21adcd77e0cdeb3ffba1cf3ca8b96ea4"
+        ],
+        "label": "synthetic",
+        "traces": [
+          [
+            "trace:independent",
+            "accepted"
+          ]
+        ]
+      },
+      "case": "valid-v1-task",
+      "consumer": "project",
+      "expected": "accept",
+      "generator": false,
+      "matches": true
+    },
+    {
+      "actual": {
+        "actors": [],
+        "environments": [
+          "environment:independent"
+        ],
+        "events": [
+          "trace-event:sha256:8f27aa86ddf54a785dba685c5e3c615e21adcd77e0cdeb3ffba1cf3ca8b96ea4"
+        ],
+        "label": "synthetic",
+        "traces": [
+          [
+            "trace:independent",
+            "accepted"
+          ]
+        ]
+      },
+      "case": "valid-v1-task",
+      "consumer": "project",
+      "expected": "accept",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "actors": [],
+        "environments": [
+          "environment:independent"
+        ],
+        "events": [
+          "trace-event:sha256:8f27aa86ddf54a785dba685c5e3c615e21adcd77e0cdeb3ffba1cf3ca8b96ea4"
+        ],
+        "graph_html_agree": true,
+        "label": "synthetic",
+        "traces": [
+          [
+            "trace:independent",
+            "accepted"
+          ]
+        ]
+      },
+      "case": "valid-v1-task",
+      "consumer": "render",
+      "expected": "accept",
+      "generator": false,
+      "matches": true
+    },
+    {
+      "actual": {
+        "actors": [],
+        "environments": [
+          "environment:independent"
+        ],
+        "events": [
+          "trace-event:sha256:8f27aa86ddf54a785dba685c5e3c615e21adcd77e0cdeb3ffba1cf3ca8b96ea4"
+        ],
+        "graph_html_agree": true,
+        "label": "synthetic",
+        "traces": [
+          [
+            "trace:independent",
+            "accepted"
+          ]
+        ]
+      },
+      "case": "valid-v1-task",
+      "consumer": "render",
+      "expected": "accept",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "actors": [
+          "actor:one"
+        ],
+        "environments": [
+          "environment:independent"
+        ],
+        "events": [
+          "trace-event:sha256:5b5a634a83bf3eaadfcc4767074414d7c04a3c59c825383eac091585a4189536"
+        ],
+        "label": "synthetic",
+        "traces": [
+          [
+            "trace:independent",
+            "accepted"
+          ]
+        ]
+      },
+      "case": "valid-v2-task",
+      "consumer": "project",
+      "expected": "accept",
+      "generator": false,
+      "matches": true
+    },
+    {
+      "actual": {
+        "actors": [
+          "actor:one"
+        ],
+        "environments": [
+          "environment:independent"
+        ],
+        "events": [
+          "trace-event:sha256:5b5a634a83bf3eaadfcc4767074414d7c04a3c59c825383eac091585a4189536"
+        ],
+        "label": "synthetic",
+        "traces": [
+          [
+            "trace:independent",
+            "accepted"
+          ]
+        ]
+      },
+      "case": "valid-v2-task",
+      "consumer": "project",
+      "expected": "accept",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "actors": [
+          "actor:one"
+        ],
+        "environments": [
+          "environment:independent"
+        ],
+        "events": [
+          "trace-event:sha256:5b5a634a83bf3eaadfcc4767074414d7c04a3c59c825383eac091585a4189536"
+        ],
+        "graph_html_agree": true,
+        "label": "synthetic",
+        "traces": [
+          [
+            "trace:independent",
+            "accepted"
+          ]
+        ]
+      },
+      "case": "valid-v2-task",
+      "consumer": "render",
+      "expected": "accept",
+      "generator": false,
+      "matches": true
+    },
+    {
+      "actual": {
+        "actors": [
+          "actor:one"
+        ],
+        "environments": [
+          "environment:independent"
+        ],
+        "events": [
+          "trace-event:sha256:5b5a634a83bf3eaadfcc4767074414d7c04a3c59c825383eac091585a4189536"
+        ],
+        "graph_html_agree": true,
+        "label": "synthetic",
+        "traces": [
+          [
+            "trace:independent",
+            "accepted"
+          ]
+        ]
+      },
+      "case": "valid-v2-task",
+      "consumer": "render",
+      "expected": "accept",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "actors": [
+          "actor:one"
+        ],
+        "environments": [
+          "environment:independent"
+        ],
+        "events": [
+          "trace-event:sha256:8e38fca0069665242e33d0d48acbdb923059a613015361dff1caa2587927f374"
+        ],
+        "label": "synthetic",
+        "traces": []
+      },
+      "case": "valid-v2-agent",
+      "consumer": "project",
+      "expected": "accept",
+      "generator": false,
+      "matches": true
+    },
+    {
+      "actual": {
+        "actors": [
+          "actor:one"
+        ],
+        "environments": [
+          "environment:independent"
+        ],
+        "events": [
+          "trace-event:sha256:8e38fca0069665242e33d0d48acbdb923059a613015361dff1caa2587927f374"
+        ],
+        "label": "synthetic",
+        "traces": []
+      },
+      "case": "valid-v2-agent",
+      "consumer": "project",
+      "expected": "accept",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "actors": [
+          "actor:one"
+        ],
+        "environments": [
+          "environment:independent"
+        ],
+        "events": [
+          "trace-event:sha256:8e38fca0069665242e33d0d48acbdb923059a613015361dff1caa2587927f374"
+        ],
+        "graph_html_agree": true,
+        "label": "synthetic",
+        "traces": []
+      },
+      "case": "valid-v2-agent",
+      "consumer": "render",
+      "expected": "accept",
+      "generator": false,
+      "matches": true
+    },
+    {
+      "actual": {
+        "actors": [
+          "actor:one"
+        ],
+        "environments": [
+          "environment:independent"
+        ],
+        "events": [
+          "trace-event:sha256:8e38fca0069665242e33d0d48acbdb923059a613015361dff1caa2587927f374"
+        ],
+        "graph_html_agree": true,
+        "label": "synthetic",
+        "traces": []
+      },
+      "case": "valid-v2-agent",
+      "consumer": "render",
+      "expected": "accept",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "actors": [
+          "actor:one",
+          "actor:two"
+        ],
+        "environments": [
+          "environment:independent"
+        ],
+        "events": [
+          "trace-event:sha256:8f27aa86ddf54a785dba685c5e3c615e21adcd77e0cdeb3ffba1cf3ca8b96ea4",
+          "trace-event:sha256:67dcc66da79442c889a48814d8c7853c8ead574ed4e78e754a897939ef3e1297",
+          "trace-event:sha256:c54e6a561855f02c378d02117502ad12440b6e850546f9e2b1b82f4151039444"
+        ],
+        "graph_html_agree": true,
+        "label": "synthetic",
+        "traces": [
+          [
+            "trace:independent",
+            "accepted"
+          ]
+        ]
+      },
+      "case": "mixed-order-0",
+      "consumer": "render",
+      "expected": "accept",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "actors": [
+          "actor:one",
+          "actor:two"
+        ],
+        "environments": [
+          "environment:independent"
+        ],
+        "events": [
+          "trace-event:sha256:8f27aa86ddf54a785dba685c5e3c615e21adcd77e0cdeb3ffba1cf3ca8b96ea4",
+          "trace-event:sha256:67dcc66da79442c889a48814d8c7853c8ead574ed4e78e754a897939ef3e1297",
+          "trace-event:sha256:c54e6a561855f02c378d02117502ad12440b6e850546f9e2b1b82f4151039444"
+        ],
+        "graph_html_agree": true,
+        "label": "synthetic",
+        "traces": [
+          [
+            "trace:independent",
+            "accepted"
+          ]
+        ]
+      },
+      "case": "mixed-order-1",
+      "consumer": "render",
+      "expected": "accept",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "actors": [
+          "actor:one",
+          "actor:two"
+        ],
+        "environments": [
+          "environment:independent"
+        ],
+        "events": [
+          "trace-event:sha256:8f27aa86ddf54a785dba685c5e3c615e21adcd77e0cdeb3ffba1cf3ca8b96ea4",
+          "trace-event:sha256:67dcc66da79442c889a48814d8c7853c8ead574ed4e78e754a897939ef3e1297",
+          "trace-event:sha256:c54e6a561855f02c378d02117502ad12440b6e850546f9e2b1b82f4151039444"
+        ],
+        "graph_html_agree": true,
+        "label": "synthetic",
+        "traces": [
+          [
+            "trace:independent",
+            "accepted"
+          ]
+        ]
+      },
+      "case": "mixed-order-2",
+      "consumer": "render",
+      "expected": "accept",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "actors": [
+          "actor:one",
+          "actor:two"
+        ],
+        "environments": [
+          "environment:independent"
+        ],
+        "events": [
+          "trace-event:sha256:8f27aa86ddf54a785dba685c5e3c615e21adcd77e0cdeb3ffba1cf3ca8b96ea4",
+          "trace-event:sha256:67dcc66da79442c889a48814d8c7853c8ead574ed4e78e754a897939ef3e1297",
+          "trace-event:sha256:c54e6a561855f02c378d02117502ad12440b6e850546f9e2b1b82f4151039444"
+        ],
+        "graph_html_agree": true,
+        "label": "synthetic",
+        "traces": [
+          [
+            "trace:independent",
+            "accepted"
+          ]
+        ]
+      },
+      "case": "mixed-order-3",
+      "consumer": "render",
+      "expected": "accept",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "actors": [
+          "actor:one",
+          "actor:two"
+        ],
+        "environments": [
+          "environment:independent"
+        ],
+        "events": [
+          "trace-event:sha256:8f27aa86ddf54a785dba685c5e3c615e21adcd77e0cdeb3ffba1cf3ca8b96ea4",
+          "trace-event:sha256:67dcc66da79442c889a48814d8c7853c8ead574ed4e78e754a897939ef3e1297",
+          "trace-event:sha256:c54e6a561855f02c378d02117502ad12440b6e850546f9e2b1b82f4151039444"
+        ],
+        "graph_html_agree": true,
+        "label": "synthetic",
+        "traces": [
+          [
+            "trace:independent",
+            "accepted"
+          ]
+        ]
+      },
+      "case": "mixed-order-4",
+      "consumer": "render",
+      "expected": "accept",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "actors": [
+          "actor:one",
+          "actor:two"
+        ],
+        "environments": [
+          "environment:independent"
+        ],
+        "events": [
+          "trace-event:sha256:8f27aa86ddf54a785dba685c5e3c615e21adcd77e0cdeb3ffba1cf3ca8b96ea4",
+          "trace-event:sha256:67dcc66da79442c889a48814d8c7853c8ead574ed4e78e754a897939ef3e1297",
+          "trace-event:sha256:c54e6a561855f02c378d02117502ad12440b6e850546f9e2b1b82f4151039444"
+        ],
+        "graph_html_agree": true,
+        "label": "synthetic",
+        "traces": [
+          [
+            "trace:independent",
+            "accepted"
+          ]
+        ]
+      },
+      "case": "mixed-order-5",
+      "consumer": "render",
+      "expected": "accept",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "actors": [],
+        "environments": [],
+        "events": [],
+        "label": "synthetic",
+        "traces": []
+      },
+      "case": "empty",
+      "consumer": "project",
+      "expected": "accept",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "actors": [],
+        "environments": [],
+        "events": [],
+        "graph_html_agree": true,
+        "label": "synthetic",
+        "traces": []
+      },
+      "case": "empty",
+      "consumer": "render",
+      "expected": "accept",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": "accepted",
+      "case": "explicit-status-terminal_task_accepted",
+      "expected": "accepted",
+      "matches": true
+    },
+    {
+      "actual": "accepted",
+      "case": "explicit-status-terminal_task_accepted_with_deficit",
+      "expected": "accepted",
+      "matches": true
+    },
+    {
+      "actual": "rejected",
+      "case": "explicit-status-terminal_task_rejected",
+      "expected": "rejected",
+      "matches": true
+    },
+    {
+      "actual": "open",
+      "case": "explicit-status-execution_failed",
+      "expected": "open",
+      "matches": true
+    },
+    {
+      "actual": "open",
+      "case": "explicit-status-semantic_admission_rejected",
+      "expected": "open",
+      "matches": true
+    },
+    {
+      "actual": "open",
+      "case": "explicit-status-budget_exhausted",
+      "expected": "open",
+      "matches": true
+    },
+    {
+      "actual": "open",
+      "case": "explicit-status-retry_exhausted",
+      "expected": "open",
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "ValueError",
+        "message": "v1 events require task scope without actor identity"
+      },
+      "case": "v1-excluded-{'agent_run_id': 'actor:forged'}",
+      "consumer": "project",
+      "expected": "reject",
+      "generator": false,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "ValueError",
+        "message": "v1 events require task scope without actor identity"
+      },
+      "case": "v1-excluded-{'agent_run_id': 'actor:forged'}",
+      "consumer": "project",
+      "expected": "reject",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "ValueError",
+        "message": "v1 events require task scope without actor identity"
+      },
+      "case": "v1-excluded-{'agent_run_id': 'actor:forged'}",
+      "consumer": "render",
+      "expected": "reject",
+      "generator": false,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "ValueError",
+        "message": "v1 events require task scope without actor identity"
+      },
+      "case": "v1-excluded-{'agent_run_id': 'actor:forged'}",
+      "consumer": "render",
+      "expected": "reject",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "ValueError",
+        "message": "v1 events require task scope without actor identity"
+      },
+      "case": "v1-excluded-{'event_scope': 'agent'}",
+      "consumer": "project",
+      "expected": "reject",
+      "generator": false,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "ValueError",
+        "message": "v1 events require task scope without actor identity"
+      },
+      "case": "v1-excluded-{'event_scope': 'agent'}",
+      "consumer": "project",
+      "expected": "reject",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "ValueError",
+        "message": "v1 events require task scope without actor identity"
+      },
+      "case": "v1-excluded-{'event_scope': 'agent'}",
+      "consumer": "render",
+      "expected": "reject",
+      "generator": false,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "ValueError",
+        "message": "v1 events require task scope without actor identity"
+      },
+      "case": "v1-excluded-{'event_scope': 'agent'}",
+      "consumer": "render",
+      "expected": "reject",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "ValueError",
+        "message": "v1 events require task scope without actor identity"
+      },
+      "case": "v1-excluded-{'event_scope': 'agent', 'agent_run_id': 'actor:forged'}",
+      "consumer": "project",
+      "expected": "reject",
+      "generator": false,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "ValueError",
+        "message": "v1 events require task scope without actor identity"
+      },
+      "case": "v1-excluded-{'event_scope': 'agent', 'agent_run_id': 'actor:forged'}",
+      "consumer": "project",
+      "expected": "reject",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "ValueError",
+        "message": "v1 events require task scope without actor identity"
+      },
+      "case": "v1-excluded-{'event_scope': 'agent', 'agent_run_id': 'actor:forged'}",
+      "consumer": "render",
+      "expected": "reject",
+      "generator": false,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "ValueError",
+        "message": "v1 events require task scope without actor identity"
+      },
+      "case": "v1-excluded-{'event_scope': 'agent', 'agent_run_id': 'actor:forged'}",
+      "consumer": "render",
+      "expected": "reject",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "ValueError",
+        "message": "v1 events require task scope without actor identity"
+      },
+      "case": "v1-excluded-{'event_scope': 'unknown'}",
+      "consumer": "project",
+      "expected": "reject",
+      "generator": false,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "ValueError",
+        "message": "v1 events require task scope without actor identity"
+      },
+      "case": "v1-excluded-{'event_scope': 'unknown'}",
+      "consumer": "project",
+      "expected": "reject",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "ValueError",
+        "message": "v1 events require task scope without actor identity"
+      },
+      "case": "v1-excluded-{'event_scope': 'unknown'}",
+      "consumer": "render",
+      "expected": "reject",
+      "generator": false,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "ValueError",
+        "message": "v1 events require task scope without actor identity"
+      },
+      "case": "v1-excluded-{'event_scope': 'unknown'}",
+      "consumer": "render",
+      "expected": "reject",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "ValueError",
+        "message": "v1 events require task scope without actor identity"
+      },
+      "case": "v1-excluded-{'event_scope': None}",
+      "consumer": "project",
+      "expected": "reject",
+      "generator": false,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "ValueError",
+        "message": "v1 events require task scope without actor identity"
+      },
+      "case": "v1-excluded-{'event_scope': None}",
+      "consumer": "project",
+      "expected": "reject",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "ValueError",
+        "message": "v1 events require task scope without actor identity"
+      },
+      "case": "v1-excluded-{'event_scope': None}",
+      "consumer": "render",
+      "expected": "reject",
+      "generator": false,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "ValueError",
+        "message": "v1 events require task scope without actor identity"
+      },
+      "case": "v1-excluded-{'event_scope': None}",
+      "consumer": "render",
+      "expected": "reject",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "ValueError",
+        "message": "v1 events require task scope without actor identity"
+      },
+      "case": "v1-excluded-{'agent_run_id': 7}",
+      "consumer": "project",
+      "expected": "reject",
+      "generator": false,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "ValueError",
+        "message": "v1 events require task scope without actor identity"
+      },
+      "case": "v1-excluded-{'agent_run_id': 7}",
+      "consumer": "project",
+      "expected": "reject",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "ValueError",
+        "message": "v1 events require task scope without actor identity"
+      },
+      "case": "v1-excluded-{'agent_run_id': 7}",
+      "consumer": "render",
+      "expected": "reject",
+      "generator": false,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "ValueError",
+        "message": "v1 events require task scope without actor identity"
+      },
+      "case": "v1-excluded-{'agent_run_id': 7}",
+      "consumer": "render",
+      "expected": "reject",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "ValueError",
+        "message": "trace event identity does not match content"
+      },
+      "case": "stale-event_type",
+      "consumer": "project",
+      "expected": "reject",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "ValueError",
+        "message": "trace event identity does not match content"
+      },
+      "case": "stale-event_type",
+      "consumer": "render",
+      "expected": "reject",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "ValueError",
+        "message": "trace event identity does not match content"
+      },
+      "case": "stale-environment_run_id",
+      "consumer": "project",
+      "expected": "reject",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "ValueError",
+        "message": "trace event identity does not match content"
+      },
+      "case": "stale-environment_run_id",
+      "consumer": "render",
+      "expected": "reject",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "ValueError",
+        "message": "trace event identity does not match content"
+      },
+      "case": "stale-task_id",
+      "consumer": "project",
+      "expected": "reject",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "ValueError",
+        "message": "trace event identity does not match content"
+      },
+      "case": "stale-task_id",
+      "consumer": "render",
+      "expected": "reject",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "ValueError",
+        "message": "trace event identity does not match content"
+      },
+      "case": "stale-trace_id",
+      "consumer": "project",
+      "expected": "reject",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "ValueError",
+        "message": "trace event identity does not match content"
+      },
+      "case": "stale-trace_id",
+      "consumer": "render",
+      "expected": "reject",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "ValueError",
+        "message": "trace event identity does not match content"
+      },
+      "case": "stale-sequence",
+      "consumer": "project",
+      "expected": "reject",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "ValueError",
+        "message": "trace event identity does not match content"
+      },
+      "case": "stale-sequence",
+      "consumer": "render",
+      "expected": "reject",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "ValueError",
+        "message": "trace event identity does not match content"
+      },
+      "case": "stale-commit_id",
+      "consumer": "project",
+      "expected": "reject",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "ValueError",
+        "message": "trace event identity does not match content"
+      },
+      "case": "stale-commit_id",
+      "consumer": "render",
+      "expected": "reject",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "ValueError",
+        "message": "trace event commit position is invalid"
+      },
+      "case": "stale-commit_index",
+      "consumer": "project",
+      "expected": "reject",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "ValueError",
+        "message": "trace event commit position is invalid"
+      },
+      "case": "stale-commit_index",
+      "consumer": "render",
+      "expected": "reject",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "ValueError",
+        "message": "trace event identity does not match content"
+      },
+      "case": "stale-commit_size",
+      "consumer": "project",
+      "expected": "reject",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "ValueError",
+        "message": "trace event identity does not match content"
+      },
+      "case": "stale-commit_size",
+      "consumer": "render",
+      "expected": "reject",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "ValueError",
+        "message": "trace event identity does not match content"
+      },
+      "case": "stale-recorded_at",
+      "consumer": "project",
+      "expected": "reject",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "ValueError",
+        "message": "trace event identity does not match content"
+      },
+      "case": "stale-recorded_at",
+      "consumer": "render",
+      "expected": "reject",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "ValueError",
+        "message": "trace event identity does not match content"
+      },
+      "case": "stale-operation_id",
+      "consumer": "project",
+      "expected": "reject",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "ValueError",
+        "message": "trace event identity does not match content"
+      },
+      "case": "stale-operation_id",
+      "consumer": "render",
+      "expected": "reject",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "ValueError",
+        "message": "trace event identity does not match content"
+      },
+      "case": "stale-parent_event_id",
+      "consumer": "project",
+      "expected": "reject",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "ValueError",
+        "message": "trace event identity does not match content"
+      },
+      "case": "stale-parent_event_id",
+      "consumer": "render",
+      "expected": "reject",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "ValueError",
+        "message": "trace event identity does not match content"
+      },
+      "case": "stale-artifact_refs",
+      "consumer": "project",
+      "expected": "reject",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "ValueError",
+        "message": "trace event identity does not match content"
+      },
+      "case": "stale-artifact_refs",
+      "consumer": "render",
+      "expected": "reject",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "ValueError",
+        "message": "trace event identity does not match content"
+      },
+      "case": "stale-data_json",
+      "consumer": "project",
+      "expected": "reject",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "ValueError",
+        "message": "trace event identity does not match content"
+      },
+      "case": "stale-data_json",
+      "consumer": "render",
+      "expected": "reject",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "ValueError",
+        "message": "trace event identity does not match content"
+      },
+      "case": "stale-event_id",
+      "consumer": "project",
+      "expected": "reject",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "ValueError",
+        "message": "trace event identity does not match content"
+      },
+      "case": "stale-event_id",
+      "consumer": "render",
+      "expected": "reject",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "ValueError",
+        "message": "trace event identity does not match content"
+      },
+      "case": "stale-v2-agent_run_id",
+      "consumer": "render",
+      "expected": "reject",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "ValueError",
+        "message": "v2 agent scope cannot carry task lineage"
+      },
+      "case": "stale-v2-event_scope",
+      "consumer": "render",
+      "expected": "reject",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "ValueError",
+        "message": "unsupported trace event schema: uah.trace_event/v9"
+      },
+      "case": "shape-{'schema_version': 'uah.trace_event/v9'}",
+      "consumer": "project",
+      "expected": "reject",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "ValueError",
+        "message": "unsupported trace event schema: uah.trace_event/v9"
+      },
+      "case": "shape-{'schema_version': 'uah.trace_event/v9'}",
+      "consumer": "render",
+      "expected": "reject",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "ValueError",
+        "message": "v1 events require task scope without actor identity"
+      },
+      "case": "shape-{'event_scope': 'bogus'}",
+      "consumer": "project",
+      "expected": "reject",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "ValueError",
+        "message": "v1 events require task scope without actor identity"
+      },
+      "case": "shape-{'event_scope': 'bogus'}",
+      "consumer": "render",
+      "expected": "reject",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "ValueError",
+        "message": "trace event requires immutable artifact references"
+      },
+      "case": "shape-{'artifact_refs': ['artifact:independent']}",
+      "consumer": "project",
+      "expected": "reject",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "ValueError",
+        "message": "trace event requires immutable artifact references"
+      },
+      "case": "shape-{'artifact_refs': ['artifact:independent']}",
+      "consumer": "render",
+      "expected": "reject",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "ValueError",
+        "message": "trace event requires immutable artifact references"
+      },
+      "case": "shape-{'artifact_refs': ()}",
+      "consumer": "project",
+      "expected": "reject",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "ValueError",
+        "message": "trace event requires immutable artifact references"
+      },
+      "case": "shape-{'artifact_refs': ()}",
+      "consumer": "render",
+      "expected": "reject",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "ValueError",
+        "message": "trace event artifact references must not be empty"
+      },
+      "case": "shape-{'artifact_refs': ('',)}",
+      "consumer": "project",
+      "expected": "reject",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "ValueError",
+        "message": "trace event artifact references must not be empty"
+      },
+      "case": "shape-{'artifact_refs': ('',)}",
+      "consumer": "render",
+      "expected": "reject",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "ValueError",
+        "message": "trace event sequence must be positive"
+      },
+      "case": "shape-{'sequence': 0}",
+      "consumer": "project",
+      "expected": "reject",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "ValueError",
+        "message": "trace event sequence must be positive"
+      },
+      "case": "shape-{'sequence': 0}",
+      "consumer": "render",
+      "expected": "reject",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "ValueError",
+        "message": "trace event sequence must be positive"
+      },
+      "case": "shape-{'sequence': -1}",
+      "consumer": "project",
+      "expected": "reject",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "ValueError",
+        "message": "trace event sequence must be positive"
+      },
+      "case": "shape-{'sequence': -1}",
+      "consumer": "render",
+      "expected": "reject",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "ValueError",
+        "message": "trace event commit position is invalid"
+      },
+      "case": "shape-{'commit_index': 0}",
+      "consumer": "project",
+      "expected": "reject",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "ValueError",
+        "message": "trace event commit position is invalid"
+      },
+      "case": "shape-{'commit_index': 0}",
+      "consumer": "render",
+      "expected": "reject",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "ValueError",
+        "message": "trace event commit position is invalid"
+      },
+      "case": "shape-{'commit_index': 2}",
+      "consumer": "project",
+      "expected": "reject",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "ValueError",
+        "message": "trace event commit position is invalid"
+      },
+      "case": "shape-{'commit_index': 2}",
+      "consumer": "render",
+      "expected": "reject",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "ValueError",
+        "message": "v1 events require task and trace identities"
+      },
+      "case": "shape-{'task_id': None}",
+      "consumer": "project",
+      "expected": "reject",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "ValueError",
+        "message": "v1 events require task and trace identities"
+      },
+      "case": "shape-{'task_id': None}",
+      "consumer": "render",
+      "expected": "reject",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "ValueError",
+        "message": "v1 events require task and trace identities"
+      },
+      "case": "shape-{'trace_id': ''}",
+      "consumer": "project",
+      "expected": "reject",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "ValueError",
+        "message": "v1 events require task and trace identities"
+      },
+      "case": "shape-{'trace_id': ''}",
+      "consumer": "render",
+      "expected": "reject",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "ValueError",
+        "message": "trace event data must be a canonical JSON object"
+      },
+      "case": "shape-{'data_json': '[]'}",
+      "consumer": "project",
+      "expected": "reject",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "ValueError",
+        "message": "trace event data must be a canonical JSON object"
+      },
+      "case": "shape-{'data_json': '[]'}",
+      "consumer": "render",
+      "expected": "reject",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "ValueError",
+        "message": "trace event data must be a canonical JSON object"
+      },
+      "case": "shape-{'data_json': '{\"a\": 1}'}",
+      "consumer": "project",
+      "expected": "reject",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "ValueError",
+        "message": "trace event data must be a canonical JSON object"
+      },
+      "case": "shape-{'data_json': '{\"a\": 1}'}",
+      "consumer": "render",
+      "expected": "reject",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "ValueError",
+        "message": "trace event fields must not be empty: environment_run_id"
+      },
+      "case": "shape-{'environment_run_id': ''}",
+      "consumer": "project",
+      "expected": "reject",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "ValueError",
+        "message": "trace event fields must not be empty: environment_run_id"
+      },
+      "case": "shape-{'environment_run_id': ''}",
+      "consumer": "render",
+      "expected": "reject",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "ValueError",
+        "message": "trace event fields must not be empty: event_type"
+      },
+      "case": "shape-{'event_type': ''}",
+      "consumer": "project",
+      "expected": "reject",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "ValueError",
+        "message": "trace event fields must not be empty: event_type"
+      },
+      "case": "shape-{'event_type': ''}",
+      "consumer": "render",
+      "expected": "reject",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "ValueError",
+        "message": "trace event fields must not be empty: recorded_at"
+      },
+      "case": "shape-{'recorded_at': ''}",
+      "consumer": "project",
+      "expected": "reject",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "ValueError",
+        "message": "trace event fields must not be empty: recorded_at"
+      },
+      "case": "shape-{'recorded_at': ''}",
+      "consumer": "render",
+      "expected": "reject",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "TypeError",
+        "message": "'<' not supported between instances of 'str' and 'int'"
+      },
+      "case": "invalid-type-v1-{'sequence': 'one'}",
+      "consumer": "project",
+      "expected": "reject",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "AttributeError",
+        "message": "'int' object has no attribute 'strip'"
+      },
+      "case": "invalid-type-v1-{'artifact_refs': (1,)}",
+      "consumer": "project",
+      "expected": "reject",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "AttributeError",
+        "message": "'int' object has no attribute 'strip'"
+      },
+      "case": "invalid-type-v1-{'environment_run_id': 1}",
+      "consumer": "project",
+      "expected": "reject",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "AttributeError",
+        "message": "'NoneType' object has no attribute 'strip'"
+      },
+      "case": "invalid-type-v1-{'data_json': None}",
+      "consumer": "project",
+      "expected": "reject",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "ValueError",
+        "message": "v2 events require explicit actor identity"
+      },
+      "case": "invalid-type-v2-{'agent_run_id': None}",
+      "consumer": "project",
+      "expected": "reject",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "ValueError",
+        "message": "v2 events require explicit actor identity"
+      },
+      "case": "invalid-type-v2-{'agent_run_id': ''}",
+      "consumer": "project",
+      "expected": "reject",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "ValueError",
+        "message": "v2 agent scope cannot carry task lineage"
+      },
+      "case": "invalid-type-v2-{'event_scope': 'agent'}",
+      "consumer": "project",
+      "expected": "reject",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "ValueError",
+        "message": "unsupported lifecycle event scope"
+      },
+      "case": "invalid-type-v2-{'event_scope': 'bogus'}",
+      "consumer": "project",
+      "expected": "reject",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "TypeError",
+        "message": "Observatory accepts TraceEvent values only"
+      },
+      "case": "foreign-<object object at 0x7c531ecd89e0>",
+      "consumer": "project",
+      "expected": "reject",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "TypeError",
+        "message": "Observatory accepts TraceEvent values only"
+      },
+      "case": "foreign-{}",
+      "consumer": "project",
+      "expected": "reject",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "TypeError",
+        "message": "Observatory accepts TraceEvent values only"
+      },
+      "case": "foreign-{'schema_version': 'foreign/v1'}",
+      "consumer": "project",
+      "expected": "reject",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "TypeError",
+        "message": "Observatory accepts TraceEvent values only"
+      },
+      "case": "foreign-'foreign'",
+      "consumer": "project",
+      "expected": "reject",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "TypeError",
+        "message": "Observatory accepts TraceEvent values only"
+      },
+      "case": "foreign-7",
+      "consumer": "project",
+      "expected": "reject",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "TypeError",
+        "message": "Observatory accepts TraceEvent values only"
+      },
+      "case": "foreign-None",
+      "consumer": "project",
+      "expected": "reject",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "ValueError",
+        "message": "Observatory event identities must be unique"
+      },
+      "case": "duplicate-identity",
+      "consumer": "render",
+      "expected": "reject",
+      "generator": false,
+      "matches": true
+    },
+    {
+      "actual": {
+        "actors": [],
+        "environments": [
+          "environment:independent"
+        ],
+        "events": [
+          "trace-event:sha256:8f27aa86ddf54a785dba685c5e3c615e21adcd77e0cdeb3ffba1cf3ca8b96ea4",
+          "trace-event:sha256:204c5b3d1719df4ffb9be19840130bca9bea37d3c8c2dabee28bc2e329488118"
+        ],
+        "label": "synthetic",
+        "traces": [
+          [
+            "trace:independent",
+            "rejected"
+          ]
+        ]
+      },
+      "case": "duplicate-sequence-distinct-ids",
+      "consumer": "project",
+      "expected": "accept",
+      "generator": false,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "ValueError",
+        "message": "trace mixes task or environment lineage"
+      },
+      "case": "mixed-trace-lineage",
+      "consumer": "project",
+      "expected": "reject",
+      "generator": false,
+      "matches": true
+    },
+    {
+      "actual": {
+        "error_type": "ValueError",
+        "message": "agent run mixes environment lineage"
+      },
+      "case": "mixed-actor-environments",
+      "consumer": "project",
+      "expected": "reject",
+      "generator": false,
+      "matches": true
+    },
+    {
+      "actual": {
+        "actors": [],
+        "environments": [
+          "environment:independent"
+        ],
+        "events": [
+          "trace-event:sha256:73b95f3f5f68004baa7673e90abbdd21e5b38253c48d254281b8553ccfbce60b"
+        ],
+        "graph_html_agree": true,
+        "label": "synthetic",
+        "traces": [
+          [
+            "trace:independent",
+            "accepted"
+          ]
+        ]
+      },
+      "case": "missing-parent-synthetic",
+      "consumer": "render",
+      "expected": "accept",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "actors": [],
+        "environments": [
+          "environment:independent"
+        ],
+        "events": [
+          "trace-event:sha256:44065f97a3d1d33b98b3d947eff25442624e77acc5ca3e4e71511aecdf960813"
+        ],
+        "graph_html_agree": true,
+        "label": "synthetic",
+        "traces": [
+          [
+            "trace:independent",
+            "accepted"
+          ]
+        ]
+      },
+      "case": "incomplete-commit-synthetic",
+      "consumer": "render",
+      "expected": "accept",
+      "generator": true,
+      "matches": true
+    },
+    {
+      "actual": {
+        "actors": [
+          "actor:one"
+        ],
+        "environments": [
+          "environment:independent"
+        ],
+        "events": [
+          "trace-event:sha256:5b5a634a83bf3eaadfcc4767074414d7c04a3c59c825383eac091585a4189536"
+        ],
+        "label": "synthetic",
+        "traces": [
+          [
+            "trace:independent",
+            "accepted"
+          ]
+        ]
+      },
+      "all_retained_fields_stable": true,
+      "case": "later-input-alias-mutation",
+      "expected": {
+        "actors": [
+          "actor:one"
+        ],
+        "environments": [
+          "environment:independent"
+        ],
+        "events": [
+          "trace-event:sha256:5b5a634a83bf3eaadfcc4767074414d7c04a3c59c825383eac091585a4189536"
+        ],
+        "label": "synthetic",
+        "traces": [
+          [
+            "trace:independent",
+            "accepted"
+          ]
+        ]
+      },
+      "matches": true,
+      "payload_getter_detached": true,
+      "shared_detached_views": true
+    }
+  ],
+  "total": 134
+}

@@ -2,7 +2,7 @@
 
 ## Executive brief
 
-**Prepared:** 2026-09-28
+**Prepared:** 2026-10-04
 
 **Positioning:** evidence-governed infrastructure for deploying language models
 inside operational systems
@@ -125,22 +125,36 @@ The repository currently demonstrates:
   prohibition, and budget artifact;
 - content-addressed TypedProposal normalization, UAH semantic admission, and
   independent domain execution-lease issuance or typed rejection;
+- reviewed portable input-schema validation with the validated schema identity
+  pinned in each admitted operation;
 - exact lease-only environment execution with complete binding fingerprint
   fencing, separate native result and normalized evidence artifacts;
 - one common lifecycle ledger with strict restart replay and deterministic
-  `VerifiedTraceDigest` construction for accepted and best-effort-deficit tasks,
-  including atomic commit framing for multi-event facts;
+  `VerifiedTraceDigest` construction for accepted, best-effort-deficit, and
+  required-effect-rejected tasks,
+  including atomic commit framing, advisory-lock writer coordination, and
+  typed proposal/semantic/domain/evidence rejection replay;
+- frame-relative operation edges and initial H1 budget, pre-dispatch
+  cancellation, recorded-timeout, and retry-policy facts;
 - required versus best-effort task acceptance from owner-issued evidence;
 - append-only common lifecycle persistence and model-free restart replay;
 - a ROS-free NAO canary with accepted lease execution, semantic no-dispatch
-  rejection, restart replay, and verified digest output;
-- **146 passing tests** and passing Ruff validation. Complete pre-commit,
-  generated-document, and clean-wheel gates are rerun before release.
+  rejection, a terminal counterexample, restart replay, and verified digest output;
+- content-addressed role/model declarations and agent manifests, initial handle
+  revisions, and ledger-backed actor attachment, standby, and termination;
+- fixed exclusive model leases, fresh owner resource checks, bounded startup
+  reports, deterministic prompts, and fake-provider invocation with atomic
+  model-call accounting;
+- read-only Observatory environment/task/trace and explicit actor views with
+  honest terminal status and provenance labels;
+- focused and full-suite validation in the development log. Complete
+  pre-commit, generated-document, and clean-wheel gates are rerun before release.
 
-The proof does not yet include a complete rejection/cancellation/retry grammar,
-a live agent loop, model allocation, H2 NAO planner parity, a Watson/Bonsai
-comparison, runtime budget enforcement, production deployment, or measured
-Workbench uplift.
+The proof does not yet include stale-evidence or false-completion policy,
+in-flight cancellation, live provider transport, dynamic allocation, durable
+context, H2 NAO planner parity, a Watson/Bonsai comparison, production deployment,
+or measured Workbench uplift. Fixed lease exclusivity is scoped to participating
+actors sharing one host/ledger and does not govern external hardware consumers.
 
 ## Commercial hypothesis
 

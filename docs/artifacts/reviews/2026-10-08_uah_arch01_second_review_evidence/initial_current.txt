@@ -1,0 +1,53 @@
+exit_code=0
+{
+  "accepted_case": {
+    "closed_observables": [
+      "fresh detector-backed result returned"
+    ],
+    "evidence_owner": "object_finder",
+    "passed": true
+  },
+  "checks": {
+    "accepted_path": true,
+    "rejected_path": true,
+    "terminal_counterexample": true,
+    "verified_trace_digest": true
+  },
+  "configuration": {
+    "adapter_version": "nao-shadow-v1",
+    "configuration_id": "uah-config:sha256:c77566ee8d541faf77b118b04f707210c648c4e490b3de860015c35885e76299",
+    "environment_id": "nao_fake",
+    "environment_revision": "uah-smoke-v1",
+    "evaluator_version": "owner-evidence-v1",
+    "harness_version": "0.1.0",
+    "model_format": "recorded-json",
+    "model_id": "recorded-fixture",
+    "model_revision": "fixture-v1",
+    "prompt_hash": "sha256:none",
+    "registry_version": "sha256:fb7f9ffaceed518ab0ea4045fbe2618196f358cba941b910b51b663ca6097ae3",
+    "runtime_id": "ab_harness.recorded",
+    "runtime_parameters": {
+      "mode": "deterministic"
+    },
+    "runtime_revision": "0.1.0",
+    "task_suite_version": "uah-smoke-v1"
+  },
+  "counterexample_case": {
+    "acceptance_status": "rejected",
+    "failure_stage": "evidence_closure",
+    "missing_observables": [
+      "fresh detector-backed result returned"
+    ],
+    "passed": false
+  },
+  "rejected_case": {
+    "failure_stage": "semantic_admission",
+    "passed": false,
+    "reasons": [
+      "object_outside_projection",
+      "missing_effect_obligation"
+    ]
+  },
+  "status": "passed",
+  "verified_trace_digest": "verified-trace-digest:sha256:0de3fa134af65ff52644e1e611277250d9d75a09c953401f7618a6e98f813d1e"
+}

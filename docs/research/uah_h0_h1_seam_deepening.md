@@ -83,9 +83,12 @@ the following sources:
 The deslop audit found no hard repository-standard violation after the
 correctness fixes. It retained four judgment calls: lifecycle grammar locality,
 the private task-start seam, repeated content-ID mechanics, and the admitted
-operation field group. The specification review found the accepted path sound
-and identified the typed counterexample grammar as the remaining partial H0/H1
-requirement.
+operation field group. The current parity pass resolved the private task-start
+seam and consolidated lifecycle prerequisite and operation-scope metadata. It
+also froze representative public artifact identities without asserting that
+all content-addressed families share one compatibility contract. The
+specification review found the accepted path sound and identified stale
+evidence and false-completion attribution as the remaining H0 work.
 
 ## 3. Current strengths to preserve
 
@@ -97,9 +100,9 @@ append, flush, and `fsync`. `replay()` derives terminal status and a
 `VerifiedTraceDigest` without a model. Deleting this module would spread
 ordering, persistence, and replay mechanics across every authority owner.
 
-The module's 1,412 lines are therefore not sufficient evidence for a split.
-The relevant measure is interface depth. Its small write and replay interface
-hides substantial implementation detail and supplies high leverage.
+The module's size is not sufficient evidence for a split. The relevant measure
+is interface depth. Its small write and replay interface hides substantial
+implementation detail and supplies high leverage.
 
 ### 3.2 Authority artifacts fail closed at trust crossings
 
@@ -118,8 +121,8 @@ closed across cooperating processes.
 ### 3.4 The task registry is a projection, not a second event store
 
 `EnvironmentTaskRegistry` reconstructs task and ingress lineage from lifecycle
-events. This matches the masterplan and should remain true after the task-start
-interface changes.
+events. This matches the masterplan and remains true behind the public
+`TaskIngressAuthority`.
 
 ## 4. Findings and deletion tests
 
@@ -130,40 +133,38 @@ Adding one event currently requires coordinated edits to several regions of
 
 - the accepted `LifecycleFact` union;
 - `_event_specs()` conversion;
-- `_SUPPORTED_EVENT_TYPES`;
-- `_EVENT_PREREQUISITES` and operation-event classification;
+- `_EVENT_RULES` support, prerequisite, and operation-scope metadata;
 - `_apply_event()` dispatch and a reducer function;
 - digest projection where the event contributes to the verified result.
 
-This is a repeated-switch problem. It becomes material when the remaining
-failure families are added. A partial extraction that moves only the event-name
-set would make the module shallower because contributors would still need to
-know every other location.
+This remains a repeated-switch problem. The metadata consolidation removes two
+parallel tables, but conversion, reduction, and digest behavior still require
+coordinated edits. Moving only the metadata out of the ledger would make the
+module shallower because contributors would still need to know every other
+location.
 
 **Deletion test:** deleting a cohesive typed grammar would return event
 conversion, transition rules, state reduction, and digest projection to
 separate switches. It earns a seam once at least two failure families use it.
 
-**Decision:** keep the public ledger interface. During the first rejection
-slice, co-locate the new fact, conversion, transition, and projection logic.
-Extract an internal grammar module only after the pattern is proven by a second
-slice.
+**Decision:** keep the public ledger interface and immutable `_EVENT_RULES`
+table. Extract an internal grammar module only when the active event families
+stabilize enough to move conversion, transition, reduction, and digest behavior
+together.
 
-### 4.2 Task ingress crosses a private mutation seam
+### 4.2 Task ingress now has one public authority seam
 
-`TaskIngressPolicy` constructs `TaskLineage` and calls
-`EnvironmentTaskRegistry._record_policy_start()`. The policy therefore performs
-stateful authority work while its name and public shape suggest pure
-classification. The registry exposes public mutation for resume and notify but
-a private mutation for start. The division is difficult to explain and creates
-an implementation-shaped test surface.
+`TaskIngressAuthority.admit()` owns rule matching, deterministic identities,
+duplicate and terminal checks, ledger writes, and projection refresh for start,
+resume, and notify ingress. `EnvironmentTaskRegistry` is a read-only projection
+of the common ledger. The former private task-start mutation seam has been
+removed.
 
 **Deletion test:** deleting a task-ingress authority would force every domain
 adapter to coordinate rule matching, deterministic IDs, duplicate checks,
 terminal checks, ledger writes, and projection refresh. The module earns depth.
 
-**Decision:** introduce one public task-ingress authority with an operation such
-as:
+**Implemented interface:**
 
 ```python
 class TaskIngressAuthority:
@@ -174,15 +175,9 @@ class TaskIngressAuthority:
     ) -> TaskIngressDecision: ...
 ```
 
-`admit()` owns rule matching, content verification, deterministic task and trace
-identity, duplicate and terminal checks, decision issuance, ledger append, and
-projection refresh. The task registry becomes an internal or explicitly
-read-only projection. The compiler continues to require the accepted start
-decision and exact recorded lineage.
-
-The migration should preserve the present decision schema until the first
-counterexample proves that a new schema is needed. A broad
-`AuthorityRepository` abstraction is deferred.
+The compiler continues to require the accepted start decision and exact
+recorded lineage. The decision schema remains unchanged. A broad
+`AuthorityRepository` abstraction remains deferred.
 
 ### 4.3 The current event envelope assumes a task already exists
 
@@ -221,6 +216,12 @@ authority artifact. Keep public `issue()`, `from_dict()`, `to_dict()`, and
 `verify_identity()` behavior on the artifact. If the conventions converge,
 introduce one private fixed codec. Do not expose a pluggable hash service or
 caller-facing `content_id()` utility.
+
+The current parity pass adds compatibility vectors for an agent manifest,
+object-argument schema, operation edge, and budget decision. Four vectors do
+not prove that every persisted artifact family has identical finite-number,
+error, and schema semantics. The proposed shared helper therefore remains
+deferred.
 
 ### 4.5 `AdmittedOperation` contains a real but not yet proven data clump
 
@@ -366,10 +367,10 @@ restart replay.
    - Test inactive run, revision mismatch, binding-environment mismatch, and
      duplicate lease.
    - Require no execution start and deterministic replay.
-3. **Task-ingress authority**
-   - Test start, resume, notify, duplicate ingress, second start, terminal task,
-     restart, and two independently opened writers through one public method.
-   - Remove `_record_policy_start()` only after parity.
+3. **Task-ingress authority (implemented)**
+   - Start, resume, notify, duplicate ingress, second start, terminal task,
+     restart, and independently opened writers use one public method.
+   - The private task-start mutation seam has been removed.
 4. **OperationEdge**
    - Test same-frame decomposition, explicit cross-frame delegation,
      continuation, missing endpoint, self-edge, cycle, and cross-trace rejection.
@@ -493,3 +494,38 @@ operation edges and identical terminal digests after restart.
 | Binding snapshot duplicates `ABImplementationBinding` | Wait for the H2 adapter, then compare exact consumers and delete redundant fields |
 | Retry edges imply authority | Require fresh semantic and domain admission for every retry operation |
 | Guardrails documentation drifts | Keep canonical claims in architecture and plan documents; make the skill route to them and validate it after major wording changes |
+
+## 12. Implementation checkpoint on 2026-10-04
+
+This checkpoint supersedes current-state assumptions in the historical audit
+without changing its accepted architecture or non-goals. The canonical
+development log remains the implementation authority.
+
+The pre-task actor case now justifies `uah.trace_event/v2`: scoped attachment,
+fixed lease, owner readiness, release, and termination use explicit
+`agent_run_id` with null task/trace identity. The original v1 task envelope
+retains its serialized identity. New task-scoped invocation facts carry actor
+identity and remain part of their real task trace. O1 indexes environments,
+tasks, and traces and renders explicitly recorded actor facts, including
+activations that have no task yet. It does not infer actor links for v1 events.
+
+The closed `agent_lifecycle.py` family localizes actor conversion and replay
+without a plugin system. `LifecycleLedger` retains the public write interface,
+commit framing, lock/reload/append/fsync critical section, and strict replay.
+Role/model registries and registration preflight validate declarations without
+resource reservation. Fixed allocation uses fresh owner RAM/VRAM/context and
+exclusive host/instance reservations among actors sharing one ledger; it is
+not global hardware control. Bounded startup evaluates an owner's exact
+lease/model/instance report, and failed readiness releases atomically.
+
+PromptCompiler and the provider-neutral invocation port now have fake-provider
+fixtures. The prompt consumes the immutable compiled task and reviewed schemas;
+call start atomically consumes one model-call budget. Completion and failure
+retain exact actor/task/prompt/lease provenance, and completed IDs replay without
+reinvoking. Outstanding calls block task acceptance and cannot automatically
+retry. Raw finite JSON remains untrusted input to proposal normalization.
+
+Output validation, stale-effect-evidence and false-completion policy, live
+ZeroTier transport, durable context, and NAO H2 parity remain open. Dynamic
+scheduling and qualified rebinding remain H3 work. This checkpoint does not
+approve a shared artifact codec or broader runtime facade.

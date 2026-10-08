@@ -1,0 +1,20 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+__ test_outer_identity_uses_actual_nested_fields_despite_instance_serializer ___
+
+tmp_path = PosixPath('/tmp/pytest-of-juanbeck/pytest-184/test_outer_identity_uses_actua0')
+
+    def test_outer_identity_uses_actual_nested_fields_despite_instance_serializer(tmp_path):
+        _, _, _, ledger, admitted, _ = authority_fixture(tmp_path)
+        before = ledger.path.read_bytes()
+        original = substitute_proposal_with_misreported_wire(admitted)
+        assert admitted.proposal.arguments == {"label": "mug"}
+        assert admitted.proposal.to_dict() == original
+        TypedProposal.verify_identity(admitted.proposal)
+>       with pytest.raises(ValueError, match="identity"):
+E       Failed: DID NOT RAISE ValueError
+
+tests/test_nested_admission_owner.py:32: Failed
+=========================== short test summary info ============================
+FAILED tests/test_nested_admission_owner.py::test_outer_identity_uses_actual_nested_fields_despite_instance_serializer
+1 failed in 0.14s
