@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+from dataclasses import dataclass
 from dataclasses import replace
 
 from ab_harness.bindings import BindingCatalog
@@ -22,6 +23,7 @@ from ab_harness.task_compiler import TaskBudgets
 from ab_harness.task_compiler import TaskEffectRequest
 from ab_harness_nao.qualification import NaoQualificationCase
 from ab_harness_nao.qualification import RecordedNaoQualificationHarness
+from ab_harness_nao.qualification import nao_qualification_argument_validator
 from ab_harness_nao.qualification import nao_qualification_domain_contract_pack
 
 
@@ -47,9 +49,33 @@ PLANNER_OUT_OF_SCOPE = {
         "steps": [{"id": "step_1", "type": "skill", "name": "walk_to", "args": {}}]
     }
 }
+PLANNER_MISSING_TARGET = {
+    "plan": {
+        "steps": [
+            {
+                "id": "step_1",
+                "type": "skill",
+                "name": "find_object",
+                "args": {"label": "bottle"},
+            }
+        ]
+    }
+}
+
+
+@dataclass(frozen=True)
+class RecordedSmokeRun:
+    """Machine report and the exact validated ledger that produced it."""
+
+    report: dict[str, object]
+    lifecycle_ledger: LifecycleLedger
 
 
 def run_smoke() -> dict[str, object]:
+    return record_smoke_run().report
+
+
+def record_smoke_run() -> RecordedSmokeRun:
     registry = _registry()
     binding = ABImplementationBinding(
         binding_id="nao_fake.find_object.v1",
@@ -104,6 +130,7 @@ def run_smoke() -> dict[str, object]:
         owner,
         lifecycle_ledger,
         domain_pack,
+        nao_qualification_argument_validator(),
     )
     case = NaoQualificationCase(
         case_id="uah-smoke-find-cup",
@@ -137,6 +164,18 @@ def run_smoke() -> dict[str, object]:
         planner_payload=PLANNER_OUT_OF_SCOPE,
         runtime_mode="smoke",
     )
+    counterexample_case = replace(
+        case,
+        case_id="uah-smoke-find-bottle-counterexample",
+        task_id="find_the_bottle_counterexample",
+    )
+    counterexample = harness.run(
+        case=counterexample_case,
+        ingress=_ingress(environment_run.environment_run_id, counterexample_case),
+        chatbot_payload=CHATBOT_HANDOFF,
+        planner_payload=PLANNER_MISSING_TARGET,
+        runtime_mode="smoke",
+    )
     configuration = _configuration(registry.version)
     accepted_trace_id = next(
         event.trace_id
@@ -147,9 +186,13 @@ def run_smoke() -> dict[str, object]:
     checks = {
         "accepted_path": accepted.passed,
         "rejected_path": rejected.failure_stage == "semantic_admission",
+        "terminal_counterexample": (
+            counterexample.acceptance is not None
+            and counterexample.acceptance.status == "rejected"
+        ),
         "verified_trace_digest": accepted_replay.verified_trace_digest is not None,
     }
-    return {
+    report = {
         "status": "passed" if all(checks.values()) else "failed",
         "configuration": configuration.to_dict(),
         "checks": checks,
@@ -163,12 +206,23 @@ def run_smoke() -> dict[str, object]:
             "failure_stage": rejected.failure_stage,
             "reasons": list(rejected.planner_reasons),
         },
+        "counterexample_case": {
+            "passed": counterexample.passed,
+            "failure_stage": counterexample.failure_stage,
+            "acceptance_status": (
+                counterexample.acceptance.status
+                if counterexample.acceptance is not None
+                else None
+            ),
+            "missing_observables": list(counterexample.missing_observables),
+        },
         "verified_trace_digest": (
             accepted_replay.verified_trace_digest.digest_id
             if accepted_replay.verified_trace_digest is not None
             else None
         ),
     }
+    return RecordedSmokeRun(report=report, lifecycle_ledger=lifecycle_ledger)
 
 
 def _registry() -> RegistrySnapshot:
@@ -223,11 +277,12 @@ def _configuration(registry_version: str) -> ConfigurationIdentity:
 
 
 def _find_object(arguments: dict[str, object]) -> OwnerExecutionResult:
+    succeeded = arguments.get("label") == "cup"
     return OwnerExecutionResult(
-        evidence_ref="builtin://uah-smoke/detection-001",
-        succeeded=arguments.get("label") == "cup",
-        observed_effects=("fresh detector-backed result returned",),
-        payload={"canonical_target_id": "cup_01"},
+        evidence_ref="builtin://uah-smoke/detection-%s" % arguments.get("label"),
+        succeeded=succeeded,
+        observed_effects=("fresh detector-backed result returned",) if succeeded else (),
+        payload={"canonical_target_id": "cup_01" if succeeded else None},
     )
 
 

@@ -11,10 +11,10 @@ from ab_harness import EnvironmentRunAttestation
 from ab_harness import EnvironmentRunRegistry
 from ab_harness import EnvironmentTaskRegistry
 from ab_harness import LifecycleLedger
-from ab_harness import TaskIngressPolicy
 from ab_harness import TaskIngressRule
 from ab_harness import TaskIngressDecision
 from ab_harness import TaskLineage
+from ab_harness.task_ingress_authority import TaskIngressAuthority
 
 
 DOMAIN_PACK = DomainContractPack.issue(
@@ -89,11 +89,12 @@ def _pack_with_rules(rules):
 def _active_environment_run(
     environment_run_id="environment-run:synthetic:001",
     attestation_id="environment-attestation:sha256:001",
+    domain_contract_pack_revision=DOMAIN_PACK.revision,
 ):
     profile = EnvironmentProfile(
         environment_profile_id="environment-profile:synthetic:v1",
         domain_contract_pack_id="domain-pack:synthetic:v1",
-        domain_contract_pack_revision=DOMAIN_PACK.revision,
+        domain_contract_pack_revision=domain_contract_pack_revision,
         native_runtime_revision="synthetic-runtime:v1",
         environment_owner_id="synthetic.runtime.owner",
         required_interface_ids=("synthetic.observation",),
@@ -124,13 +125,12 @@ def test_normalized_observation_is_classified_as_an_environment_state_update():
         native_lineage=(("observation_id", "native-observation-001"),),
         observed_at="2026-09-11T09:00:01Z",
     )
-    policy = TaskIngressPolicy(
+    authority = TaskIngressAuthority(
         environment_profile_id="environment-profile:synthetic:v1",
         domain_contract_pack=DOMAIN_PACK,
-        task_registry=EnvironmentTaskRegistry(),
     )
 
-    decision = policy.classify(environment_run, ingress)
+    decision = authority.admit(environment_run, ingress)
 
     assert decision.environment_ingress_id == ingress.environment_ingress_id
     assert decision.environment_run_id == environment_run.environment_run_id
@@ -142,6 +142,7 @@ def test_normalized_observation_is_classified_as_an_environment_state_update():
 
 def test_new_task_preserves_domain_identity_and_receives_a_uah_trace():
     environment_run = _active_environment_run()
+    ledger = LifecycleLedger()
     ingress = EnvironmentIngress(
         environment_ingress_id="environment-ingress:synthetic:task-001",
         environment_run_id=environment_run.environment_run_id,
@@ -151,13 +152,13 @@ def test_new_task_preserves_domain_identity_and_receives_a_uah_trace():
         native_lineage=(("goal_id", "goal:bring-cup:001"),),
         observed_at="2026-09-13T09:00:00Z",
     )
-    policy = TaskIngressPolicy(
+    authority = TaskIngressAuthority(
         environment_profile_id="environment-profile:synthetic:v1",
         domain_contract_pack=DOMAIN_PACK,
-        task_registry=EnvironmentTaskRegistry(),
+        lifecycle_ledger=ledger,
     )
 
-    decision = policy.classify(environment_run, ingress)
+    decision = authority.admit(environment_run, ingress)
 
     assert decision.action == "start_task"
     assert decision.reason_code == "matched_rule"
@@ -167,6 +168,20 @@ def test_new_task_preserves_domain_identity_and_receives_a_uah_trace():
         "trace:sha256:9665443f9db9073cc24dbebb5d288bd0cf928157f1509d8d8f83d8c0f578de9e"
     )
     assert decision.decision_id.startswith("task-ingress-decision:sha256:")
+    assert (
+        EnvironmentTaskRegistry(ledger)
+        .require_start(
+            environment_run_id=decision.environment_run_id,
+            environment_ingress_id=decision.environment_ingress_id,
+            ingress_artifact_id=decision.environment_ingress_artifact_id,
+            decision_id=decision.decision_id,
+            domain_contract_pack_revision=decision.domain_contract_pack_revision,
+            task_id=decision.task_id,
+            trace_id=decision.trace_id,
+        )
+        .starting_decision_id
+        == decision.decision_id
+    )
 
 
 def test_task_ingress_decision_detects_post_construction_content_changes():
@@ -199,14 +214,47 @@ def test_ingress_policy_rejects_post_construction_content_changes():
         "native_lineage",
         (("goal_id", "goal:tampered-after-hashing"),),
     )
-    policy = TaskIngressPolicy(
+    authority = TaskIngressAuthority(
         environment_profile_id="environment-profile:synthetic:v1",
         domain_contract_pack=DOMAIN_PACK,
-        task_registry=EnvironmentTaskRegistry(),
     )
 
     with pytest.raises(ValueError, match="ingress identity does not match"):
-        policy.classify(environment_run, ingress)
+        authority.admit(environment_run, ingress)
+
+
+def test_authority_freezes_rule_values_at_construction():
+    start_rule = TaskIngressRule(
+        binding_id="binding:synthetic.request:v1",
+        ingress_type="user_request",
+        action="start_task",
+        task_id_lineage_key="goal_id",
+    )
+    domain_pack = _pack_with_rules((start_rule,))
+    environment_run = _active_environment_run(
+        domain_contract_pack_revision=domain_pack.revision,
+    )
+    authority = TaskIngressAuthority(
+        environment_profile_id="environment-profile:synthetic:v1",
+        domain_contract_pack=domain_pack,
+    )
+    object.__setattr__(start_rule, "action", "state_update")
+
+    decision = authority.admit(
+        environment_run,
+        EnvironmentIngress(
+            environment_ingress_id="environment-ingress:synthetic:frozen-rule",
+            environment_run_id=environment_run.environment_run_id,
+            binding_id="binding:synthetic.request:v1",
+            ingress_type="user_request",
+            payload_artifact_id="artifact:sha256:frozen-rule",
+            native_lineage=(("goal_id", "goal:frozen-rule"),),
+            observed_at="2026-09-13T09:00:00Z",
+        ),
+    )
+
+    assert decision.action == "start_task"
+    assert decision.domain_contract_pack_revision == domain_pack.revision
 
 
 def test_new_task_without_the_domain_identity_is_rejected():
@@ -220,13 +268,12 @@ def test_new_task_without_the_domain_identity_is_rejected():
         native_lineage=(("request_id", "request:001"),),
         observed_at="2026-09-13T09:00:01Z",
     )
-    policy = TaskIngressPolicy(
+    authority = TaskIngressAuthority(
         environment_profile_id="environment-profile:synthetic:v1",
         domain_contract_pack=DOMAIN_PACK,
-        task_registry=EnvironmentTaskRegistry(),
     )
 
-    decision = policy.classify(environment_run, ingress)
+    decision = authority.admit(environment_run, ingress)
 
     assert decision.action == "reject"
     assert decision.reason_code == "missing_task_identity"
@@ -236,6 +283,7 @@ def test_new_task_without_the_domain_identity_is_rejected():
 
 def test_replayed_start_ingress_is_rejected_with_its_registered_lineage():
     environment_run = _active_environment_run()
+    ledger = LifecycleLedger()
     ingress = EnvironmentIngress(
         environment_ingress_id="environment-ingress:synthetic:replayed-start",
         environment_run_id=environment_run.environment_run_id,
@@ -245,15 +293,14 @@ def test_replayed_start_ingress_is_rejected_with_its_registered_lineage():
         native_lineage=(("goal_id", "goal:replayed-start"),),
         observed_at="2026-09-13T10:00:00Z",
     )
-    registry = EnvironmentTaskRegistry()
-    policy = TaskIngressPolicy(
+    authority = TaskIngressAuthority(
         environment_profile_id="environment-profile:synthetic:v1",
         domain_contract_pack=DOMAIN_PACK,
-        task_registry=registry,
+        lifecycle_ledger=ledger,
     )
 
-    first = policy.classify(environment_run, ingress)
-    replay = policy.classify(environment_run, ingress)
+    first = authority.admit(environment_run, ingress)
+    replay = authority.admit(environment_run, ingress)
 
     assert first.action == "start_task"
     assert replay.action == "reject"
@@ -265,17 +312,15 @@ def test_replayed_start_ingress_is_rejected_with_its_registered_lineage():
 def test_duplicate_start_is_rejected_across_stale_registry_instances(tmp_path):
     environment_run = _active_environment_run()
     path = tmp_path / "shared-lifecycle.jsonl"
-    first_registry = EnvironmentTaskRegistry(LifecycleLedger(path))
-    stale_registry = EnvironmentTaskRegistry(LifecycleLedger(path))
-    first_policy = TaskIngressPolicy(
+    first_authority = TaskIngressAuthority(
         environment_profile_id="environment-profile:synthetic:v1",
         domain_contract_pack=DOMAIN_PACK,
-        task_registry=first_registry,
+        lifecycle_ledger=LifecycleLedger(path),
     )
-    stale_policy = TaskIngressPolicy(
+    stale_authority = TaskIngressAuthority(
         environment_profile_id="environment-profile:synthetic:v1",
         domain_contract_pack=DOMAIN_PACK,
-        task_registry=stale_registry,
+        lifecycle_ledger=LifecycleLedger(path),
     )
     ingress = EnvironmentIngress(
         environment_ingress_id="environment-ingress:synthetic:shared-start",
@@ -287,27 +332,116 @@ def test_duplicate_start_is_rejected_across_stale_registry_instances(tmp_path):
         observed_at="2026-09-13T10:00:00Z",
     )
 
-    first = first_policy.classify(environment_run, ingress)
-    duplicate = stale_policy.classify(environment_run, ingress)
+    first = first_authority.admit(environment_run, ingress)
+    duplicate = stale_authority.admit(environment_run, ingress)
 
     assert first.action == "start_task"
     assert duplicate.action == "reject"
     assert duplicate.reason_code == "duplicate_environment_ingress"
     assert duplicate.task_id == first.task_id
     assert duplicate.trace_id == first.trace_id
-    assert EnvironmentTaskRegistry(LifecycleLedger(path)).require_start(
-        environment_run_id=first.environment_run_id,
-        environment_ingress_id=first.environment_ingress_id,
-        ingress_artifact_id=first.environment_ingress_artifact_id,
-        decision_id=first.decision_id,
-        domain_contract_pack_revision=first.domain_contract_pack_revision,
-        task_id=first.task_id,
-        trace_id=first.trace_id,
-    ).starting_decision_id == first.decision_id
+    assert (
+        EnvironmentTaskRegistry(LifecycleLedger(path))
+        .require_start(
+            environment_run_id=first.environment_run_id,
+            environment_ingress_id=first.environment_ingress_id,
+            ingress_artifact_id=first.environment_ingress_artifact_id,
+            decision_id=first.decision_id,
+            domain_contract_pack_revision=first.domain_contract_pack_revision,
+            task_id=first.task_id,
+            trace_id=first.trace_id,
+        )
+        .starting_decision_id
+        == first.decision_id
+    )
+
+
+@pytest.mark.parametrize("same_ingress", (True, False))
+def test_task_start_commands_remain_atomic_across_cooperating_writers(tmp_path, same_ingress):
+    from concurrent.futures import ThreadPoolExecutor
+    from threading import Barrier
+
+    run = _active_environment_run()
+    path = tmp_path / "atomic-starts.jsonl"
+    authorities = [TaskIngressAuthority(
+        environment_profile_id=run.attestation.environment_profile_id,
+        domain_contract_pack=DOMAIN_PACK,
+        lifecycle_ledger=LifecycleLedger(path),
+    ) for _ in range(2)]
+    barrier = Barrier(2)
+
+    def request(index):
+        suffix = "shared" if same_ingress else str(index)
+        ingress = EnvironmentIngress(
+            environment_ingress_id="ingress:atomic:" + suffix,
+            environment_run_id=run.environment_run_id,
+            binding_id="binding:synthetic.request:v1",
+            ingress_type="user_request",
+            payload_artifact_id="artifact:atomic:" + suffix,
+            native_lineage=(("goal_id", "task:atomic:" + suffix),),
+            observed_at="2026-10-08T18:00:00Z",
+        )
+        barrier.wait()
+        return authorities[index].admit(run, ingress)
+
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        decisions = list(pool.map(request, range(2)))
+    events = LifecycleLedger(path).events()
+    assert sorted(decision.action for decision in decisions) == (
+        ["reject", "start_task"] if same_ingress else ["start_task", "start_task"]
+    )
+    assert len(events) == (1 if same_ingress else 2)
+    assert [event.sequence for event in events] == list(range(1, len(events) + 1))
+    for decision in decisions:
+        if decision.action == "start_task":
+            assert EnvironmentTaskRegistry(LifecycleLedger(path)).require_start(
+                environment_run_id=decision.environment_run_id,
+                environment_ingress_id=decision.environment_ingress_id,
+                ingress_artifact_id=decision.environment_ingress_artifact_id,
+                decision_id=decision.decision_id,
+                domain_contract_pack_revision=decision.domain_contract_pack_revision,
+                task_id=decision.task_id,
+                trace_id=decision.trace_id,
+            ).task_id == decision.task_id
+
+
+def test_rejected_or_mutated_start_ingress_records_no_authoritative_start():
+    run = _active_environment_run()
+    ledger = LifecycleLedger()
+    authority = TaskIngressAuthority(
+        environment_profile_id=run.attestation.environment_profile_id,
+        domain_contract_pack=DOMAIN_PACK,
+        lifecycle_ledger=ledger,
+    )
+    ingress = EnvironmentIngress(
+        environment_ingress_id="ingress:rejected-start",
+        environment_run_id=run.environment_run_id,
+        binding_id="binding:unreviewed-request",
+        ingress_type="user_request",
+        payload_artifact_id="artifact:rejected-start",
+        native_lineage=(("goal_id", "task:rejected-start"),),
+        observed_at="2026-10-08T18:00:00Z",
+    )
+    assert authority.admit(run, ingress).action == "reject"
+    object.__setattr__(ingress, "binding_id", "binding:synthetic.request:v1")
+    with pytest.raises(ValueError, match="identity does not match content"):
+        authority.admit(run, ingress)
+    assert ledger.events() == ()
+
+
+def test_task_ingress_authority_rejects_stale_domain_policy_before_freezing():
+    domain = _pack_with_rules(tuple(replace(rule) for rule in DOMAIN_PACK.ingress_rules))
+    object.__setattr__(domain.ingress_rules[1], "binding_id", "binding:unreviewed")
+    with pytest.raises(ValueError, match="revision does not match content"):
+        TaskIngressAuthority(
+            environment_profile_id="environment-profile:synthetic:v1",
+            domain_contract_pack=domain,
+        )
 
 
 def test_second_start_for_a_registered_domain_task_is_rejected():
     environment_run = _active_environment_run()
+    ledger = LifecycleLedger()
     first_ingress = EnvironmentIngress(
         environment_ingress_id="environment-ingress:synthetic:first-start",
         environment_run_id=environment_run.environment_run_id,
@@ -323,14 +457,14 @@ def test_second_start_for_a_registered_domain_task_is_rejected():
         payload_artifact_id="artifact:sha256:second-start",
         observed_at="2026-09-13T10:01:01Z",
     )
-    policy = TaskIngressPolicy(
+    authority = TaskIngressAuthority(
         environment_profile_id="environment-profile:synthetic:v1",
         domain_contract_pack=DOMAIN_PACK,
-        task_registry=EnvironmentTaskRegistry(),
+        lifecycle_ledger=ledger,
     )
 
-    first = policy.classify(environment_run, first_ingress)
-    duplicate_start = policy.classify(environment_run, second_ingress)
+    first = authority.admit(environment_run, first_ingress)
+    duplicate_start = authority.admit(environment_run, second_ingress)
 
     assert first.action == "start_task"
     assert duplicate_start.action == "reject"
@@ -350,13 +484,13 @@ def test_registered_task_receives_existing_task_ingress_with_its_trace(
     action, ingress_type
 ):
     environment_run = _active_environment_run()
-    registry = EnvironmentTaskRegistry()
-    start_policy = TaskIngressPolicy(
+    ledger = LifecycleLedger()
+    authority = TaskIngressAuthority(
         environment_profile_id="environment-profile:synthetic:v1",
         domain_contract_pack=DOMAIN_PACK,
-        task_registry=registry,
+        lifecycle_ledger=ledger,
     )
-    started = start_policy.classify(
+    started = authority.admit(
         environment_run,
         EnvironmentIngress(
             environment_ingress_id="environment-ingress:synthetic:start-resume",
@@ -368,11 +502,6 @@ def test_registered_task_receives_existing_task_ingress_with_its_trace(
             observed_at="2026-09-13T10:00:00Z",
         ),
     )
-    existing_task_policy = TaskIngressPolicy(
-        environment_profile_id="environment-profile:synthetic:v1",
-        domain_contract_pack=DOMAIN_PACK,
-        task_registry=registry,
-    )
 
     ingress = EnvironmentIngress(
         environment_ingress_id="environment-ingress:synthetic:resume",
@@ -383,14 +512,14 @@ def test_registered_task_receives_existing_task_ingress_with_its_trace(
         native_lineage=(("goal_id", "goal:resume-me"),),
         observed_at="2026-09-13T12:01:00Z",
     )
-    associated = existing_task_policy.classify(environment_run, ingress)
+    associated = authority.admit(environment_run, ingress)
 
     assert associated.action == action
     assert associated.reason_code == "matched_registered_task"
     assert associated.task_id == started.task_id
     assert associated.trace_id == started.trace_id
     assert associated.domain_contract_pack_revision == DOMAIN_PACK.revision
-    recorded = registry.ledger.events()[-1]
+    recorded = ledger.events()[-1]
     assert recorded.artifact_refs == (
         ingress.ingress_artifact_id,
         associated.decision_id,
@@ -398,15 +527,96 @@ def test_registered_task_receives_existing_task_ingress_with_its_trace(
     )
 
 
-def test_existing_task_ingress_for_an_unknown_task_is_rejected():
+def test_replayed_existing_task_ingress_is_rejected_through_the_authority():
     environment_run = _active_environment_run()
-    policy = TaskIngressPolicy(
+    authority = TaskIngressAuthority(
         environment_profile_id="environment-profile:synthetic:v1",
         domain_contract_pack=DOMAIN_PACK,
-        task_registry=EnvironmentTaskRegistry(),
+    )
+    authority.admit(
+        environment_run,
+        EnvironmentIngress(
+            environment_ingress_id="environment-ingress:synthetic:start-replay",
+            environment_run_id=environment_run.environment_run_id,
+            binding_id="binding:synthetic.request:v1",
+            ingress_type="user_request",
+            payload_artifact_id="artifact:sha256:start-replay",
+            native_lineage=(("goal_id", "goal:replay-existing"),),
+            observed_at="2026-09-13T12:00:00Z",
+        ),
+    )
+    ingress = EnvironmentIngress(
+        environment_ingress_id="environment-ingress:synthetic:resume-replay",
+        environment_run_id=environment_run.environment_run_id,
+        binding_id="binding:synthetic.feedback:v1",
+        ingress_type="resume_request",
+        payload_artifact_id="artifact:sha256:resume-replay",
+        native_lineage=(("goal_id", "goal:replay-existing"),),
+        observed_at="2026-09-13T12:01:00Z",
     )
 
-    decision = policy.classify(
+    accepted = authority.admit(environment_run, ingress)
+    replay = authority.admit(environment_run, ingress)
+
+    assert accepted.action == "resume_task"
+    assert replay.action == "reject"
+    assert replay.reason_code == "duplicate_environment_ingress"
+    assert replay.task_id == accepted.task_id
+    assert replay.trace_id == accepted.trace_id
+
+
+def test_existing_task_ingress_is_admitted_after_authority_restart(tmp_path):
+    environment_run = _active_environment_run()
+    path = tmp_path / "restart-lifecycle.jsonl"
+    first_authority = TaskIngressAuthority(
+        environment_profile_id="environment-profile:synthetic:v1",
+        domain_contract_pack=DOMAIN_PACK,
+        lifecycle_ledger=LifecycleLedger(path),
+    )
+    started = first_authority.admit(
+        environment_run,
+        EnvironmentIngress(
+            environment_ingress_id="environment-ingress:synthetic:start-restart",
+            environment_run_id=environment_run.environment_run_id,
+            binding_id="binding:synthetic.request:v1",
+            ingress_type="user_request",
+            payload_artifact_id="artifact:sha256:start-restart",
+            native_lineage=(("goal_id", "goal:restart-existing"),),
+            observed_at="2026-09-13T12:00:00Z",
+        ),
+    )
+    restarted_authority = TaskIngressAuthority(
+        environment_profile_id="environment-profile:synthetic:v1",
+        domain_contract_pack=DOMAIN_PACK,
+        lifecycle_ledger=LifecycleLedger(path),
+    )
+
+    resumed = restarted_authority.admit(
+        environment_run,
+        EnvironmentIngress(
+            environment_ingress_id="environment-ingress:synthetic:resume-restart",
+            environment_run_id=environment_run.environment_run_id,
+            binding_id="binding:synthetic.feedback:v1",
+            ingress_type="resume_request",
+            payload_artifact_id="artifact:sha256:resume-restart",
+            native_lineage=(("goal_id", "goal:restart-existing"),),
+            observed_at="2026-09-13T12:01:00Z",
+        ),
+    )
+
+    assert resumed.action == "resume_task"
+    assert resumed.task_id == started.task_id
+    assert resumed.trace_id == started.trace_id
+
+
+def test_existing_task_ingress_for_an_unknown_task_is_rejected():
+    environment_run = _active_environment_run()
+    authority = TaskIngressAuthority(
+        environment_profile_id="environment-profile:synthetic:v1",
+        domain_contract_pack=DOMAIN_PACK,
+    )
+
+    decision = authority.admit(
         environment_run,
         EnvironmentIngress(
             environment_ingress_id="environment-ingress:synthetic:unknown-task",
@@ -431,13 +641,13 @@ def test_existing_task_ingress_cannot_cross_environment_runs():
         environment_run_id="environment-run:synthetic:002",
         attestation_id="environment-attestation:sha256:002",
     )
-    registry = EnvironmentTaskRegistry()
-    start_policy = TaskIngressPolicy(
+    ledger = LifecycleLedger()
+    authority = TaskIngressAuthority(
         environment_profile_id="environment-profile:synthetic:v1",
         domain_contract_pack=DOMAIN_PACK,
-        task_registry=registry,
+        lifecycle_ledger=ledger,
     )
-    start_policy.classify(
+    authority.admit(
         first_run,
         EnvironmentIngress(
             environment_ingress_id="environment-ingress:synthetic:first-run",
@@ -449,13 +659,7 @@ def test_existing_task_ingress_cannot_cross_environment_runs():
             observed_at="2026-09-13T12:03:00Z",
         ),
     )
-    resume_policy = TaskIngressPolicy(
-        environment_profile_id="environment-profile:synthetic:v1",
-        domain_contract_pack=DOMAIN_PACK,
-        task_registry=registry,
-    )
-
-    decision = resume_policy.classify(
+    decision = authority.admit(
         second_run,
         EnvironmentIngress(
             environment_ingress_id="environment-ingress:synthetic:second-run",
@@ -485,13 +689,12 @@ def test_ingress_from_another_environment_run_is_rejected():
         native_lineage=(),
         observed_at="2026-09-11T09:00:02Z",
     )
-    policy = TaskIngressPolicy(
+    authority = TaskIngressAuthority(
         environment_profile_id="environment-profile:synthetic:v1",
         domain_contract_pack=DOMAIN_PACK,
-        task_registry=EnvironmentTaskRegistry(),
     )
 
-    decision = policy.classify(environment_run, ingress)
+    decision = authority.admit(environment_run, ingress)
 
     assert decision.action == "reject"
     assert decision.reason_code == "environment_run_mismatch"
@@ -508,13 +711,12 @@ def test_ingress_without_a_frozen_rule_is_rejected():
         native_lineage=(),
         observed_at="2026-09-11T09:00:03Z",
     )
-    policy = TaskIngressPolicy(
+    authority = TaskIngressAuthority(
         environment_profile_id="environment-profile:synthetic:v1",
         domain_contract_pack=DOMAIN_PACK,
-        task_registry=EnvironmentTaskRegistry(),
     )
 
-    decision = policy.classify(environment_run, ingress)
+    decision = authority.admit(environment_run, ingress)
 
     assert decision.action == "reject"
     assert decision.reason_code == "unsupported_ingress_type"
@@ -597,13 +799,12 @@ def test_unconfigured_binding_cannot_reuse_an_allowed_ingress_type():
         native_lineage=(),
         observed_at="2026-09-11T09:00:05Z",
     )
-    policy = TaskIngressPolicy(
+    authority = TaskIngressAuthority(
         environment_profile_id="environment-profile:synthetic:v1",
         domain_contract_pack=DOMAIN_PACK,
-        task_registry=EnvironmentTaskRegistry(),
     )
 
-    decision = policy.classify(environment_run, ingress)
+    decision = authority.admit(environment_run, ingress)
 
     assert decision.action == "reject"
     assert decision.reason_code == "unsupported_ingress_binding"
@@ -620,13 +821,12 @@ def test_policy_for_another_environment_profile_cannot_classify_ingress():
         native_lineage=(),
         observed_at="2026-09-11T09:00:06Z",
     )
-    policy = TaskIngressPolicy(
+    authority = TaskIngressAuthority(
         environment_profile_id="environment-profile:other:v1",
         domain_contract_pack=DOMAIN_PACK,
-        task_registry=EnvironmentTaskRegistry(),
     )
 
-    decision = policy.classify(environment_run, ingress)
+    decision = authority.admit(environment_run, ingress)
 
     assert decision.action == "reject"
     assert decision.reason_code == "policy_environment_profile_mismatch"
@@ -643,13 +843,12 @@ def test_policy_from_another_domain_contract_revision_is_rejected():
         native_lineage=(),
         observed_at="2026-09-11T09:00:07Z",
     )
-    policy = TaskIngressPolicy(
+    authority = TaskIngressAuthority(
         environment_profile_id="environment-profile:synthetic:v1",
         domain_contract_pack=OTHER_DOMAIN_PACK,
-        task_registry=EnvironmentTaskRegistry(),
     )
 
-    decision = policy.classify(environment_run, ingress)
+    decision = authority.admit(environment_run, ingress)
 
     assert decision.action == "reject"
     assert decision.reason_code == "policy_contract_revision_mismatch"
@@ -661,22 +860,6 @@ def test_start_task_rule_requires_a_domain_identity_lineage_key():
             binding_id="binding:synthetic.request:v1",
             ingress_type="user_request",
             action="start_task",
-        )
-
-
-@pytest.mark.parametrize("action", ("start_task", "resume_task", "notify_task"))
-def test_task_bearing_actions_require_a_task_registry(action):
-    rule = TaskIngressRule(
-        binding_id="binding:synthetic.request:v1",
-        ingress_type="user_request",
-        action=action,
-        task_id_lineage_key="goal_id",
-    )
-
-    with pytest.raises(ValueError, match="requires a task registry"):
-        TaskIngressPolicy(
-            environment_profile_id="environment-profile:synthetic:v1",
-            domain_contract_pack=_pack_with_rules((rule,)),
         )
 
 

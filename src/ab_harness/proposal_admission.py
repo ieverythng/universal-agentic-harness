@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass, fields, replace
 import hashlib
 import json
 from typing import Any
@@ -10,11 +10,17 @@ from typing import Any
 from ab_harness.bindings import BindingCatalog
 from ab_harness.bindings import binding_fingerprint
 from ab_harness.contracts import AgentOutput
+from ab_harness.contracts import ABObjectView
+from ab_harness.schema_validation import ArgumentSchemaValidator
 from ab_harness.task_compiler import CompiledTask
 
 
 TYPED_PROPOSAL_SCHEMA = "uah.typed_proposal/v1"
-ADMITTED_OPERATION_SCHEMA = "uah.admitted_operation/v1"
+PROPOSAL_NORMALIZATION_REJECTION_SCHEMA = (
+    "uah.proposal_normalization_rejection/v1"
+)
+ADMITTED_OPERATION_SCHEMA = "uah.admitted_operation/v3"
+SEMANTIC_ADMISSION_REJECTION_SCHEMA = "uah.semantic_admission_rejection/v1"
 
 
 def _content_id(prefix: str, payload: dict[str, object]) -> str:
@@ -138,8 +144,13 @@ class TypedProposal:
     def arguments(self) -> dict[str, Any]:
         return json.loads(self.arguments_json)
 
+    def verified_copy(self) -> TypedProposal:
+        if type(self) is not TypedProposal:
+            raise ValueError("current proposal requires the supported concrete artifact")
+        return replace(self)
+
     def to_dict(self) -> dict[str, object]:
-        self.verify_identity()
+        TypedProposal.verify_identity(self)
         return {
             "proposal_id": self.proposal_id,
             **_proposal_payload(
@@ -154,7 +165,6 @@ class TypedProposal:
                 arguments_json=self.arguments_json,
             ),
         }
-
 
 def _new_typed_proposal(
     *,
@@ -182,20 +192,180 @@ def _new_typed_proposal(
     )
 
 
+def _normalization_rejection_payload(
+    *,
+    compiled_task_id: str,
+    environment_run_id: str,
+    task_id: str,
+    trace_id: str,
+    operation_id: str | None,
+    raw_output_artifact_id: str | None,
+    reason_codes: tuple[str, ...],
+) -> dict[str, object]:
+    return {
+        "schema_version": PROPOSAL_NORMALIZATION_REJECTION_SCHEMA,
+        "compiled_task_id": compiled_task_id,
+        "environment_run_id": environment_run_id,
+        "task_id": task_id,
+        "trace_id": trace_id,
+        "operation_id": operation_id,
+        "raw_output_artifact_id": raw_output_artifact_id,
+        "reason_codes": reason_codes,
+    }
+
+
+@dataclass(frozen=True)
+class ProposalNormalizationRejection:
+    """Content-addressed refusal to create a typed proposal."""
+
+    rejection_id: str
+    compiled_task_id: str
+    environment_run_id: str
+    task_id: str
+    trace_id: str
+    operation_id: str | None
+    raw_output_artifact_id: str | None
+    reason_codes: tuple[str, ...]
+    schema_version: str = PROPOSAL_NORMALIZATION_REJECTION_SCHEMA
+
+    def __post_init__(self) -> None:
+        self.verify_identity()
+
+    def verify_identity(self) -> None:
+        required = {
+            "compiled_task_id": self.compiled_task_id,
+            "environment_run_id": self.environment_run_id,
+            "task_id": self.task_id,
+            "trace_id": self.trace_id,
+        }
+        missing = tuple(name for name, value in required.items() if not value.strip())
+        if missing:
+            raise ValueError(
+                "normalization rejection fields must not be empty: %s"
+                % ", ".join(missing)
+            )
+        if self.schema_version != PROPOSAL_NORMALIZATION_REJECTION_SCHEMA:
+            raise ValueError("unsupported normalization rejection schema")
+        if not self.reason_codes or any(
+            not reason.strip() for reason in self.reason_codes
+        ):
+            raise ValueError("normalization rejection requires reason codes")
+        if self.operation_id is not None and not self.operation_id.strip():
+            raise ValueError("normalization rejection operation id must not be blank")
+        if (
+            self.raw_output_artifact_id is not None
+            and not self.raw_output_artifact_id.strip()
+        ):
+            raise ValueError("normalization rejection raw output id must not be blank")
+        payload = _normalization_rejection_payload(
+            compiled_task_id=self.compiled_task_id,
+            environment_run_id=self.environment_run_id,
+            task_id=self.task_id,
+            trace_id=self.trace_id,
+            operation_id=self.operation_id,
+            raw_output_artifact_id=self.raw_output_artifact_id,
+            reason_codes=self.reason_codes,
+        )
+        if self.rejection_id != _content_id("proposal-rejection", payload):
+            raise ValueError("normalization rejection identity does not match content")
+
+    def to_dict(self) -> dict[str, object]:
+        self.verify_identity()
+        return {
+            "rejection_id": self.rejection_id,
+            **_normalization_rejection_payload(
+                compiled_task_id=self.compiled_task_id,
+                environment_run_id=self.environment_run_id,
+                task_id=self.task_id,
+                trace_id=self.trace_id,
+                operation_id=self.operation_id,
+                raw_output_artifact_id=self.raw_output_artifact_id,
+                reason_codes=self.reason_codes,
+            ),
+        }
+
+    @classmethod
+    def from_dict(cls, payload: dict[str, object]) -> ProposalNormalizationRejection:
+        expected = {
+            "rejection_id",
+            "schema_version",
+            "compiled_task_id",
+            "environment_run_id",
+            "task_id",
+            "trace_id",
+            "operation_id",
+            "raw_output_artifact_id",
+            "reason_codes",
+        }
+        if set(payload) != expected:
+            raise ValueError("invalid normalization rejection fields")
+        reasons = payload["reason_codes"]
+        if not isinstance(reasons, list) or any(
+            not isinstance(reason, str) for reason in reasons
+        ):
+            raise ValueError("normalization rejection reason codes are invalid")
+        optional = ("operation_id", "raw_output_artifact_id")
+        if any(
+            payload[name] is not None and not isinstance(payload[name], str)
+            for name in optional
+        ):
+            raise ValueError("normalization rejection optional ids are invalid")
+        string_fields = expected - {
+            "operation_id",
+            "raw_output_artifact_id",
+            "reason_codes",
+        }
+        if any(not isinstance(payload[name], str) for name in string_fields):
+            raise ValueError("normalization rejection fields must be strings")
+        values = dict(payload)
+        values["reason_codes"] = tuple(reasons)
+        return cls(**values)  # type: ignore[arg-type]
+
+
+def _new_normalization_rejection(
+    *,
+    compiled_task: CompiledTask,
+    operation_id: str,
+    raw_output_artifact_id: str,
+    reason_codes: tuple[str, ...],
+) -> ProposalNormalizationRejection:
+    fields = {
+        "compiled_task_id": compiled_task.compiled_task_id,
+        "environment_run_id": compiled_task.environment_run_id,
+        "task_id": compiled_task.task_id,
+        "trace_id": compiled_task.trace_id,
+        "operation_id": operation_id if operation_id.strip() else None,
+        "raw_output_artifact_id": (
+            raw_output_artifact_id if raw_output_artifact_id.strip() else None
+        ),
+        "reason_codes": reason_codes,
+    }
+    return ProposalNormalizationRejection(
+        rejection_id=_content_id(
+            "proposal-rejection", _normalization_rejection_payload(**fields)
+        ),
+        **fields,
+    )
+
+
 @dataclass(frozen=True)
 class ProposalNormalizationResult:
     """Typed result of parsing one model output into one operation proposal."""
 
     proposal: TypedProposal | None = None
-    reason_codes: tuple[str, ...] = ()
+    rejection: ProposalNormalizationRejection | None = None
 
     def __post_init__(self) -> None:
-        if (self.proposal is None) == (not self.reason_codes):
-            raise ValueError("normalization result must contain proposal or reasons")
+        if (self.proposal is None) == (self.rejection is None):
+            raise ValueError("normalization result must contain proposal or rejection")
 
     @property
     def accepted(self) -> bool:
         return self.proposal is not None
+
+    @property
+    def reason_codes(self) -> tuple[str, ...]:
+        return self.rejection.reason_codes if self.rejection is not None else ()
 
 
 class ProposalNormalizer:
@@ -210,6 +380,17 @@ class ProposalNormalizer:
         output: AgentOutput,
     ) -> ProposalNormalizationResult:
         compiled_task.verify_identity()
+
+        def reject(reason_codes: tuple[str, ...]) -> ProposalNormalizationResult:
+            return ProposalNormalizationResult(
+                rejection=_new_normalization_rejection(
+                    compiled_task=compiled_task,
+                    operation_id=operation_id,
+                    raw_output_artifact_id=raw_output_artifact_id,
+                    reason_codes=reason_codes,
+                )
+            )
+
         reasons: list[str] = []
         if not operation_id.strip():
             reasons.append("missing_operation_id")
@@ -226,7 +407,7 @@ class ProposalNormalizer:
             "arguments",
         }:
             reasons.append("invalid_proposal_payload")
-            return ProposalNormalizationResult(reason_codes=tuple(reasons))
+            return reject(tuple(reasons))
 
         object_id = output.payload["object_id"]
         arguments = output.payload["arguments"]
@@ -237,14 +418,12 @@ class ProposalNormalizer:
         if output.referenced_objects != (object_id,):
             reasons.append("proposal_object_reference_mismatch")
         if reasons:
-            return ProposalNormalizationResult(reason_codes=tuple(reasons))
+            return reject(tuple(reasons))
 
         try:
             arguments_json = _canonical_arguments(arguments)
         except ValueError:
-            return ProposalNormalizationResult(
-                reason_codes=("invalid_proposal_arguments",)
-            )
+            return reject(("invalid_proposal_arguments",))
         proposal = _new_typed_proposal(
             compiled_task=compiled_task,
             operation_id=operation_id,
@@ -259,6 +438,7 @@ class ProposalNormalizer:
 def _admitted_operation_payload(
     *,
     proposal: TypedProposal,
+    object_snapshot: ABObjectView,
     frame_id: str,
     ab_level: int,
     binding_id: str,
@@ -266,6 +446,7 @@ def _admitted_operation_payload(
     binding_fingerprint: str,
     binding_owner: str,
     input_schema_ref: str,
+    input_schema_id: str,
     output_schema_ref: str,
     evidence_adapter: str,
     environment_id: str,
@@ -275,7 +456,8 @@ def _admitted_operation_payload(
 ) -> dict[str, object]:
     return {
         "schema_version": ADMITTED_OPERATION_SCHEMA,
-        "proposal": proposal.to_dict(),
+        "proposal": TypedProposal.to_dict(proposal),
+        "object_snapshot": asdict(object_snapshot),
         "frame_id": frame_id,
         "ab_level": ab_level,
         "binding_id": binding_id,
@@ -283,6 +465,7 @@ def _admitted_operation_payload(
         "binding_fingerprint": binding_fingerprint,
         "binding_owner": binding_owner,
         "input_schema_ref": input_schema_ref,
+        "input_schema_id": input_schema_id,
         "output_schema_ref": output_schema_ref,
         "evidence_adapter": evidence_adapter,
         "environment_id": environment_id,
@@ -298,6 +481,7 @@ class AdmittedOperation:
 
     admission_id: str
     proposal: TypedProposal
+    object_snapshot: ABObjectView
     frame_id: str
     ab_level: int
     binding_id: str
@@ -305,6 +489,7 @@ class AdmittedOperation:
     binding_fingerprint: str
     binding_owner: str
     input_schema_ref: str
+    input_schema_id: str
     output_schema_ref: str
     evidence_adapter: str
     environment_id: str
@@ -317,7 +502,37 @@ class AdmittedOperation:
         self.verify_identity()
 
     def verify_identity(self) -> None:
-        self.proposal.verify_identity()
+        if type(self) is not AdmittedOperation or type(self.proposal) is not TypedProposal:
+            raise ValueError("current admission requires the supported concrete artifact")
+        TypedProposal.verify_identity(self.proposal)
+        if type(self.object_snapshot) is not ABObjectView:
+            raise ValueError("admitted operation requires an AB object snapshot")
+        snapshot = self.object_snapshot
+        if (
+            type(snapshot.ab_level) is not int
+            or type(self.ab_level) is not int
+            or type(snapshot.runtime_callable) is not bool
+            or any(
+                not isinstance(getattr(snapshot, name), str)
+                for name in ("object_id", "kind", "category", "owner_package")
+            )
+        ):
+            raise ValueError("admitted object snapshot fields have invalid types")
+        if (
+            snapshot.object_id != self.object_id
+            or snapshot.ab_level != self.ab_level
+            or snapshot.owner_package != self.binding_owner
+        ):
+            raise ValueError("admitted object snapshot does not match operation lineage")
+        for values in (
+            snapshot.expected_effects,
+            snapshot.observable_success,
+            snapshot.decomposes_to,
+        ):
+            if not isinstance(values, tuple) or any(
+                not isinstance(value, str) for value in values
+            ):
+                raise ValueError("admitted object snapshot collections must be string tuples")
         if not isinstance(self.effect_obligation_ids, tuple):
             raise TypeError("admitted operation obligations must be a tuple")
         _required_strings(
@@ -329,6 +544,7 @@ class AdmittedOperation:
                 "binding_fingerprint": self.binding_fingerprint,
                 "binding_owner": self.binding_owner,
                 "input_schema_ref": self.input_schema_ref,
+                "input_schema_id": self.input_schema_id,
                 "output_schema_ref": self.output_schema_ref,
                 "evidence_adapter": self.evidence_adapter,
                 "environment_id": self.environment_id,
@@ -345,6 +561,7 @@ class AdmittedOperation:
             raise ValueError("admitted operation requires an effect obligation")
         payload = _admitted_operation_payload(
             proposal=self.proposal,
+            object_snapshot=self.object_snapshot,
             frame_id=self.frame_id,
             ab_level=self.ab_level,
             binding_id=self.binding_id,
@@ -352,6 +569,7 @@ class AdmittedOperation:
             binding_fingerprint=self.binding_fingerprint,
             binding_owner=self.binding_owner,
             input_schema_ref=self.input_schema_ref,
+            input_schema_id=self.input_schema_id,
             output_schema_ref=self.output_schema_ref,
             evidence_adapter=self.evidence_adapter,
             environment_id=self.environment_id,
@@ -394,12 +612,26 @@ class AdmittedOperation:
     def arguments(self) -> dict[str, Any]:
         return self.proposal.arguments
 
+    def verified_copy(self) -> AdmittedOperation:
+        if (
+            type(self) is not AdmittedOperation
+            or type(getattr(self, "proposal", None)) is not TypedProposal
+            or type(getattr(self, "object_snapshot", None)) is not ABObjectView
+        ):
+            raise ValueError("current admission requires complete supported proposal and snapshot artifacts")
+        return replace(
+            self,
+            proposal=TypedProposal.verified_copy(self.proposal),
+            object_snapshot=replace(self.object_snapshot),
+        )
+
     def to_dict(self) -> dict[str, object]:
-        self.verify_identity()
-        return {
+        AdmittedOperation.verify_identity(self)
+        payload = {
             "admission_id": self.admission_id,
             **_admitted_operation_payload(
                 proposal=self.proposal,
+                object_snapshot=self.object_snapshot,
                 frame_id=self.frame_id,
                 ab_level=self.ab_level,
                 binding_id=self.binding_id,
@@ -407,6 +639,7 @@ class AdmittedOperation:
                 binding_fingerprint=self.binding_fingerprint,
                 binding_owner=self.binding_owner,
                 input_schema_ref=self.input_schema_ref,
+                input_schema_id=self.input_schema_id,
                 output_schema_ref=self.output_schema_ref,
                 evidence_adapter=self.evidence_adapter,
                 environment_id=self.environment_id,
@@ -415,11 +648,62 @@ class AdmittedOperation:
                 effect_obligation_ids=self.effect_obligation_ids,
             ),
         }
+        payload["effect_obligation_ids"] = list(self.effect_obligation_ids)
+        snapshot = payload["object_snapshot"]
+        for name in ("expected_effects", "observable_success", "decomposes_to"):
+            snapshot[name] = list(snapshot[name])
+        return payload
+
+    @classmethod
+    def from_dict(cls, payload: dict[str, object]) -> AdmittedOperation:
+        expected = {field.name for field in fields(cls)}
+        if not isinstance(payload, dict) or set(payload) != expected:
+            raise ValueError("invalid admitted operation fields")
+        if payload["schema_version"] != ADMITTED_OPERATION_SCHEMA:
+            raise ValueError("unsupported admitted operation schema")
+        scalars = expected - {
+            "proposal", "object_snapshot", "ab_level", "effect_obligation_ids"
+        }
+        if any(not isinstance(payload[name], str) for name in scalars) or type(
+            payload["ab_level"]
+        ) is not int:
+            raise ValueError("admitted operation fields have invalid types")
+        proposal = payload["proposal"]
+        if (
+            not isinstance(proposal, dict)
+            or set(proposal) != {field.name for field in fields(TypedProposal)}
+            or any(not isinstance(value, str) for value in proposal.values())
+        ):
+            raise ValueError("invalid admitted operation proposal")
+        snapshot = payload["object_snapshot"]
+        if not isinstance(snapshot, dict) or set(snapshot) != {
+            field.name for field in fields(ABObjectView)
+        }:
+            raise ValueError("invalid admitted object snapshot fields")
+        snapshot_values = dict(snapshot)
+        for name in ("expected_effects", "observable_success", "decomposes_to"):
+            values = snapshot[name]
+            if not isinstance(values, list) or any(
+                not isinstance(value, str) for value in values
+            ):
+                raise ValueError("invalid admitted object snapshot collection")
+            snapshot_values[name] = tuple(values)
+        obligations = payload["effect_obligation_ids"]
+        if not isinstance(obligations, list) or any(
+            not isinstance(value, str) for value in obligations
+        ):
+            raise ValueError("invalid admitted operation obligations")
+        values = dict(payload)
+        values["proposal"] = TypedProposal(**proposal)
+        values["object_snapshot"] = ABObjectView(**snapshot_values)
+        values["effect_obligation_ids"] = tuple(obligations)
+        return cls(**values)
 
 
 def _new_admitted_operation(
     *,
     proposal: TypedProposal,
+    object_snapshot: ABObjectView,
     frame_id: str,
     ab_level: int,
     binding_id: str,
@@ -427,6 +711,7 @@ def _new_admitted_operation(
     binding_fingerprint: str,
     binding_owner: str,
     input_schema_ref: str,
+    input_schema_id: str,
     output_schema_ref: str,
     evidence_adapter: str,
     environment_id: str,
@@ -436,6 +721,7 @@ def _new_admitted_operation(
 ) -> AdmittedOperation:
     fields = {
         "proposal": proposal,
+        "object_snapshot": object_snapshot,
         "frame_id": frame_id,
         "ab_level": ab_level,
         "binding_id": binding_id,
@@ -443,6 +729,7 @@ def _new_admitted_operation(
         "binding_fingerprint": binding_fingerprint,
         "binding_owner": binding_owner,
         "input_schema_ref": input_schema_ref,
+        "input_schema_id": input_schema_id,
         "output_schema_ref": output_schema_ref,
         "evidence_adapter": evidence_adapter,
         "environment_id": environment_id,
@@ -459,64 +746,135 @@ def _new_admitted_operation(
     )
 
 
+def _semantic_rejection_payload(
+    *,
+    compiled_task_id: str,
+    proposal: TypedProposal,
+    reason_codes: tuple[str, ...],
+) -> dict[str, object]:
+    return {
+        "schema_version": SEMANTIC_ADMISSION_REJECTION_SCHEMA,
+        "compiled_task_id": compiled_task_id,
+        "proposal": proposal.to_dict(),
+        "reason_codes": reason_codes,
+    }
+
+
+@dataclass(frozen=True)
+class SemanticAdmissionRejection:
+    """Content-addressed rejection issued by UAH semantic admission."""
+
+    rejection_id: str
+    compiled_task_id: str
+    proposal: TypedProposal
+    reason_codes: tuple[str, ...]
+    schema_version: str = SEMANTIC_ADMISSION_REJECTION_SCHEMA
+
+    def __post_init__(self) -> None:
+        self.verify_identity()
+
+    def verify_identity(self) -> None:
+        self.proposal.verify_identity()
+        if self.schema_version != SEMANTIC_ADMISSION_REJECTION_SCHEMA:
+            raise ValueError(
+                "unsupported semantic rejection schema: %s" % self.schema_version
+            )
+        if not self.compiled_task_id.strip():
+            raise ValueError("semantic rejection compiled task must not be empty")
+        if not isinstance(self.reason_codes, tuple) or not self.reason_codes:
+            raise ValueError("semantic rejection requires ordered reason codes")
+        if any(not reason.strip() for reason in self.reason_codes):
+            raise ValueError("semantic rejection reason codes must not be empty")
+        payload = _semantic_rejection_payload(
+            compiled_task_id=self.compiled_task_id,
+            proposal=self.proposal,
+            reason_codes=self.reason_codes,
+        )
+        if self.rejection_id != _content_id("semantic-rejection", payload):
+            raise ValueError("semantic rejection identity does not match content")
+
+    @property
+    def environment_run_id(self) -> str:
+        return self.proposal.environment_run_id
+
+    @property
+    def task_id(self) -> str:
+        return self.proposal.task_id
+
+    @property
+    def trace_id(self) -> str:
+        return self.proposal.trace_id
+
+    @property
+    def operation_id(self) -> str:
+        return self.proposal.operation_id
+
+    def to_dict(self) -> dict[str, object]:
+        self.verify_identity()
+        return {
+            "rejection_id": self.rejection_id,
+            **_semantic_rejection_payload(
+                compiled_task_id=self.compiled_task_id,
+                proposal=self.proposal,
+                reason_codes=self.reason_codes,
+            ),
+        }
+
+
+def _new_semantic_rejection(
+    compiled_task: CompiledTask,
+    proposal: TypedProposal,
+    reason_codes: tuple[str, ...],
+) -> SemanticAdmissionRejection:
+    payload = _semantic_rejection_payload(
+        compiled_task_id=compiled_task.compiled_task_id,
+        proposal=proposal,
+        reason_codes=reason_codes,
+    )
+    return SemanticAdmissionRejection(
+        rejection_id=_content_id("semantic-rejection", payload),
+        compiled_task_id=compiled_task.compiled_task_id,
+        proposal=proposal,
+        reason_codes=reason_codes,
+    )
+
+
 @dataclass(frozen=True)
 class SemanticAdmissionDecision:
     """Accepted operation or deterministic UAH rejection reasons."""
 
     admitted_operation: AdmittedOperation | None = None
-    reason_codes: tuple[str, ...] = ()
+    rejection: SemanticAdmissionRejection | None = None
 
     def __post_init__(self) -> None:
-        if (self.admitted_operation is None) == (not self.reason_codes):
-            raise ValueError("semantic decision must contain operation or reasons")
+        if (self.admitted_operation is None) == (self.rejection is None):
+            raise ValueError("semantic decision must contain operation or rejection")
 
     @property
     def accepted(self) -> bool:
         return self.admitted_operation is not None
 
+    @property
+    def reason_codes(self) -> tuple[str, ...]:
+        return self.rejection.reason_codes if self.rejection is not None else ()
+
 
 class SemanticAdmission:
     """Admit proposal semantics without granting domain execution authority."""
 
-    def __init__(
-        self,
-        *,
-        catalog: BindingCatalog,
-        environment_id: str,
-        runtime_mode: str,
-    ) -> None:
-        self._catalog = catalog
-        self._environment_id = environment_id
-        self._runtime_mode = runtime_mode
-
-    def admit(
-        self,
+    @staticmethod
+    def static_object_rejection_reasons(
         compiled_task: CompiledTask,
-        proposal: TypedProposal,
-    ) -> SemanticAdmissionDecision:
-        compiled_task.verify_identity()
-        proposal.verify_identity()
-        reasons: list[str] = []
-        if proposal.compiled_task_id != compiled_task.compiled_task_id:
-            reasons.append("compiled_task_mismatch")
-        if (
-            proposal.environment_run_id != compiled_task.environment_run_id
-            or proposal.task_id != compiled_task.task_id
-            or proposal.trace_id != compiled_task.trace_id
-        ):
-            reasons.append("proposal_lineage_mismatch")
-        if (
-            proposal.output_type
-            not in compiled_task.interaction_module.role.allowed_output_types
-        ):
-            reasons.append("role_output_type_forbidden")
-        object_view = compiled_task.interaction_module.object_for(proposal.object_id)
+        object_id: str,
+    ) -> tuple[str, ...]:
+        """Task-local eligibility shared by prompt projection and admission."""
+        module = compiled_task.interaction_module
+        object_view = module.object_for(object_id)
+        reasons = []
         if object_view is None:
             reasons.append("object_outside_projection")
         else:
-            if not compiled_task.interaction_module.role.control_band.admits_direct(
-                object_view.ab_level
-            ):
+            if not module.role.control_band.admits_direct(object_view.ab_level):
                 reasons.append("object_inspection_only")
             if not object_view.runtime_callable:
                 reasons.append("object_not_runtime_callable")
@@ -525,16 +883,69 @@ class SemanticAdmission:
             )
             if exposed_effects.intersection(compiled_task.prohibited_effects):
                 reasons.append("object_effect_prohibited")
+        if not any(
+            item.object_id == object_id for item in compiled_task.effect_obligations
+        ):
+            reasons.append("missing_effect_obligation")
+        return tuple(reasons)
+
+    def __init__(
+        self,
+        *,
+        catalog: BindingCatalog,
+        environment_id: str,
+        runtime_mode: str,
+        schema_validator: ArgumentSchemaValidator,
+    ) -> None:
+        self._catalog = catalog
+        self._environment_id = environment_id
+        self._runtime_mode = runtime_mode
+        self._schema_validator = schema_validator
+
+    def admit(
+        self,
+        compiled_task: CompiledTask,
+        proposal: TypedProposal,
+    ) -> SemanticAdmissionDecision:
+        compiled_task.verify_identity()
+        proposal.verify_identity()
+        if (
+            proposal.compiled_task_id != compiled_task.compiled_task_id
+            or proposal.environment_run_id != compiled_task.environment_run_id
+            or proposal.task_id != compiled_task.task_id
+            or proposal.trace_id != compiled_task.trace_id
+        ):
+            raise ValueError("compiled task does not match proposal lineage")
+
+        def reject(reason_codes: tuple[str, ...]) -> SemanticAdmissionDecision:
+            return SemanticAdmissionDecision(
+                rejection=_new_semantic_rejection(
+                    compiled_task,
+                    proposal,
+                    reason_codes,
+                )
+            )
+
+        reasons: list[str] = []
+        if (
+            proposal.output_type
+            not in compiled_task.interaction_module.role.allowed_output_types
+        ):
+            reasons.append("role_output_type_forbidden")
+        reasons.extend(
+            self.static_object_rejection_reasons(compiled_task, proposal.object_id)
+        )
         obligations = tuple(
             item
             for item in compiled_task.effect_obligations
             if item.object_id == proposal.object_id
         )
-        if not obligations:
-            reasons.append("missing_effect_obligation")
         if reasons:
-            return SemanticAdmissionDecision(reason_codes=tuple(reasons))
+            return reject(tuple(reasons))
 
+        object_view = compiled_task.interaction_module.object_for(proposal.object_id)
+        if self._catalog.object_for(proposal.object_id) != object_view:
+            return reject(("catalog_object_mismatch",))
         try:
             binding = self._catalog.resolve(
                 proposal.object_id,
@@ -542,9 +953,9 @@ class SemanticAdmission:
                 environment_id=self._environment_id,
             )
         except LookupError:
-            return SemanticAdmissionDecision(reason_codes=("binding_unavailable",))
+            return reject(("binding_unavailable",))
         if binding.implementation_owner != object_view.owner_package:
-            return SemanticAdmissionDecision(reason_codes=("binding_owner_mismatch",))
+            return reject(("binding_owner_mismatch",))
         if any(
             not value.strip()
             for value in (
@@ -553,11 +964,21 @@ class SemanticAdmission:
                 binding.evidence_adapter,
             )
         ):
-            return SemanticAdmissionDecision(
-                reason_codes=("binding_contract_incomplete",)
-            )
+            return reject(("binding_contract_incomplete",))
+        schema_validation = self._schema_validator.validate_arguments(
+            schema_ref=binding.input_schema_ref,
+            arguments=proposal.arguments,
+        )
+        if (
+            schema_validation.schema_ref != binding.input_schema_ref
+            or schema_validation.schema_id is None
+        ):
+            return reject(("input_schema_unavailable",))
+        if not schema_validation.accepted:
+            return reject(("proposal_arguments_schema_invalid",))
         admitted = _new_admitted_operation(
             proposal=proposal,
+            object_snapshot=replace(object_view),
             frame_id=compiled_task.interaction_module.frame.frame_id,
             ab_level=object_view.ab_level,
             binding_id=binding.binding_id,
@@ -565,6 +986,7 @@ class SemanticAdmission:
             binding_fingerprint=binding_fingerprint(binding),
             binding_owner=binding.implementation_owner,
             input_schema_ref=binding.input_schema_ref,
+            input_schema_id=schema_validation.schema_id,
             output_schema_ref=binding.output_schema_ref,
             evidence_adapter=binding.evidence_adapter,
             environment_id=binding.environment_id,

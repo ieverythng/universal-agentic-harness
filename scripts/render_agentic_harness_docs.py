@@ -99,6 +99,14 @@ def main(argv: list[str] | None = None) -> int:
         if not render(name, check=args.check):
             drifted.append(ROOT / "docs" / name.with_suffix(".html"))
     drifted.extend(render_legacy_redirects(check=args.check))
+    research_command = [
+        sys.executable, str(ROOT / "scripts/render_research_dashboard.py"),
+        "--repo-root", str(ROOT),
+    ]
+    if args.check:
+        research_command.append("--check")
+    if subprocess.run(research_command, check=False).returncode:
+        drifted.append(ROOT / "docs/research/uah_research_dashboard.html")
     if drifted:
         print("Generated documentation is out of sync:", file=sys.stderr)
         for path in drifted:

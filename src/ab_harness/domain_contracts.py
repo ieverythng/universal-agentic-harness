@@ -262,6 +262,10 @@ class DomainContractPack:
                 for item in self.ingress_rules
             ),
         )
+        self.verify_identity()
+
+    def verify_identity(self) -> None:
+        """Recheck covered content before another owner consumes this pack."""
         payload = _pack_payload(
             domain_contract_pack_id=self.domain_contract_pack_id,
             frame_id=self.frame_id,
