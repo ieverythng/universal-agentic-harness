@@ -2,7 +2,9 @@ name: CI
 
 on:
   push:
+    branches: [main]
   pull_request:
+    branches: [main]
 
 permissions:
   contents: read
@@ -11,14 +13,38 @@ jobs:
   test:
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         python-version: ["3.10", "3.12", "3.13"]
     steps:
       - uses: actions/checkout@v7
+        # pull_request's github.sha is the synthetic merge commit; validate against main.
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
       - uses: actions/setup-python@v7
         with:
           python-version: ${{ matrix.python-version }}
-      - run: python -m pip install -e ".[test]"
-      - run: python -m pytest
-      - run: python scripts/render_agentic_harness_docs.py
-      - run: git diff --exit-code -- docs/agentic_harness
+      - name: Install project and development dependencies
+        run: python -m pip install -e ".[test]" -r requirements-dev.txt
+      - name: Validate pre-commit configuration
+        run: python -m pre_commit validate-config
+      - name: Lint source, tests, and scripts
+        run: python -m ruff check src tests scripts
+      - name: Run full deterministic tests (includes NAO public seams)
+        run: python -m pytest
+      - name: Run recorded NAO adapter canary
+        run: python -m ab_harness_nao
+      - name: Check generated documentation
+        run: python scripts/render_agentic_harness_docs.py --check
+      - name: Build wheel and verify isolated imports
+        run: |
+          mkdir -p "$RUNNER_TEMP/wheelhouse"
+          python -m pip wheel . --no-deps --wheel-dir "$RUNNER_TEMP/wheelhouse"
+          wheel_path="$(printf '%s\n' "$RUNNER_TEMP"/wheelhouse/*.whl)"
+          test -f "$wheel_path"
+          smoke_venv="$RUNNER_TEMP/package-smoke"
+          python -m venv "$smoke_venv"
+          "$smoke_venv/bin/python" -m pip install "$wheel_path"
+          cd "$RUNNER_TEMP"
+          "$smoke_venv/bin/python" -I -c 'from pathlib import Path; import sys; import ab_harness; import ab_harness_nao; prefix = Path(sys.prefix).resolve(); assert Path(ab_harness.__file__).resolve().is_relative_to(prefix); assert Path(ab_harness_nao.__file__).resolve().is_relative_to(prefix)'

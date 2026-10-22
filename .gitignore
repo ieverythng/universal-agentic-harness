@@ -5,7 +5,15 @@ __pycache__/
 .pytest_cache/
 .ruff_cache/
 .venv/
+.env
+.env.*
+!.env.example
 build/
 dist/
 htmlcov/
 *.jsonl
+!tests/fixtures/model_invocation_legacy_v1/completed.jsonl
+!tests/fixtures/model_invocation_legacy_v1/unfinished.jsonl
+.artifacts/
+.test-tmp/
+~$*.docx

@@ -19,6 +19,8 @@ class InteractionProjector:
         requested_object_ids: tuple[str, ...],
         include_decomposition: bool = True,
     ) -> InteractionModuleSpec:
+        if frame.registry_version != self._registry.version:
+            raise ValueError("frame registry version does not match projection registry")
         selected: dict[str, object] = {}
         pending = list(requested_object_ids)
         while pending:
@@ -28,6 +30,8 @@ class InteractionProjector:
             item = self._registry.get(object_id)
             if item is None:
                 raise ValueError('unknown AB object: %s' % object_id)
+            if type(item.runtime_callable) is not bool:
+                raise ValueError('runtime_callable must be a boolean')
             if not role.control_band.admits_inspection(item.ab_level):
                 raise ValueError('AB object outside inspectable control band: %s' % object_id)
             selected[object_id] = item

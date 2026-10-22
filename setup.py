@@ -1,4 +1,20 @@
+import shutil
+from pathlib import Path
+
 from setuptools import find_packages, setup
+from setuptools.command.build_py import build_py
+
+
+class CleanBuildPy(build_py):
+    """Rebuild package directories without retaining deleted source modules."""
+
+    def run(self):
+        package_roots = {package.partition(".")[0] for package in self.packages}
+        for package_root in package_roots:
+            destination = Path(self.build_lib, package_root)
+            if destination.exists():
+                shutil.rmtree(destination)
+        super().run()
 
 package_name = "ab_harness"
 
@@ -7,6 +23,7 @@ setup(
     version="0.1.0",
     package_dir={"": "src"},
     packages=find_packages(where="src"),
+    cmdclass={"build_py": CleanBuildPy},
     data_files=[
         ("share/ament_index/resource_index/packages", ["resource/" + package_name]),
         ("share/" + package_name, ["package.xml"]),
