@@ -13,32 +13,65 @@ as a dependency of the kernel.
 
 ## Current status
 
-H0 proves:
+H0, H1, and O1 remain partial; H2 NAO parity is unqualified. The following
+implemented seams are available for review, but do not constitute release-exit
+evidence:
 
 - frame-relative AB control bands;
 - read-only registry snapshots with SHA-256 content identity;
 - task projection with inspectable decomposition closure;
 - deterministic output-type, object-reachability, AB-level, and effect-claim
   gates;
-- append-only JSONL trace round trips;
-- thin NAO chatbot/planner payload adapters.
+- one append-only, globally sequenced lifecycle ledger with strict JSONL reload;
+- a separate `ab_harness_nao` package for thin chatbot/planner payload adapters;
+- semantic implementation bindings with candidate quarantine;
+- a lease-only in-process environment owner that preserves the native result
+  separately from normalized effect evidence;
+- one recorded, ROS-free chatbot-to-planner-to-fake-owner qualification path
+  through `CompiledTask`, two-stage admission, and exact lease dispatch;
+- content-addressed model-harness-environment configuration identity;
+- bounded Neural Workbench retrieval of supporting and counterexample traces;
+- profile-verified registration of owner-attested environment activations;
+- content-addressed `DomainContractPack` revisions whose identity covers role,
+  task-type, ingress, effect-evidence, and prohibited-effect rules;
+- content-addressed, profile-bound normalized ingress and classification
+  decisions with domain task identity and deterministic UAH trace issuance;
+- task lineage projected from the common ledger with duplicate-start protection,
+  same-run resume/notify lineage, and terminal-state reload across restart;
+- deterministic TaskSpec compilation into one content-addressed projection,
+  obligation, prohibition, and declared-budget artifact; model-call and
+  tool-call limits are consumed at dispatch, retry attempts are bounded and
+  recorded, and wall-time is checked when the timeout control is invoked;
+- content-addressed typed proposals, UAH semantic admission, and domain-owned
+  operation leases with deterministic rejection reasons;
+- content-addressed execution receipts, replay-derived task acceptance, and
+  deterministic `VerifiedTraceDigest` artifacts;
+- content-addressed `uah.trace_event/v1` records with atomic commit framing for
+  multi-event lifecycle facts;
+- a machine-readable NAO reference canary with accepted replay and
+  no-dispatch semantic rejection.
 
-It does **not** yet provide a complete runnable agent loop. Provider adapters,
-full task/environment schemas, lifecycle events, execution, evidence closure,
-replay, and cross-domain conformance are the H1-H5 roadmap.
+It does **not** yet provide a complete live agent loop. Provider adapters, full
+task/environment schemas, rejection/failure lifecycle coverage, stale-evidence
+handling, model evaluation, live-node parity, and cross-domain conformance
+remain on the H1-H5 roadmap.
 
 ```mermaid
 flowchart LR
-    task["Task + role + AB frame"] --> compiler["Interaction projector"]
+    task["Task + role + AB frame"] --> compiler["TaskSpec compiler"]
     registry["Versioned AB registry"] --> compiler
-    compiler --> module["Task-scoped interaction module"]
+    compiler --> module["CompiledTask"]
     model["Model / worker adapter"] --> output["Typed proposal"]
-    module --> gate["Deterministic output gate"]
-    output --> gate
-    gate -->|accepted proposal| runtime["Environment-owned runtime"]
-    gate --> trace["Append-only trace"]
-    runtime --> evidence["Owner-issued effect evidence"]
-    evidence --> trace
+    module --> admission["UAH semantic admission"]
+    output --> admission
+    admission --> lease["Domain ExecutionLease"]
+    lease --> runtime["Lease-only environment owner"]
+    runtime --> receipt["Native result + effect evidence"]
+    module --> ledger["Common lifecycle ledger"]
+    admission --> ledger
+    lease --> ledger
+    receipt --> ledger
+    ledger --> digest["VerifiedTraceDigest"]
 ```
 
 ## Quick start
@@ -49,7 +82,36 @@ Python 3.10 or newer is required.
 python -m venv .venv
 python -m pip install -e ".[test]"
 python -m pytest
+python -m ab_harness_nao
 ```
+
+The adapter canary is a deterministic boot qualification over recorded NAO
+outputs and a fake environment. It compiles typed task authority, admits each
+operation, dispatches only the exact domain lease, reloads the lifecycle, and
+derives a verified digest through the explicit `ab_harness_nao` boundary. It
+does not claim live-model, ROS, or general agentic capability.
+
+## Development environment
+
+Keep local secrets and machine-specific paths out of the repository and its
+artifacts. The kernel does not load `.env` files or depend on local credentials.
+
+```bash
+./scripts/setup_dev_tools.sh
+./scripts/run_precommit.sh
+```
+
+The setup script creates the ignored `.venv`, installs the editable package and
+version-bounded development tools, then installs pre-commit and pre-push hooks.
+The pre-commit run checks merge markers, YAML, EOF and whitespace hygiene,
+Ruff, the complete test suite, and generated-document synchronization. A
+successful manual run removes inherited hook skips and interpreter overrides
+before executing checks, then records the repository signature and complete
+checked Git tree inside `.git`. The pre-push guard performs its cache check
+with the repository interpreter and clears those overrides before running the
+pre-commit delegate. Only the manual run command can create the success
+record; pre-push rejects a missing or stale record and any outgoing tip whose
+tree differs from the checked snapshot.
 
 Minimal use:
 
@@ -79,12 +141,21 @@ module = InteractionProjector(registry).compile(
 
 ## Repository map
 
-- `src/ab_harness/` — portable H0 contracts, registry adapter, projector, gate,
-  trace store, and NAO compatibility views.
+- `src/ab_harness/` contains portable contracts, registries, projection, gates,
+  evidence evaluation, and trace storage.
+- `src/ab_harness_nao/` contains the explicit ROS-free NAO compatibility and
+  recorded qualification adapter.
+- `src/Neural-Wokbench/` is the declared companion-engine submodule path. The
+  intended revision is `e76ba7e`, but the current UAH tree has no gitlink. It
+  remains optional before H3 and attaches through a versioned adapter protocol.
 - `tests/` — fail-closed H0 tests and a standalone registry fixture.
-- `docs/agentic_harness/` — canonical foundation, adaptive Workbench design,
-  implementation masterplan, and generated HTML editions.
-- `docs/watson_inference_seams.md` — concrete seams for local-model and
+- `docs/plans/` — implementation masterplan, development log, and coupling
+  plans.
+- `docs/architecture/` — foundation, Workbench integration, Observatory, ADRs,
+  and runtime seam designs.
+- `docs/artifacts/` — provenance, selected architecture decisions, and generated
+  Observatory examples.
+- `docs/architecture/watson_inference_seams.md` — concrete seams for local-model and
   llama.cpp experimentation.
 - `scripts/` — dependency-free Markdown-to-HTML rendering.
 - `package.xml`, `resource/` — optional ROS 2 `ament_python` packaging wrapper;
@@ -98,9 +169,11 @@ Provider, sandbox, browser, shell, ROS, MCP, and frontier-worker integrations
 belong behind adapters.
 
 See the
-[implementation masterplan](docs/agentic_harness/universal_agentic_harness_masterplan.md)
-for the H0-H6 release spine and [source
-provenance](docs/provenance.md) for the exact extraction revision.
+[implementation masterplan](docs/plans/universal_agentic_harness_masterplan.md)
+for the evidence-gated H0-H6 release spine, the
+[development log](docs/plans/universal_agentic_harness_development_log.md)
+for current gates, and [source
+provenance](docs/artifacts/provenance.md) for the exact extraction revision.
 
 ## License
 

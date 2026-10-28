@@ -9,8 +9,33 @@ from pathlib import Path
 from ab_harness.contracts import ABObjectView
 
 
+def _unique_json_object(pairs: list[tuple[str, object]]) -> dict[str, object]:
+    payload: dict[str, object] = {}
+    for key, value in pairs:
+        if key in payload:
+            raise ValueError('duplicate JSON object key: %s' % key)
+        payload[key] = value
+    return payload
+
+
 class RegistrySnapshot:
-    def __init__(self, objects: tuple[ABObjectView, ...], *, source: str, version: str) -> None:
+    def __init__(
+        self,
+        objects: tuple[ABObjectView, ...],
+        *,
+        source: str,
+        version: str,
+    ) -> None:
+        object_ids = tuple(item.object_id for item in objects)
+        duplicate_ids = tuple(
+            dict.fromkeys(
+                object_id
+                for object_id in object_ids
+                if object_ids.count(object_id) > 1
+            )
+        )
+        if duplicate_ids:
+            raise ValueError("duplicate AB object id: %s" % ", ".join(duplicate_ids))
         self.objects = objects
         self.source = source
         self.version = version
@@ -23,7 +48,7 @@ class RegistrySnapshot:
     def from_json_file(cls, path: str | Path) -> 'RegistrySnapshot':
         registry_path = Path(path)
         raw = registry_path.read_bytes()
-        payload = json.loads(raw)
+        payload = json.loads(raw, object_pairs_hook=_unique_json_object)
         objects = tuple(_object_view(item) for item in payload.get('objects', ()))
         version = 'sha256:' + hashlib.sha256(raw).hexdigest()
         return cls(objects, source=str(registry_path), version=version)
@@ -31,6 +56,9 @@ class RegistrySnapshot:
 
 def _object_view(payload: dict) -> ABObjectView:
     metadata = payload.get('metadata', {}) if isinstance(payload.get('metadata'), dict) else {}
+    runtime_callable = metadata.get('runtime_callable', False)
+    if type(runtime_callable) is not bool:
+        raise ValueError('runtime_callable must be a boolean')
     return ABObjectView(
         object_id=str(payload.get('object_id', '')).strip(),
         ab_level=int(payload.get('ab_level', 0)),
@@ -40,5 +68,5 @@ def _object_view(payload: dict) -> ABObjectView:
         expected_effects=tuple(str(item) for item in payload.get('expected_effects', ())),
         observable_success=tuple(str(item) for item in payload.get('observable_success', ())),
         decomposes_to=tuple(str(item) for item in payload.get('decomposes_to', ())),
-        runtime_callable=bool(metadata.get('runtime_callable', False)),
+        runtime_callable=runtime_callable,
     )

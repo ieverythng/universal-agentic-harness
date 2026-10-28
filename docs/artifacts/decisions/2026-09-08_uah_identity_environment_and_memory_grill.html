@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>UAH Identity, Environment, and Memory Design Grill</title>
+  <style>
+    @page {
+      size: A4;
+      margin: 2.6cm 2.2cm 2.4cm 2.2cm;
+    }
+    :root {
+      --ink: #111;
+      --muted: #3a3a3a;
+      --line: #1f1f1f;
+      --soft: #f3f3f3;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: #fff;
+      font-family: "Liberation Serif", "Times New Roman", Times, serif;
+      font-size: 11.5pt;
+      line-height: 1.42;
+    }
+    .doc {
+      max-width: 172mm;
+      margin: 0 auto;
+      padding: 0;
+    }
+    .title-page {
+      min-height: 247mm;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      page-break-after: always;
+    }
+    .title-top {
+      text-align: center;
+      margin-top: 18mm;
+    }
+    .title-top h1 {
+      font-size: 20pt;
+      line-height: 1.28;
+      margin: 20mm 0 8mm;
+      font-weight: 700;
+    }
+    .title-top h2 {
+      font-size: 13pt;
+      margin: 0 0 3mm;
+      font-weight: 600;
+      border-bottom: 0;
+    }
+    .title-top p {
+      margin: 2mm 0;
+      color: var(--muted);
+    }
+    .title-meta {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 0 auto 20mm;
+      font-size: 11pt;
+    }
+    .title-meta td {
+      padding: 2.5mm 0;
+      vertical-align: top;
+      border: 0;
+    }
+    .title-meta td:first-child {
+      width: 38mm;
+      font-weight: 700;
+    }
+    .small { font-size: 10.3pt; color: #222; }
+    h1, h2, h3 {
+      margin: 0 0 3mm;
+      line-height: 1.28;
+      font-weight: 700;
+    }
+    h1 { font-size: 16.5pt; margin-top: 0; }
+    h2 {
+      font-size: 13pt;
+      margin-top: 9mm;
+      border-bottom: 0.5pt solid var(--line);
+      padding-bottom: 1.5mm;
+    }
+    h3 {
+      font-size: 11.8pt;
+      margin-top: 6mm;
+    }
+    p { margin: 2.2mm 0; }
+    ul, ol { margin: 2.5mm 0 2.5mm 6mm; padding: 0; }
+    li { margin: 1.4mm 0; }
+    pre {
+      margin: 2.5mm 0 4mm;
+      background: var(--soft);
+      border: 0.6pt solid #666;
+      padding: 2.6mm 2.8mm;
+      overflow-x: auto;
+      white-space: pre;
+      font-family: "Liberation Mono", "Courier New", monospace;
+      font-size: 9.2pt;
+      line-height: 1.3;
+    }
+    code {
+      font-family: "Liberation Mono", "Courier New", monospace;
+      background: #efefef;
+      padding: 0.2mm 1mm;
+      border: 0.4pt solid #d7d7d7;
+      border-radius: 2px;
+      font-size: 10.3pt;
+    }
+    pre code {
+      background: transparent;
+      padding: 0;
+      border: 0;
+      font-size: inherit;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 3mm 0 4mm;
+      font-size: 10.8pt;
+    }
+    th, td {
+      border: 0.6pt solid #333;
+      padding: 2.2mm 2.3mm;
+      vertical-align: top;
+      overflow-wrap: anywhere;
+      hyphens: auto;
+    }
+    th {
+      background: #fafafa;
+      text-align: left;
+      font-weight: 700;
+    }
+    .diagram {
+      margin: 4mm 0 5mm;
+      border: 0.6pt solid #777;
+      padding: 2mm;
+      background: #fff;
+    }
+    .diagram pre {
+      margin: 0;
+      border: 0;
+      background: #fcfcfc;
+      font-size: 10.2pt;
+      white-space: pre-wrap;
+    }
+    .diagram svg {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+    .diagram-labels {
+      font-family: "Liberation Serif", "Times New Roman", Times, serif;
+      font-size: 25px;
+      font-weight: 700;
+      fill: #111;
+    }
+    .lifelines {
+      stroke: #999;
+      stroke-dasharray: 4 4;
+    }
+    .messages {
+      stroke: #111;
+      stroke-width: 1.35;
+      fill: none;
+    }
+    .messages text {
+      stroke: none;
+      fill: #111;
+      font-family: "Liberation Serif", "Times New Roman", Times, serif;
+      font-size: 22px;
+    }
+    .caption {
+      margin-top: 2mm;
+      font-size: 10.5pt;
+      color: #222;
+      font-style: italic;
+      text-align: center;
+    }
+    blockquote {
+      border: 0.6pt solid #333;
+      background: #fcfcfc;
+      margin: 3mm 0;
+      padding: 2.6mm 3mm;
+      color: var(--muted);
+    }
+    a { color: #111; }
+  </style>
+  <link rel="stylesheet" href="../../assets/harness-theme.css" />
+  <script defer src="../../assets/harness-theme.js"></script>
+</head>
+<body>
+  <main class="doc">
+
+<h1>UAH Identity, Environment, and Memory Design Grill</h1>
+<p><strong>Date:</strong> 2026-09-08 <strong>Status:</strong> Architecture decisions accepted; grill closed; H0 authority and H1 fixed activation seams implemented in part <strong>Scope:</strong> H0-H2 contracts, with H3-H5 compatibility seams only</p>
+<h2>1. Purpose</h2>
+<p>This record captures the decisions made after the H2 commit review. It keeps the original H0-H6 delivery spine intact while resolving agent identity, hardware allocation, environment activation, multi-actor traces, task closure, Observatory, and NeuralWorkbench ownership.</p>
+<h2>2. Role, Agent, and Runtime Identity</h2>
+<p><strong>Question:</strong> Does changing the model change the role configuration or the agent?</p>
+<p><strong>Decision:</strong> <code>AgentRoleConfiguration</code> is model-independent. It freezes the role&#x27;s primary abstraction frame, approved additional frame projections, capability packs, authority, budgets, bindings, and model-admission profile. <code>AgentManifest</code> combines that role with a model configuration, prompt pack, harness build, and adapter revisions. Changing any member creates a new <code>agent_id</code>.</p>
+<p><strong>Question:</strong> How do stable names such as Watson or NAO planner survive model changes?</p>
+<p><strong>Decision:</strong> <code>agent_handle_id</code> is a stable routed name. Each immutable handle revision selects one <code>agent_id</code>, preserves the required role, cites fidelity evidence, and retains rollback lineage. A handle is not the agent and does not own memory.</p>
+<pre><code class="language-text">role_configuration_id
+  + model_configuration_id
+  + prompt_pack_id
+  + harness_build_id
+  + adapter revisions
+  -&gt; agent_id
+  -&gt; immutable agent_handle_revision_id
+  -&gt; stable agent_handle_id</code></pre>
+<h2>3. Provider and Hardware Allocation</h2>
+<p><strong>Question:</strong> Can one loaded model process embody several logical agents?</p>
+<p><strong>Decision:</strong> Yes, when the hardware and provider isolation contracts permit it. The provider process is a computational resource; the harness owns logical agent identity. Separate agents retain distinct runs, prompts, frame projections, task state, and authority even when they share an equivalent model instance.</p>
+<pre><code class="language-text">provider_pool_id
+  -&gt; model_instance_id
+  -&gt; model_lease_id
+  -&gt; model_invocation_id</code></pre>
+<p>Registration does not reserve hardware or invoke a model. An explicit startup or invocation request acquires a lease after capacity and freshness checks. <code>ModelAllocator</code> may choose an equivalent instance of the declared model configuration. It cannot silently substitute another model configuration.</p>
+<p>H1 supplies a fixed-instance lease interface. H2 uses fixed NAO provider profiles. Dynamic pools, eviction, arbitration, multi-agent scheduling, and fidelity-gated rebinding begin in H3.</p>
+<h2>4. Environment Activation and Continuous Agents</h2>
+<p><strong>Question:</strong> What groups a running NAO container, its chatbot and planner, and the tasks they process?</p>
+<p><strong>Decision:</strong> <code>EnvironmentProfile</code> is the reusable native-runtime contract. <code>environment_run_id</code> identifies one owner-attested activation. It groups native ingress, attached agent runs, tasks, traces, and native evidence.</p>
+<pre><code class="language-text">EnvironmentProfile
+  -&gt; EnvironmentRunAttestation
+  -&gt; environment_run_id
+       -&gt; chatbot agent_run_id
+       -&gt; planner agent_run_id
+       -&gt; task_id
+            -&gt; trace_id
+                 -&gt; operation graph</code></pre>
+<p>Each <code>agent_run_id</code> attaches to exactly one environment run and may process many stimuli, tasks, model leases, and model invocations. A run may enter standby without holding a model. A normal turn creates an invocation, not a new agent run. Restart, terminal failure, explicit detach, or changed embodiment creates a new run.</p>
+<p>The environment owner starts native infrastructure and issues readiness evidence. UAH validates and registers the attestation. It does not claim native readiness from discovery alone.</p>
+<h2>5. Environment Ingress and Task Association</h2>
+<p><strong>Question:</strong> Does every incoming user message or runtime event create a new task or model call?</p>
+<p><strong>Decision:</strong> No. Approved bindings normalize input into immutable <code>EnvironmentIngress</code>. Deterministic <code>TaskIngressAuthority</code> classifies and admits each item as an environment state update, new task, resumed task, notification to an existing task, or rejection. It is the only public writer for accepted task-bearing ingress; the task registry is a read-only ledger projection. A model may interpret admitted task content but cannot rewrite the assigned task or trace lineage.</p>
+<p>Domain task IDs retain native meaning. NAO goal, request, plan, version, and step IDs cross the UAH boundary unchanged. UAH identities supplement this lineage rather than reconstructing or replacing it.</p>
+<h2>6. Trace, Actor, and Operation Graph</h2>
+<p><strong>Question:</strong> Is <code>trace_id</code> equivalent to a chat session or one agent&#x27;s log?</p>
+<p><strong>Decision:</strong> No. It identifies one causal workflow and may contain operations from several actor agent runs. Environment, task, chatbot, planner, role, and handle views are read-only projections over one append-only ledger.</p>
+<p>Every operation is anchored to exactly one frame-relative AB object. Internal complexity or cross-frame delegation does not promote its AB level.</p>
+<ul>
+<li><code>decomposes_to</code> refines an operation inside the same frame.</li>
+<li><code>delegates_to</code> crosses into another frame through a typed role or handle, closed input artifact, expected output artifact, and authority boundary.</li>
+<li><code>continues_with</code> records ordered workflow progression without claiming decomposition.</li>
+</ul>
+<h2>7. NAO <code>report_result</code></h2>
+<p><strong>Question:</strong> Is <code>report_result</code> AB2 because it verifies evidence, calls the chatbot, and dispatches speech?</p>
+<p><strong>Decision:</strong> It remains AB1 in the planner runtime frame because it is one planner-visible semantic operation. It verifies execution evidence, delegates grounded response composition to the chatbot agent run in the dialogue frame, then returns to the native communication owner. The delegated model text can produce a typed report artifact but cannot prove navigation, manipulation, or speech effects.</p>
+<p>The NAO <code>v1.0.0</code> runtime and pinned chatbot source are authoritative. The intended NeuralWorkbench revision contains an older same-frame decomposition. H2 must correct that drift through an owner-reviewed, content-addressed DomainContractPack revision. Live mutable registry synchronization is rejected.</p>
+<h2>8. Task Effects and Terminal Acceptance</h2>
+<p><strong>Question:</strong> How should the harness represent an operation whose primary effect succeeds but whose final spoken report fails?</p>
+<p><strong>Decision:</strong> Tasks declare typed <code>EffectObligation</code> values before execution. Each is <code>required</code> or <code>best_effort</code> and names its evidence contract, owner, and freshness policy. A pure evaluator derives <code>TaskAcceptance</code> from these obligations and owner-issued evidence.</p>
+<pre><code class="language-text">all required satisfied              -&gt; accepted
+all required satisfied,
+best-effort deficit recorded         -&gt; accepted_with_deficit
+required effect still obtainable     -&gt; suspended
+required effect terminally failed    -&gt; rejected</code></pre>
+<p>An operation retains its own result. A later reporting failure cannot retroactively turn successful navigation or manipulation into failure. Model text and an event named <code>execution_feedback</code> are not terminal proof by themselves.</p>
+<h2>9. Observatory and Verified Memory</h2>
+<p><strong>Question:</strong> Should Observatory and NeuralWorkbench be one frame or service?</p>
+<p><strong>Decision:</strong> No. Observatory renders immutable facts and read-only projections. NeuralWorkbench consumes evidence to retrieve experience, compare candidates, and change future candidate priors. Workbench cannot mutate the ledger, and Observatory does not construct memory or candidates.</p>
+<p><code>VerifiedTraceDigest</code> is a deterministic, model-free projection of lifecycle, operation, evidence, and obligation events. It is the trusted compact unit for Observatory and future Workbench retrieval. <code>memory_policy_id</code> limits which digests a role may inspect by domain, environment profile, frame, role, task, object, outcome, and approved handle lineage.</p>
+<p>Model-authored reflection is excluded from the trusted digest. H3 may later create reflection candidates under Workbench quarantine.</p>
+<h2>10. NeuralWorkbench Intervention</h2>
+<p><strong>Question:</strong> Must full Workbench search run on every interaction?</p>
+<p><strong>Decision:</strong> No. H2 freezes the attachment seams only. H3 may perform a cheap, deterministic task-root retrieval according to <code>memory_policy_id</code>. Empty memory returns no candidate. Full <code>ConsultWorkbench</code> search is explicit or triggered by deterministic policy based on task complexity, uncertainty, failure, recovery need, and budget. It does not run by default for every trivial AB0 or AB1 operation.</p>
+<p>Workbench remains the muscle-memory engine: retrieved and adapted traces, host-model multi-trajectory candidates, deterministic verification and scoring, then H4 crystallization quarantine. It is not merely deterministic lookup and does not require learned retrieval for its first implementation.</p>
+<h2>11. Domain Onboarding Boundary</h2>
+<p><strong>Question:</strong> Does every domain require a new UAH kernel package?</p>
+<p><strong>Decision:</strong> No. Domain onboarding produces a declarative, content-addressed DomainContractPack containing frames, objects, role projections, bindings, evidence rules, prompt policy, environment profile, and qualification cases. A custom adapter is permitted only for irreducible native semantics. NAO may need a ROS-free normalization and parity adapter, while ROS imports and native lifecycle ownership remain in the NAO repository.</p>
+<p>Assisted onboarding may propose pack content and apply SkillOpt, TDD, and deslop workflows. It cannot approve its own semantic objects or bindings.</p>
+<h2>12. Delivery Spine</h2>
+<ul>
+<li><strong>H0:</strong> freeze the complete identity, environment, ingress, operation-edge, obligation, acceptance, trace, and provider grammar.</li>
+<li><strong>H1:</strong> implement registries, deterministic ingress, attached run lifecycle, standby, fixed-instance leases, PromptCompiler, admission, obligation evaluation, append-only replay, O1, and deterministic trace digests.</li>
+<li><strong>H2:</strong> register the NAO environment, fixed chatbot/planner handles and providers, preserve native lifecycle owners, implement planner parity and <code>report_result</code> delegation, then run recorded and fake/sim qualification.</li>
+<li><strong>H3:</strong> add hardware-aware provider pools and the first retrieval/search NeuralWorkbench.</li>
+<li><strong>H4:</strong> add crystallization and reviewed promotion.</li>
+<li><strong>H5:</strong> federate local and remote provider pools with conformance tests.</li>
+<li><strong>H6:</strong> retain AB5 policy-foundry research as optional.</li>
+</ul>
+<h2>13. TDD Seam Confirmed on 2026-09-09</h2>
+<p>The owner confirmed the public seam and closed the architecture grill:</p>
+<pre><code class="language-text">TaskAcceptanceEvaluator.evaluate(
+    effect_obligations,
+    evidence_set,
+) -&gt; TaskAcceptance</code></pre>
+<p>The first red-green slices now distinguish required-effect failure from a best-effort deficit using the same immutable evidence grammar. Duplicate obligation identities and empty obligation sets fail closed. At this checkpoint the recorded NAO result retained a <code>required_observables</code> compatibility field. Decision 21 records its removal once typed obligations became the sole input.</p>
+<p>The owner-attested synthetic environment registration seam is now implemented. It requires a registered frozen <code>EnvironmentProfile</code>, exact owner, native runtime, and DomainContractPack revisions, plus readiness evidence. Reused run or attestation identities fail before state is written. Registration performs no native startup or model action. Immutable environment ingress and deterministic state-update classification are now implemented under exact profile, DomainContractPack revision, run, binding, and type checks.</p>
+<p>Task-bearing actions remained disabled at this checkpoint until task and trace identity issuance was defined. This prevented <code>start_task</code>, <code>resume_task</code>, or <code>notify_task</code> decisions from carrying absent or reconstructed lineage.</p>
+<h2>14. Evidence and Limits</h2>
+<p>The architecture was checked against NAO tag <code>v1.0.0</code>, chatbot revision <code>a2ecca796...</code>, and intended NeuralWorkbench revision <code>e76ba7e</code>. Focused read-only baselines passed 112 chatbot turn-engine tests and 41 planner supervisor/gate tests. These results constrain compatibility but do not qualify UAH H2. <code>EffectObligation</code>, <code>TaskAcceptance</code>, the pure acceptance evaluator, and profile-verified environment-run registration are now implemented. The NAO projection and recorded qualification live in the separate <code>ab_harness_nao</code> adapter package. No TaskSpec obligation compiler, environment-profile serialization or signature verification, task registry, ingress persistence and deduplication, multi-actor ledger, <code>report_result</code> adapter, or Workbench retrieval policy is implemented at this checkpoint. The current in-memory registration and ingress contracts do not provide durable persistence, attestation signature validation, or environment close semantics.</p>
+<h2>15. TDD Continuation on 2026-09-13</h2>
+<p>This implementation checkpoint applies Decision 5 without reopening the architecture grill. A reviewed <code>start_task</code> rule now selects the domain-owned task identifier from a named immutable native-lineage field. UAH preserves that identifier and derives the initial causal <code>trace_id</code> with the versioned <code>uah-trace-v1</code> scheme over the environment run and task identity.</p>
+<p>Missing task lineage produces typed rejection. Mutable lineage containers, duplicate keys, and empty lineage fields fail contract construction. Resume and notify remain disabled until an environment-bound task registry can prove that the referenced task exists in the same activation. No model may author, replace, or infer these identities.</p>
+<h2>16. Environment Task Registry TDD Continuation on 2026-09-13</h2>
+<p>The next implementation round applies the same Decision 5 boundary. <code>EnvironmentTaskRegistry</code> records immutable task and trace lineage under the exact environment activation. Replayed task-bearing ingress is rejected. A different ingress cannot start a domain task that is already registered in the same environment run. Both decisions retain the existing task and trace identifiers for inspection without authorizing another activation.</p>
+<p>Registered <code>resume_task</code> and <code>notify_task</code> ingress reuse the original trace. Unknown task identifiers and references to a task registered under another environment run fail closed. This registry is an in-memory H0 contract proof. It does not supply durable recovery, terminal task transitions, concurrent transaction guarantees, or native effect evidence.</p>
+<h2>17. Acceptance and Task Replay TDD Continuation on 2026-09-19</h2>
+<p>Historical checkpoint. Section 21 supersedes the separate task-event authority described below with the common <code>LifecycleLedger</code>.</p>
+<p>This round connects the existing pure <code>TaskAcceptance</code> judgment to the environment task registry. <code>accepted</code>, <code>accepted_with_deficit</code>, and <code>rejected</code> become terminal registry states and reject later resume or notify ingress. <code>suspended</code> remains nonterminal because required evidence is still pending. A terminal judgment cannot be replaced, and no acceptance may close a task registered under another environment activation.</p>
+<p>Task start, resume, notification, suspension, and terminal acceptance emit content-addressed <code>TaskLifecycleEvent</code> values using the Observatory event vocabulary. Ordered replay reconstructs lineage, terminal state, and duplicate-ingress protection without a model or a second acceptance-evaluator pass. Modified event content, duplicate event identity, and acceptance before task start fail closed.</p>
+<p>The event stream remains an in-memory H0 proof. Durable storage, global event sequence, timestamps, and process-restart recovery remain open. Cancellation and native failure are not represented as generic terminal calls because their environment-owner authority contract has not yet been implemented.</p>
+<h2>18. Task Lifecycle Persistence TDD Continuation on 2026-09-23</h2>
+<p>Historical checkpoint. <code>uah.task_lifecycle_event/v1</code> and <code>JsonlTaskLifecycleStore</code> were removed when <code>uah.trace_event/v1</code> became the single writable lifecycle envelope.</p>
+<p>This round applies Decision 5 to restart recovery without expanding the event authority model. <code>TaskLifecycleEvent</code> now serializes through the exact <code>uah.task_lifecycle_event/v1</code> envelope. Missing or additional fields, unsupported versions, empty or non-string values, incompatible event/status pairs, and content-address mismatches fail validation.</p>
+<p><code>JsonlTaskLifecycleStore</code> provides a canonical, append-only local stream. Each append is flushed through <code>fsync</code>. Reload validates the complete UTF-8 stream before replaying it into a fresh <code>EnvironmentTaskRegistry</code>, so malformed JSON, blank records, invalid events, duplicates, invalid ordering, and an unterminated final record cannot publish partial registry state. A missing store reconstructs an empty registry. A valid stream reconstructs task and trace lineage, ingress replay protection, suspension, and terminal acceptance after process restart without a model or evaluator call.</p>
+<p>The accepted scope is a single-writer, task-event subset. It does not claim cross-process locking, a global event sequence, timestamps, parent-event links, compaction, or a filesystem-wide power-loss transaction. Integration with the common lifecycle ledger remains required. Cancellation and native failure remain excluded until an environment-owner authority contract defines who may assert those transitions and which evidence must accompany them.</p>
+<h2>19. TaskSpec Compiler TDD Continuation on 2026-09-23</h2>
+<p>The next H0 seam compiles one accepted task start into a single immutable source of truth. <code>TaskSpecCompiler.compile(...)</code> consumes the admitted <code>TaskIngressDecision</code>, <code>uah.task_spec/v1</code>, role, frame, registry, and reviewed DomainContractPack. It emits a content-addressed <code>uah.compiled_task/v1</code> with task and trace lineage, one closed <code>InteractionModuleSpec</code>, compiled effect obligations, merged prohibited effects, finite budgets, and exact domain-pack provenance.</p>
+<p>The task author selects semantic effects and whether each is required or best-effort. The DomainContractPack owns the mapping from each effect to one AB object, evidence owner, and failure policy. The compiler verifies that the owner matches the AB object and that the effect is a declared normalized observable. This prevents task text or future model output from selecting its own evidence authority.</p>
+<p>Compilation occurs once after successful <code>start_task</code> ingress. Resume and notify ingress resolve the existing compiled artifact. Recompilation is rejected so a task cannot change projection, obligations, prohibitions, or budgets while retaining the same task and trace identities. Domain-rule ambiguity, duplicate obligation identities, prohibited requested effects, lineage or revision mismatches, mutable collections, and altered content identities fail closed.</p>
+<p>This round does not implement prompt wording, proposal normalization, semantic admission, domain lifecycle admission, execution leases, or ledger events for compilation. The next seam must make <code>CompiledTask</code> the sole authority input to <code>TypedProposal -&gt; AdmittedOperation -&gt; ExecutionLease</code>.</p>
+<h2>20. Typed Proposal and Two-Stage Admission TDD Continuation on 2026-09-28</h2>
+<p>This round implements the authority path selected during the grill without granting execution authority to model output or to UAH semantic admission. <code>ProposalNormalizer</code> converts one raw typed model-output artifact into one content-addressed <code>uah.typed_proposal/v1</code>. The proposal preserves the exact compiled task, environment run, task, trace, operation, output type, AB object, and canonical finite-JSON arguments. It rejects model-authored effect claims, ambiguous payload shapes, missing artifact lineage, and disagreement between the requested object and the model&#x27;s object references.</p>
+<p><code>SemanticAdmission</code> is the domain-agnostic UAH gate. It rechecks the compiled task identity and causal lineage, role output policy, task projection, direct control band, runtime callability, prohibited effects, effect obligations, and the selected approved binding. The binding must match the environment and runtime mode, retain the semantic owner&#x27;s implementation boundary, and provide input, output, and evidence adapter references. Acceptance produces one content-addressed <code>uah.admitted_operation/v1</code>. That artifact records a semantic decision and still cannot authorize native execution.</p>
+<p><code>DomainLifecycleAdmission</code> is a separate environment-owned gate. It rechecks the active environment activation, environment identity, DomainContractPack revision, and duplicate-operation state before issuing an operation-scoped, attestation-bound <code>uah.execution_lease/v1</code>. The accepted tracer therefore has the following authority order:</p>
+<pre><code class="language-text">CompiledTask + raw typed model output
+  -&gt; TypedProposal
+  -&gt; UAH semantic admission
+  -&gt; AdmittedOperation
+  -&gt; domain lifecycle admission
+  -&gt; ExecutionLease or typed rejection</code></pre>
+<p>All three artifacts reject content tampering. At this checkpoint the slice did not validate arguments against the binding&#x27;s input schema, decrement task budgets, dispatch to an environment owner, persist proposal and admission events in the common ledger, or implement cancellation, concurrency, expiry, and fencing. Section 21 records the subsequent lease-only owner and accepted event chain. Argument-schema validation, runtime budget enforcement, and the remaining lifecycle controls remain open.</p>
+<h2>21. Lease-Only Execution and Common-Ledger Continuation on 2026-09-28</h2>
+<p>The next authority seam is implemented without retaining a direct-dispatch compatibility path. <code>InProcessEnvironmentOwner.execute(...)</code> accepts only an exact <code>ExecutionLease</code>. Before invoking the mounted native handler, it verifies environment and lifecycle ownership, re-resolves the approved binding, compares the complete binding fingerprint, and records <code>execution_started</code> in the common ledger. A repeated attempt is rejected even after constructing a new owner or domain-admission instance over the same ledger.</p>
+<p>Successful execution returns a content-addressed <code>uah.execution_receipt/v1</code> that keeps the native owner result separate from normalized <code>EffectEvidence</code>. The receipt preserves lease, admission, environment, task, trace, operation, binding, and evidence lineage. Native exceptions append <code>execution_failed</code> before propagating. A consumed lease is not retried implicitly; cancellation and reviewed retry authority require a later lifecycle contract.</p>
+<p>The old <code>HarnessTrace</code>, <code>JsonlHarnessTraceStore</code>, <code>TaskLifecycleEvent</code>, and <code>JsonlTaskLifecycleStore</code> were removed rather than layered beneath another store. <code>LifecycleLedger</code> is now the single writable authority. Its <code>uah.trace_event/v1</code> values provide global sequence, causal parent, timestamp, artifact references, strict canonical JSONL reload, optimistic sequence conflict checks, and transition validation. <code>EnvironmentTaskRegistry</code> rebuilds its routing projection from these events.</p>
+<p>The accepted tracer now records:</p>
+<pre><code class="language-text">task_started
+  -&gt; task_compiled
+  -&gt; proposal_normalized
+  -&gt; semantic_admission_accepted
+  -&gt; domain_admission_leased
+  -&gt; execution_started
+  -&gt; execution_completed
+  -&gt; evidence_issued
+  -&gt; effect_obligation_satisfied | effect_obligation_failed/pending
+  -&gt; terminal_task_accepted | terminal_task_accepted_with_deficit</code></pre>
+<p>Strict restart replay derives a content-addressed <code>uah.verified_trace_digest/v1</code> without a model or native handler. The paired best-effort case remains accepted while preserving its deficit. Recorded NAO qualification now uses task-owned <code>TaskEffectRequest</code> values against an injected domain-owned contract pack and the same compiled authority chain; the older <code>required_observables</code> fallback and duplicate planner gate were removed.</p>
+<p>This continuation does not complete the lifecycle grammar. Proposal, semantic-admission, and domain-admission rejection artifacts, evidence rejection, required-effect failure, stale evidence, timeout, cancellation, retry exhaustion, false completion, <code>OperationEdge</code>, cross-process writer locking, and agent/model events remain scheduled H0/H1 work.</p>
+<h2>22. Authority-Hardening Continuation on 2026-09-28</h2>
+<p>The review rejected caller-authored routing and domain-rule provenance. The implemented <code>uah.domain_contract_pack/v1</code> now derives its SHA-256 revision from the exact pack/frame/registry identifiers, role and task allowlists, ingress rules, effect-to-object and evidence-owner rules, failure policies, and prohibited effects. Any covered rule change requires a new revision.</p>
+<p><code>uah.environment_ingress/v1</code> now has a content-derived ingress artifact ID, and <code>uah.task_ingress_decision/v1</code> has a content-derived <code>decision_id</code> that binds that artifact. Identity verification is necessary but not sufficient: <code>TaskSpecCompiler</code> also calls <code>EnvironmentTaskRegistry.require_start(...)</code> and rejects a decision unless the same environment activation, starting ingress, task, and trace are already recorded in the common ledger. The ledger, not a caller-constructed decision, owns task-start authority. The internal start fact records the exact ingress artifact, decision ID, and pack revision; no public raw-lineage registration method can create compilation authority.</p>
+<p><code>uah.trace_event/v1</code> now includes <code>commit_id</code>, <code>commit_index</code>, and <code>commit_size</code>. All events emitted for one lifecycle fact share a commit frame. Strict reload rejects an incomplete, noncontiguous, or interleaved commit, so a newline-terminated crash after only part of a multi-event fact cannot publish partial authority state. The ledger remains single-writer; cross-process coordination is still open.</p>
+<p>Recorded NAO qualification must receive an injected, content-addressed DomainContractPack. It may not synthesize policy from the qualification case. It routes the supplied <code>EnvironmentIngress</code> through the real <code>TaskIngressPolicy</code>, uses the ledger-backed decision for compilation, rejects malformed planner steps without dropping them, and content-hashes the complete raw planner payload. This is a strict recorded qualification of the generic seam, not H2 owner review, live-node, or planner-parity evidence.</p>
+<p>Task budgets remain immutable declarations in <code>CompiledTask</code>. No current runtime decrements wall time, model calls, or tool calls, so documentation and qualification must not describe budget enforcement as implemented.</p>
+<p>Terminal acceptance must account for the complete evidence set already recorded on the trace. Replay rejects both unrecorded evidence and omitted evidence. Receipt replay also compares the admission ID, AB object, binding, and evidence owner with the recorded semantic admission before accepting an execution result. The NAO recorded parser rejects unknown plan or step fields, so dependency, retry, and ordering semantics cannot be silently flattened.</p>
+<h2>23. Seam-Audit Continuation on 2026-09-30</h2>
+<p>The H0/H1 audit found that constructor-time hashing did not protect later trust crossings. Content-addressed ingress, compiled tasks, proposals, admitted operations, and execution leases now reverify their complete nested identity before policy classification, semantic admission, domain admission, ledger recording, receipt issuance, or native dispatch. A post-lease proposal change therefore fails before its handler can run.</p>
+<p>File-backed ledgers now coordinate cooperating processes with an OS advisory lock. A writer locks, reloads and validates the stream, evaluates the proposed transition, appends, and calls <code>fsync</code> before it releases the lock. Two stale ledger instances cannot consume the same lease twice. Strict reload still rejects a crash-truncated multi-event commit; automatic repair is not claimed.</p>
+<p>Resume and notify facts now retain the exact ingress artifact, decision, and DomainContractPack revision. Pre-dispatch suspension is representable without an invented lease. Stale task-registry projections reload before start and existing-task admission. Replay globally fences task-bearing ingress identity and rejects a second start on one trace. Receipt construction failures record <code>execution_failed</code> before they propagate. Registry snapshots reject duplicate object identity, frame projection rejects registry-revision mismatch, and replay rejects unknown event types. Typed counterexample and cancellation grammar remains the next H0/H1 decision.</p>
+<p>The final H0 lifecycle slices and Observatory O1 now proceed in parallel. O1 is a read-only replay projection and static review surface over the common ledger. It cannot append events, issue evidence, repair traces, or promote memory. Each failure family enters O1 only after its restart-replay contract is stable.</p>
+<h2>24. Executable-Seam Continuation on 2026-10-01</h2>
+<p>The public task-ingress authority is implemented. It snapshots primitive DomainContractPack rule values, owns accepted task-bearing ledger writes, and refreshes its read-only task projection before duplicate and terminal checks. State updates and rejected ingress still require an environment-scoped event family before they can claim durable replay.</p>
+<p>Semantic admission now validates canonical arguments through a reviewed, content-addressed portable object-schema subset. The subset covers required fields, top-level JSON types, and additional-property policy. Executable callable validators were removed because a source-revision string did not make captured callable state deterministic. <code>uah.admitted_operation/v2</code> records the validated input-schema identity.</p>
+<p><code>uah.semantic_admission_rejection/v1</code> and <code>uah.domain_admission_rejection/v1</code> are immutable operation-scoped facts. The semantic coordinator appends the returned semantic rejection; the domain lifecycle owner appends its own rejection. Replay exposes either as a nonterminal failure stage. Only explicit task-acceptance authority may make the trace terminal. Repeated requests for an already issued domain lease return the same deterministic lease and do not append a contradictory rejection.</p>
+<p>Initial H1 identity registries now implement content-addressed <code>AgentManifest</code>, one-time <code>AgentHandleRevision</code> registration, and roster-bound <code>AgentRun</code> attachment in <code>attached_standby</code>. The handle registry refuses rebinding because the required fidelity evaluator is H3 work. These registries are in-memory and do not emit lifecycle events, perform preflight, allocate a model, persist run state, or invoke a provider.</p>
+<p>The initial O1 implementation projects validated ledger events into immutable trace views and static searchable HTML. It derives terminal status only from explicit terminal facts, retains operation failure stages, escapes raw payloads, and embeds inert graph JSON. Arbitrary event collections default to <code>synthetic</code>; the <code>recorded</code> label requires a validated <code>LifecycleLedger</code>. The full actor, configuration, provider, comparison, and Workbench views remain open.</p>
+<p>The next ordered seams are <code>OperationEdge</code>, typed normalization and evidence rejection, terminal required-effect counterexample replay, scoped activation events, fixed-instance model leases and preflights, then <code>PromptCompiler</code> and a provider-neutral invocation port.</p>
+<h2>25. Operation, Counterexample, Control, and O1 Continuation on 2026-10-02</h2>
+<p><code>uah.operation_edge/v1</code> is the immutable relationship artifact for <code>decomposes_to</code>, <code>continues_with</code>, and <code>delegates_to</code>. The ledger accepts an edge only when both endpoint operations and their semantic admissions exist, the recorded frames match the edge, the target has no lease, and the edge does not create a duplicate pair, second structural parent, or cycle. Same-frame decomposition and continuation are executable. Cross-frame delegation remains fail-closed until the target has its own compiled projection and artifact contract.</p>
+<p>Proposal normalization owns malformed or noncanonical model output rejection. The environment evidence adapter owns rejection of a valid native result that cannot become accepted evidence. A valid negative owner result is not an evidence rejection. It may reach the task acceptance evaluator, fail a required obligation, emit <code>terminal_task_rejected</code>, and derive a rejected <code>VerifiedTraceDigest</code>. Operation rejection remains nonterminal unless explicit task acceptance closes the trace.</p>
+<p><code>uah.task_spec/v2</code> and <code>uah.compiled_task/v2</code> add <code>retry_attempts</code>. Tool-call budget grants and execution start share one atomic ledger commit. Budget subjects are idempotent and cannot change units. Cancellation is owner-authorized and pre-dispatch only. Timeout decisions derive task start from the recorded ledger and retain the observed time; they do not imply an asynchronous scheduler. Retry decisions validate the failure disposition, compiled limit, ordinal, and fresh target identity. They grant no proposal or execution authority. Model-call accounting has no provider consumer yet.</p>
+<p>O1 remains a read-only projection. Its graph contains lifecycle-event nodes, explicit operation nodes, ledger-parent edges, and only recorded operation relations. Control and rejection events expose failure stages but do not create terminal status. The committed recorded-canary HTML contains one accepted trace, one open semantic rejection, and one terminal required-effect rejection.</p>
+<h2>26. Activation, Fixed Allocation, and O1 Continuation on 2026-10-04</h2>
+<p>This pass implements Decisions 2, 3, 4, 6, and 9. The architecture grill remains closed; fixed-runtime behavior is exercised through the confirmed public registry, lease, readiness, and Observatory seams.</p>
+<p><strong>Question resolved:</strong> Does registration reserve hardware or establish model capability?</p>
+<p><strong>Executable decision:</strong> Role/model registries and <code>RegistrationPreflight</code> check frozen references, declared capability names, context, and provider policy. Registration invokes no provider and reserves no resource. The result records declaration compatibility only.</p>
+<p><strong>Question resolved:</strong> What survives model release and process restart?</p>
+<p><strong>Executable decision:</strong> The common lifecycle ledger records attached agent identity and pins its manifest, handle revision, environment profile, and owner attestation. Exclusive roster checks prevent a second live actor for one environment handle. Fixed allocation, bounded owner startup report, release, standby, and termination replay without inventing task IDs. Termination releases an idle lease and records termination atomically; an outstanding invocation blocks termination. This preserves logical activation continuity; durable conversation/context storage remains unimplemented.</p>
+<p><strong>Question resolved:</strong> How far does hardware awareness extend in H1?</p>
+<p><strong>Executable decision:</strong> <code>FixedModelAllocator</code> accepts one declared instance of the exact model configuration, owner-issued RAM/VRAM/context capacity no older than 30 seconds, and exclusive host/instance occupancy within the common ledger. An active identical request returns the same lease; a released request cannot be reused. Startup evaluates owner evidence for the exact lease, instance, and model, capped at two attempts over ten seconds with 30-second freshness. Failure and release share an atomic commit. The allocator performs no live probe, model loading, eviction, or dynamic scheduling. H3 retains those wider allocation mechanisms.</p>
+<p><strong>Question resolved:</strong> Can O1 inspect agents before tasks exist?</p>
+<p><strong>Executable decision:</strong> Yes. <code>uah.trace_event/v2</code> carries explicit actor scope and <code>agent_run_id</code>; agent facts use null task/trace IDs. O1 keeps environments with actor events visible and indexes real tasks and traces separately. New task-scoped invocation events carry actor identity; earlier v1 task events retain their serialized identity and receive no inferred actor assignment. Static actor cards, hierarchy links, and inert graph data consume one ordered event stream. Observatory writes no authority, and H2 multi-actor parity remains unqualified.</p>
+<p>The next vertical slice now implements <code>PromptCompiler</code>, versioned prompt packs, and the provider-neutral invocation port. The compiler uses the recorded <code>CompiledTask</code>, frozen role, and reviewed argument schemas to produce one direct typed-operation schema and content-addressed prompt. The call port requires an exact ready actor and unexpired lease and atomically appends model-call grant plus invocation start before invoking a fake provider. It retains distinct raw output or typed failure and prevents task judgment while a call is outstanding. Raw finite JSON is untrusted input to proposal normalization and cannot become admission or effect evidence by itself.</p>
+<p>Stale-effect-evidence and false-completion policy remain H0 closure work. Live ZeroTier transport, durable context, and NAO H2 parity remain unqualified. A fake or real provider-connectivity probe does not prove domain admission or execution effects.</p>
+  </main>
+</body>
+</html>

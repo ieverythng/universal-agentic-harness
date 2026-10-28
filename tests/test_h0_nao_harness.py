@@ -3,16 +3,16 @@ from pathlib import Path
 import pytest
 
 from ab_harness import AgentOutput
-from ab_harness import HarnessTrace
+from ab_harness import BindingCatalog
 from ab_harness import InteractionProjector
-from ab_harness import JsonlHarnessTraceStore
 from ab_harness import OutputGate
 from ab_harness import RegistrySnapshot
-from ab_harness.nao_h0 import CHATBOT_ROLE
-from ab_harness.nao_h0 import PLANNER_ROLE
-from ab_harness.nao_h0 import chatbot_output
-from ab_harness.nao_h0 import nao_frame
-from ab_harness.nao_h0 import planner_output
+from ab_harness_nao.contracts import CHATBOT_ROLE
+from ab_harness_nao.contracts import PLANNER_ROLE
+from ab_harness_nao.contracts import chatbot_output
+from ab_harness_nao.contracts import nao_contract_bindings
+from ab_harness_nao.contracts import nao_frame
+from ab_harness_nao.contracts import planner_output
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -114,28 +114,35 @@ def test_unknown_registry_object_fails_projection_closed():
         _module(PLANNER_ROLE, 'invented_skill')
 
 
-def test_h0_trace_round_trip_reconstructs_projection_and_gate(tmp_path):
-    module = _module(PLANNER_ROLE, 'find_object')
-    output = AgentOutput('executable_plan', {}, referenced_objects=('find_object',))
-    decision = OutputGate().evaluate(output, module)
-    trace = HarnessTrace(
-        trace_id='trace_h0_001',
-        task_id=module.task_id,
-        role_id=module.role.role_id,
-        frame_id=module.frame.frame_id,
-        registry_version=module.frame.registry_version,
-        projected_object_ids=tuple(sorted(module.object_ids)),
-        output_type=output.output_type,
-        referenced_objects=output.referenced_objects,
-        gate=decision,
-        evidence_refs=('planner_output:fixture_001',),
-        metadata={'mode': 'parent_repo_h0'},
+def test_latest_nao_contract_seams_preserve_planner_gate_boundary():
+    bindings = nao_contract_bindings(
+        chatbot_revision="a2ecca7c",
+        stack_revision="9da89c0c",
     )
-    store = JsonlHarnessTraceStore(tmp_path / 'h0.jsonl')
+    catalog = BindingCatalog(_registry(), bindings)
+    planner_gate_bindings = catalog.bindings_for(
+        "/nao_orchestrator/planner_request"
+    )
+    planner_request_bindings = catalog.bindings_for("/planner/request")
 
-    store.append(trace)
-    loaded = store.load_all()
-
-    assert loaded == (trace,)
-    assert loaded[0].gate.accepted is True
-    assert 'resolve_target_reference' in loaded[0].projected_object_ids
+    assert [binding.locator for binding in planner_gate_bindings] == [
+        "chatbot_llm.planner_request_adapter:build_planner_request_payload"
+    ]
+    assert len(planner_request_bindings) == 2
+    assert {
+        binding.locator for binding in planner_request_bindings
+    } == {
+        "nao_orchestrator.planner_gate:PlannerGate.decide",
+        "planner_common.contracts:PlannerRequest",
+    }
+    assert all(binding.status == "candidate" for binding in bindings)
+    assert {
+        binding.object_id for binding in bindings
+    } == {
+        "/nao_orchestrator/planner_request",
+        "/planner/request",
+        "/intents",
+        "/planner/execution_feedback",
+        "/planner/dialogue_act",
+        "/scene/summary",
+    }

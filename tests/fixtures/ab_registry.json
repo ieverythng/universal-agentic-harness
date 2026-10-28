@@ -2,6 +2,88 @@
   "schema_version": "standalone-fixture-v1",
   "objects": [
     {
+      "object_id": "/nao_orchestrator/planner_request",
+      "ab_level": 0,
+      "kind": "topic",
+      "category": "planner_gate_ingress",
+      "owner_package": "chatbot_llm",
+      "expected_effects": ["planner request reaches deterministic admission"],
+      "observable_success": [
+        "Intent.intent=planner_request",
+        "Intent.data.goal_id"
+      ],
+      "decomposes_to": [],
+      "metadata": {"runtime_callable": false}
+    },
+    {
+      "object_id": "/planner/request",
+      "ab_level": 0,
+      "kind": "topic",
+      "category": "admitted_planner_ingress",
+      "owner_package": "nao_orchestrator",
+      "expected_effects": ["planner receives a normalized task request"],
+      "observable_success": [
+        "Intent.intent=planner_request",
+        "Intent.data.goal_text"
+      ],
+      "decomposes_to": [],
+      "metadata": {"runtime_callable": false}
+    },
+    {
+      "object_id": "/intents",
+      "ab_level": 0,
+      "kind": "topic",
+      "category": "planner_egress",
+      "owner_package": "planner_llm",
+      "expected_effects": ["orchestrator receives a typed executable-plan candidate"],
+      "observable_success": [
+        "Intent.source=planner_llm",
+        "Intent.data.plan.goal_id",
+        "Intent.data.plan.steps"
+      ],
+      "decomposes_to": [],
+      "metadata": {"runtime_callable": false}
+    },
+    {
+      "object_id": "/planner/execution_feedback",
+      "ab_level": 0,
+      "kind": "topic",
+      "category": "execution_feedback",
+      "owner_package": "nao_orchestrator",
+      "expected_effects": [
+        "planner receives lifecycle-aware execution status"
+      ],
+      "observable_success": ["event_type", "status", "result_payload"],
+      "decomposes_to": [],
+      "metadata": {"runtime_callable": false}
+    },
+    {
+      "object_id": "/planner/dialogue_act",
+      "ab_level": 0,
+      "kind": "topic",
+      "category": "planner_dialogue",
+      "owner_package": "planner_llm",
+      "expected_effects": [
+        "dialogue layer receives planner communication intent"
+      ],
+      "observable_success": ["act", "text_hint", "await_user_response"],
+      "decomposes_to": [],
+      "metadata": {"runtime_callable": false}
+    },
+    {
+      "object_id": "/scene/summary",
+      "ab_level": 0,
+      "kind": "topic",
+      "category": "perception_state",
+      "owner_package": "nao_scene_grounding",
+      "expected_effects": [
+        "latest detector-grounded scene summary is observable"
+      ],
+      "observable_success": ["objects", "people", "timestamp_sec"],
+      "decomposes_to": [],
+      "metadata": {"runtime_callable": false}
+    },
+    {
       "object_id": "resolve_target_reference",
       "ab_level": 0,
       "kind": "effect_primitive",
