@@ -31,12 +31,15 @@ branches/worktrees are removed only after the human confirms merge.
 
 ## Release-label map
 
-The human-selected planning map is migration/development `v0.1`, H0 `v0.2`,
-H1/O1 `v0.3`–`v0.4`, H2 `v0.5`, H3/H4 `v0.6+`, and H5 `v1.0` for the stable
-public contract. These labels are not release qualifications. A merge does not
-close a milestone, and a tag may be created only on the exact human-selected
-committed release after its required gates pass. No tag is created by this
-workflow.
+The human-selected planning map is `v0.1` for the reviewed migration baseline,
+H0 `v0.2`, H1/O1 `v0.3`–`v0.4`, complete Python NAO H2 `v0.5`, native H2.1
+`v0.6`, H3 increments `v0.7` through full Workbench integration at `v1.0`, and
+H4 `v1.5`. H5 and later release numbers remain unassigned; H6 is research only.
+These labels are not release qualifications. A merge does not close a
+milestone, and a tag may be created only on the exact human-selected committed
+release after its required gates pass. No tag is created by this workflow. The
+[PR delivery status](../plans/pr-delivery-status.md) records dated publication
+states separately from this policy.
 
 The repository's [REVIEW.md](../../REVIEW.md) remains the independent-review
 contract. Research proposals, exact reviewed bytes, validation results, staged

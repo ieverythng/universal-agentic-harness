@@ -60,6 +60,44 @@ cross-domain conformance, or release-gate completion. These targets do not
 authorize tags or publication. H0, H1, O1, and H2 remain open until their
 stated acceptance evidence passes.
 
+### Current release status (2026-10-28)
+
+The `v0.1` reviewed migration baseline is the PR1 publication and records
+partial H0/H1 evidence. It closes neither milestone. No `v0.1` tag has been
+created or authorized; the tag remains under human consideration. The
+implementation targets in D-20261017-07 remain as stated above. H6 remains
+research only and receives no release assignment here.
+
+### Current publication state (2026-10-28)
+
+PR1 [merged into `main`](https://github.com/ieverythng/universal-agentic-harness/pull/1)
+on October 28 at merge commit `d9eb84a04099431d774f459792bcd16524ab54ce`
+(tree `f611dfbb9f8b6dfc5cd8800bef8e2fe3879fa3aa`). Its 137-state local review
+baseline received Spec and Standards `APPROVE` verdicts; the published PR1
+commit also includes `uv.lock` and the coordination policy README, outside that
+review manifest. The head-associated hosted CI run reported all three required
+Python jobs passed. Its pull-request workflow checked synthetic merge commit
+`b7ef095c8599db7ee20b432d2ae5a57376a5d966`, whose tree matches the published
+PR1 head; see the [pull-request run](https://github.com/ieverythng/universal-agentic-harness/actions/runs/39704657812).
+The post-merge push run on `d9eb84a04099431d774f459792bcd16524ab54ce` also
+reported success with all three jobs complete
+([main run](https://github.com/ieverythng/universal-agentic-harness/actions/runs/40683070828)).
+The merged commit is the verified `main` base for the current documentation
+candidate. PR2 has not been opened, and this candidate's independent review and
+hosted CI outcomes are not asserted here. These publication states do not
+close H0, H1, O1, or H2. See the [delivery status](pr-delivery-status.md) for
+the review and source identities.
+
+The [Harness2/UniiChat dossier](../artifacts/research/2026-10-20_uah_harness2_uniichat_and_bounded_rsi.md)
+records primary-source observations and unexecuted proposals. Its original
+three-file research unit received final Spec and Standards `APPROVE` verdicts;
+those private receipts do not approve this publication copy or the PR2
+candidate. The [research-to-sprint map](harness_research_to_sprints.md) keeps
+the broader trajectory-learning objective, including the AB/ML-object strand,
+and maps six existing unexecuted comparisons to their owners and gates. The
+Workbench feedback loop remains a Workbench-owned H3 research target; UAH does
+not add a second search engine or relax H3/H4 review and promotion boundaries.
+
 ## 2. Target Contract
 
 ### Required outcome
