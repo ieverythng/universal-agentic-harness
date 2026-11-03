@@ -1,8 +1,10 @@
 # DEV coordination
 
-## Active bounded scope: BASE-QUARANTINE-MAP-02
+## Stopped partial scope: BASE-QUARANTINE-MAP-02
 
-Actual DEV1 start: 2026-11-03 15:00:28 UTC / 16:00:28 Madrid. Hard stop: 2026-11-03 15:45:28 UTC / 16:45:28 Madrid. Audit-only preparation from base `29e52a4f92e0fe89028f970949c926dbccce36d0` against main `d9eb84a04099431d774f459792bcd16524ab54ce`, with exact PR2 history `d9f4ab9` plus unreviewed `uv.lock` commit `d97fadd`. Shared base/source/index remain read-only. ROOT owns any adoption or cleanup. Private evidence directory: `/home/juanbeck/uah-experiments/checkpoint-20261103/dev1/`.
+Actual start: 2026-11-03 15:00:28 UTC / 16:00:28 Madrid. Hard stop: 15:45:28 UTC / 16:45:28 Madrid. Exact stop time not recorded; latest durable path-manifest capture was 2026-11-03T18:40:36.464855+00:00. Shared source and index remain unchanged by DEV1.
+
+Partial handoff: `/home/juanbeck/uah-experiments/checkpoint-20261103/dev1/BASE-QUARANTINE-MAP-02.md`, SHA-256 `52d4f6dee2080fd385f8c762448d3a4a0e09f614e24b089d7643f6da1fe8e290`. Full 781-path state manifest: `/home/juanbeck/uah-experiments/checkpoint-20261103/dev1/source-index-worktree-manifest.json`, SHA-256 `d61ca49206f6cc572e7bc6d50a9c1bed26fdf667aea25c55f750acd9b20e0602`. Root custody freeze and private reconciliation are linked in the report. No tests, probes, implementation, staging, commit, push, or peer dispatch were performed by DEV1. Root owns cleanup.
 
 ## Closed bounded scope: BASE-RESIDUAL-SPRINT-MAP-20261102
 
