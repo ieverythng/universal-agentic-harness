@@ -42,7 +42,35 @@ source suite PASS; eight focused tests PASS; generated docs PASS. Fresh fork-non
 6.1Sol/XHigh Spec and 5.6Sol/XHigh Standards dispatched through collaboration;
 raw request/response and prompt hashes in
 `/home/juanbeck/uah-experiments/pr-migration-20261103/root-viewer-final/review-dispatch.json`.
-No backend identity attestation is claimed. Final verdicts PENDING, no transfer.
+No backend identity attestation is claimed. Final verdicts BOTH CHANGES, no transfer. See current correction state below.
+
+## Current decision boundary: Python requirement, no target transfer
+
+Both exact whole-unit reviewers returned CHANGES on bd5ce22. Spec identified
+mixed semantics for the Open badge; Standards identified a mixed-record no-JS
+count and reproduced uv.lock's Python3.12 regression (base passes, candidate
+>=3.14 rejects). These are explicit presentation/compatibility defects, not new
+kernel edge-case repair. Initial raw reports and immutable tree are preserved.
+Standards requested gpt5.6Sol/XHigh but its initial report header mislabeled6.1;
+receipt-only correction records requested5.6 and unknown serving identity without
+changing findings/verdict. Original and corrected hashes retained. No Astra/Max.
+
+Root prepared a separate private focused UI correction under
+`/home/juanbeck/uah-experiments/pr-migration-20261103/root-viewer-fix/`:
+common Delivery status workflow definitions, independent actual GitHub PR facts,
+generic no-JS record count, regenerated HTML and public regression assertions.
+Eight focused renderer tests, Ruff, doc synchronization and whitespace PASS.
+These corrected bytes are NOT independently approved. No new fix reviewer pair
+or target transfer occurred. Full final hooks/review will follow only after
+human disposition fixes the exact outgoing unit.
+
+ASYNC HUMAN QUESTION PENDING: align uv.lock to the package's existing >=3.10
+support (still admits Python3.14, recommended), or retain >=3.14 for separate
+review. This revises a deliberate human commit, so no lock edit/default is
+assumed from elapsed time. Current target remains clean d97fadd; committed
+uv.lock>=3.14 preserved. Root source patches/archives and CURRENT.json provide
+concrete correction custody. Current prototype may be manually previewed but
+is not a main-ready delivery. Do not restart expired DEV scopes or infer approval.
 
 ## Base reconciliation completed
 
