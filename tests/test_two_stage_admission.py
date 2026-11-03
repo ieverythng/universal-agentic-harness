@@ -1,7 +1,10 @@
 from dataclasses import replace
+from concurrent.futures import ThreadPoolExecutor
 import hashlib
 import inspect
 import json
+from pathlib import Path
+from threading import Event
 
 import pytest
 
@@ -11,6 +14,7 @@ from ab_harness import AbstractionFrame
 from ab_harness import AgentOutput
 from ab_harness import AgentRoleSpec
 from ab_harness import BindingCatalog
+from ab_harness import CompiledTask
 from ab_harness import DomainContractPack
 from ab_harness import DomainEffectRule
 from ab_harness import DomainLifecycleAdmission
@@ -31,6 +35,8 @@ from ab_harness import TaskIngressRule
 from ab_harness import TaskSpec
 from ab_harness import TaskSpecCompiler
 from ab_harness.environment import ExecutionReceipt
+from ab_harness.environment import EXECUTION_RECEIPT_SCHEMA
+from ab_harness.environment import EvidenceRejection
 from ab_harness.environment import InProcessEnvironmentOwner
 from ab_harness.contracts import OwnerExecutionResult
 from ab_harness.acceptance import TaskAcceptanceEvaluator
@@ -48,8 +54,14 @@ from ab_harness.schema_validation import InMemoryArgumentSchemaRegistry
 from ab_harness.schema_validation import ObjectArgumentSchema
 
 
-def _admission_fixture(*, include_best_effort=False, budgets=None):
-    registry = RegistrySnapshot.from_json_file("tests/fixtures/ab_registry.json")
+def _admission_fixture(
+    *,
+    include_best_effort=False,
+    budgets=None,
+    prohibited_effects=("direct_speech",),
+    registry_path="tests/fixtures/ab_registry.json",
+):
+    registry = RegistrySnapshot.from_json_file(registry_path)
     role = AgentRoleSpec(
         role_id="planner",
         allowed_output_types=("executable_plan",),
@@ -167,7 +179,7 @@ def _admission_fixture(*, include_best_effort=False, budgets=None):
                 else ()
             ),
         ),
-        prohibited_effects=("direct_speech",),
+        prohibited_effects=prohibited_effects,
         budgets=budgets
         or TaskBudgets(
             wall_time_seconds=90,
@@ -669,6 +681,43 @@ def test_semantic_admission_rejects_inspection_only_decomposition():
     )
 
 
+def test_semantic_admission_rejects_false_callable_with_matching_obligation(
+    tmp_path,
+):
+    registry_payload = json.loads(
+        Path("tests/fixtures/ab_registry.json").read_text(encoding="utf-8")
+    )
+    for item in registry_payload["objects"]:
+        if item["object_id"] == "find_object":
+            item["metadata"]["runtime_callable"] = False
+    registry_path = tmp_path / "noncallable-registry.json"
+    registry_path.write_text(json.dumps(registry_payload), encoding="utf-8")
+    compiled, catalog, _environment_run = _admission_fixture(
+        registry_path=registry_path
+    )
+
+    decision = _semantic_admission(catalog).admit(compiled, _proposal(compiled))
+
+    assert decision.admitted_operation is None
+    assert decision.reason_codes == ("object_not_runtime_callable",)
+
+
+def test_semantic_admission_eligibility_fails_closed_after_invalid_runtime_mutation():
+    compiled, catalog, _environment_run = _admission_fixture()
+    object_view = compiled.interaction_module.object_for("find_object")
+    assert object_view is not None
+    object.__setattr__(object_view, "runtime_callable", "false")
+    try:
+        reasons = SemanticAdmission.static_object_rejection_reasons(
+            compiled,
+            "find_object",
+        )
+    finally:
+        object.__setattr__(object_view, "runtime_callable", True)
+
+    assert "object_not_runtime_callable" in reasons
+
+
 def test_semantic_rejection_is_a_replayable_typed_fact(tmp_path):
     compiled, catalog, _environment_run = _admission_fixture()
     proposal = _proposal(
@@ -987,17 +1036,1227 @@ def test_environment_owner_executes_only_the_exact_operation_lease():
         receipt.to_dict()
 
 
+def _prepared_execution_lease(*, ledger, compiled, catalog, environment_run, operation_id):
+    _record_task_start(ledger, compiled)
+    ledger.record(compiled)
+    proposal = _proposal(compiled, operation_id=operation_id)
+    ledger.record(proposal)
+    semantic = _semantic_admission(catalog).admit(compiled, proposal)
+    assert semantic.admitted_operation is not None
+    ledger.record(semantic.admitted_operation)
+    decision = DomainLifecycleAdmission(
+        environment_run=environment_run,
+        environment_id="nao_fake",
+        lifecycle_ledger=ledger,
+    ).request_execution(semantic.admitted_operation)
+    assert decision.execution_lease is not None
+    return decision.execution_lease
+
+
+@pytest.mark.parametrize("succeeded", (True, False))
+def test_boolean_execution_receipts_keep_their_outcome_through_restart(
+    succeeded, tmp_path
+):
+    compiled, catalog, environment_run = _admission_fixture()
+    ledger = LifecycleLedger(
+        tmp_path / "lifecycle.jsonl",
+        clock=lambda: "2026-09-28T12:00:00Z",
+    )
+    lease = _prepared_execution_lease(
+        ledger=ledger,
+        compiled=compiled,
+        catalog=catalog,
+        environment_run=environment_run,
+        operation_id="operation:boolean-control:%s" % succeeded,
+    )
+    ledger.start_execution(lease)
+    owner_result = OwnerExecutionResult(
+        evidence_ref="fake-nao://evidence/boolean-control",
+        succeeded=succeeded,
+        observed_effects=("fresh detector-backed result returned",),
+    )
+    evidence = EffectEvidence(
+        evidence_ref=owner_result.evidence_ref,
+        object_id=lease.object_id,
+        binding_id=lease.binding_id,
+        environment_id="nao_fake",
+        owner=lease.admitted_operation.binding_owner,
+        succeeded=succeeded,
+        observed_effects=owner_result.observed_effects,
+    )
+
+    receipt = ExecutionReceipt.issue(
+        lease=lease,
+        owner_result=owner_result,
+        evidence=evidence,
+    )
+    ledger.complete_execution(receipt)
+    acceptance = TaskAcceptanceEvaluator().evaluate(
+        compiled.effect_obligations,
+        (receipt.evidence,),
+    )
+    if succeeded:
+        assert acceptance.status == "accepted"
+    else:
+        assert acceptance.status != "accepted"
+        assert "target_observed" not in acceptance.satisfied_obligation_ids
+    ledger.record(
+        AcceptanceFact(
+            compiled_task=compiled,
+            evidence_set=(receipt.evidence,),
+            acceptance=acceptance,
+        )
+    )
+
+    restarted = LifecycleLedger(tmp_path / "lifecycle.jsonl")
+    replayed = restarted.replay(compiled.trace_id)
+    assert replayed.terminal_status == acceptance.status
+    assert replayed.verified_trace_digest is not None
+
+
+def _rehash_execution_receipt(payload):
+    identity = {
+        key: value for key, value in payload.items() if key != "execution_result_id"
+    }
+    encoded = json.dumps(
+        identity,
+        allow_nan=False,
+        sort_keys=True,
+        separators=(",", ":"),
+    ).encode("utf-8")
+    return "execution-receipt:sha256:%s" % hashlib.sha256(encoded).hexdigest()
+
+
+def _rewrite_ledger_event(path, event_type, field, value):
+    rows = [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines()]
+    renamed = {}
+    for row in rows:
+        old_event_id = row["event_id"]
+        parent_event_id = row["parent_event_id"]
+        if parent_event_id in renamed:
+            row["parent_event_id"] = renamed[parent_event_id]
+        if row["event_type"] == event_type:
+            event_data = json.loads(row["data_json"])
+            event_data[field] = value
+            row["data_json"] = json.dumps(
+                event_data,
+                allow_nan=False,
+                sort_keys=True,
+                separators=(",", ":"),
+            )
+        identity = {key: item for key, item in row.items() if key != "event_id"}
+        encoded = json.dumps(
+            identity,
+            allow_nan=False,
+            sort_keys=True,
+            separators=(",", ":"),
+        ).encode("utf-8")
+        row["event_id"] = "trace-event:sha256:%s" % hashlib.sha256(
+            encoded
+        ).hexdigest()
+        renamed[old_event_id] = row["event_id"]
+    path.write_text(
+        "".join(json.dumps(row, sort_keys=True, separators=(",", ":")) + "\n" for row in rows),
+        encoding="utf-8",
+    )
+
+
+@pytest.mark.parametrize(
+    ("malformed_shape", "owner_changes", "evidence_changes"),
+    (
+        (
+            "evidence_ref",
+            {"evidence_ref": 1},
+            {"evidence_ref": 1},
+        ),
+        (
+            "observed_effects_member",
+            {"observed_effects": ("effect", 1)},
+            {"observed_effects": ("effect", 1)},
+        ),
+        (
+            "observed_effects_container",
+            {"observed_effects": ["effect"]},
+            {"observed_effects": ["effect"]},
+        ),
+        (
+            "payload_container",
+            {"payload": []},
+            {"payload": []},
+        ),
+        (
+            "nested_tuple",
+            {"payload": {"nested": ("x",)}},
+            {"payload": {"nested": ("x",)}},
+        ),
+        (
+            "mapping_key_alias",
+            {"payload": {1: "x"}},
+            {"payload": {"1": "x"}},
+        ),
+    ),
+)
+def test_execution_receipt_issue_rejects_malformed_json_wire_shapes(
+    malformed_shape, owner_changes, evidence_changes
+):
+    compiled, catalog, environment_run = _admission_fixture()
+    ledger = LifecycleLedger(clock=lambda: "2026-10-21T00:00:00Z")
+    lease = _prepared_execution_lease(
+        ledger=ledger,
+        compiled=compiled,
+        catalog=catalog,
+        environment_run=environment_run,
+        operation_id="operation:malformed-wire:%s" % malformed_shape,
+    )
+    owner_result = OwnerExecutionResult(
+        evidence_ref="fake-nao://evidence/malformed-wire",
+        succeeded=False,
+        observed_effects=("effect",),
+        payload={"nested": [None, True, 1, 1.5, "x"]},
+    )
+    evidence = EffectEvidence(
+        evidence_ref=owner_result.evidence_ref,
+        object_id=lease.object_id,
+        binding_id=lease.binding_id,
+        environment_id="nao_fake",
+        owner=lease.admitted_operation.binding_owner,
+        succeeded=False,
+        observed_effects=owner_result.observed_effects,
+        payload=owner_result.payload,
+    )
+
+    with pytest.raises(ValueError):
+        ExecutionReceipt.issue(
+            lease=lease,
+            owner_result=replace(owner_result, **owner_changes),
+            evidence=replace(evidence, **evidence_changes),
+        )
+
+
+def test_execution_receipt_round_trips_exact_nested_json_and_false_outcome():
+    compiled, catalog, environment_run = _admission_fixture()
+    ledger = LifecycleLedger(clock=lambda: "2026-10-21T00:00:00Z")
+    lease = _prepared_execution_lease(
+        ledger=ledger,
+        compiled=compiled,
+        catalog=catalog,
+        environment_run=environment_run,
+        operation_id="operation:valid-json-roundtrip",
+    )
+    owner_result = OwnerExecutionResult(
+        evidence_ref="fake-nao://evidence/valid-json-roundtrip",
+        succeeded=False,
+        observed_effects=("effect was not observed",),
+        payload={"nested": [None, True, 1, 1.5, "x", {"empty": []}]},
+    )
+    evidence = EffectEvidence(
+        evidence_ref=owner_result.evidence_ref,
+        object_id=lease.object_id,
+        binding_id=lease.binding_id,
+        environment_id="nao_fake",
+        owner=lease.admitted_operation.binding_owner,
+        succeeded=False,
+        observed_effects=owner_result.observed_effects,
+        payload=owner_result.payload,
+    )
+
+    receipt = ExecutionReceipt.issue(
+        lease=lease,
+        owner_result=owner_result,
+        evidence=evidence,
+    )
+    wire = json.loads(json.dumps(receipt.to_dict(), allow_nan=False))
+    restored = ExecutionReceipt.from_dict(wire)
+
+    assert restored == receipt
+    assert restored.owner_result.succeeded is False
+    assert restored.owner_result.payload == owner_result.payload
+
+
+def test_execution_receipt_from_dict_rejects_non_json_nested_payload():
+    compiled, catalog, environment_run = _admission_fixture()
+    ledger = LifecycleLedger(clock=lambda: "2026-10-21T00:00:00Z")
+    lease = _prepared_execution_lease(
+        ledger=ledger,
+        compiled=compiled,
+        catalog=catalog,
+        environment_run=environment_run,
+        operation_id="operation:from-dict-non-json-payload",
+    )
+    owner_result = OwnerExecutionResult(
+        evidence_ref="fake-nao://evidence/from-dict-non-json-payload",
+        succeeded=True,
+        observed_effects=("effect",),
+    )
+    evidence = EffectEvidence(
+        evidence_ref=owner_result.evidence_ref,
+        object_id=lease.object_id,
+        binding_id=lease.binding_id,
+        environment_id="nao_fake",
+        owner=lease.admitted_operation.binding_owner,
+        succeeded=True,
+        observed_effects=owner_result.observed_effects,
+    )
+    payload = ExecutionReceipt.issue(
+        lease=lease,
+        owner_result=owner_result,
+        evidence=evidence,
+    ).to_dict()
+    payload["owner_result"]["payload"] = {"nested": ("tuple is not JSON",)}
+    payload["execution_result_id"] = _rehash_execution_receipt(payload)
+
+    with pytest.raises(ValueError, match="must contain JSON values"):
+        ExecutionReceipt.from_dict(payload)
+
+
+def test_execution_completion_rejects_non_json_payload_without_ledger_write(
+    tmp_path,
+):
+    compiled, catalog, environment_run = _admission_fixture()
+    ledger_path = tmp_path / "completion-non-json-payload.jsonl"
+    ledger = LifecycleLedger(
+        ledger_path,
+        clock=lambda: "2026-10-21T00:00:00Z",
+    )
+    lease = _prepared_execution_lease(
+        ledger=ledger,
+        compiled=compiled,
+        catalog=catalog,
+        environment_run=environment_run,
+        operation_id="operation:completion-non-json-payload",
+    )
+    ledger.start_execution(lease)
+    owner_result = OwnerExecutionResult(
+        evidence_ref="fake-nao://evidence/completion-non-json-payload",
+        succeeded=True,
+        observed_effects=("effect",),
+    )
+    evidence = EffectEvidence(
+        evidence_ref=owner_result.evidence_ref,
+        object_id=lease.object_id,
+        binding_id=lease.binding_id,
+        environment_id="nao_fake",
+        owner=lease.admitted_operation.binding_owner,
+        succeeded=True,
+        observed_effects=owner_result.observed_effects,
+    )
+    receipt = ExecutionReceipt.issue(
+        lease=lease,
+        owner_result=owner_result,
+        evidence=evidence,
+    )
+    forged_payload = receipt.to_dict()
+    forged_payload["owner_result"]["payload"] = {"nested": {1: "alias"}}
+    forged_payload["evidence"]["payload"] = {"nested": {"1": "alias"}}
+    forged_payload["execution_result_id"] = _rehash_execution_receipt(forged_payload)
+    object.__setattr__(receipt.owner_result, "payload", {"nested": {1: "alias"}})
+    object.__setattr__(receipt.evidence, "payload", {"nested": {"1": "alias"}})
+    object.__setattr__(
+        receipt,
+        "execution_result_id",
+        forged_payload["execution_result_id"],
+    )
+    events_before = ledger.events()
+
+    with pytest.raises(ValueError, match="mapping keys must be strings"):
+        ledger.complete_execution(receipt)
+
+    assert ledger.events() == events_before
+
+
+def test_execution_completion_uses_detached_receipt_verification(tmp_path):
+    compiled, catalog, environment_run = _admission_fixture()
+    ledger = LifecycleLedger(
+        tmp_path / "completion-overridden-receipt.jsonl",
+        clock=lambda: "2026-10-21T00:00:00Z",
+    )
+    lease = _prepared_execution_lease(
+        ledger=ledger,
+        compiled=compiled,
+        catalog=catalog,
+        environment_run=environment_run,
+        operation_id="operation:overridden-receipt-verifier",
+    )
+    ledger.start_execution(lease)
+    owner_result = OwnerExecutionResult(
+        evidence_ref="fake-nao://evidence/overridden-receipt-verifier",
+        succeeded=True,
+        observed_effects=("fresh detector-backed result returned",),
+        payload={"value": True},
+    )
+    receipt = ExecutionReceipt.issue(
+        lease=lease,
+        owner_result=owner_result,
+        evidence=EffectEvidence(
+            evidence_ref=owner_result.evidence_ref,
+            object_id=lease.object_id,
+            binding_id=lease.binding_id,
+            environment_id="nao_fake",
+            owner=lease.admitted_operation.binding_owner,
+            succeeded=True,
+            observed_effects=owner_result.observed_effects,
+            payload=owner_result.payload,
+        ),
+    )
+    object.__setattr__(
+        receipt.owner_result,
+        "payload",
+        {"nested": ("not a JSON wire value",)},
+    )
+    object.__setattr__(receipt, "verify_identity", lambda: None)
+    object.__setattr__(receipt, "_identity_payload", lambda: {})
+    events_before = ledger.events()
+
+    with pytest.raises(ValueError):
+        ledger.complete_execution(receipt)
+
+    assert ledger.events() == events_before
+
+
+@pytest.mark.parametrize("nested_artifact", ("owner_result", "evidence"))
+def test_execution_completion_rejects_nested_artifact_overrides(
+    nested_artifact, tmp_path
+):
+    compiled, catalog, environment_run = _admission_fixture()
+    ledger = LifecycleLedger(
+        tmp_path / ("completion-nested-override-%s.jsonl" % nested_artifact),
+        clock=lambda: "2026-10-21T00:00:00Z",
+    )
+    lease = _prepared_execution_lease(
+        ledger=ledger,
+        compiled=compiled,
+        catalog=catalog,
+        environment_run=environment_run,
+        operation_id="operation:nested-override:%s" % nested_artifact,
+    )
+    ledger.start_execution(lease)
+    owner_result = OwnerExecutionResult(
+        evidence_ref="fake-nao://evidence/nested-override",
+        succeeded=True,
+        observed_effects=("fresh detector-backed result returned",),
+        payload={"value": True},
+    )
+    evidence = EffectEvidence(
+        evidence_ref=owner_result.evidence_ref,
+        object_id=lease.object_id,
+        binding_id=lease.binding_id,
+        environment_id="nao_fake",
+        owner=lease.admitted_operation.binding_owner,
+        succeeded=True,
+        observed_effects=owner_result.observed_effects,
+        payload=owner_result.payload,
+    )
+    receipt = ExecutionReceipt.issue(
+        lease=lease,
+        owner_result=owner_result,
+        evidence=evidence,
+    )
+
+    if nested_artifact == "owner_result":
+
+        class OverriddenOwnerResult(OwnerExecutionResult):
+            def __getattribute__(self, name):
+                if name == "payload":
+                    return {"value": True}
+                return super().__getattribute__(name)
+
+        nested = OverriddenOwnerResult(
+            evidence_ref=owner_result.evidence_ref,
+            succeeded=True,
+            observed_effects=owner_result.observed_effects,
+            payload={"nested": ("not JSON",)},
+        )
+    else:
+
+        class OverriddenEvidence(EffectEvidence):
+            def __getattribute__(self, name):
+                if name == "payload":
+                    return {"value": True}
+                return super().__getattribute__(name)
+
+        nested = OverriddenEvidence(
+            evidence_ref=evidence.evidence_ref,
+            object_id=evidence.object_id,
+            binding_id=evidence.binding_id,
+            environment_id=evidence.environment_id,
+            owner=evidence.owner,
+            succeeded=True,
+            observed_effects=evidence.observed_effects,
+            payload={"nested": ("not JSON",)},
+        )
+
+    object.__setattr__(receipt, nested_artifact, nested)
+    object.__setattr__(receipt, "verify_identity", lambda: None)
+    events_before = ledger.events()
+
+    with pytest.raises(ValueError):
+        ledger.complete_execution(receipt)
+
+    assert ledger.events() == events_before
+
+
+def test_execution_completion_rejects_receipt_subclass_verifier_override():
+    compiled, catalog, environment_run = _admission_fixture()
+    ledger = LifecycleLedger(clock=lambda: "2026-10-21T00:00:00Z")
+    lease = _prepared_execution_lease(
+        ledger=ledger,
+        compiled=compiled,
+        catalog=catalog,
+        environment_run=environment_run,
+        operation_id="operation:receipt-subclass-verifier",
+    )
+    ledger.start_execution(lease)
+    owner_result = OwnerExecutionResult(
+        evidence_ref="fake-nao://evidence/receipt-subclass-verifier",
+        succeeded=True,
+        observed_effects=("fresh detector-backed result returned",),
+    )
+    valid = ExecutionReceipt.issue(
+        lease=lease,
+        owner_result=owner_result,
+        evidence=EffectEvidence(
+            evidence_ref=owner_result.evidence_ref,
+            object_id=lease.object_id,
+            binding_id=lease.binding_id,
+            environment_id="nao_fake",
+            owner=lease.admitted_operation.binding_owner,
+            succeeded=True,
+            observed_effects=owner_result.observed_effects,
+        ),
+    )
+
+    class OverriddenReceipt(ExecutionReceipt):
+        def verify_identity(self):
+            return None
+
+    forged = OverriddenReceipt(
+        execution_result_id=valid.execution_result_id,
+        execution_lease_id=valid.execution_lease_id,
+        admission_id=valid.admission_id,
+        environment_run_id=valid.environment_run_id,
+        task_id=valid.task_id,
+        trace_id=valid.trace_id,
+        operation_id=valid.operation_id,
+        owner_result=valid.owner_result,
+        evidence=valid.evidence,
+        schema_version=valid.schema_version,
+    )
+    events_before = ledger.events()
+
+    with pytest.raises(ValueError, match="concrete receipt type"):
+        ledger.complete_execution(forged)
+
+    assert ledger.events() == events_before
+
+
+@pytest.mark.parametrize(
+    ("event_type", "field", "malformed"),
+    (
+        ("execution_completed", "execution_result_id", 1),
+        ("evidence_issued", "evidence_artifact_id", 1),
+        ("evidence_issued", "native_evidence_ref", 1),
+        ("evidence_issued", "observed_effects", ["effect", 1]),
+        ("evidence_rejected", "native_evidence_ref", 1),
+        ("evidence_rejected", "reason_codes", [1]),
+    ),
+)
+def test_receipt_replay_rejects_malformed_wire_evidence_fields(
+    tmp_path, event_type, field, malformed
+):
+    compiled, catalog, environment_run = _admission_fixture()
+    ledger_path = tmp_path / "malformed-receipt-replay.jsonl"
+    ledger = LifecycleLedger(
+        ledger_path,
+        clock=lambda: "2026-10-21T00:00:00Z",
+    )
+    lease = _prepared_execution_lease(
+        ledger=ledger,
+        compiled=compiled,
+        catalog=catalog,
+        environment_run=environment_run,
+        operation_id="operation:malformed-replay:%s:%s" % (event_type, field),
+    )
+    ledger.start_execution(lease)
+    owner_result = OwnerExecutionResult(
+        evidence_ref="fake-nao://evidence/malformed-replay",
+        succeeded=True,
+        observed_effects=("effect",),
+    )
+    evidence = EffectEvidence(
+        evidence_ref=owner_result.evidence_ref,
+        object_id=lease.object_id,
+        binding_id=lease.binding_id,
+        environment_id="nao_fake",
+        owner=lease.admitted_operation.binding_owner,
+        succeeded=True,
+        observed_effects=owner_result.observed_effects,
+    )
+    if event_type == "evidence_rejected":
+        ledger.record(
+            EvidenceRejection.issue(
+                lease=lease,
+                owner_result=owner_result,
+                reason_codes=("invalid_evidence",),
+            )
+        )
+    else:
+        ledger.complete_execution(
+            ExecutionReceipt.issue(
+                lease=lease,
+                owner_result=owner_result,
+                evidence=evidence,
+            )
+        )
+    _rewrite_ledger_event(ledger_path, event_type, field, malformed)
+
+    with pytest.raises(ValueError):
+        LifecycleLedger(ledger_path).replay(compiled.trace_id)
+
+
+def test_receipt_consistency_holds_through_construction_completion_and_restart(
+    tmp_path,
+):
+    compiled, catalog, environment_run = _admission_fixture()
+    ledger_path = tmp_path / "receipt-consistency.jsonl"
+    ledger = LifecycleLedger(
+        ledger_path,
+        clock=lambda: "2026-10-20T00:00:00Z",
+    )
+    lease = _prepared_execution_lease(
+        ledger=ledger,
+        compiled=compiled,
+        catalog=catalog,
+        environment_run=environment_run,
+        operation_id="operation:receipt-consistency",
+    )
+    ledger.start_execution(lease)
+    owner_result = OwnerExecutionResult(
+        evidence_ref="fake-nao://evidence/receipt-consistency",
+        succeeded=True,
+        observed_effects=("fresh detector-backed result returned",),
+    )
+    evidence = EffectEvidence(
+        evidence_ref=owner_result.evidence_ref,
+        object_id=lease.object_id,
+        binding_id=lease.binding_id,
+        environment_id="nao_fake",
+        owner=lease.admitted_operation.binding_owner,
+        succeeded=True,
+        observed_effects=owner_result.observed_effects,
+    )
+    receipt = ExecutionReceipt.issue(
+        lease=lease,
+        owner_result=owner_result,
+        evidence=evidence,
+    )
+    mismatched = receipt.to_dict()
+    mismatched["owner_result"]["succeeded"] = False
+    mismatched["execution_result_id"] = _rehash_execution_receipt(mismatched)
+    inconsistent_owner_result = replace(owner_result, succeeded=False)
+
+    with pytest.raises(ValueError, match="does not match owner result"):
+        ExecutionReceipt.from_dict(mismatched)
+    with pytest.raises(ValueError, match="does not match owner result"):
+        replace(
+            receipt,
+            execution_result_id=mismatched["execution_result_id"],
+            owner_result=inconsistent_owner_result,
+        )
+
+    events_before_completion = ledger.events()
+    object.__setattr__(receipt.owner_result, "succeeded", False)
+    object.__setattr__(
+        receipt,
+        "execution_result_id",
+        mismatched["execution_result_id"],
+    )
+    with pytest.raises(ValueError, match="does not match owner result"):
+        ledger.complete_execution(receipt)
+    assert ledger.events() == events_before_completion
+
+    restarted = LifecycleLedger(ledger_path)
+    assert restarted.replay(compiled.trace_id).terminal_status is None
+
+
+def test_receipt_projection_is_replay_verifiable_after_event_rehash(tmp_path):
+    compiled, catalog, environment_run = _admission_fixture()
+    ledger_path = tmp_path / "receipt-projection.jsonl"
+    ledger = LifecycleLedger(
+        ledger_path,
+        clock=lambda: "2026-10-20T00:00:00Z",
+    )
+    lease = _prepared_execution_lease(
+        ledger=ledger,
+        compiled=compiled,
+        catalog=catalog,
+        environment_run=environment_run,
+        operation_id="operation:receipt-projection",
+    )
+    ledger.start_execution(lease)
+    owner_result = OwnerExecutionResult(
+        evidence_ref="fake-nao://evidence/receipt-projection",
+        succeeded=True,
+        observed_effects=("fresh detector-backed result returned",),
+        payload={"value": "native"},
+    )
+    evidence = EffectEvidence(
+        evidence_ref=owner_result.evidence_ref,
+        object_id=lease.object_id,
+        binding_id=lease.binding_id,
+        environment_id="nao_fake",
+        owner=lease.admitted_operation.binding_owner,
+        succeeded=owner_result.succeeded,
+        observed_effects=owner_result.observed_effects,
+        payload=owner_result.payload,
+    )
+    receipt = ExecutionReceipt.issue(
+        lease=lease,
+        owner_result=owner_result,
+        evidence=evidence,
+    )
+    ledger.complete_execution(receipt)
+
+    completed = next(
+        event for event in ledger.events() if event.event_type == "execution_completed"
+    )
+    issued = next(
+        event for event in ledger.events() if event.event_type == "evidence_issued"
+    )
+    assert completed.data["receipt_projection_version"] == EXECUTION_RECEIPT_SCHEMA
+    assert completed.data["execution_receipt"] == receipt.to_dict()
+    assert issued.data["receipt_projection_version"] == EXECUTION_RECEIPT_SCHEMA
+    LifecycleLedger(ledger_path).replay(compiled.trace_id)
+
+    original_ledger = ledger_path.read_bytes()
+    _rewrite_ledger_event(
+        ledger_path,
+        "evidence_issued",
+        "native_evidence_ref",
+        "fake-nao://evidence/forged-after-rehash",
+    )
+    with pytest.raises(ValueError, match="receipt projection|native evidence"):
+        LifecycleLedger(ledger_path).replay(compiled.trace_id)
+
+    for event_type, field in (
+        ("execution_completed", "execution_receipt"),
+        ("evidence_issued", "receipt_projection_version"),
+    ):
+        ledger_path.write_bytes(original_ledger)
+        _rewrite_ledger_event(ledger_path, event_type, field, None)
+        with pytest.raises(ValueError, match="receipt projection"):
+            LifecycleLedger(ledger_path).replay(compiled.trace_id)
+
+
+@pytest.mark.parametrize(
+    ("native_value", "normalized_value"),
+    ((False, 0), (True, 1), (1, 1.0)),
+)
+def test_receipt_requires_type_exact_json_agreement_through_issue_and_replay(
+    native_value, normalized_value, tmp_path
+):
+    compiled, catalog, environment_run = _admission_fixture()
+    ledger_path = tmp_path / "typed-json-receipt.jsonl"
+    ledger = LifecycleLedger(
+        ledger_path,
+        clock=lambda: "2026-10-20T00:00:00Z",
+    )
+    lease = _prepared_execution_lease(
+        ledger=ledger,
+        compiled=compiled,
+        catalog=catalog,
+        environment_run=environment_run,
+        operation_id="operation:typed-json-receipt:%s"
+        % type(native_value).__name__,
+    )
+    ledger.start_execution(lease)
+    owner_result = OwnerExecutionResult(
+        evidence_ref="fake-nao://evidence/typed-json-receipt",
+        succeeded=True,
+        observed_effects=(),
+        payload={"nested": {"value": native_value}},
+    )
+    evidence = EffectEvidence(
+        evidence_ref=owner_result.evidence_ref,
+        object_id=lease.object_id,
+        binding_id=lease.binding_id,
+        environment_id="nao_fake",
+        owner=lease.admitted_operation.binding_owner,
+        succeeded=True,
+        observed_effects=(),
+        payload={"nested": {"value": normalized_value}},
+    )
+
+    with pytest.raises(ValueError, match="does not match (?:lease and )?owner result"):
+        ExecutionReceipt.issue(
+            lease=lease,
+            owner_result=owner_result,
+            evidence=evidence,
+        )
+    assert not any(
+        event.event_type in {"execution_completed", "evidence_issued"}
+        for event in ledger.events()
+    )
+
+    valid_owner_result = replace(owner_result, payload=evidence.payload)
+    valid_receipt = ExecutionReceipt.issue(
+        lease=lease,
+        owner_result=valid_owner_result,
+        evidence=evidence,
+    )
+    forged_payload = valid_receipt.to_dict()
+    forged_payload["owner_result"]["payload"] = owner_result.payload
+    forged_payload["execution_result_id"] = _rehash_execution_receipt(forged_payload)
+    with pytest.raises(ValueError, match="does not match (?:lease and )?owner result"):
+        ExecutionReceipt.from_dict(forged_payload)
+    with pytest.raises(ValueError, match="does not match (?:lease and )?owner result"):
+        replace(
+            valid_receipt,
+            owner_result=owner_result,
+            execution_result_id=forged_payload["execution_result_id"],
+        )
+
+    object.__setattr__(valid_receipt, "owner_result", owner_result)
+    object.__setattr__(
+        valid_receipt,
+        "execution_result_id",
+        forged_payload["execution_result_id"],
+    )
+    with pytest.raises(ValueError, match="does not match (?:lease and )?owner result"):
+        ledger.complete_execution(valid_receipt)
+    assert not any(
+        event.event_type in {"execution_completed", "evidence_issued"}
+        for event in ledger.events()
+    )
+    assert LifecycleLedger(ledger_path).replay(compiled.trace_id).terminal_status is None
+
+
+@pytest.mark.parametrize(
+    ("native_value", "normalized_value"),
+    ((False, 0), (True, 1), (1, 1.0)),
+)
+def test_receipt_issue_requires_type_exact_observed_effects(
+    native_value, normalized_value
+):
+    compiled, catalog, environment_run = _admission_fixture()
+    ledger = LifecycleLedger(clock=lambda: "2026-10-20T00:00:00Z")
+    lease = _prepared_execution_lease(
+        ledger=ledger,
+        compiled=compiled,
+        catalog=catalog,
+        environment_run=environment_run,
+        operation_id="operation:typed-effects:%s" % type(native_value).__name__,
+    )
+    ledger.start_execution(lease)
+    owner_result = OwnerExecutionResult(
+        evidence_ref="fake-nao://evidence/typed-effects",
+        succeeded=True,
+        observed_effects=(native_value,),
+    )
+    evidence = EffectEvidence(
+        evidence_ref=owner_result.evidence_ref,
+        object_id=lease.object_id,
+        binding_id=lease.binding_id,
+        environment_id="nao_fake",
+        owner=lease.admitted_operation.binding_owner,
+        succeeded=True,
+        observed_effects=(normalized_value,),
+    )
+
+    with pytest.raises(
+        ValueError,
+        match=(
+            "execution receipt effects must be tuples of strings|"
+            "does not match (?:lease and )?owner result"
+        ),
+    ):
+        ExecutionReceipt.issue(
+            lease=lease,
+            owner_result=owner_result,
+            evidence=evidence,
+        )
+
+
+@pytest.mark.parametrize("malformed", ("false", "true", 0, 1, None))
+def test_execution_receipt_issue_rejects_non_boolean_success_before_evidence(
+    malformed,
+):
+    compiled, catalog, environment_run = _admission_fixture()
+    ledger = LifecycleLedger(clock=lambda: "2026-09-28T12:00:00Z")
+    lease = _prepared_execution_lease(
+        ledger=ledger,
+        compiled=compiled,
+        catalog=catalog,
+        environment_run=environment_run,
+        operation_id="operation:malformed-success:%s" % type(malformed).__name__,
+    )
+    ledger.start_execution(lease)
+    owner_result = OwnerExecutionResult(
+        evidence_ref="fake-nao://evidence/malformed-success",
+        succeeded=malformed,
+        observed_effects=("fresh detector-backed result returned",),
+    )
+    evidence = EffectEvidence(
+        evidence_ref=owner_result.evidence_ref,
+        object_id=lease.object_id,
+        binding_id=lease.binding_id,
+        environment_id="nao_fake",
+        owner=lease.admitted_operation.binding_owner,
+        succeeded=malformed,
+        observed_effects=owner_result.observed_effects,
+    )
+
+    with pytest.raises(ValueError, match="success values must be booleans"):
+        ExecutionReceipt.issue(
+            lease=lease,
+            owner_result=owner_result,
+            evidence=evidence,
+        )
+
+    event_types = tuple(event.event_type for event in ledger.events())
+    assert "execution_completed" not in event_types
+    assert "evidence_issued" not in event_types
+
+
+def _replace_ledger_event_success(path, event_type, malformed):
+    rows = [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines()]
+    parent_event_id = None
+    for row in rows:
+        if row["event_type"] == event_type:
+            data = json.loads(row["data_json"])
+            data["succeeded"] = malformed
+            row["data_json"] = json.dumps(
+                data, allow_nan=False, sort_keys=True, separators=(",", ":")
+            )
+        row["parent_event_id"] = parent_event_id
+        identity = {key: value for key, value in row.items() if key != "event_id"}
+        row["event_id"] = "trace-event:sha256:%s" % hashlib.sha256(
+            json.dumps(
+                identity, allow_nan=False, sort_keys=True, separators=(",", ":")
+            ).encode("utf-8")
+        ).hexdigest()
+        parent_event_id = row["event_id"]
+    path.write_text(
+        "".join(
+            json.dumps(row, allow_nan=False, sort_keys=True, separators=(",", ":"))
+            + "\n"
+            for row in rows
+        ),
+        encoding="utf-8",
+    )
+
+
+def _replace_ledger_event_success_values(path, replacements):
+    rows = [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines()]
+    parent_event_id = None
+    for row in rows:
+        if row["event_type"] in replacements:
+            data = json.loads(row["data_json"])
+            data["succeeded"] = replacements[row["event_type"]]
+            row["data_json"] = json.dumps(
+                data, allow_nan=False, sort_keys=True, separators=(",", ":")
+            )
+        row["parent_event_id"] = parent_event_id
+        identity = {key: value for key, value in row.items() if key != "event_id"}
+        row["event_id"] = "trace-event:sha256:%s" % hashlib.sha256(
+            json.dumps(
+                identity, allow_nan=False, sort_keys=True, separators=(",", ":")
+            ).encode("utf-8")
+        ).hexdigest()
+        parent_event_id = row["event_id"]
+    path.write_text(
+        "".join(
+            json.dumps(row, allow_nan=False, sort_keys=True, separators=(",", ":"))
+            + "\n"
+            for row in rows
+        ),
+        encoding="utf-8",
+    )
+
+
+@pytest.mark.parametrize("event_type", ("execution_completed", "evidence_issued"))
+def test_lifecycle_reload_rejects_non_boolean_execution_success(event_type, tmp_path):
+    compiled, catalog, environment_run = _admission_fixture()
+    ledger_path = tmp_path / "lifecycle.jsonl"
+    ledger = LifecycleLedger(
+        ledger_path,
+        clock=lambda: "2026-09-28T12:00:00Z",
+    )
+    _record_successful_operation(
+        compiled=compiled,
+        catalog=catalog,
+        environment_run=environment_run,
+        ledger=ledger,
+        operation_id="operation:reload-bool-check",
+        evidence_ref="fake-nao://evidence/reload-bool-check",
+    )
+
+    _replace_ledger_event_success(ledger_path, event_type, "false")
+
+    with pytest.raises(ValueError, match="success values must be booleans"):
+        LifecycleLedger(ledger_path)
+
+
+def test_lifecycle_reload_rejects_owner_evidence_success_disagreement(tmp_path):
+    compiled, catalog, environment_run = _admission_fixture()
+    ledger_path = tmp_path / "receipt-outcome-mismatch.jsonl"
+    ledger = LifecycleLedger(
+        ledger_path,
+        clock=lambda: "2026-10-20T00:00:00Z",
+    )
+    _lease, receipt = _record_successful_operation(
+        compiled=compiled,
+        catalog=catalog,
+        environment_run=environment_run,
+        ledger=ledger,
+        operation_id="operation:receipt-outcome-mismatch",
+        evidence_ref="fake-nao://evidence/receipt-outcome-mismatch",
+    )
+    acceptance = TaskAcceptanceEvaluator().evaluate(
+        compiled.effect_obligations,
+        (receipt.evidence,),
+    )
+    ledger.record(
+        AcceptanceFact(
+            compiled_task=compiled,
+            evidence_set=(receipt.evidence,),
+            acceptance=acceptance,
+        )
+    )
+    assert acceptance.status == "accepted"
+
+    _replace_ledger_event_success_values(
+        ledger_path,
+        {"execution_completed": False, "evidence_issued": True},
+    )
+
+    with pytest.raises(ValueError, match="does not match execution result"):
+        LifecycleLedger(ledger_path)
+
+
+@pytest.mark.parametrize("malformed", ("false", "true", 0, 1, None))
+def test_evidence_rejection_issue_rejects_non_boolean_success(malformed):
+    compiled, catalog, environment_run = _admission_fixture()
+    ledger = LifecycleLedger(clock=lambda: "2026-10-20T00:00:00Z")
+    lease = _prepared_execution_lease(
+        ledger=ledger,
+        compiled=compiled,
+        catalog=catalog,
+        environment_run=environment_run,
+        operation_id="operation:evidence-rejection-non-bool:%s"
+        % type(malformed).__name__,
+    )
+    owner_result = OwnerExecutionResult(
+        evidence_ref="fake-nao://evidence/rejected-non-bool",
+        succeeded=malformed,
+        observed_effects=(),
+    )
+
+    with pytest.raises(ValueError, match="success values must be booleans"):
+        EvidenceRejection.issue(
+            lease=lease,
+            owner_result=owner_result,
+            reason_codes=("invalid_evidence",),
+        )
+
+
+def test_evidence_rejection_keeps_literal_false_and_rejects_mutated_value():
+    compiled, catalog, environment_run = _admission_fixture()
+    lease = _prepared_execution_lease(
+        ledger=LifecycleLedger(clock=lambda: "2026-10-20T00:00:00Z"),
+        compiled=compiled,
+        catalog=catalog,
+        environment_run=environment_run,
+        operation_id="operation:evidence-rejection-false-control",
+    )
+    owner_result = OwnerExecutionResult(
+        evidence_ref="fake-nao://evidence/false-result",
+        succeeded=False,
+        observed_effects=(),
+    )
+    rejection = EvidenceRejection.issue(
+        lease=lease,
+        owner_result=owner_result,
+        reason_codes=("owner_reported_failure",),
+    )
+
+    assert rejection.owner_result.succeeded is False
+    with pytest.raises(ValueError, match="success values must be booleans"):
+        replace(
+            rejection,
+            owner_result=replace(owner_result, succeeded="false"),
+        )
+
+
+@pytest.mark.parametrize(
+    "malformed_result",
+    (
+        {"evidence_ref": 1},
+        {"observed_effects": ("effect", 1)},
+        {"payload": {"nested": ("tuple",)}},
+        {"payload": {1: "not a string key"}},
+    ),
+)
+def test_evidence_rejection_rejects_non_wire_owner_result_shape(malformed_result):
+    compiled, catalog, environment_run = _admission_fixture()
+    lease = _prepared_execution_lease(
+        ledger=LifecycleLedger(clock=lambda: "2026-10-20T00:00:00Z"),
+        compiled=compiled,
+        catalog=catalog,
+        environment_run=environment_run,
+        operation_id="operation:evidence-rejection-wire-shape",
+    )
+    owner_result = OwnerExecutionResult(
+        evidence_ref="fake-nao://evidence/rejected-wire-shape",
+        succeeded=False,
+        observed_effects=("effect",),
+        payload={"nested": ["valid"]},
+    )
+
+    with pytest.raises(ValueError):
+        EvidenceRejection.issue(
+            lease=lease,
+            owner_result=replace(owner_result, **malformed_result),
+            reason_codes=("invalid_evidence",),
+        )
+
+
+@pytest.mark.parametrize("malformed", ("false", "true", 0, 1, None))
+def test_task_acceptance_rejects_non_boolean_evidence(malformed):
+    compiled, _catalog, _environment_run = _admission_fixture()
+    obligation = compiled.effect_obligations[0]
+    evidence = EffectEvidence(
+        evidence_ref="fake-nao://evidence/non-boolean-acceptance",
+        object_id=obligation.object_id,
+        binding_id="nao_fake.find_object.v1",
+        environment_id="nao_fake",
+        owner=obligation.evidence_owner,
+        succeeded=malformed,
+        observed_effects=(obligation.effect_id,),
+    )
+
+    with pytest.raises(ValueError, match="success values must be booleans"):
+        TaskAcceptanceEvaluator().evaluate(
+            compiled.effect_obligations,
+            (evidence,),
+        )
+
+
+@pytest.mark.parametrize(
+    "policy,attack",
+    (
+        (False, "none"),
+        (True, "none"),
+        ("false", "none"),
+        (0, "none"),
+        (1, "none"),
+        (None, "none"),
+        (False, "shadow_before_registry"),
+        (False, "shadow_after_registry"),
+    ),
+)
+def test_additional_argument_policy_is_boolean_before_admission_and_owner_dispatch(
+    policy, attack
+):
+    compiled, catalog, environment = _admission_fixture()
+    native_calls = []
+
+    def admit_and_execute():
+        schema = ObjectArgumentSchema.issue(
+            schema_ref="schema://find_object/input/v1",
+            fields=(ArgumentField("label", "string"),),
+            required=("label",),
+            allow_additional_properties=policy,
+        )
+        if attack == "shadow_before_registry":
+            object.__setattr__(schema, "allow_additional_properties", "false")
+            object.__setattr__(schema, "verify_identity", lambda: None)
+        proposal = (
+            ProposalNormalizer()
+            .normalize(
+                compiled_task=compiled,
+                operation_id="operation:strict-policy",
+                raw_output_artifact_id="artifact:strict-policy",
+                output=AgentOutput(
+                    "executable_plan",
+                    {
+                        "object_id": "find_object",
+                        "arguments": {"label": "cup", "extra": True},
+                    },
+                    ("find_object",),
+                ),
+            )
+            .proposal
+        )
+        validator = InMemoryArgumentSchemaRegistry((schema,))
+        if attack == "shadow_after_registry":
+            object.__setattr__(schema, "allow_additional_properties", "false")
+            object.__setattr__(schema, "verify_identity", lambda: None)
+        semantic = SemanticAdmission(
+            catalog=catalog,
+            environment_id="nao_fake",
+            runtime_mode="fake",
+            schema_validator=validator,
+        ).admit(compiled, proposal)
+        if not semantic.accepted:
+            return semantic.reason_codes
+        ledger = _ledger_for_admission(compiled, proposal, semantic.admitted_operation)
+        lease = (
+            DomainLifecycleAdmission(
+                environment_run=environment,
+                environment_id="nao_fake",
+                lifecycle_ledger=ledger,
+            )
+            .request_execution(semantic.admitted_operation)
+            .execution_lease
+        )
+
+        def native(arguments):
+            native_calls.append(arguments)
+            return OwnerExecutionResult(
+                "artifact:strict-policy-evidence",
+                True,
+                ("fresh detector-backed result returned",),
+            )
+
+        return InProcessEnvironmentOwner(
+            environment_id="nao_fake",
+            environment_run=environment,
+            catalog=catalog,
+            lifecycle_ledger=ledger,
+            handlers={"fake_nao.skills:find_object": native},
+        ).execute(lease)
+
+    if attack == "shadow_before_registry":
+        with pytest.raises(TypeError, match="additional properties.*boolean"):
+            admit_and_execute()
+        assert native_calls == []
+    elif type(policy) is not bool:
+        with pytest.raises(TypeError, match="additional properties.*boolean"):
+            admit_and_execute()
+        assert native_calls == []
+    elif policy is False:
+        assert admit_and_execute() == ("proposal_arguments_schema_invalid",)
+        assert native_calls == []
+    else:
+        assert admit_and_execute().receipt is not None
+        assert native_calls == [{"label": "cup", "extra": True}]
+
+
 def test_environment_owner_records_typed_evidence_rejection():
     compiled, catalog, environment_run = _admission_fixture()
     proposal = _proposal(compiled, operation_id="operation:evidence-rejected")
     semantic = _semantic_admission(catalog).admit(compiled, proposal)
     assert semantic.admitted_operation is not None
     ledger = _ledger_for_admission(compiled, proposal, semantic.admitted_operation)
-    lease = DomainLifecycleAdmission(
-        environment_run=environment_run,
-        environment_id="nao_fake",
-        lifecycle_ledger=ledger,
-    ).request_execution(semantic.admitted_operation).execution_lease
+    lease = (
+        DomainLifecycleAdmission(
+            environment_run=environment_run,
+            environment_id="nao_fake",
+            lifecycle_ledger=ledger,
+        )
+        .request_execution(semantic.admitted_operation)
+        .execution_lease
+    )
     assert lease is not None
     owner = InProcessEnvironmentOwner(
         environment_id="nao_fake",
@@ -1030,6 +2289,49 @@ def test_environment_owner_records_typed_evidence_rejection():
     )
     assert replay.failure_stage == "evidence"
     assert replay.terminal_status is None
+
+
+@pytest.mark.parametrize(
+    ("observed_effects", "payload"),
+    (
+        (["fresh detector-backed result returned"], {}),
+        (("fresh detector-backed result returned",), [("value", False)]),
+    ),
+)
+def test_environment_owner_rejects_malformed_native_result_without_evidence(
+    observed_effects, payload
+):
+    compiled, catalog, environment_run = _admission_fixture()
+    ledger = LifecycleLedger(clock=lambda: "2026-10-21T00:00:00Z")
+    lease = _prepared_execution_lease(
+        ledger=ledger,
+        compiled=compiled,
+        catalog=catalog,
+        environment_run=environment_run,
+        operation_id="operation:malformed-native-result",
+    )
+    owner = InProcessEnvironmentOwner(
+        environment_id="nao_fake",
+        environment_run=environment_run,
+        catalog=catalog,
+        lifecycle_ledger=ledger,
+        handlers={
+            "fake_nao.skills:find_object": lambda _arguments: OwnerExecutionResult(
+                evidence_ref="fake-nao://evidence/malformed-native-result",
+                succeeded=True,
+                observed_effects=observed_effects,
+                payload=payload,
+            )
+        },
+    )
+
+    with pytest.raises(ValueError):
+        owner.execute(lease)
+
+    event_types = tuple(event.event_type for event in ledger.events())
+    assert event_types[-2:] == ("execution_started", "execution_failed")
+    assert "execution_completed" not in event_types
+    assert "evidence_issued" not in event_types
 
 
 def test_environment_owner_rejects_a_proposal_changed_after_lease_issuance():
@@ -1067,6 +2369,49 @@ def test_environment_owner_rejects_a_proposal_changed_after_lease_issuance():
         owner.execute(lease_decision.execution_lease)
 
     assert dispatched_arguments == []
+
+
+@pytest.mark.parametrize("runtime_callable", (1, 1.0))
+def test_environment_owner_requires_literal_runtime_callable_before_dispatch(
+    runtime_callable,
+):
+    compiled, catalog, environment_run = _admission_fixture()
+    ledger = LifecycleLedger(clock=lambda: "2026-10-21T00:00:00Z")
+    lease = _prepared_execution_lease(
+        ledger=ledger,
+        compiled=compiled,
+        catalog=catalog,
+        environment_run=environment_run,
+        operation_id="operation:malformed-runtime-callable",
+    )
+    item = catalog.object_for(lease.object_id)
+    assert item is not None
+    object.__setattr__(item, "runtime_callable", runtime_callable)
+    dispatched_arguments = []
+    owner = InProcessEnvironmentOwner(
+        environment_id="nao_fake",
+        environment_run=environment_run,
+        catalog=catalog,
+        lifecycle_ledger=ledger,
+        handlers={
+            "fake_nao.skills:find_object": lambda arguments: (
+                dispatched_arguments.append(arguments)
+                or OwnerExecutionResult(
+                    evidence_ref="fake-nao://evidence/malformed-runtime-callable",
+                    succeeded=True,
+                    observed_effects=("fresh detector-backed result returned",),
+                )
+            )
+        },
+    )
+
+    with pytest.raises(ValueError, match="not runtime callable"):
+        owner.execute(lease)
+
+    assert dispatched_arguments == []
+    assert not any(
+        event.event_type == "execution_started" for event in ledger.events()
+    )
 
 
 def test_environment_owner_consumes_a_lease_when_native_execution_fails():
@@ -1462,6 +2807,106 @@ def test_common_ledger_replays_the_full_accepted_authority_chain(tmp_path):
     assert decision.task_status == "accepted"
 
 
+def test_task_acceptance_waits_for_every_dispatched_native_operation(tmp_path):
+    compiled, catalog, environment_run = _admission_fixture()
+    ledger_path = tmp_path / "unsettled-native-operation.jsonl"
+    ledger = LifecycleLedger(
+        ledger_path,
+        clock=lambda: "2026-09-28T12:00:00Z",
+    )
+    _first_lease, first_receipt = _record_successful_operation(
+        compiled=compiled,
+        catalog=catalog,
+        environment_run=environment_run,
+        ledger=ledger,
+        operation_id="operation:settlement:first",
+        evidence_ref="fake-nao://evidence/settlement-first",
+    )
+
+    pending_proposal = _proposal(
+        compiled,
+        operation_id="operation:settlement:pending",
+    )
+    ledger.record(pending_proposal)
+    pending_admission = _semantic_admission(catalog).admit(
+        compiled,
+        pending_proposal,
+    )
+    assert pending_admission.admitted_operation is not None
+    ledger.record(pending_admission.admitted_operation)
+    pending_lease = DomainLifecycleAdmission(
+        environment_run=environment_run,
+        environment_id="nao_fake",
+        lifecycle_ledger=ledger,
+    ).request_execution(pending_admission.admitted_operation).execution_lease
+    assert pending_lease is not None
+
+    handler_started = Event()
+    release_handler = Event()
+
+    def blocked_handler(_arguments):
+        handler_started.set()
+        assert release_handler.wait(timeout=5)
+        return OwnerExecutionResult(
+            evidence_ref="fake-nao://evidence/settlement-pending",
+            succeeded=True,
+            observed_effects=("fresh detector-backed result returned",),
+        )
+
+    owner = InProcessEnvironmentOwner(
+        environment_id="nao_fake",
+        environment_run=environment_run,
+        catalog=catalog,
+        lifecycle_ledger=ledger,
+        handlers={"fake_nao.skills:find_object": blocked_handler},
+    )
+    acceptance_before_settlement = TaskAcceptanceEvaluator().evaluate(
+        compiled.effect_obligations,
+        (first_receipt.evidence,),
+    )
+
+    with ThreadPoolExecutor(max_workers=1) as executor:
+        dispatched = executor.submit(owner.execute, pending_lease)
+        assert handler_started.wait(timeout=5)
+        events_before_acceptance = ledger.events()
+        try:
+            with pytest.raises(ValueError, match="settled native execution"):
+                ledger.record(
+                    AcceptanceFact(
+                        compiled_task=compiled,
+                        evidence_set=(first_receipt.evidence,),
+                        acceptance=acceptance_before_settlement,
+                    )
+                )
+        finally:
+            release_handler.set()
+        pending_decision = dispatched.result(timeout=5)
+
+    assert pending_decision.receipt is not None
+    assert ledger.events()[: len(events_before_acceptance)] == events_before_acceptance
+    settled_evidence = (first_receipt.evidence, pending_decision.receipt.evidence)
+    settled_acceptance = TaskAcceptanceEvaluator().evaluate(
+        compiled.effect_obligations,
+        settled_evidence,
+    )
+    ledger.record(
+        AcceptanceFact(
+            compiled_task=compiled,
+            evidence_set=settled_evidence,
+            acceptance=settled_acceptance,
+        )
+    )
+
+    replay = LifecycleLedger(ledger_path).replay(compiled.trace_id)
+    assert replay.terminal_status == "accepted"
+    assert replay.verified_trace_digest is not None
+    assert replay.verified_trace_digest.execution_result_ids == tuple(
+        event.data["execution_result_id"]
+        for event in replay.events
+        if event.event_type == "execution_completed"
+    )
+
+
 def test_terminal_required_effect_failure_replays_as_counterexample_digest(tmp_path):
     compiled, catalog, environment_run = _admission_fixture()
     path = tmp_path / "terminal-counterexample.jsonl"
@@ -1521,6 +2966,56 @@ def test_terminal_required_effect_failure_replays_as_counterexample_digest(tmp_p
     )
 
 
+@pytest.mark.parametrize(
+    "success_value",
+    ("false", "true", 0, 1, None, [], {}),
+    ids=("string-false", "string-true", "zero", "one", "none", "list", "object"),
+)
+def test_owner_rejects_non_boolean_success_before_issuing_evidence(
+    tmp_path, success_value
+):
+    compiled, catalog, environment_run = _admission_fixture()
+    ledger_path = tmp_path / "non-boolean-owner-result.jsonl"
+    ledger = LifecycleLedger(
+        ledger_path,
+        clock=lambda: "2026-10-17T00:00:00Z",
+    )
+    _record_task_start(ledger, compiled)
+    ledger.record(compiled)
+    proposal = _proposal(compiled, operation_id="operation:non-boolean-owner")
+    ledger.record(proposal)
+    admitted = _semantic_admission(catalog).admit(compiled, proposal).admitted_operation
+    assert admitted is not None
+    ledger.record(admitted)
+    lease = DomainLifecycleAdmission(
+        environment_run=environment_run,
+        environment_id="nao_fake",
+        lifecycle_ledger=ledger,
+    ).request_execution(admitted).execution_lease
+    assert lease is not None
+    owner = InProcessEnvironmentOwner(
+        environment_id="nao_fake",
+        environment_run=environment_run,
+        catalog=catalog,
+        lifecycle_ledger=ledger,
+        handlers={
+            "fake_nao.skills:find_object": lambda _arguments: OwnerExecutionResult(
+                evidence_ref="fake://non-boolean-owner-result",
+                succeeded=success_value,
+                observed_effects=("fresh detector-backed result returned",),
+            )
+        },
+    )
+
+    with pytest.raises(TypeError, match="succeeded must be a boolean"):
+        owner.execute(lease)
+
+    event_types = tuple(event.event_type for event in ledger.events())
+    assert "evidence_issued" not in event_types
+    assert "terminal_task_accepted" not in event_types
+    assert LifecycleLedger(ledger_path).replay(compiled.trace_id).terminal_status is None
+
+
 def test_common_ledger_replays_an_accepted_task_with_best_effort_deficit(tmp_path):
     compiled, catalog, environment_run = _admission_fixture(include_best_effort=True)
     ledger = LifecycleLedger(
@@ -1560,6 +3055,58 @@ def test_common_ledger_replays_an_accepted_task_with_best_effort_deficit(tmp_pat
     assert replayed.verified_trace_digest.deficit_obligation_ids == ("result_reported",)
 
 
+@pytest.mark.parametrize(
+    ("field", "malformed"),
+    (
+        ("status", "rejected"),
+        ("satisfied_obligation_ids", ["invented-satisfied"]),
+        ("deficit_obligation_ids", []),
+        ("pending_obligation_ids", ["invented-pending"]),
+        ("failed_obligation_ids", ["invented-failed"]),
+        ("evidence_refs", ["fake-nao://evidence/invented"]),
+        ("acceptance_id", "task-acceptance:sha256:invented"),
+    ),
+)
+def test_replay_rejects_resigned_terminal_acceptance_mismatches(
+    field,
+    malformed,
+    tmp_path,
+):
+    compiled, catalog, environment_run = _admission_fixture(include_best_effort=True)
+    path = tmp_path / ("acceptance-mismatch-%s.jsonl" % field)
+    ledger = LifecycleLedger(path, clock=lambda: "2026-10-02T09:20:00Z")
+    _lease, receipt = _record_successful_operation(
+        compiled=compiled,
+        catalog=catalog,
+        environment_run=environment_run,
+        ledger=ledger,
+        operation_id="operation:acceptance-mismatch:%s" % field,
+        evidence_ref="fake-nao://evidence/acceptance-mismatch:%s" % field,
+    )
+    acceptance = TaskAcceptanceEvaluator().evaluate(
+        compiled.effect_obligations,
+        (receipt.evidence,),
+    )
+    ledger.record(
+        AcceptanceFact(
+            compiled_task=compiled,
+            evidence_set=(receipt.evidence,),
+            acceptance=acceptance,
+        )
+    )
+
+    assert acceptance.status == "accepted_with_deficit"
+    _rewrite_ledger_event(
+        path,
+        "terminal_task_accepted_with_deficit",
+        field,
+        malformed,
+    )
+
+    with pytest.raises(ValueError):
+        LifecycleLedger(path)
+
+
 def test_common_ledger_records_pre_dispatch_suspension():
     compiled, _catalog, _environment_run = _admission_fixture()
     ledger = LifecycleLedger(clock=lambda: "2026-09-28T12:07:00Z")
@@ -1586,6 +3133,248 @@ def test_common_ledger_records_pre_dispatch_suspension():
     replayed = ledger.replay(compiled.trace_id)
     assert replayed.terminal_status is None
     assert replayed.verified_trace_digest is None
+
+
+def test_ledger_rejects_tampered_compiled_task_before_acceptance_append(tmp_path):
+    compiled, _catalog, _environment_run = _admission_fixture()
+    ledger_path = tmp_path / "tampered-compiled-task.jsonl"
+    ledger = LifecycleLedger(
+        ledger_path,
+        clock=lambda: "2026-09-28T12:00:00Z",
+    )
+    _record_task_start(ledger, compiled)
+    ledger.record(compiled)
+    before = ledger.events()
+
+    object.__setattr__(
+        compiled,
+        "effect_obligations",
+        tuple(
+            replace(item, requirement="best_effort")
+            for item in compiled.effect_obligations
+        ),
+    )
+    object.__setattr__(compiled, "verify_identity", lambda: None)
+    acceptance = TaskAcceptanceEvaluator().evaluate(
+        compiled.effect_obligations,
+        (),
+    )
+    assert acceptance.status == "accepted_with_deficit"
+
+    with pytest.raises((TypeError, ValueError), match="compiled task"):
+        ledger.record(
+            AcceptanceFact(
+                compiled_task=compiled,
+                evidence_set=(),
+                acceptance=acceptance,
+            )
+        )
+
+    assert ledger.events() == before
+    assert LifecycleLedger(ledger_path).replay(compiled.trace_id).terminal_status is None
+
+
+def test_ledger_rejects_tampered_compiled_task_before_compiled_event(tmp_path):
+    compiled, _catalog, _environment_run = _admission_fixture()
+    ledger_path = tmp_path / "tampered-compiled-event.jsonl"
+    ledger = LifecycleLedger(
+        ledger_path,
+        clock=lambda: "2026-09-28T12:00:00Z",
+    )
+    _record_task_start(ledger, compiled)
+    before = ledger.events()
+    object.__setattr__(
+        compiled,
+        "effect_obligations",
+        tuple(
+            replace(item, requirement="best_effort")
+            for item in compiled.effect_obligations
+        ),
+    )
+    object.__setattr__(compiled, "verify_identity", lambda: None)
+
+    with pytest.raises((TypeError, ValueError), match="compiled task"):
+        ledger.record(compiled)
+
+    assert ledger.events() == before
+    assert LifecycleLedger(ledger_path).replay(compiled.trace_id).terminal_status is None
+
+
+@pytest.mark.parametrize("field", (
+    "goal", "requested_effects", "requested_requirement", "model_calls",
+    "tool_calls", "wall_time_seconds", "retry_attempts",
+))
+@pytest.mark.parametrize("consumer", (
+    "export", "record", "normalize", "admit", "accept", "timeout",
+))
+def test_compiled_task_consumers_reject_changed_source_before_progress(
+    tmp_path, field, consumer,
+):
+    compiled, catalog, _environment_run = _admission_fixture()
+    path = tmp_path / "consumer-source.jsonl"
+    ledger = LifecycleLedger(path, clock=lambda: "2026-10-02T09:00:00Z")
+    _record_task_start(ledger, compiled)
+    if consumer != "record":
+        ledger.record(compiled)
+    before = ledger.events()
+    trace_id = compiled.trace_id
+    proposal = _proposal(compiled, operation_id="operation:source-integrity")
+    if field == "goal":
+        object.__setattr__(compiled.task_spec, "goal", "changed task intent")
+    elif field == "requested_effects":
+        object.__setattr__(
+            compiled.task_spec.requested_effects[0], "effect_id", "different effect",
+        )
+    elif field == "requested_requirement":
+        object.__setattr__(
+            compiled.task_spec.requested_effects[0], "requirement", "best_effort",
+        )
+    else:
+        object.__setattr__(compiled.budgets, field, 999)
+    object.__setattr__(compiled, "verify_identity", lambda: None)
+
+    with pytest.raises((TypeError, ValueError)):
+        if consumer == "export":
+            compiled.to_dict()
+        elif consumer == "record":
+            ledger.record(compiled)
+        elif consumer == "normalize":
+            ProposalNormalizer().normalize(
+                compiled_task=compiled,
+                operation_id="operation:source-integrity",
+                raw_output_artifact_id="model-output:source-integrity",
+                output=AgentOutput(
+                    output_type="executable_plan",
+                    payload={"object_id": "find_object", "arguments": {}},
+                    referenced_objects=("find_object",),
+                ),
+            )
+        elif consumer == "admit":
+            _semantic_admission(catalog).admit(compiled, proposal)
+        elif consumer == "accept":
+            ledger.record(AcceptanceFact(
+                compiled_task=compiled, evidence_set=(),
+                acceptance=TaskAcceptanceEvaluator().evaluate(
+                    compiled.effect_obligations, (),
+                ),
+            ))
+        else:
+            TaskRuntimeControlAuthority(ledger).evaluate_timeout(
+                compiled_task=compiled, observed_at="2026-10-02T09:00:30Z",
+                policy_revision="timeout-policy:v1",
+            )
+
+    assert ledger.events() == before
+    replay = LifecycleLedger(path).replay(trace_id)
+    assert replay.terminal_status is None
+    assert not any(event.event_type == "execution_started" for event in replay.events)
+
+
+def test_compiled_task_verified_copy_detaches_and_checks_nested_contracts():
+    compiled, _catalog, _environment_run = _admission_fixture()
+    snapshot = CompiledTask.verified_copy(compiled)
+
+    assert snapshot == compiled
+    assert snapshot is not compiled
+    assert snapshot.task_spec is not compiled.task_spec
+    assert snapshot.interaction_module is not compiled.interaction_module
+    assert snapshot.effect_obligations[0] is not compiled.effect_obligations[0]
+
+    object.__setattr__(
+        compiled.effect_obligations[0],
+        "requirement",
+        "best_effort",
+    )
+
+    with pytest.raises(ValueError, match="compiled task identity does not match content"):
+        CompiledTask.verified_copy(compiled)
+    assert snapshot.effect_obligations[0].requirement == "required"
+
+
+def test_compiled_task_verified_copy_rejects_top_level_and_nested_subclasses():
+    compiled, _catalog, _environment_run = _admission_fixture()
+
+    class CompiledTaskSubclass(CompiledTask):
+        pass
+
+    subclass = object.__new__(CompiledTaskSubclass)
+    for field_name in CompiledTask.__dataclass_fields__:
+        object.__setattr__(subclass, field_name, getattr(compiled, field_name))
+
+    with pytest.raises(TypeError, match="concrete owner type"):
+        CompiledTask.verified_copy(subclass)
+
+    original = compiled.interaction_module
+    module_type = type(original)
+
+    class InteractionModuleSubclass(module_type):
+        pass
+
+    nested = InteractionModuleSubclass(
+        task_id=original.task_id,
+        role=original.role,
+        frame=original.frame,
+        objects=original.objects,
+        registry_source=original.registry_source,
+    )
+    nested_subclass_task = replace(compiled, interaction_module=nested)
+
+    with pytest.raises(TypeError, match="trusted concrete dataclass"):
+        CompiledTask.verified_copy(nested_subclass_task)
+
+
+def test_proposal_normalizer_rejects_shadow_verified_task_before_proposal():
+    compiled, _catalog, _environment_run = _admission_fixture()
+    object.__setattr__(
+        compiled,
+        "effect_obligations",
+        tuple(
+            replace(item, requirement="best_effort")
+            for item in compiled.effect_obligations
+        ),
+    )
+    object.__setattr__(compiled, "verify_identity", lambda: None)
+
+    with pytest.raises((TypeError, ValueError), match="compiled task"):
+        ProposalNormalizer().normalize(
+            compiled_task=compiled,
+            operation_id="operation:shadowed-task",
+            raw_output_artifact_id="model-output:shadowed-task",
+            output=AgentOutput(
+                output_type="executable_plan",
+                payload={"object_id": "find_object", "arguments": {}},
+                referenced_objects=("find_object",),
+            ),
+        )
+
+
+def test_semantic_admission_rejects_shadow_verified_task_before_decision():
+    compiled, catalog, _environment_run = _admission_fixture()
+    proposal = _proposal(compiled, operation_id="operation:shadowed-task")
+    object.__setattr__(
+        compiled,
+        "effect_obligations",
+        tuple(
+            replace(item, requirement="best_effort")
+            for item in compiled.effect_obligations
+        ),
+    )
+    object.__setattr__(compiled, "verify_identity", lambda: None)
+
+    with pytest.raises((TypeError, ValueError), match="compiled task"):
+        _semantic_admission(catalog).admit(compiled, proposal)
+
+
+def test_semantic_admission_does_not_consume_removed_task_prohibition():
+    compiled, catalog, _environment_run = _admission_fixture(
+        prohibited_effects=("requested object localized",)
+    )
+    proposal = _proposal(compiled, operation_id="operation:prohibited-task")
+    object.__setattr__(compiled, "prohibited_effects", ())
+    object.__setattr__(compiled, "verify_identity", lambda: None)
+
+    with pytest.raises((TypeError, ValueError), match="compiled task"):
+        _semantic_admission(catalog).admit(compiled, proposal)
 
 
 def test_common_ledger_rejects_a_crash_truncated_acceptance_commit(tmp_path):
@@ -1961,6 +3750,26 @@ def test_recorded_timeout_replays_without_consulting_current_clock(tmp_path):
     assert replay.events[-1].data["observed_at"] == "2026-10-02T09:01:31Z"
 
 
+def test_timeout_authority_rejects_tampered_compiled_task_before_record(tmp_path):
+    compiled, _catalog, _environment_run = _admission_fixture()
+    path = tmp_path / "tampered-timeout-source.jsonl"
+    ledger = LifecycleLedger(path, clock=lambda: "2026-10-02T09:00:00Z")
+    _record_task_start(ledger, compiled)
+    ledger.record(compiled)
+    before = ledger.events()
+    object.__setattr__(compiled, "prohibited_effects", (*compiled.prohibited_effects, "forged"))
+    object.__setattr__(compiled, "verify_identity", lambda: None)
+
+    with pytest.raises((TypeError, ValueError), match="compiled task"):
+        TaskRuntimeControlAuthority(ledger).evaluate_timeout(
+            compiled_task=compiled,
+            observed_at="2026-10-02T09:00:30Z",
+            policy_revision="timeout-policy:v1",
+        )
+
+    assert ledger.events() == before
+
+
 def test_timeout_check_can_progress_from_within_budget_to_recorded_timeout():
     compiled, _catalog, _environment_run = _admission_fixture()
     ledger = LifecycleLedger(clock=lambda: "2026-10-02T09:00:00Z")
@@ -2044,3 +3853,48 @@ def test_retry_exhaustion_is_bounded_by_compiled_task_budget():
     replay = ledger.replay(compiled.trace_id)
     assert replay.failure_stage == "retry"
     assert replay.terminal_status is None
+
+
+def test_retry_authority_rejects_tampered_compiled_budget_before_record():
+    compiled, catalog, environment_run = _admission_fixture(
+        budgets=TaskBudgets(
+            wall_time_seconds=90,
+            model_calls=1,
+            tool_calls=2,
+            retry_attempts=0,
+        )
+    )
+    proposal = _proposal(compiled, operation_id="operation:retry-source")
+    semantic = _semantic_admission(catalog).admit(compiled, proposal)
+    assert semantic.admitted_operation is not None
+    ledger = _ledger_for_admission(compiled, proposal, semantic.admitted_operation)
+    lease = DomainLifecycleAdmission(
+        environment_run=environment_run,
+        environment_id="nao_fake",
+        lifecycle_ledger=ledger,
+    ).request_execution(semantic.admitted_operation).execution_lease
+    assert lease is not None
+    ledger.start_execution(lease)
+    failure = ExecutionFailure.issue(
+        lease=lease,
+        failure_ref="failure:native:retry-budget-tamper",
+        failure_code="temporary_unavailable",
+        failure_stage="native_execution",
+        retry_disposition="retryable",
+    )
+    ledger.record(failure)
+    before = ledger.events()
+    object.__setattr__(compiled.budgets, "retry_attempts", 1)
+    object.__setattr__(compiled, "verify_identity", lambda: None)
+
+    with pytest.raises(
+        (TypeError, ValueError), match="compiled task source fields"
+    ):
+        RetryAuthority(ledger).decide(
+            compiled_task=compiled,
+            source_failure=failure,
+            target_operation_id="operation:retry-tampered",
+            policy_revision="retry-policy:v1",
+        )
+
+    assert ledger.events() == before

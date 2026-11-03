@@ -1,7 +1,7 @@
 # Universal Agentic Harness: Implementation Masterplan
 
 **Status:** Canonical implementation plan; H0/H1 partial implementation and H2 qualification gates specified
-**Date:** 2026-10-08
+**Date:** 2026-10-11
 **Scope:** Model-agnostic and task-agnostic harness kernel with domain-specific AB frames and adapters
 **Extends:** `../architecture/universal_agentic_harness_foundation.md` and `../architecture/neural_workbench_adaptive_ab_harness.md`
 **Decision owner:** UAH H0-H2 core; NeuralWorkbench H3+ companion track; NAO remains the first reference environment
@@ -40,7 +40,7 @@ H1  Executable harness runtime and complete lifecycle     PARTIAL CONTROL SLICE
 H2  Cooperative NAO adapter and parity ablation           FIRST REAL ENVIRONMENT
 H3  Trace-adaptive Neural Workbench                       OFFLINE-FIRST ADAPTATION
 H4  Crystallization and reviewed AB promotion             QUARANTINED LEARNING
-H5  Cross-runtime federation and conformance              UNIVERSAL HARNESS v1
+H5  Cross-runtime federation and conformance              LATER VERSION UNASSIGNED
 H6  AB5 policy-foundry hypothesis                         RESEARCH ONLY, NOT COMMITTED
 ```
 
@@ -48,6 +48,17 @@ The true Universal Agentic Harness is reached at H5, not when every feature of
 every existing harness has been copied. H5 means that the unchanged semantic
 kernel can govern more than one model family, runtime style, and task domain
 through explicit adapters and comparable traces.
+
+### Release milestones (2026-10-17)
+
+Human decision D-20261017-07 stages the implementation releases as follows:
+H0 v0.2; H1/O1 v0.3-v0.4; complete Python NAO planner parity H2 v0.5; native
+NAO H2.1 v0.6; H3 increments from v0.7 through full Workbench integration
+v1.0; and H4 v1.5. H5 and later release numbers remain unassigned. A v1.0
+tag records the H3 milestone only; it does not imply H4 or H5 completion,
+cross-domain conformance, or release-gate completion. These targets do not
+authorize tags or publication. H0, H1, O1, and H2 remain open until their
+stated acceptance evidence passes.
 
 ## 2. Target Contract
 
@@ -397,9 +408,32 @@ domain-lifecycle policy.
 
 ### Independent review status on 2026-10-08
 
+### Historical source-integrity checkpoint (2026-10-09)
+
+The retained SOURCE-PACK-01 counterexample bypasses dynamic verification and
+export through instance-shadowed `PromptPack` methods while preserving its old
+identity. A private candidate now reconstructs the exact configured source
+closure from concrete stored fields, verifies content-addressed identities and
+recompiles the prompt before invocation accounting or provider dispatch.
+`ModelInvocationAuthority` continues to reject caller-authored prompt content
+unless it matches the configured source owner's `PromptCompiler` result. The
+candidate passes its 730-test suite, both O1/runtime example freshness checks,
+Ruff, and the normal isolated pre-commit hooks. Independent review and the exact
+transfer gate remain pending. No candidate bytes have transferred to the shared
+checkout; H0/H1/H2 are not closed by this repair. See the
+REVIEWED-HANDOFF-02 receipt (`2026-10-09_uah_reviewed_handoff_02.md`)
+for exact scope and current gate status.
+
+The later REVIEW-DELIVER-03 closeout (`2026-10-09_uah_reviewed_handoff_02_closeout.md`)
+supersedes that pending status: independent Spec and Standards reviews approved
+the exact 23 tracked paths plus receipt, delivered unstaged after 731 tests
+passed. This does not close H0, H1, O1, or H2. The next mechanical queue is
+proposed in the October 11 seam design (`2026-10-11_uah_mechanical_seam_design.md`),
+not dispatched as implementation work.
+
 **Latest consolidation:** The human selected NAO as the first parity/test
 environment and deferred synthetic environment integration. The
-[dated handoff](../artifacts/reviews/2026-10-08_uah_consolidated_handoff.md)
+dated handoff (`2026-10-08_uah_consolidated_handoff.md`)
 records four original scoped closures (R1 compiler crossing, R3 ledger,
 SPEC-03 reviewed concrete catalog mechanisms, ARCH-01 static eligibility),
 the additional approved raw O1 repair, and the remaining original
@@ -407,15 +441,15 @@ STD-02/SPEC-02/ARCH-02 gaps. R5 remains a deferred unapproved candidate with
 three defects. Dashboard work remains stopped. H0/H1/H2 exits remain open.
 The following round accounts retain their historical gates.
 
-The [October 5 review](../artifacts/reviews/2026-10-05_uah_h0_h1_independent_review.md)
+The October 5 review (`2026-10-05_uah_h0_h1_independent_review.md`)
 identifies seven distinct blocking mechanisms, including domain-pack tamper,
 raw task-start authority, catalog semantic drift, in-memory event integrity,
 prompt/admission mismatch, unsupported O1 provenance labels and outgoing-cache
-coverage. [R0](../artifacts/reviews/2026-10-08_uah_r0_baseline_and_skill_handoff.md)
+coverage. R0 (`2026-10-08_uah_r0_baseline_and_skill_handoff.md`)
 reproduced all seven on the captured dirty tree. Existing green fixtures are
 narrow implementation evidence and cannot close the release gates.
 
-[R1](../artifacts/reviews/2026-10-08_uah_r1_domain_pack_identity.md) is limited to
+R1 (`2026-10-08_uah_r1_domain_pack_identity.md`) is limited to
 STD-01/SPEC-01: reverify the issued domain-pack content before task compilation,
 with replacement/nested tamper regressions and an unchanged compilation control.
 Its reviewed-byte verdict is recorded separately. Other mechanisms and missing
@@ -423,7 +457,7 @@ H0/H1 deliverables require later authorized rounds. Evidence/freshness contracts
 and both approved provider targets remain separately staged. No H0/H1 closure
 or live provider qualification is claimed.
 
-[R2](../artifacts/reviews/2026-10-08_uah_r2_catalog_semantic_fencing.md)
+R2 (`2026-10-08_uah_r2_catalog_semantic_fencing.md`)
 adds an independently approved admission-time comparison against the compiled
 ABObjectView, while retaining reviewed binding replacement. SPEC-03 remains
 PARTIAL/OPEN: the retained public probe shows that post-admission catalog
@@ -431,7 +465,7 @@ replacement can still legitimize a prohibited observed effect. The required
 execution-boundary semantic snapshot or artifact-resolution contract awaited
 human selection at that checkpoint. No additional release gate was closed.
 
-[R3](../artifacts/reviews/2026-10-08_uah_r3_ledger_integrity.md) is independently
+R3 (`2026-10-08_uah_r3_ledger_integrity.md`) is independently
 approved for detached ledger exports and stale-content validation using the
 existing TraceEvent identity. The raw-iterable O1 projection identity residual
 remains open. Human decisions now select a frozen ABObjectView carried by a
@@ -439,7 +473,7 @@ versioned AdmittedOperation for the next execution repair, and an owner-local
 frozen exact-content predicate for the first synthetic suite. These are staged
 contracts, not implemented exit evidence or a portable predicate language.
 
-[R4](../artifacts/reviews/2026-10-08_uah_r4_admitted_object_snapshot.md)
+R4 (`2026-10-08_uah_r4_admitted_object_snapshot.md`)
 implements versioned admitted-object snapshots and repairs the reproduced
 pre-dispatch and mid-handler catalog drift. Its independent gate returns
 CHANGES: removing every current marker permits historical-shaped admission
@@ -448,19 +482,19 @@ obtain current leases and accepted evidence records. The frozen implementation
 is not approved and SPEC-03 remains PARTIAL/OPEN. A separate correction must
 enforce current active authority without rewriting historical evidence.
 
-The [R4-FIX gate](../artifacts/reviews/2026-10-08_uah_r4_fix.md) remains CHANGES:
+The R4-FIX gate (`2026-10-08_uah_r4_fix.md`) remains CHANGES:
 one complete approval does not replace an interrupted primary review, whose
 reported nested-field mismatch remains unresolved in that round. A separately
-authorized [nested-owner correction](../artifacts/reviews/2026-10-08_uah_r4_nested_owner.md)
+authorized nested-owner correction (`2026-10-08_uah_r4_nested_owner.md`)
 has two fresh approvals and passing integration at its frozen bytes. This
 closes the reproduced concrete-artifact mechanisms within scope, without a
-global SPEC-03 proof or release exit. The [O1 constructor correction](../artifacts/reviews/2026-10-08_uah_o1_conformance_fix.md)
+global SPEC-03 proof or release exit. The O1 constructor correction (`2026-10-08_uah_o1_conformance_fix.md`)
 has two scoped approvals for raw-event identity, shape and detachment, with
 current integration passing separately. ARCH-02 labels, raw-ingress
 producer provenance remain open. Shared static prompt/admission eligibility
 has its separate scoped gate below.
 
-The separate [ARCH-01 round](../artifacts/reviews/2026-10-08_uah_arch01_static_eligibility.md)
+The separate ARCH-01 round (`2026-10-08_uah_arch01_static_eligibility.md`)
 now places pure task-local object eligibility in SemanticAdmission and consumes
 it from PromptCompiler. Expected and observable effects both obey task
 prohibitions; direct band, callability, projection and obligation rules retain
@@ -469,7 +503,7 @@ freeze its intended public red is repaired; two fresh reviews approve and
 integration passes. This is not an additional execution authority or release
 closure.
 
-The [R5 native-note foundation](../artifacts/reviews/2026-10-08_uah_r5_owner_local_foundation.md)
+The R5 native-note foundation (`2026-10-08_uah_r5_owner_local_foundation.md`)
 is a separately frozen H1 fixture slice outside the core. It retains trusted
 expected text and full task source, performs an actual write, and distinguishes
 write occurrence from exact-byte content at designated closure. Its single-instance
@@ -1621,12 +1655,12 @@ protocol is frozen and conformance-tested.
 
 **Work order:** Prepare the existing NAO domain first, after the human-selected
 authority-bound ingress command receives its scoped correction and review.
-The decision was accepted on 2026-10-08; the [separate ingress round](../artifacts/reviews/2026-10-08_uah_ingress_authority_repair.md)
+The decision was accepted on 2026-10-08; the separate ingress round (`2026-10-08_uah_ingress_authority_repair.md`)
 records implementation and review status without closing H0/H1. Synthetic environment
 integration is deferred, not deleted or qualified. The H0 synthetic lifecycle
 replay and H1 synthetic failure-suite exit requirements above remain unchanged;
 mapping NAO-first fixtures to those requirements needs an explicit agreement.
-Use the [consolidated prerequisite sequence](../artifacts/reviews/2026-10-08_uah_consolidated_handoff.md)
+Use the consolidated prerequisite sequence (`2026-10-08_uah_consolidated_handoff.md`)
 instead of starting a new R5 repair or treating a green canary as H2 parity.
 
 1. Freeze schema versioning and serialization conventions.
@@ -1684,7 +1718,7 @@ instead of starting a new R5 repair or treating a green canary as H2 parity.
 4. Require explicit labels for recorded, synthetic, and conceptual data.
    The human's 2026-10-08 decision rejects unsupported `measured`/`reviewed`
    requests until an evaluator/result and independent-gate provenance interface
-   is implemented. The [separate ARCH-02 correction](../artifacts/reviews/2026-10-08_uah_arch02_label_repair.md)
+   is implemented. The separate ARCH-02 correction (`2026-10-08_uah_arch02_label_repair.md`)
    tracks its implementation gate, not full measurement support. Retain future
    label definitions and the [deferred interface criteria](../architecture/observatory_contract.md#deferred-evaluator-and-review-provenance-interface).
    O1 owns read-only consumption; evaluators and applicable independent gates

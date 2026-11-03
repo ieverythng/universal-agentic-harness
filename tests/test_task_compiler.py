@@ -329,6 +329,160 @@ def test_compiled_task_rejects_an_identity_that_does_not_match_its_content():
         replace(compiled, compiled_task_id="compiled-task:sha256:tampered")
 
 
+def test_compiled_task_export_rejects_shadow_verified_required_effect_mutation():
+    compiled = TaskSpecCompiler().compile(**_compiler_inputs())
+    object.__setattr__(compiled.effect_obligations[0], "requirement", "best_effort")
+    object.__setattr__(compiled, "verify_identity", lambda: None)
+
+    with pytest.raises((TypeError, ValueError)):
+        compiled.to_dict()
+
+
+@pytest.mark.parametrize("mutation", ("prohibitions", "nested_rule"))
+def test_compiler_rejects_shadow_verified_domain_content(mutation):
+    inputs = _compiler_inputs()
+    domain = inputs["domain_contract_pack"]
+    if mutation == "prohibitions":
+        object.__setattr__(domain, "prohibited_effects", ())
+    else:
+        object.__setattr__(domain.effect_rules[0], "failure_policy", "retryable")
+    object.__setattr__(domain, "verify_identity", lambda: None)
+
+    with pytest.raises((TypeError, ValueError)):
+        TaskSpecCompiler().compile(**inputs)
+
+
+def test_compiled_task_detaches_inputs_from_caller():
+    inputs = _compiler_inputs()
+    compiled = TaskSpecCompiler().compile(**inputs)
+    object.__setattr__(inputs["domain_contract_pack"], "prohibited_effects", ())
+    object.__setattr__(inputs["task_spec"].budgets, "tool_calls", 999)
+    object.__setattr__(
+        inputs["task_ingress_decision"],
+        "environment_ingress_id",
+        "changed-ingress",
+    )
+
+    assert compiled.prohibited_effects == ("direct_kb_write", "direct_speech")
+    assert compiled.budgets.tool_calls == 12
+    assert compiled.task_spec is not inputs["task_spec"]
+    assert compiled.environment_ingress_id != "changed-ingress"
+
+
+def test_compiler_rejects_caller_supplied_task_registry():
+    inputs = _compiler_inputs()
+
+    class NoopTaskRegistry:
+        def require_start(self, **_lineage):
+            return None
+
+    with pytest.raises(TypeError, match="concrete environment task registry"):
+        TaskSpecCompiler().compile(**{**inputs, "task_registry": NoopTaskRegistry()})
+
+
+def test_compiler_bypasses_instance_shadowed_registry_method():
+    inputs = _compiler_inputs()
+    inputs["task_registry"] = EnvironmentTaskRegistry(LifecycleLedger())
+    inputs["task_registry"].require_start = lambda **_lineage: None
+
+    with pytest.raises(ValueError, match="task-start ingress is not recorded"):
+        TaskSpecCompiler().compile(**inputs)
+
+
+def test_compiler_rejects_subclassed_task_registry():
+    inputs = _compiler_inputs()
+
+    class NoopTaskRegistry(EnvironmentTaskRegistry):
+        def require_start(self, **_lineage):
+            return None
+
+    inputs["task_registry"] = NoopTaskRegistry(LifecycleLedger())
+    with pytest.raises(TypeError, match="concrete environment task registry"):
+        TaskSpecCompiler().compile(**inputs)
+
+
+def test_compiler_rejects_instance_shadowed_ledger_with_exported_start():
+    inputs = _compiler_inputs()
+    exported_events = inputs["task_registry"]._ledger.events()
+    target = LifecycleLedger()
+    target.events = lambda: exported_events
+    target.validated_events = lambda: exported_events
+    target.require_authoritative_task_start = lambda **_lineage: None
+    inputs["task_registry"] = EnvironmentTaskRegistry(target)
+
+    with pytest.raises(ValueError, match="task-start ingress is not recorded"):
+        TaskSpecCompiler().compile(**inputs)
+
+
+def test_task_registry_rejects_subclassed_ledger():
+    class ExportingLedger(LifecycleLedger):
+        def events(self):
+            return ()
+
+        def require_authoritative_task_start(self, **_lineage):
+            return None
+
+    with pytest.raises(TypeError, match="concrete lifecycle ledger"):
+        EnvironmentTaskRegistry(ExportingLedger())
+
+
+def test_compiler_publication_does_not_retain_registry_object_aliases():
+    inputs = _compiler_inputs()
+    compiled = TaskSpecCompiler().compile(**inputs)
+    source_object = inputs["registry"].get("find_object")
+    object.__setattr__(source_object, "owner_package", "changed_owner")
+
+    assert compiled.interaction_module.object_for("find_object").owner_package == (
+        "object_finder"
+    )
+    compiled.verify_identity()
+
+
+def test_domain_public_export_rejects_old_revision_after_nested_mutation():
+    domain = _compiler_inputs()["domain_contract_pack"]
+    object.__setattr__(domain.effect_rules[0], "failure_policy", "retryable")
+    object.__setattr__(domain, "verify_identity", lambda: None)
+
+    with pytest.raises((TypeError, ValueError)):
+        domain.to_dict()
+
+
+def test_domain_snapshot_preserves_identity_and_detaches_nested_rules():
+    domain = _compiler_inputs()["domain_contract_pack"]
+    snapshot = DomainContractPack.verified_copy(domain)
+    assert snapshot.to_dict() == domain.to_dict()
+    assert snapshot is not domain
+    assert snapshot.effect_rules[0] is not domain.effect_rules[0]
+    object.__setattr__(domain.effect_rules[0], "failure_policy", "retryable")
+    assert snapshot.effect_rules[0].failure_policy == "terminal"
+
+
+@pytest.mark.parametrize("mutation", ("extra_field", "subclass", "nested_subclass"))
+def test_compiler_rejects_domain_behavior_in_place_of_plain_data(mutation):
+    inputs = _compiler_inputs()
+    domain = inputs["domain_contract_pack"]
+    if mutation == "extra_field":
+        object.__setattr__(domain, "_pack_payload", lambda: {})
+    elif mutation == "nested_subclass":
+        class RuleSubclass(DomainEffectRule):
+            pass
+
+        rule = domain.effect_rules[0]
+        object.__setattr__(domain, "effect_rules", (RuleSubclass(
+            effect_id=rule.effect_id, object_id=rule.object_id,
+            evidence_owner=rule.evidence_owner, failure_policy=rule.failure_policy,
+        ),))
+    else:
+        class PackSubclass(DomainContractPack):
+            pass
+
+        replacement = object.__new__(PackSubclass)
+        replacement.__dict__.update(domain.__dict__)
+        inputs["domain_contract_pack"] = replacement
+    with pytest.raises((TypeError, ValueError)):
+        TaskSpecCompiler().compile(**inputs)
+
+
 def test_compiler_rejects_domain_revision_not_admitted_at_task_ingress():
     inputs = _compiler_inputs()
     inputs["task_ingress_decision"] = replace(

@@ -84,6 +84,86 @@ def test_trace_event_rejects_modified_content():
         TraceEvent.from_dict(payload)
 
 
+def _resign_trace_rows(rows):
+    renamed = {}
+    for row in rows:
+        old_event_id = row["event_id"]
+        parent_event_id = row["parent_event_id"]
+        if parent_event_id in renamed:
+            row["parent_event_id"] = renamed[parent_event_id]
+        identity = {key: value for key, value in row.items() if key != "event_id"}
+        encoded = json.dumps(
+            identity,
+            allow_nan=False,
+            sort_keys=True,
+            separators=(",", ":"),
+        ).encode("utf-8")
+        row["event_id"] = "trace-event:sha256:%s" % hashlib.sha256(
+            encoded
+        ).hexdigest()
+        renamed[old_event_id] = row["event_id"]
+    return rows
+
+
+@pytest.mark.parametrize("field", ("sequence", "commit_index", "commit_size"))
+@pytest.mark.parametrize("malformed", (True, 1.0, "1"))
+@pytest.mark.parametrize("constructor", ("direct", "from_dict"))
+def test_trace_event_requires_literal_integer_commit_counters(
+    field, malformed, constructor
+):
+    event = _ledger(None).events()[0]
+    payload = event.to_dict()
+    payload[field] = malformed
+    identity = {key: value for key, value in payload.items() if key != "event_id"}
+    encoded = json.dumps(
+        identity,
+        allow_nan=False,
+        sort_keys=True,
+        separators=(",", ":"),
+    ).encode("utf-8")
+    payload["event_id"] = "trace-event:sha256:%s" % hashlib.sha256(
+        encoded
+    ).hexdigest()
+
+    with pytest.raises(ValueError, match="sequence fields must be integers"):
+        if constructor == "from_dict":
+            TraceEvent.from_dict(payload)
+        else:
+            payload["artifact_refs"] = tuple(payload["artifact_refs"])
+            TraceEvent(**payload)
+
+
+@pytest.mark.parametrize("field", ("sequence", "commit_index", "commit_size"))
+def test_strict_ledger_reload_rejects_rehashed_boolean_counters(tmp_path, field):
+    events = _ledger(None).events()
+    rows = [event.to_dict() for event in events]
+    rows[0][field] = True
+    _resign_trace_rows(rows)
+    path = tmp_path / "boolean-sequence.jsonl"
+    path.write_text(
+        "".join(
+            json.dumps(row, sort_keys=True, separators=(",", ":")) + "\n"
+            for row in rows
+        ),
+        encoding="utf-8",
+    )
+
+    with pytest.raises(ValueError, match="invalid lifecycle event at line 1"):
+        LifecycleLedger(path)
+
+
+def test_strict_ledger_reload_rejects_duplicate_event_member_names(tmp_path):
+    event = _ledger(None).events()[0]
+    line = json.dumps(event.to_dict(), sort_keys=True, separators=(",", ":"))
+    line = line.replace('"sequence":1,', '"sequence":1,"sequence":1,', 1)
+    path = tmp_path / "duplicate-event-key.jsonl"
+    path.write_text(line + "\n", encoding="utf-8")
+
+    with pytest.raises(ValueError, match="invalid lifecycle event at line 1") as exc:
+        LifecycleLedger(path)
+    assert "duplicate JSON object key" in str(exc.value.__cause__)
+
+
 @pytest.mark.parametrize("source", ["events", "replay", "commit"])
 def test_public_event_exports_do_not_alias_ledger_authority(source):
     ledger = _ledger(None)

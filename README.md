@@ -13,7 +13,9 @@ as a dependency of the kernel.
 
 ## Current status
 
-H0 proves:
+H0, H1, and O1 remain partial; H2 NAO parity is unqualified. The following
+implemented seams are available for review, but do not constitute release-exit
+evidence:
 
 - frame-relative AB control bands;
 - read-only registry snapshots with SHA-256 content identity;
@@ -37,8 +39,9 @@ H0 proves:
 - task lineage projected from the common ledger with duplicate-start protection,
   same-run resume/notify lineage, and terminal-state reload across restart;
 - deterministic TaskSpec compilation into one content-addressed projection,
-  obligation, prohibition, and declared-budget artifact (budget consumption is
-  not yet enforced at runtime);
+  obligation, prohibition, and declared-budget artifact; model-call and
+  tool-call limits are consumed at dispatch, retry attempts are bounded and
+  recorded, and wall-time is checked when the timeout control is invoked;
 - content-addressed typed proposals, UAH semantic admission, and domain-owned
   operation leases with deterministic rejection reasons;
 - content-addressed execution receipts, replay-derived task acceptance, and
@@ -90,9 +93,8 @@ does not claim live-model, ROS, or general agentic capability.
 
 ## Development environment
 
-Local secrets and machine-specific paths belong in an ignored `.env`; use
-`.env.example` as the policy template. The kernel does not load `.env` files or
-depend on local credentials.
+Keep local secrets and machine-specific paths out of the repository and its
+artifacts. The kernel does not load `.env` files or depend on local credentials.
 
 ```bash
 ./scripts/setup_dev_tools.sh
@@ -103,8 +105,13 @@ The setup script creates the ignored `.venv`, installs the editable package and
 version-bounded development tools, then installs pre-commit and pre-push hooks.
 The pre-commit run checks merge markers, YAML, EOF and whitespace hygiene,
 Ruff, the complete test suite, and generated-document synchronization. A
-successful manual run records the exact repository signature inside `.git`;
-pre-push rejects a missing or stale record.
+successful manual run removes inherited hook skips and interpreter overrides
+before executing checks, then records the repository signature and complete
+checked Git tree inside `.git`. The pre-push guard performs its cache check
+with the repository interpreter and clears those overrides before running the
+pre-commit delegate. Only the manual run command can create the success
+record; pre-push rejects a missing or stale record and any outgoing tip whose
+tree differs from the checked snapshot.
 
 Minimal use:
 
@@ -146,8 +153,8 @@ module = InteractionProjector(registry).compile(
   plans.
 - `docs/architecture/` — foundation, Workbench integration, Observatory, ADRs,
   and runtime seam designs.
-- `docs/artifacts/` — provenance, decision records, and system-design outputs.
-- `docs/research/` — evidence reviews and research notes.
+- `docs/artifacts/` — provenance, selected architecture decisions, and generated
+  Observatory examples.
 - `docs/architecture/watson_inference_seams.md` — concrete seams for local-model and
   llama.cpp experimentation.
 - `scripts/` — dependency-free Markdown-to-HTML rendering.

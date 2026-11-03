@@ -385,6 +385,35 @@ def test_agent_run_requires_handle_membership_in_the_environment_roster():
         )
 
 
+def test_agent_run_attachment_uses_the_registered_profile_snapshot():
+    profile = _environment_profile()
+    _, _, profile_registry, environment_runs, agent_runs = _run_registries(
+        profiles=(profile,)
+    )
+    object.__setattr__(profile, "agent_handle_ids", ("handle:unapproved",))
+    returned = profile_registry.get(profile.environment_profile_id)
+    object.__setattr__(returned, "agent_handle_ids", ("handle:forged",))
+    attestation = _environment_attestation(
+        "environment-run:synthetic:snapshot",
+        profile.environment_profile_id,
+    )
+    environment_runs.register(attestation)
+
+    with pytest.raises(ValueError, match="not in environment profile roster"):
+        agent_runs.attach(
+            agent_run_id="agent-run:synthetic:forged",
+            environment_run_id=attestation.environment_run_id,
+            agent_handle_id="handle:forged",
+        )
+
+    run = agent_runs.attach(
+        agent_run_id="agent-run:synthetic:authorized",
+        environment_run_id=attestation.environment_run_id,
+        agent_handle_id="handle:synthetic.worker.primary",
+    )
+    assert run.agent_handle_id == "handle:synthetic.worker.primary"
+
+
 class _InactiveEnvironmentRuns:
     def __init__(self, environment_run: EnvironmentRun) -> None:
         self._environment_run = environment_run

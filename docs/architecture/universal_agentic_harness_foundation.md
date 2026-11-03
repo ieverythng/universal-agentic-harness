@@ -499,7 +499,7 @@ the full artifact so restart can reverify its nested and outer identities.
 The current wire parser rejects active v2 payloads and does not infer missing
 snapshots for historical metadata. Original R4 probes reproduced an all-marker
 replay downgrade and current consumers accepting a genuine old concrete
-artifact. The [separately reviewed nested-owner correction](../artifacts/reviews/2026-10-08_uah_r4_nested_owner.md)
+artifact. The separately reviewed nested-owner correction (`2026-10-08_uah_r4_nested_owner.md`)
 now rejects these active continuations and validates actual concrete nested
 fields before detached dispatch, evidence and ledger consumption. Both fresh
 reviews approve that bounded repair; historical read-only controls pass.
@@ -511,7 +511,7 @@ choices; expected effects and observable effects both respect prohibited
 effects. Static eligibility grants no execution authority and does not replace
 binding, argument-schema or domain gates. Two fresh reviews approve this
 bounded static rule; its gate and stateful limits are tracked in
-the [ARCH-01 receipt](../artifacts/reviews/2026-10-08_uah_arch01_static_eligibility.md).
+the ARCH-01 receipt (`2026-10-08_uah_arch01_static_eligibility.md`).
 `DomainLifecycleAdmission` independently rechecks activation, domain revision,
 binding environment, readiness attestation, and duplicate operation before
 issuing a content-addressed, operation-scoped `ExecutionLease`. Native
@@ -523,6 +523,19 @@ native result separately from normalized evidence. Explicit task acceptance
 produces accepted, deficit, suspended, or required-effect-rejected terminal
 facts and deterministic trace digests. An operation rejection never makes the
 whole task terminal by inference.
+
+New execution starts declare the `uah.execution_receipt/v1` projection version.
+An accepted `execution_completed` event retains the exact `ExecutionReceipt`
+wire object, including native `OwnerExecutionResult` and normalized
+`EffectEvidence`; its paired `evidence_issued` event carries the same version.
+Replay verifies receipt identity and native/normalized agreement, compares the
+completion and evidence fields with the retained receipt, and checks the
+evidence artifact references. A typed `EvidenceRejection` can still record a
+completion followed by `evidence_rejected`, without claiming an accepted
+receipt. Genuine older unmarked events remain readable under their narrower
+historical checks. Replay does not invent missing receipt fields or grant a new
+execution lease from historical metadata. A marked projection with missing or
+mismatched data fails closed.
 
 ### Prompt compilation seam
 
@@ -768,6 +781,14 @@ owner-reviewed, content-addressed DomainContractPack revision before H2 parity.
 | Runtime | Shell, ROS, browser, API, MCP, sandbox, worker | Execution adapter |
 | Trace/eval | Events, lineage, artifacts, scores, regression gates | Storage and evaluator |
 
+**Accepted context direction (2026-10-11; not implemented):** retain exact
+task-scoped requests, raw responses, and tool observations as local source
+artifacts; the sole lifecycle ledger owns their hashes and causal references.
+Derive model-visible context separately. Summaries cannot replace ledger facts,
+change recorded outcomes, or serve as owner evidence. The first authorized
+Observatory retrieval is limited to current-task artifacts. Cross-task retrieval,
+new storage schema, and raw transport-fidelity claims remain out of scope.
+
 ## 5. Proposed Contract Grammar
 
 ### EnvironmentProfile, EnvironmentRun, and EnvironmentIngress
@@ -834,7 +855,7 @@ ledger writes the resulting authoritative start. The read-only task registry
 must require that provenance before fresh compilation. Caller-created raw facts
 and exported events do not grant command authority. Historical unmarked starts
 remain readable without fresh compilation rights. The bounded repair and fresh
-review are tracked in the [ingress round](../artifacts/reviews/2026-10-08_uah_ingress_authority_repair.md);
+review are tracked in the ingress round (`2026-10-08_uah_ingress_authority_repair.md`);
 this accepted boundary is not H0/H1 release sign-off. It relies on trusted
 runtime ownership of the ledger file, not resistance to an attacker rewriting
 the entire file and recomputing its hashes.

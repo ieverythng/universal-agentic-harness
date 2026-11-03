@@ -103,13 +103,21 @@ class ObjectArgumentSchema:
     schema_version: str = OBJECT_ARGUMENT_SCHEMA_VERSION
 
     def __post_init__(self) -> None:
+        if type(self) is not ObjectArgumentSchema:
+            raise TypeError("schema must be a concrete ObjectArgumentSchema")
+        if type(self.allow_additional_properties) is not bool:
+            raise TypeError("additional properties policy must be a boolean")
         if not isinstance(self.fields, tuple) or not isinstance(self.required, tuple):
             raise TypeError("object schema collections must be tuples")
+        if any(type(field) is not ArgumentField for field in self.fields):
+            raise TypeError("object schema fields must be concrete ArgumentField values")
+        if any(type(name) is not str for name in self.required):
+            raise TypeError("required argument names must be strings")
         object.__setattr__(
             self, "fields", tuple(sorted(self.fields, key=lambda f: f.name))
         )
         object.__setattr__(self, "required", tuple(sorted(self.required)))
-        self.verify_identity()
+        ObjectArgumentSchema.verify_identity(self)
 
     @classmethod
     def issue(
@@ -120,6 +128,14 @@ class ObjectArgumentSchema:
         required: tuple[str, ...],
         allow_additional_properties: bool = False,
     ) -> ObjectArgumentSchema:
+        if cls is not ObjectArgumentSchema:
+            raise TypeError("schema must be a concrete ObjectArgumentSchema")
+        if type(allow_additional_properties) is not bool:
+            raise TypeError("additional properties policy must be a boolean")
+        if not isinstance(fields, tuple) or any(
+            type(field) is not ArgumentField for field in fields
+        ):
+            raise TypeError("object schema fields must be concrete ArgumentField values")
         canonical_fields = tuple(sorted(fields, key=lambda field: field.name))
         canonical_required = tuple(sorted(required))
         payload = _object_schema_payload(
@@ -136,13 +152,53 @@ class ObjectArgumentSchema:
             allow_additional_properties=allow_additional_properties,
         )
 
+    @classmethod
+    def validated_snapshot(cls, schema: object) -> ObjectArgumentSchema:
+        """Detach schema values after validating them with the owning class."""
+        if cls is not ObjectArgumentSchema or type(schema) is not ObjectArgumentSchema:
+            raise TypeError("schema must be a concrete ObjectArgumentSchema")
+        for name in ("schema_id", "schema_ref", "schema_version"):
+            if type(getattr(schema, name)) is not str:
+                raise TypeError("object schema %s must be a string" % name)
+        if type(schema.fields) is not tuple or any(
+            type(field) is not ArgumentField for field in schema.fields
+        ):
+            raise TypeError("object schema fields must be concrete ArgumentField values")
+        if type(schema.required) is not tuple or any(
+            type(name) is not str for name in schema.required
+        ):
+            raise TypeError("required argument names must be strings")
+        if type(schema.allow_additional_properties) is not bool:
+            raise TypeError("additional properties policy must be a boolean")
+        for field in schema.fields:
+            values = object.__getattribute__(field, "__dict__")
+            if any(type(values.get(name)) is not str for name in ("name", "value_type")):
+                raise TypeError("argument field names and types must be strings")
+        fields = tuple(
+            ArgumentField(field.name, field.value_type) for field in schema.fields
+        )
+        return ObjectArgumentSchema(
+            schema_id=schema.schema_id,
+            schema_ref=schema.schema_ref,
+            fields=fields,
+            required=tuple(schema.required),
+            allow_additional_properties=schema.allow_additional_properties,
+            schema_version=schema.schema_version,
+        )
+
     def verify_identity(self) -> None:
+        if type(self) is not ObjectArgumentSchema:
+            raise TypeError("schema must be a concrete ObjectArgumentSchema")
+        if type(self.allow_additional_properties) is not bool:
+            raise TypeError("additional properties policy must be a boolean")
         if self.schema_version != OBJECT_ARGUMENT_SCHEMA_VERSION:
             raise ValueError("unsupported object argument schema version")
         if not self.schema_ref.strip():
             raise ValueError("schema reference must not be empty")
         if not isinstance(self.fields, tuple) or not isinstance(self.required, tuple):
             raise TypeError("object schema collections must be tuples")
+        if any(type(field) is not ArgumentField for field in self.fields):
+            raise TypeError("object schema fields must be concrete ArgumentField values")
         field_names = tuple(field.name for field in self.fields)
         if len(field_names) != len(set(field_names)):
             raise ValueError("object schema field names must be unique")
@@ -175,7 +231,7 @@ class InMemoryArgumentSchemaRegistry:
     def __init__(self, schemas: tuple[ObjectArgumentSchema, ...]) -> None:
         by_ref: dict[str, ObjectArgumentSchema] = {}
         for schema in schemas:
-            schema.verify_identity()
+            schema = ObjectArgumentSchema.validated_snapshot(schema)
             if schema.schema_ref in by_ref:
                 raise ValueError(
                     "duplicate argument schema ref: %s" % schema.schema_ref
@@ -196,7 +252,7 @@ class InMemoryArgumentSchemaRegistry:
                 schema_id=None,
                 violations=("schema_not_registered",),
             )
-        schema.verify_identity()
+        schema = ObjectArgumentSchema.validated_snapshot(schema)
         fields = {field.name: field for field in schema.fields}
         violations: list[str] = []
         for name in schema.required:

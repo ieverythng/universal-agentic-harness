@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from dataclasses import asdict
 from dataclasses import dataclass
+from dataclasses import fields
 import hashlib
 import json
 from typing import Literal
@@ -120,6 +121,18 @@ class DomainContractPack:
     ingress_rules: tuple[TaskIngressRule, ...]
     effect_rules: tuple[DomainEffectRule, ...]
     prohibited_effects: tuple[str, ...] = ()
+
+    @classmethod
+    def verified_copy(cls, pack: object) -> DomainContractPack:
+        """Consume one concrete domain-owned snapshot, including nested rules."""
+        if cls is not DomainContractPack or type(pack) is not DomainContractPack:
+            raise TypeError("domain contract pack requires its concrete owner type")
+        values = _stored_domain_fields(pack, DomainContractPack)
+        snapshot = DomainContractPack(
+            **{name: _detached_domain_value(value) for name, value in values.items()}
+        )
+        DomainContractPack.verify_identity(snapshot)
+        return snapshot
 
     @classmethod
     def issue(
@@ -262,7 +275,7 @@ class DomainContractPack:
                 for item in self.ingress_rules
             ),
         )
-        self.verify_identity()
+        DomainContractPack.verify_identity(self)
 
     def verify_identity(self) -> None:
         """Recheck covered content before another owner consumes this pack."""
@@ -291,16 +304,41 @@ class DomainContractPack:
             raise ValueError("duplicate %s: %s" % (label, ", ".join(duplicates)))
 
     def to_dict(self) -> dict[str, object]:
+        snapshot = DomainContractPack.verified_copy(self)
         return {
-            "revision": self.revision,
+            "revision": snapshot.revision,
             **_pack_payload(
-                domain_contract_pack_id=self.domain_contract_pack_id,
-                frame_id=self.frame_id,
-                registry_version=self.registry_version,
-                allowed_role_ids=self.allowed_role_ids,
-                supported_task_type_ids=self.supported_task_type_ids,
-                ingress_rules=self.ingress_rules,
-                effect_rules=self.effect_rules,
-                prohibited_effects=self.prohibited_effects,
+                domain_contract_pack_id=snapshot.domain_contract_pack_id,
+                frame_id=snapshot.frame_id,
+                registry_version=snapshot.registry_version,
+                allowed_role_ids=snapshot.allowed_role_ids,
+                supported_task_type_ids=snapshot.supported_task_type_ids,
+                ingress_rules=snapshot.ingress_rules,
+                effect_rules=snapshot.effect_rules,
+                prohibited_effects=snapshot.prohibited_effects,
             ),
         }
+
+
+def _stored_domain_fields(value: object, expected_type: type) -> dict[str, object]:
+    if type(value) is not expected_type:
+        raise TypeError("domain contract sources require concrete values")
+    stored = object.__getattribute__(value, "__dict__")
+    names = tuple(item.name for item in fields(expected_type))
+    if type(stored) is not dict or set(stored) != set(names):
+        raise TypeError("domain contract source fields must be plain data")
+    return {name: stored[name] for name in names}
+
+
+def _detached_domain_value(value: object) -> object:
+    if type(value) in (str, type(None)):
+        return value
+    if type(value) is tuple:
+        return tuple(_detached_domain_value(item) for item in value)
+    if type(value) in (TaskIngressRule, DomainEffectRule):
+        owner = type(value)
+        return owner(**{
+            name: _detached_domain_value(item)
+            for name, item in _stored_domain_fields(value, owner).items()
+        })
+    raise TypeError("domain contract source contains an unsupported value")

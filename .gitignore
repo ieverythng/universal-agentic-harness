@@ -12,6 +12,8 @@ build/
 dist/
 htmlcov/
 *.jsonl
+!tests/fixtures/model_invocation_legacy_v1/completed.jsonl
+!tests/fixtures/model_invocation_legacy_v1/unfinished.jsonl
 .artifacts/
 .test-tmp/
 ~$*.docx

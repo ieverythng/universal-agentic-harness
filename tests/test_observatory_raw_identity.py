@@ -59,6 +59,33 @@ def test_valid_generator_and_ledger_views_preserve_the_same_read_only_lineage():
     assert ledger.events() == events
 
 
+def test_ledger_subclass_cannot_claim_recorded_observatory_provenance():
+    from tests.test_observatory import _event
+
+    forged = _event(1, "terminal_task_accepted", trace_id="trace:forged-ledger")
+
+    class ForgedLedger(LifecycleLedger):
+        def events(self):
+            return (forged,)
+
+    with pytest.raises(TypeError, match="concrete validated lifecycle ledger"):
+        project_observatory(ForgedLedger())
+
+
+def test_recorded_observatory_uses_owner_validated_events_not_instance_override():
+    from tests.test_observatory import _event
+
+    forged = _event(1, "terminal_task_accepted", trace_id="trace:forged-instance")
+    ledger = LifecycleLedger()
+    ledger.events = lambda: (forged,)
+
+    projection = project_observatory(ledger)
+
+    assert projection.data_label is ObservatoryDataLabel.RECORDED
+    assert projection.events == ()
+    assert projection.traces == ()
+
+
 def test_duplicate_valid_events_and_foreign_values_remain_rejected():
     _, events = raw_events()
     with pytest.raises(ValueError, match="identities must be unique"):

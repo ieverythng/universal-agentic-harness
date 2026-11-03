@@ -379,7 +379,7 @@ class ProposalNormalizer:
         raw_output_artifact_id: str,
         output: AgentOutput,
     ) -> ProposalNormalizationResult:
-        compiled_task.verify_identity()
+        compiled_task = CompiledTask.verified_copy(compiled_task)
 
         def reject(reason_codes: tuple[str, ...]) -> ProposalNormalizationResult:
             return ProposalNormalizationResult(
@@ -876,7 +876,7 @@ class SemanticAdmission:
         else:
             if not module.role.control_band.admits_direct(object_view.ab_level):
                 reasons.append("object_inspection_only")
-            if not object_view.runtime_callable:
+            if object_view.runtime_callable is not True:
                 reasons.append("object_not_runtime_callable")
             exposed_effects = set(object_view.expected_effects) | set(
                 object_view.observable_success
@@ -907,7 +907,7 @@ class SemanticAdmission:
         compiled_task: CompiledTask,
         proposal: TypedProposal,
     ) -> SemanticAdmissionDecision:
-        compiled_task.verify_identity()
+        compiled_task = CompiledTask.verified_copy(compiled_task)
         proposal.verify_identity()
         if (
             proposal.compiled_task_id != compiled_task.compiled_task_id

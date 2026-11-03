@@ -10,7 +10,7 @@ import re
 from typing import Callable, Protocol, TYPE_CHECKING
 
 from ab_harness.model_allocator import ModelLease
-from ab_harness.prompt_compiler import CompiledPrompt
+from ab_harness.prompt_compiler import CompiledPrompt, ConfiguredPromptSourceOwner
 
 if TYPE_CHECKING:
     from ab_harness.lifecycle import LifecycleLedger
@@ -52,11 +52,18 @@ class ModelInvocationRequest:
     requested_at: str
     task_id: str
     trace_id: str
+    source_references: tuple[str, ...] = ()
     request_id: str = field(init=False)
 
     def __post_init__(self) -> None:
+        prompt = CompiledPrompt.validated_snapshot(self.compiled_prompt)
+        object.__setattr__(self, "compiled_prompt", prompt)
         self.lease.verify_identity()
-        self.compiled_prompt.verify_identity()
+        if type(self.source_references) is not tuple or any(
+            type(reference) is not str or not reference.strip()
+            for reference in self.source_references
+        ):
+            raise TypeError("prompt source references must be nonempty strings")
         for name in ("invocation_id", "task_id", "trace_id"):
             value = getattr(self, name)
             if not isinstance(value, str) or not value.strip():
@@ -92,7 +99,7 @@ class ModelInvocationRequest:
         return self.compiled_prompt.compiled_task_id
 
     def _payload(self) -> dict[str, object]:
-        return {
+        payload = {
             "schema_version": "uah.model_invocation_request/v1",
             "invocation_id": self.invocation_id,
             "lease": self.lease.to_dict(),
@@ -101,6 +108,9 @@ class ModelInvocationRequest:
             "task_id": self.task_id,
             "trace_id": self.trace_id,
         }
+        if self.source_references:
+            payload["source_references"] = self.source_references
+        return payload
 
     def verify_identity(self) -> None:
         if self.request_id != _identity("model-invocation-request", self._payload()):
@@ -118,6 +128,8 @@ class ModelInvocationRequest:
             raise ValueError("unsupported model invocation request schema")
         data["lease"] = ModelLease.from_dict(data["lease"])
         data["compiled_prompt"] = CompiledPrompt.from_dict(data["compiled_prompt"])
+        if "source_references" in data:
+            data["source_references"] = tuple(data["source_references"])
         result = cls(**data)
         if result.request_id != identity:
             raise ValueError("model invocation request identity does not match content")
@@ -299,6 +311,38 @@ class ModelInvocationStarted:
             )
 
 
+@dataclass(frozen=True)
+class _ModelInvocationStartCommand:
+    """Private ledger command issued only by the configured prompt owner."""
+
+    authority: ModelInvocationAuthority
+    capability: object
+    started: ModelInvocationStarted
+
+    def require_fact(self, ledger: LifecycleLedger) -> ModelInvocationStarted:
+        authority = self.authority
+        if (
+            type(authority) is not ModelInvocationAuthority
+            or authority.ledger is not ledger
+            or self.capability is not authority._start_capability
+        ):
+            raise ValueError("invalid authority-bound model-invocation command")
+        self.started.validate()
+        request = self.started.request
+        sources = authority.prompt_source_owner.resolve(
+            request.compiled_task_id,
+            request.lease.agent_id,
+            request.compiled_prompt.frame_id,
+        )
+        if (
+            sources.compile() != request.compiled_prompt
+            or sources.references(request.compiled_prompt)
+            != request.source_references
+        ):
+            raise ValueError("model invocation does not match configured prompt sources")
+        return self.started
+
+
 class ProviderPort(Protocol):
     """External model boundary; responses are untrusted JSON values."""
 
@@ -348,10 +392,15 @@ class ModelInvocationAuthority:
         ledger: LifecycleLedger,
         provider: ProviderPort,
         *,
+        prompt_source_owner: ConfiguredPromptSourceOwner,
         clock: Callable[[], str] | None = None,
     ) -> None:
         self.ledger = ledger
         self.provider = provider
+        if type(prompt_source_owner) is not ConfiguredPromptSourceOwner:
+            raise TypeError("model invocation requires configured prompt source owners")
+        self.prompt_source_owner = prompt_source_owner
+        self._start_capability = object()
         self.clock = clock or (lambda: datetime.now(timezone.utc).isoformat())
 
     def invoke(
@@ -363,8 +412,8 @@ class ModelInvocationAuthority:
             TaskBudgetAuthority,
         )
 
+        compiled_prompt = CompiledPrompt.validated_snapshot(compiled_prompt)
         lease.verify_identity()
-        compiled_prompt.verify_identity()
         for attempt in range(2):
             events = self.ledger.events()
             previous = tuple(
@@ -440,6 +489,23 @@ class ModelInvocationAuthority:
                 != compiled_prompt.domain_contract_pack_revision
             ):
                 raise ValueError("invocation requires the exact recorded compiled task")
+            sources = self.prompt_source_owner.resolve(
+                compiled_prompt.compiled_task_id,
+                actor.manifest.agent_id,
+                compiled_prompt.frame_id,
+            )
+            if (
+                sources.compiled_task.environment_run_id != lease.environment_run_id
+                or sources.task_spec.task_id != compiled.task_id
+                or sources.task_spec.trace_id != compiled.trace_id
+                or sources.environment_id != compiled_prompt.environment_id
+                or sources.runtime_mode != compiled_prompt.runtime_mode
+            ):
+                raise ValueError("prompt sources do not match admitted task and actor")
+            owner_prompt = sources.compile()
+            if owner_prompt != compiled_prompt:
+                raise ValueError("compiled prompt does not match trusted source revisions")
+            compiled_prompt = owner_prompt
             request = ModelInvocationRequest(
                 invocation_id,
                 lease,
@@ -447,6 +513,7 @@ class ModelInvocationAuthority:
                 self.clock(),
                 compiled_prompt.task_id,
                 compiled_prompt.trace_id,
+                sources.references(compiled_prompt),
             )
             assessment = TaskBudgetAuthority(self.ledger).assess(
                 trace_id=request.trace_id,
@@ -467,7 +534,11 @@ class ModelInvocationAuthority:
                     )
                     raise BudgetExhaustedError("model_call budget exhausted")
                 self.ledger.record(
-                    ModelInvocationStarted(request, assessment.decision),
+                    _ModelInvocationStartCommand(
+                        self,
+                        self._start_capability,
+                        ModelInvocationStarted(request, assessment.decision),
+                    ),
                     expected_sequence=assessment.expected_sequence,
                 )
                 break
@@ -475,8 +546,11 @@ class ModelInvocationAuthority:
                 if attempt:
                     raise
         try:
+            provider_request = ModelInvocationRequest.from_dict(request.to_dict())
             output = RawModelOutput.capture(
-                request, self.provider.invoke(request), completed_at=self.clock()
+                request,
+                self.provider.invoke(provider_request),
+                completed_at=self.clock(),
             )
         except Exception as error:
             failure = ModelInvocationFailure.capture(

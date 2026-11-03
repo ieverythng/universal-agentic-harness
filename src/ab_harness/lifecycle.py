@@ -6,6 +6,7 @@ from dataclasses import asdict
 from dataclasses import dataclass
 from dataclasses import field
 from dataclasses import replace
+from contextlib import AbstractContextManager
 from datetime import datetime, timedelta, timezone
 import hashlib
 import json
@@ -13,10 +14,12 @@ import os
 from pathlib import Path
 from types import MappingProxyType
 from types import TracebackType
+from threading import RLock
 from typing import Callable, TYPE_CHECKING
 
 from ab_harness.acceptance import TaskAcceptanceEvaluator
 from ab_harness.contracts import EffectEvidence
+from ab_harness.contracts import EffectObligation
 from ab_harness.contracts import TaskAcceptance
 
 if TYPE_CHECKING:
@@ -47,6 +50,7 @@ if TYPE_CHECKING:
         ModelLeaseRelease,
     )
     from ab_harness.model_invocation import (
+        _ModelInvocationStartCommand,
         ModelInvocationStarted,
         RawModelOutput,
         ModelInvocationFailure,
@@ -57,6 +61,7 @@ TRACE_EVENT_SCHEMA = "uah.trace_event/v1"
 SCOPED_EVENT_SCHEMA = "uah.trace_event/v2"
 VERIFIED_TRACE_DIGEST_SCHEMA = "uah.verified_trace_digest/v1"
 TASK_START_AUTHORITY = "uah.task_ingress_authority/v1"
+COMPILED_TASK_OBLIGATIONS_SCHEMA = "uah.compiled_task_obligations/v1"
 
 
 def _canonical_json(payload: object) -> str:
@@ -71,6 +76,15 @@ def _canonical_json(payload: object) -> str:
         raise ValueError("lifecycle content must contain finite JSON values") from exc
 
 
+def _unique_json_object(pairs: list[tuple[str, object]]) -> dict[str, object]:
+    payload: dict[str, object] = {}
+    for key, value in pairs:
+        if key in payload:
+            raise ValueError("duplicate JSON object key: %s" % key)
+        payload[key] = value
+    return payload
+
+
 def _content_id(prefix: str, payload: object) -> str:
     return "%s:sha256:%s" % (
         prefix,
@@ -80,6 +94,20 @@ def _content_id(prefix: str, payload: object) -> str:
 
 def _artifact_id(prefix: str, artifact: object) -> str:
     return _content_id(prefix, asdict(artifact))
+
+
+def _compiled_obligation_contract_id(
+    compiled_task_id: str,
+    effect_obligations: tuple[EffectObligation, ...],
+) -> str:
+    return _content_id(
+        "compiled-task-obligations",
+        {
+            "schema_version": COMPILED_TASK_OBLIGATIONS_SCHEMA,
+            "compiled_task_id": compiled_task_id,
+            "effect_obligations": tuple(asdict(item) for item in effect_obligations),
+        },
+    )
 
 
 @dataclass(frozen=True)
@@ -107,6 +135,11 @@ class TraceEvent:
     def __post_init__(self) -> None:
         if self.schema_version not in {TRACE_EVENT_SCHEMA, SCOPED_EVENT_SCHEMA}:
             raise ValueError("unsupported trace event schema: %s" % self.schema_version)
+        if any(
+            type(value) is not int
+            for value in (self.sequence, self.commit_index, self.commit_size)
+        ):
+            raise ValueError("trace event sequence fields must be integers")
         if self.schema_version == TRACE_EVENT_SCHEMA:
             if self.event_scope != "task" or self.agent_run_id is not None:
                 raise ValueError("v1 events require task scope without actor identity")
@@ -223,7 +256,7 @@ class TraceEvent:
         if set(payload) != expected:
             raise ValueError("invalid trace event fields")
         if any(
-            not isinstance(payload[name], int)
+            type(payload[name]) is not int
             for name in ("sequence", "commit_index", "commit_size")
         ):
             raise ValueError("trace event sequence fields must be integers")
@@ -321,6 +354,7 @@ class AcceptanceFact:
 if TYPE_CHECKING:
     LifecycleFact = (
         _TaskStartCommand
+        | _ModelInvocationStartCommand
         | TaskIngressFact
         | CompiledTask
         | TypedProposal
@@ -520,6 +554,12 @@ class _TraceState:
     task_started_at: str = ""
     authoritative_task_start: bool = False
     compiled_task_id: str | None = None
+    effect_obligations: tuple[EffectObligation, ...] | None = None
+    evidence_by_artifact_id: dict[str, EffectEvidence] = field(default_factory=dict)
+    obligation_events_by_acceptance_id: dict[
+        str, list[tuple[str, int, int, str, str, str, str, str]]
+    ] = field(default_factory=dict)
+    task_acceptance: TaskAcceptance | None = None
     domain_contract_pack_revision: str | None = None
     role_id: str | None = None
     frame_id: str | None = None
@@ -545,6 +585,11 @@ class _TraceState:
     lease_by_operation: dict[str, str] = field(default_factory=dict)
     lease_owner_by_operation: dict[str, str] = field(default_factory=dict)
     result_by_operation: dict[str, str] = field(default_factory=dict)
+    succeeded_by_operation: dict[str, bool] = field(default_factory=dict)
+    receipt_projection_version_by_operation: dict[str, str] = field(
+        default_factory=dict
+    )
+    receipt_by_operation: dict[str, object] = field(default_factory=dict)
     operation_edges: set[tuple[str, str, str]] = field(default_factory=set)
     budget_limits: dict[str, int] = field(default_factory=dict)
     budget_consumed: dict[str, int] = field(default_factory=dict)
@@ -571,6 +616,7 @@ class LifecycleLedger:
         self.path = Path(path) if path is not None else None
         self._clock = clock or _utc_now
         self._events: list[TraceEvent] = []
+        self._memory_lock = RLock()
         with self._file_lock():
             self._refresh_from_disk()
 
@@ -592,12 +638,22 @@ class LifecycleLedger:
             ):
                 raise LifecycleSequenceConflict("lifecycle ledger sequence conflict")
             from ab_harness.task_ingress_authority import _TaskStartCommand
+            from ab_harness.model_invocation import (
+                ModelInvocationStarted,
+                _ModelInvocationStartCommand,
+            )
 
             if isinstance(fact, TaskStartedFact):
                 raise ValueError("new starts require an authority-bound task-start command")
             if type(fact) is _TaskStartCommand:
                 specs = _event_specs(fact.require_fact(self))
                 specs[0]["data"]["task_start_authority"] = TASK_START_AUTHORITY
+            elif type(fact) is _ModelInvocationStartCommand:
+                specs = _event_specs(fact.require_fact(self))
+            elif isinstance(fact, ModelInvocationStarted):
+                raise ValueError(
+                    "new model invocation starts require an authority-bound command"
+                )
             else:
                 specs = _event_specs(fact)
             if not specs:
@@ -720,18 +776,56 @@ class LifecycleLedger:
             self._refresh_from_disk()
             return tuple(replace(event) for event in self._events)
 
+    def validated_events(self) -> tuple[TraceEvent, ...]:
+        """Return an owner-validated snapshot of the complete ledger history."""
+
+        if type(self) is not LifecycleLedger:
+            raise TypeError("validated events require a concrete lifecycle ledger")
+
+        def copy_event(event: TraceEvent) -> TraceEvent:
+            payload = asdict(event)
+            payload["artifact_refs"] = list(payload["artifact_refs"])
+            if payload["schema_version"] == TRACE_EVENT_SCHEMA:
+                payload.pop("event_scope")
+                payload.pop("agent_run_id")
+            return TraceEvent.from_dict(payload)
+
+        if self.path is None:
+            with self._memory_lock:
+                events = tuple(copy_event(event) for event in self._events)
+        else:
+            lock_path = self.path.with_name(self.path.name + ".lock")
+            with _LedgerFileLock(lock_path):
+                events = LifecycleLedger._load_events(self)
+        _reduce_events(events)
+        return tuple(replace(event) for event in events)
+
     def require_authoritative_task_start(self, *, trace_id: str, decision_id: str) -> None:
         """Require a persisted issuer-controlled start, not legacy hash agreement."""
-        with self._file_lock():
-            self._refresh_from_disk()
-            if not any(
-                event.trace_id == trace_id
-                and event.event_type == "task_started"
-                and event.data.get("decision_id") == decision_id
-                and event.data.get("task_start_authority") == TASK_START_AUTHORITY
-                for event in self._events
-            ):
-                raise ValueError("fresh compilation requires authoritative task-start provenance")
+        events = LifecycleLedger.validated_events(self)
+        LifecycleLedger.require_authoritative_task_start_in_snapshot(
+            events,
+            trace_id=trace_id,
+            decision_id=decision_id,
+        )
+
+    @staticmethod
+    def require_authoritative_task_start_in_snapshot(
+        events: tuple[TraceEvent, ...],
+        *,
+        trace_id: str,
+        decision_id: str,
+    ) -> None:
+        """Require an authoritative start in one owner-validated snapshot."""
+
+        if not any(
+            event.trace_id == trace_id
+            and event.event_type == "task_started"
+            and event.data.get("decision_id") == decision_id
+            and event.data.get("task_start_authority") == TASK_START_AUTHORITY
+            for event in events
+        ):
+            raise ValueError("fresh compilation requires authoritative task-start provenance")
 
     def has_operation_event(
         self,
@@ -831,9 +925,9 @@ class LifecycleLedger:
                 return replay
         raise KeyError(agent_run_id)
 
-    def _file_lock(self) -> _LedgerFileLock | _NullLedgerLock:
+    def _file_lock(self) -> AbstractContextManager[None]:
         if self.path is None:
-            return _NullLedgerLock()
+            return self._memory_lock
         return _LedgerFileLock(self.path.with_name(self.path.name + ".lock"))
 
     def _refresh_from_disk(self) -> None:
@@ -867,7 +961,7 @@ class LifecycleLedger:
             if not line.strip():
                 raise ValueError("invalid lifecycle event at line %d" % line_number)
             try:
-                payload = json.loads(line)
+                payload = json.loads(line, object_pairs_hook=_unique_json_object)
                 if not isinstance(payload, dict):
                     raise ValueError("event record must be a JSON object")
                 events.append(TraceEvent.from_dict(payload))
@@ -876,19 +970,6 @@ class LifecycleLedger:
                     "invalid lifecycle event at line %d" % line_number
                 ) from exc
         return tuple(events)
-
-
-class _NullLedgerLock:
-    def __enter__(self) -> None:
-        return None
-
-    def __exit__(
-        self,
-        exc_type: type[BaseException] | None,
-        exc_value: BaseException | None,
-        traceback: TracebackType | None,
-    ) -> None:
-        return None
 
 
 class _LedgerFileLock:
@@ -1102,16 +1183,25 @@ def _event_specs(fact: LifecycleFact) -> tuple[dict[str, object], ...]:
             *_event_specs(ExecutionStartedFact(fact.lease)),
         )
     if isinstance(fact, CompiledTask):
-        fact.verify_identity()
+        fact = CompiledTask.verified_copy(fact)
+        obligation_contract_id = _compiled_obligation_contract_id(
+            fact.compiled_task_id,
+            fact.effect_obligations,
+        )
         return (
             _spec(
                 event_type="task_compiled",
                 environment_run_id=fact.environment_run_id,
                 task_id=fact.task_id,
                 trace_id=fact.trace_id,
-                artifact_refs=(fact.compiled_task_id,),
+                artifact_refs=(fact.compiled_task_id, obligation_contract_id),
                 data={
                     "compiled_task_id": fact.compiled_task_id,
+                    "obligation_contract_schema": COMPILED_TASK_OBLIGATIONS_SCHEMA,
+                    "obligation_contract_id": obligation_contract_id,
+                    "effect_obligations": tuple(
+                        asdict(item) for item in fact.effect_obligations
+                    ),
                     "domain_contract_pack_revision": fact.domain_contract_pack_revision,
                     "role_id": fact.interaction_module.role.role_id,
                     "frame_id": fact.interaction_module.frame.frame_id,
@@ -1240,16 +1330,21 @@ def _event_specs(fact: LifecycleFact) -> tuple[dict[str, object], ...]:
     if isinstance(fact, ExecutionStartedFact):
         lease = fact.lease
         ExecutionLease.verify_identity(lease)
+        from ab_harness.environment import EXECUTION_RECEIPT_SCHEMA
+
         return (
             _operation_spec(
                 lease.admitted_operation.proposal,
                 event_type="execution_started",
                 artifact_refs=(lease.execution_lease_id,),
-                data={"execution_lease_id": lease.execution_lease_id},
+                data={
+                    "execution_lease_id": lease.execution_lease_id,
+                    "receipt_projection_version": EXECUTION_RECEIPT_SCHEMA,
+                },
             ),
         )
     if isinstance(fact, ExecutionReceipt):
-        fact.verify_identity()
+        fact = ExecutionReceipt.verified_copy(fact)
         evidence_id = _artifact_id("effect-evidence", fact.evidence)
         common = {
             "environment_run_id": fact.environment_run_id,
@@ -1268,6 +1363,8 @@ def _event_specs(fact: LifecycleFact) -> tuple[dict[str, object], ...]:
                 "binding_id": fact.evidence.binding_id,
                 "owner": fact.evidence.owner,
                 "succeeded": fact.owner_result.succeeded,
+                "receipt_projection_version": fact.schema_version,
+                "execution_receipt": fact.to_dict(),
             },
             **common,
         )
@@ -1284,6 +1381,7 @@ def _event_specs(fact: LifecycleFact) -> tuple[dict[str, object], ...]:
                 "owner": fact.evidence.owner,
                 "succeeded": fact.evidence.succeeded,
                 "observed_effects": fact.evidence.observed_effects,
+                "receipt_projection_version": fact.schema_version,
             },
             **common,
         )
@@ -1405,7 +1503,17 @@ def _event_specs(fact: LifecycleFact) -> tuple[dict[str, object], ...]:
             ),
         )
     if isinstance(fact, TaskTimeoutDecision):
-        fact.verify_identity()
+        fact = TaskTimeoutDecision(
+            decision_id=fact.decision_id,
+            compiled_task=CompiledTask.verified_copy(fact.compiled_task),
+            task_started_at=fact.task_started_at,
+            deadline_at=fact.deadline_at,
+            observed_at=fact.observed_at,
+            policy_revision=fact.policy_revision,
+            outcome=fact.outcome,
+            schema_version=fact.schema_version,
+        )
+        TaskTimeoutDecision.verify_identity(fact)
         compiled = fact.compiled_task
         return (
             _spec(
@@ -1453,8 +1561,13 @@ def _event_specs(fact: LifecycleFact) -> tuple[dict[str, object], ...]:
             ),
         )
     if isinstance(fact, AcceptanceFact):
-        fact.compiled_task.verify_identity()
-        return _acceptance_specs(fact)
+        compiled_task = CompiledTask.verified_copy(fact.compiled_task)
+        accepted_fact = AcceptanceFact(
+            compiled_task=compiled_task,
+            evidence_set=fact.evidence_set,
+            acceptance=fact.acceptance,
+        )
+        return _acceptance_specs(accepted_fact)
     raise TypeError("unsupported lifecycle fact: %s" % type(fact).__name__)
 
 
@@ -1670,7 +1783,14 @@ def _reduce_events(
             ):
                 raise ValueError("task judgment requires settled model invocations")
         if event.agent_run_id is not None:
-            _validate_model_task_event(state, event)
+            _validate_model_task_event(
+                state,
+                event,
+                allow_legacy_invocation_start=(
+                    active_from_sequence is None
+                    or event.sequence < active_from_sequence
+                ),
+            )
             apply_invocation_event(agent_states, event)
         if active_from_sequence is not None and event.sequence >= active_from_sequence:
             _require_current_event_authority(state, event)
@@ -1768,7 +1888,7 @@ def _apply_event(state: _TraceState, event: TraceEvent) -> None:
     _validate_event_prerequisite(state, event.event_type, data, rule)
     operation_id = _event_operation_id(event, rule)
     if event.event_type == "task_compiled":
-        _apply_compiled_task(state, data)
+        _apply_compiled_task(state, data, artifact_refs=event.artifact_refs)
     elif event.event_type == "proposal_normalized":
         _apply_proposal(state, operation_id, data)
     elif event.event_type == "proposal_rejected":
@@ -1784,11 +1904,22 @@ def _apply_event(state: _TraceState, event: TraceEvent) -> None:
     elif event.event_type == "execution_started":
         _apply_execution_start(state, operation_id, data)
     elif event.event_type in {"execution_completed", "execution_failed"}:
-        _apply_execution_terminal(state, event.event_type, operation_id, data)
+        _apply_execution_terminal(
+            state,
+            event.event_type,
+            operation_id,
+            data,
+            artifact_refs=event.artifact_refs,
+        )
     elif event.event_type == "execution_cancelled":
         _apply_execution_cancellation(state, operation_id, data)
     elif event.event_type == "evidence_issued":
-        _apply_evidence(state, operation_id, data)
+        _apply_evidence(
+            state,
+            operation_id,
+            data,
+            artifact_refs=event.artifact_refs,
+        )
     elif event.event_type == "evidence_rejected":
         _apply_evidence_rejection(state, operation_id, data)
     elif event.event_type == "operation_edge_recorded":
@@ -1799,14 +1930,25 @@ def _apply_event(state: _TraceState, event: TraceEvent) -> None:
         _apply_timeout_decision(state, data)
     elif event.event_type.startswith("retry_"):
         _apply_retry_decision(state, event.event_type, operation_id, data)
+    elif event.event_type in {
+        "effect_obligation_satisfied",
+        "effect_obligation_failed",
+        "effect_obligation_pending",
+    }:
+        _apply_effect_obligation(state, event)
     if event.event_type.startswith("terminal_task_") or (
         event.event_type == "task_suspended"
     ):
-        _apply_task_judgment(state, event.event_type, data)
+        _apply_task_judgment(state, event)
     state.event_types.append(event.event_type)
 
 
-def _validate_model_task_event(state: _TraceState, event: TraceEvent) -> None:
+def _validate_model_task_event(
+    state: _TraceState,
+    event: TraceEvent,
+    *,
+    allow_legacy_invocation_start: bool = False,
+) -> None:
     from ab_harness.model_invocation import ModelInvocationRequest
 
     request_data = event.data["request"]
@@ -1829,6 +1971,27 @@ def _validate_model_task_event(state: _TraceState, event: TraceEvent) -> None:
     ):
         raise ValueError("model invocation does not match recorded compiled task")
     if event.event_type == "model_invocation_started":
+        references = set(request.source_references)
+        required_references = {
+            "task-projection:" + prompt.compiled_task_id,
+            "agent-manifest:" + prompt.agent_id,
+            "role-configuration:" + prompt.role_configuration_id,
+            "prompt-pack:" + prompt.prompt_pack_id,
+            "registry-revision:" + prompt.registry_version,
+            "domain-contract-revision:" + prompt.domain_contract_pack_revision,
+        }
+        has_legacy_unbound_sources = (
+            allow_legacy_invocation_start and not request.source_references
+        )
+        if not has_legacy_unbound_sources and (
+            not request.source_references
+            or not any(item.startswith("task-spec:sha256:") for item in references)
+            or not any(item.startswith("registry-content:sha256:") for item in references)
+            or not all(item in references for item in required_references)
+            or not {item[1] for item in prompt.source_contracts}.issubset(references)
+            or not {item[2] for item in prompt.source_contracts}.issubset(references)
+        ):
+            raise ValueError("model invocation requires ledger-bound prompt sources")
         if (
             request.invocation_id not in state.model_budget_granted_invocation_ids
             or state.task_timed_out
@@ -1871,7 +2034,12 @@ def _event_operation_id(event: TraceEvent, rule: _EventRule) -> str:
     return event.operation_id
 
 
-def _apply_compiled_task(state: _TraceState, data: dict[str, object]) -> None:
+def _apply_compiled_task(
+    state: _TraceState,
+    data: dict[str, object],
+    *,
+    artifact_refs: tuple[str, ...],
+) -> None:
     if state.compiled_task_id is not None:
         raise ValueError("trace already has a compiled task")
     state.compiled_task_id = str(data["compiled_task_id"])
@@ -1893,6 +2061,43 @@ def _apply_compiled_task(state: _TraceState, data: dict[str, object]) -> None:
         type(value) is not int for value in budgets.values()
     ):
         raise ValueError("compiled task budget limits are invalid")
+    obligation_schema = data.get("obligation_contract_schema")
+    raw_obligations = data.get("effect_obligations")
+    obligation_contract_id = data.get("obligation_contract_id")
+    if obligation_schema is None and raw_obligations is None and obligation_contract_id is None:
+        if artifact_refs != (state.compiled_task_id,):
+            raise ValueError("legacy compiled task references are invalid")
+        state.effect_obligations = None
+    else:
+        if obligation_schema != COMPILED_TASK_OBLIGATIONS_SCHEMA:
+            raise ValueError("compiled task obligation contract schema is invalid")
+        if not isinstance(raw_obligations, list) or not raw_obligations:
+            raise ValueError("compiled task obligation contract must not be empty")
+        obligation_fields = {
+            "obligation_id",
+            "effect_id",
+            "object_id",
+            "evidence_owner",
+            "requirement",
+            "failure_policy",
+        }
+        parsed_obligations: list[EffectObligation] = []
+        for item in raw_obligations:
+            if not isinstance(item, dict) or set(item) != obligation_fields:
+                raise ValueError("compiled task obligation fields are invalid")
+            parsed_obligations.append(EffectObligation(**item))
+        state.effect_obligations = tuple(parsed_obligations)
+        obligation_ids = tuple(item.obligation_id for item in state.effect_obligations)
+        if len(set(obligation_ids)) != len(obligation_ids):
+            raise ValueError("compiled task obligation identities are duplicated")
+        expected_contract_id = _compiled_obligation_contract_id(
+            state.compiled_task_id,
+            state.effect_obligations,
+        )
+        if obligation_contract_id != expected_contract_id:
+            raise ValueError("compiled task obligation contract identity is invalid")
+        if artifact_refs != (state.compiled_task_id, expected_contract_id):
+            raise ValueError("compiled task obligation references are invalid")
     state.budget_limits = {str(name): value for name, value in budgets.items()}
     state.budget_consumed = {
         "model_call": 0,
@@ -2036,6 +2241,8 @@ def _apply_execution_start(
     operation_id: str,
     data: dict[str, object],
 ) -> None:
+    from ab_harness.environment import EXECUTION_RECEIPT_SCHEMA
+
     if operation_id not in state.leased_operation_ids:
         raise ValueError("execution started without a recorded lease")
     if data["execution_lease_id"] != state.lease_by_operation.get(operation_id):
@@ -2048,6 +2255,11 @@ def _apply_execution_start(
         raise ValueError("execution lease already consumed")
     if operation_id in state.terminal_operation_ids:
         raise ValueError("cancelled operation cannot start execution")
+    if "receipt_projection_version" in data:
+        version = data["receipt_projection_version"]
+        if version != EXECUTION_RECEIPT_SCHEMA:
+            raise ValueError("unsupported execution receipt projection version")
+        state.receipt_projection_version_by_operation[operation_id] = version
     state.started_operation_ids.add(operation_id)
 
 
@@ -2056,6 +2268,8 @@ def _apply_execution_terminal(
     event_type: str,
     operation_id: str,
     data: dict[str, object],
+    *,
+    artifact_refs: tuple[str, ...] | None = None,
 ) -> None:
     if operation_id not in state.started_operation_ids:
         raise ValueError("execution terminated before it started")
@@ -2064,6 +2278,12 @@ def _apply_execution_terminal(
     if operation_id in state.terminal_operation_ids:
         raise ValueError("execution already has a terminal result")
     if event_type == "execution_completed":
+        from ab_harness.environment import ExecutionReceipt
+
+        if type(data.get("succeeded")) is not bool:
+            raise ValueError("execution receipt success values must be booleans")
+        if type(data.get("execution_result_id")) is not str:
+            raise ValueError("execution receipt result identity must be a string")
         expected = (
             state.admission_by_operation.get(operation_id),
             state.object_by_operation.get(operation_id),
@@ -2078,7 +2298,51 @@ def _apply_execution_terminal(
         )
         if observed != expected:
             raise ValueError("execution receipt does not match admitted operation")
-        state.result_by_operation[operation_id] = str(data["execution_result_id"])
+        if artifact_refs is not None and artifact_refs != (
+            data["execution_result_id"],
+            data["execution_lease_id"],
+        ):
+            raise ValueError("execution references disagree with completion")
+        has_version = "receipt_projection_version" in data
+        has_receipt = "execution_receipt" in data
+        if has_version != has_receipt:
+            raise ValueError("execution receipt projection is incomplete")
+        if has_receipt:
+            version = data["receipt_projection_version"]
+            if (
+                type(version) is not str
+                or version
+                != state.receipt_projection_version_by_operation.get(operation_id)
+            ):
+                raise ValueError("execution receipt projection version is inconsistent")
+            receipt_data = data["execution_receipt"]
+            if not isinstance(receipt_data, dict):
+                raise ValueError("execution receipt projection must be an object")
+            receipt = ExecutionReceipt.from_dict(receipt_data)
+            if (
+                receipt.owner_result.succeeded != data["succeeded"]
+                or receipt.evidence.succeeded != data["succeeded"]
+            ):
+                raise ValueError(
+                    "effect evidence success does not match execution result"
+                )
+            if (
+                receipt.environment_run_id != state.environment_run_id
+                or receipt.task_id != state.task_id
+                or receipt.trace_id != state.trace_id
+                or receipt.operation_id != operation_id
+                or receipt.execution_result_id != data["execution_result_id"]
+                or receipt.execution_lease_id != data["execution_lease_id"]
+                or receipt.admission_id != data["admission_id"]
+                or receipt.evidence.object_id != data["object_id"]
+                or receipt.evidence.binding_id != data["binding_id"]
+                or receipt.evidence.owner != data["owner"]
+                or receipt.owner_result.succeeded != data["succeeded"]
+            ):
+                raise ValueError("execution receipt projection disagrees with completion")
+            state.receipt_by_operation[operation_id] = receipt
+        state.result_by_operation[operation_id] = data["execution_result_id"]
+        state.succeeded_by_operation[operation_id] = data["succeeded"]
     else:
         failure_id = data.get("failure_id")
         retry_disposition = data.get("retry_disposition")
@@ -2105,13 +2369,37 @@ def _apply_evidence(
     state: _TraceState,
     operation_id: str,
     data: dict[str, object],
+    *,
+    artifact_refs: tuple[str, ...] | None = None,
 ) -> None:
+    from ab_harness.environment import ExecutionReceipt
+
+    if type(data.get("succeeded")) is not bool:
+        raise ValueError("execution receipt success values must be booleans")
+    if type(data.get("execution_result_id")) is not str:
+        raise ValueError("evidence result identity must be a string")
+    if type(data.get("evidence_artifact_id")) is not str:
+        raise ValueError("evidence artifact identity must be a string")
+    if type(data.get("native_evidence_ref")) is not str:
+        raise ValueError("native evidence reference must be a string")
+    if artifact_refs is not None and artifact_refs != (
+        data["evidence_artifact_id"],
+        data["execution_result_id"],
+    ):
+        raise ValueError("evidence references disagree with evidence content")
+    observed_effects = data.get("observed_effects")
+    if not isinstance(observed_effects, list) or any(
+        type(effect) is not str for effect in observed_effects
+    ):
+        raise ValueError("observed effects must be a list of strings")
     if operation_id not in state.terminal_operation_ids:
         raise ValueError("evidence issued before execution terminated")
     if data["execution_lease_id"] != state.lease_by_operation.get(operation_id):
         raise ValueError("evidence does not match operation lease")
     if data["execution_result_id"] != state.result_by_operation.get(operation_id):
         raise ValueError("evidence does not match execution result")
+    if data["succeeded"] != state.succeeded_by_operation.get(operation_id):
+        raise ValueError("effect evidence success does not match execution result")
     expected_lineage = (
         state.object_by_operation.get(operation_id),
         state.binding_by_operation.get(operation_id),
@@ -2124,7 +2412,45 @@ def _apply_evidence(
         raise ValueError("rejected evidence cannot later be issued")
     if operation_id in state.evidence_issued_operation_ids:
         raise ValueError("operation already has issued evidence")
-    state.evidence_artifact_ids.add(str(data["evidence_artifact_id"]))
+    projection_version = state.receipt_projection_version_by_operation.get(
+        operation_id
+    )
+    verified_evidence: EffectEvidence
+    if projection_version is None:
+        if "receipt_projection_version" in data:
+            raise ValueError("legacy execution cannot declare a receipt projection")
+        verified_evidence = EffectEvidence(
+            evidence_ref=data["native_evidence_ref"],
+            object_id=data["object_id"],
+            binding_id=data["binding_id"],
+            environment_id="",
+            owner=data["owner"],
+            succeeded=data["succeeded"],
+            observed_effects=tuple(observed_effects),
+        )
+    else:
+        if data.get("receipt_projection_version") != projection_version:
+            raise ValueError("evidence receipt projection version is inconsistent")
+        receipt = state.receipt_by_operation.get(operation_id)
+        if not isinstance(receipt, ExecutionReceipt):
+            raise ValueError("evidence requires its execution receipt projection")
+        evidence = receipt.evidence
+        if (
+            data["execution_result_id"] != receipt.execution_result_id
+            or data["execution_lease_id"] != receipt.execution_lease_id
+            or data["object_id"] != evidence.object_id
+            or data["binding_id"] != evidence.binding_id
+            or data["owner"] != evidence.owner
+            or data["succeeded"] != evidence.succeeded
+            or data["native_evidence_ref"] != evidence.evidence_ref
+            or tuple(observed_effects) != evidence.observed_effects
+            or data["evidence_artifact_id"]
+            != _artifact_id("effect-evidence", evidence)
+        ):
+            raise ValueError("evidence disagrees with execution receipt projection")
+        verified_evidence = evidence
+    state.evidence_artifact_ids.add(data["evidence_artifact_id"])
+    state.evidence_by_artifact_id[data["evidence_artifact_id"]] = verified_evidence
     state.evidence_issued_operation_ids.add(operation_id)
 
 
@@ -2133,12 +2459,21 @@ def _apply_evidence_rejection(
     operation_id: str,
     data: dict[str, object],
 ) -> None:
+    if type(data.get("native_evidence_ref")) is not str:
+        raise ValueError("native evidence reference must be a string")
+    reason_codes = data.get("reason_codes")
+    if not isinstance(reason_codes, list) or any(
+        type(reason) is not str for reason in reason_codes
+    ):
+        raise ValueError("evidence rejection reasons must be a list of strings")
     if operation_id not in state.terminal_operation_ids:
         raise ValueError("evidence rejected before execution completed")
     if data["execution_lease_id"] != state.lease_by_operation.get(operation_id):
         raise ValueError("evidence rejection does not match operation lease")
     if data["execution_result_id"] != state.result_by_operation.get(operation_id):
         raise ValueError("evidence rejection does not match execution result")
+    if operation_id in state.receipt_by_operation:
+        raise ValueError("issued execution receipt cannot later be rejected")
     expected_lineage = (
         state.object_by_operation.get(operation_id),
         state.binding_by_operation.get(operation_id),
@@ -2422,24 +2757,225 @@ def _operation_path_exists(
     return False
 
 
-def _apply_task_judgment(
-    state: _TraceState,
-    event_type: str,
-    data: dict[str, object],
-) -> None:
+def _apply_effect_obligation(state: _TraceState, event: TraceEvent) -> None:
+    if state.effect_obligations is None:
+        # Historical compiled-task events predate the recorded obligation
+        # contract. Keep their acceptance rows readable, but current tasks
+        # always take the strict contract-backed path below.
+        return
+    if len(event.artifact_refs) != 1:
+        raise ValueError("effect obligation event requires one acceptance reference")
+    acceptance_id = event.artifact_refs[0]
+    data = event.data
+    expected_fields = {"obligation_id", "effect_id", "requirement", "outcome"}
+    if set(data) != expected_fields:
+        raise ValueError("effect obligation event fields are invalid")
+    obligation_id = data["obligation_id"]
+    if not isinstance(obligation_id, str):
+        raise ValueError("effect obligation identity must be a string")
+    obligation = next(
+        (
+            item
+            for item in state.effect_obligations
+            if item.obligation_id == obligation_id
+        ),
+        None,
+    )
+    if obligation is None:
+        raise ValueError("effect obligation is not present in the compiled task")
+    outcome = data["outcome"]
+    expected_event_type = {
+        "satisfied": "effect_obligation_satisfied",
+        "deficit": "effect_obligation_failed",
+        "failed": "effect_obligation_failed",
+        "pending": "effect_obligation_pending",
+    }.get(outcome)
+    if (
+        data["effect_id"] != obligation.effect_id
+        or data["requirement"] != obligation.requirement
+        or event.event_type != expected_event_type
+    ):
+        raise ValueError("effect obligation event disagrees with its contract")
+    state.obligation_events_by_acceptance_id.setdefault(acceptance_id, []).append(
+        (
+            event.commit_id,
+            event.commit_index,
+            event.commit_size,
+            event.event_type,
+            obligation.obligation_id,
+            obligation.effect_id,
+            obligation.requirement,
+            outcome,
+        )
+    )
+
+
+def _apply_task_judgment(state: _TraceState, event: TraceEvent) -> None:
+    event_type = event.event_type
+    data = event.data
     if data["compiled_task_id"] != state.compiled_task_id:
         raise ValueError("task acceptance does not match compiled task")
-    acceptance_evidence = set(data["evidence_artifact_ids"])
-    if acceptance_evidence != state.evidence_artifact_ids:
+    if event_type.startswith("terminal_task_") and (
+        state.started_operation_ids - state.terminal_operation_ids
+    ):
+        raise ValueError("task judgment requires settled native execution")
+
+    expected_fields = {
+        "acceptance_id",
+        "compiled_task_id",
+        "evidence_artifact_ids",
+        "status",
+        "evidence_refs",
+        "satisfied_obligation_ids",
+        "deficit_obligation_ids",
+        "pending_obligation_ids",
+        "failed_obligation_ids",
+    }
+    if set(data) != expected_fields:
+        raise ValueError("task acceptance fields are invalid")
+
+    def string_tuple(field_name: str) -> tuple[str, ...]:
+        values = data[field_name]
+        if not isinstance(values, list) or any(type(value) is not str for value in values):
+            raise ValueError("task acceptance %s must be a list of strings" % field_name)
+        result = tuple(values)
+        if len(set(result)) != len(result):
+            raise ValueError("task acceptance %s contains duplicates" % field_name)
+        return result
+
+    evidence_artifact_ids = string_tuple("evidence_artifact_ids")
+    if set(evidence_artifact_ids) != state.evidence_artifact_ids:
         raise ValueError("task acceptance evidence set is incomplete or unrecorded")
+
+    actual_acceptance = TaskAcceptance(
+        status=data["status"],
+        evidence_refs=string_tuple("evidence_refs"),
+        satisfied_obligation_ids=string_tuple("satisfied_obligation_ids"),
+        deficit_obligation_ids=string_tuple("deficit_obligation_ids"),
+        pending_obligation_ids=string_tuple("pending_obligation_ids"),
+        failed_obligation_ids=string_tuple("failed_obligation_ids"),
+    )
+
+    if state.effect_obligations is None:
+        # Legacy task_compiled rows do not contain the source needed to
+        # recompute an acceptance. Preserve their historical, internally
+        # content-addressed judgment without treating it as current authority.
+        expected_event_type = {
+            "accepted": "terminal_task_accepted",
+            "accepted_with_deficit": "terminal_task_accepted_with_deficit",
+            "rejected": "terminal_task_rejected",
+            "suspended": "task_suspended",
+        }.get(actual_acceptance.status)
+        if event_type != expected_event_type:
+            raise ValueError("legacy task acceptance event type is inconsistent")
+        expected_acceptance_id = _artifact_id("task-acceptance", actual_acceptance)
+        if data["acceptance_id"] != expected_acceptance_id:
+            raise ValueError("legacy task acceptance identity does not match its content")
+        expected_artifact_refs = (
+            expected_acceptance_id,
+            state.compiled_task_id,
+            *evidence_artifact_ids,
+        )
+        if event.artifact_refs != expected_artifact_refs:
+            raise ValueError("legacy task acceptance references are inconsistent")
+        state.task_acceptance = actual_acceptance
+        if event_type.startswith("terminal_task_"):
+            state.terminal_status = actual_acceptance.status
+            if event_type == "terminal_task_rejected":
+                state.failure_stage = "task_acceptance"
+        return
+
+    try:
+        evidence_set = tuple(
+            state.evidence_by_artifact_id[artifact_id]
+            for artifact_id in evidence_artifact_ids
+        )
+    except KeyError as exc:
+        raise ValueError("task acceptance references unavailable evidence") from exc
+
+    expected_acceptance = TaskAcceptanceEvaluator().evaluate(
+        state.effect_obligations,
+        evidence_set,
+    )
+    if actual_acceptance != expected_acceptance:
+        raise ValueError("task acceptance does not match recorded obligations and evidence")
+
+    expected_event_type = {
+        "accepted": "terminal_task_accepted",
+        "accepted_with_deficit": "terminal_task_accepted_with_deficit",
+        "rejected": "terminal_task_rejected",
+        "suspended": "task_suspended",
+    }[expected_acceptance.status]
+    if event_type != expected_event_type:
+        raise ValueError("task acceptance event type does not match its outcome")
+
+    expected_acceptance_id = _artifact_id("task-acceptance", expected_acceptance)
+    if data["acceptance_id"] != expected_acceptance_id:
+        raise ValueError("task acceptance identity does not match its outcome")
+    expected_artifact_refs = (
+        expected_acceptance_id,
+        state.compiled_task_id,
+        *evidence_artifact_ids,
+    )
+    if event.artifact_refs != expected_artifact_refs:
+        raise ValueError("task acceptance references do not match its outcome")
+
+    outcome_by_id = {
+        **{item: "satisfied" for item in expected_acceptance.satisfied_obligation_ids},
+        **{item: "deficit" for item in expected_acceptance.deficit_obligation_ids},
+        **{item: "pending" for item in expected_acceptance.pending_obligation_ids},
+        **{item: "failed" for item in expected_acceptance.failed_obligation_ids},
+    }
+    expected_obligation_events = tuple(
+        (
+            {
+                "satisfied": "effect_obligation_satisfied",
+                "deficit": "effect_obligation_failed",
+                "pending": "effect_obligation_pending",
+                "failed": "effect_obligation_failed",
+            }[outcome_by_id[obligation.obligation_id]],
+            obligation.obligation_id,
+            obligation.effect_id,
+            obligation.requirement,
+            outcome_by_id[obligation.obligation_id],
+        )
+        for obligation in state.effect_obligations
+    )
+    recorded_obligation_events = state.obligation_events_by_acceptance_id.get(
+        expected_acceptance_id,
+        [],
+    )
+    if len(recorded_obligation_events) != len(expected_obligation_events):
+        raise ValueError("task acceptance obligation event set is incomplete")
+    for index, (recorded, expected) in enumerate(
+        zip(recorded_obligation_events, expected_obligation_events, strict=True),
+        start=1,
+    ):
+        commit_id, commit_index, commit_size, *recorded_fields = recorded
+        if (
+            commit_id != event.commit_id
+            or commit_index != index
+            or commit_size != event.commit_size
+            or tuple(recorded_fields) != expected
+        ):
+            raise ValueError("task acceptance obligation events disagree with outcome")
+    if (
+        event.commit_index != len(expected_obligation_events) + 1
+        or event.commit_size != event.commit_index
+    ):
+        raise ValueError("task acceptance is not atomically committed with its obligations")
+
+    state.obligation_events_by_acceptance_id.pop(expected_acceptance_id, None)
+    state.task_acceptance = expected_acceptance
     if event_type.startswith("terminal_task_"):
-        state.terminal_status = str(data["status"])
+        state.terminal_status = expected_acceptance.status
         if event_type == "terminal_task_rejected":
             state.failure_stage = "task_acceptance"
 
 
 def _digest(events: tuple[TraceEvent, ...], state: _TraceState) -> VerifiedTraceDigest:
-    terminal = events[-1].data
+    if state.task_acceptance is None:
+        raise ValueError("verified trace digest requires a validated task acceptance")
     event_data = tuple((event.event_type, event.data) for event in events)
 
     def values(event_type: str, field: str) -> tuple[str, ...]:
@@ -2482,10 +3018,10 @@ def _digest(events: tuple[TraceEvent, ...], state: _TraceState) -> VerifiedTrace
         "native_evidence_refs": tuple(
             str(data["native_evidence_ref"]) for data in evidence_events
         ),
-        "satisfied_obligation_ids": tuple(terminal["satisfied_obligation_ids"]),
-        "deficit_obligation_ids": tuple(terminal["deficit_obligation_ids"]),
-        "pending_obligation_ids": tuple(terminal["pending_obligation_ids"]),
-        "failed_obligation_ids": tuple(terminal["failed_obligation_ids"]),
+        "satisfied_obligation_ids": state.task_acceptance.satisfied_obligation_ids,
+        "deficit_obligation_ids": state.task_acceptance.deficit_obligation_ids,
+        "pending_obligation_ids": state.task_acceptance.pending_obligation_ids,
+        "failed_obligation_ids": state.task_acceptance.failed_obligation_ids,
         "terminal_status": state.terminal_status or "",
         "failure_stage": state.failure_stage,
     }

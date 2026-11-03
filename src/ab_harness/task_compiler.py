@@ -4,9 +4,12 @@ from __future__ import annotations
 
 from dataclasses import asdict
 from dataclasses import dataclass
+from dataclasses import fields
 import hashlib
 import json
 
+from ab_harness.contracts import ABControlBand
+from ab_harness.contracts import ABObjectView
 from ab_harness.contracts import AbstractionFrame
 from ab_harness.contracts import AgentRoleSpec
 from ab_harness.contracts import EffectObligation
@@ -201,7 +204,7 @@ class CompiledTask:
         return self.task_spec.budgets
 
     def __post_init__(self) -> None:
-        self.verify_identity()
+        CompiledTask.verify_identity(self)
 
     def verify_identity(self) -> None:
         if not isinstance(self.effect_obligations, tuple) or not isinstance(
@@ -225,21 +228,82 @@ class CompiledTask:
         if self.compiled_task_id != _compiled_task_id(payload):
             raise ValueError("compiled task identity does not match content")
 
+    @classmethod
+    def verified_copy(cls, task: object) -> CompiledTask:
+        """Rebuild the content-addressed task from exact stored source fields."""
+        if cls is not CompiledTask or type(task) is not CompiledTask:
+            raise TypeError("compiled task source must use the concrete owner type")
+        values = _stored_compiled_fields(task, CompiledTask)
+        snapshot = CompiledTask(
+            **{
+                name: _detached_compiled_value(value)
+                for name, value in values.items()
+            }
+        )
+        CompiledTask.verify_identity(snapshot)
+        return snapshot
+
     def to_dict(self) -> dict[str, object]:
-        self.verify_identity()
+        snapshot = CompiledTask.verified_copy(self)
         return {
-            "compiled_task_id": self.compiled_task_id,
+            "compiled_task_id": snapshot.compiled_task_id,
             **_compiled_task_payload(
-                environment_ingress_id=self.environment_ingress_id,
-                environment_run_id=self.environment_run_id,
-                task_spec=self.task_spec,
-                domain_contract_pack_id=self.domain_contract_pack_id,
-                domain_contract_pack_revision=self.domain_contract_pack_revision,
-                interaction_module=self.interaction_module,
-                effect_obligations=self.effect_obligations,
-                prohibited_effects=self.prohibited_effects,
+                environment_ingress_id=snapshot.environment_ingress_id,
+                environment_run_id=snapshot.environment_run_id,
+                task_spec=snapshot.task_spec,
+                domain_contract_pack_id=snapshot.domain_contract_pack_id,
+                domain_contract_pack_revision=snapshot.domain_contract_pack_revision,
+                interaction_module=snapshot.interaction_module,
+                effect_obligations=snapshot.effect_obligations,
+                prohibited_effects=snapshot.prohibited_effects,
             ),
         }
+
+
+_COMPILED_TASK_NESTED_TYPES = frozenset(
+    {
+        TaskBudgets,
+        TaskEffectRequest,
+        TaskSpec,
+        ABControlBand,
+        ABObjectView,
+        AbstractionFrame,
+        AgentRoleSpec,
+        InteractionModuleSpec,
+        EffectObligation,
+    }
+)
+
+
+def _stored_compiled_fields(value: object, expected_type: type) -> dict[str, object]:
+    if type(value) is not expected_type:
+        raise TypeError("compiled task sources require concrete dataclass values")
+    stored = object.__getattribute__(value, "__dict__")
+    declared = tuple(item.name for item in fields(expected_type))
+    if type(stored) is not dict or set(stored) != set(declared):
+        raise TypeError("compiled task source fields must be stored as plain data")
+    return {name: stored[name] for name in declared}
+
+
+def _detached_compiled_value(value: object) -> object:
+    if type(value) in (str, int, bool, type(None)):
+        return value
+    if type(value) is tuple:
+        return tuple(_detached_compiled_value(item) for item in value)
+    if type(value) in _COMPILED_TASK_NESTED_TYPES:
+        value_type = type(value)
+        stored = _stored_compiled_fields(value, value_type)
+        return value_type(
+            **{
+                name: _detached_compiled_value(item)
+                for name, item in stored.items()
+            }
+        )
+    if any(base in _COMPILED_TASK_NESTED_TYPES for base in type(value).__mro__[1:]):
+        raise TypeError(
+            "compiled task sources require trusted concrete dataclass values"
+        )
+    raise TypeError("compiled task source contains an unsupported value")
 
 
 class TaskSpecCompiler:
@@ -256,8 +320,15 @@ class TaskSpecCompiler:
         domain_contract_pack: DomainContractPack,
         task_registry: EnvironmentTaskRegistry,
     ) -> CompiledTask:
-        task_ingress_decision.verify_identity()
-        domain_contract_pack.verify_identity()
+        if type(task_registry) is not EnvironmentTaskRegistry:
+            raise TypeError(
+                "task compilation requires a concrete environment task registry"
+            )
+        domain_contract_pack = DomainContractPack.verified_copy(domain_contract_pack)
+        task_spec = _detached_compiled_value(task_spec)
+        role = _detached_compiled_value(role)
+        frame = _detached_compiled_value(frame)
+        task_ingress_decision = TaskIngressDecision.verified_copy(task_ingress_decision)
         if (
             task_ingress_decision.action != "start_task"
             or task_ingress_decision.reason_code != "matched_rule"
@@ -273,7 +344,8 @@ class TaskSpecCompiler:
             or task_ingress_decision.trace_id != task_spec.trace_id
         ):
             raise ValueError("task spec lineage does not match ingress decision")
-        task_registry.require_start(
+        EnvironmentTaskRegistry.require_start(
+            task_registry,
             environment_run_id=task_ingress_decision.environment_run_id,
             environment_ingress_id=task_ingress_decision.environment_ingress_id,
             ingress_artifact_id=(task_ingress_decision.environment_ingress_artifact_id),
@@ -376,7 +448,7 @@ class TaskSpecCompiler:
             prohibited_effects=prohibited_effects,
         )
         compiled_task_id = _compiled_task_id(identity_payload)
-        return CompiledTask(
+        return CompiledTask.verified_copy(CompiledTask(
             compiled_task_id=compiled_task_id,
             environment_ingress_id=task_ingress_decision.environment_ingress_id,
             environment_run_id=task_ingress_decision.environment_run_id,
@@ -386,4 +458,4 @@ class TaskSpecCompiler:
             interaction_module=interaction_module,
             effect_obligations=obligations,
             prohibited_effects=prohibited_effects,
-        )
+        ))

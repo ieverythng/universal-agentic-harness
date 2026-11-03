@@ -27,6 +27,6 @@ rewriting the source repository or its history.
 - The ROS package metadata was retained at repository root as an optional
   wrapper.
 
-The original package README is preserved at `docs/artifacts/h0_source_readme.md`.
+The original package README is preserved at `docs/h0_source_readme.md`.
 Standalone packaging, CI, repository guidance, and Watson integration notes
 were added after extraction.

@@ -50,7 +50,12 @@ from ab_harness.model_allocator import (
 )
 from ab_harness.model_invocation import ModelInvocationAuthority
 from ab_harness.observatory import ObservatoryDataLabel, render_observatory
-from ab_harness.prompt_compiler import PromptCompiler, PromptPack
+from ab_harness.prompt_compiler import (
+    ConfiguredPromptSourceOwner,
+    PromptCompiler,
+    PromptPack,
+    PromptSourceSet,
+)
 from ab_harness.registry import RegistrySnapshot
 from ab_harness.schema_validation import ArgumentField, ObjectArgumentSchema
 from ab_harness.task_compiler import (
@@ -210,20 +215,21 @@ def example_ledger() -> LifecycleLedger:
             RECORDED_AT,
         ),
     )
+    task_spec = TaskSpec(
+        ingress.task_id,
+        ingress.trace_id,
+        "write_note",
+        role.role_id,
+        frame.frame_id,
+        domain.revision,
+        "Propose a note about this synthetic experiment.",
+        (TaskEffectRequest("written", "note_written", "required"),),
+        (),
+        TaskBudgets(60, 2, 2),
+    )
     compiled = TaskSpecCompiler().compile(
         task_ingress_decision=ingress,
-        task_spec=TaskSpec(
-            ingress.task_id,
-            ingress.trace_id,
-            "write_note",
-            role.role_id,
-            frame.frame_id,
-            domain.revision,
-            "Propose a note about this synthetic experiment.",
-            (TaskEffectRequest("written", "note_written", "required"),),
-            (),
-            TaskBudgets(60, 2, 2),
-        ),
+        task_spec=task_spec,
         role=role,
         frame=frame,
         registry=registry,
@@ -259,6 +265,22 @@ def example_ledger() -> LifecycleLedger:
         argument_schemas=(schema,),
         environment_id="synthetic_notes",
         runtime_mode="fake",
+    )
+    prompt_source_owner = ConfiguredPromptSourceOwner(
+        (
+            PromptSourceSet(
+                task_spec=task_spec,
+                compiled_task=compiled,
+                manifest=manifest,
+                role_configuration=configuration,
+                prompt_pack=pack,
+                registry=registry,
+                bindings=(binding,),
+                argument_schemas=(schema,),
+                environment_id="synthetic_notes",
+                runtime_mode="fake",
+            ),
+        )
     )
     instance = FixedModelInstance(
         "instance:synthetic-notes",
@@ -310,7 +332,10 @@ def example_ledger() -> LifecycleLedger:
         evidence_refs=("synthetic:readiness:alpha",),
     )
     ModelInvocationAuthority(
-        ledger, SyntheticProvider(), clock=lambda: RECORDED_AT
+        ledger,
+        SyntheticProvider(),
+        prompt_source_owner=prompt_source_owner,
+        clock=lambda: RECORDED_AT,
     ).invoke(alpha_lease, prompt, invocation_id="invocation:synthetic-note:alpha")
     allocator.release(alpha_lease, reason_code="synthetic_invocation_completed")
     beta_lease = allocator.acquire(

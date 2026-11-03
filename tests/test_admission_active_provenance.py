@@ -294,6 +294,20 @@ def test_genuine_old_completed_history_remains_readable_without_snapshot(tmp_pat
         if event.event_type == "semantic_admission_accepted"
     )
     assert "admitted_operation" not in event.data
+    execution_started = next(
+        item for item in historical.events() if item.event_type == "execution_started"
+    )
+    execution_completed = next(
+        item
+        for item in historical.events()
+        if item.event_type == "execution_completed"
+    )
+    evidence_issued = next(
+        item for item in historical.events() if item.event_type == "evidence_issued"
+    )
+    assert "receipt_projection_version" not in execution_started.data
+    assert "execution_receipt" not in execution_completed.data
+    assert "receipt_projection_version" not in evidence_issued.data
     replay = historical.replay(event.trace_id)
     assert replay.terminal_status == "accepted"
     assert (

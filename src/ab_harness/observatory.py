@@ -229,9 +229,13 @@ def project_observatory(
 ) -> ObservatoryProjection:
     """Project immutable ledger events without reconstructing missing facts."""
 
-    if isinstance(source, LifecycleLedger):
-        events = source.events()
+    if type(source) is LifecycleLedger:
+        events = LifecycleLedger.validated_events(source)
         label = ObservatoryDataLabel(data_label or ObservatoryDataLabel.RECORDED)
+    elif isinstance(source, LifecycleLedger):
+        raise TypeError(
+            "recorded data requires a concrete validated lifecycle ledger"
+        )
     else:
         events = tuple(source)
         label = ObservatoryDataLabel(data_label or ObservatoryDataLabel.SYNTHETIC)

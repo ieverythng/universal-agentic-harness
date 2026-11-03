@@ -9,5 +9,4 @@ if [[ ! -x ".venv/bin/python" ]]; then
   exit 1
 fi
 
-.venv/bin/python -m pre_commit run --all-files
-.venv/bin/python scripts/precommit_cache.py record
+.venv/bin/python -I scripts/precommit_cache.py run

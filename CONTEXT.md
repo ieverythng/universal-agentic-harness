@@ -160,6 +160,18 @@ Typed raw output or failure settles the call; completed IDs replay without a
 second provider request. An outstanding call cannot retry automatically or
 permit terminal task acceptance. The port has fake-provider fixtures only.
 
+Each frame has a separately configured `ConfiguredPromptSourceOwner` holding
+the exact detached TaskSpec/CompiledTask, role/manifest, PromptPack,
+registry/binding, and schema revisions used for compilation. Before granting
+budget or recording a fresh invocation start, `ModelInvocationAuthority`
+resolves those pinned sources, compiles the owner prompt, and compares it with
+the caller's prompt assertion. It records the consumed source references on the
+invocation request. Missing or changed source bytes fail closed; there is no
+`latest` lookup. Completed invocation IDs replay before source resolution, and
+an unfinished ID remains fenced. External mutable authoring must mint a new
+pinned runtime revision. Provider fixtures remain fake-only and do not attest
+provider-side templates or tokenizers.
+
 ### Registration preflight
 
 A non-reserving validation that an agent manifest, role, provider policy, and
@@ -371,7 +383,7 @@ rejected during normalization.
 
 ### Admitted operation
 
-An immutable, content-addressed `uah.admitted_operation/v2` proving that a typed
+An immutable, content-addressed `uah.admitted_operation/v3` proving that a typed
 proposal passed UAH semantic admission for one compiled task, role, frame, AB
 object, approved binding revision, validated input-schema identity, argument
 set, runtime mode, and evidence obligation set. It still has no domain
@@ -436,7 +448,10 @@ through an explicit role or handle and typed artifact contract, and
 
 An owner-issued observation tied to the object, binding, environment, and
 execution result that produced it. Successful model text is not effect
-evidence.
+evidence. Its `succeeded` field is a literal Boolean. An execution receipt's
+normalized evidence must agree with the native owner result on evidence
+reference, success, observed effects, and payload. Ledger replay requires the
+evidence outcome to match the corresponding execution-completion event.
 
 ### Effect obligation
 
@@ -450,7 +465,8 @@ The deterministic terminal judgment compiled from a task's effect obligations.
 All required obligations must be satisfied; an unsatisfied best-effort
 obligation is retained as a deficit without invalidating otherwise complete
 work. `suspended` is explicitly nonterminal because required evidence remains
-pending.
+pending. The evaluator rejects non-Boolean evidence success values rather than
+coercing them by truthiness.
 _Avoid_: Plan completed; model-declared completion
 
 ### Verified trace digest

@@ -19,6 +19,8 @@ class TaskAcceptanceEvaluator:
     ) -> TaskAcceptance:
         obligations = tuple(effect_obligations)
         evidence = tuple(evidence_set)
+        if any(type(item.succeeded) is not bool for item in evidence):
+            raise ValueError("effect evidence success values must be booleans")
         if not obligations:
             raise ValueError('task acceptance requires at least one effect obligation')
         obligation_ids = tuple(item.obligation_id for item in obligations)

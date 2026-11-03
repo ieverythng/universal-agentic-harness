@@ -1,6 +1,6 @@
 # GRILL coordination
 
-Updated: 2 November 2026. Owner: GRILL. Canonical coordination checkout:
+Updated: 3 November 2026. Owner: GRILL. Canonical coordination checkout:
 `/home/juanbeck/universal-agentic-harness`, branch `feat/base-implementation-H0`.
 
 ## Historical custody
@@ -20,101 +20,76 @@ remain identical. 144 product/history paths remain staged and are NOT newly
 approved or committed by that checkpoint. Root owns the final board checkpoint
 when these finite tasks close; no source cleanup/reset is authorized by this file.
 
-## Current: D-20261102-01, masterplan delivery viewer and coordination custody
+## Current: D-20261103-01, resumed viewer and base quarantine/cleanup
 
-Direct human requests: adapt the delivery viewer from owned Terac incubator
-commit `289f4d0334c8395f6a293d326af70bb4fdb06176` into the beginning of the UAH
-masterplan, preserve UAH's theme and PR1, map H0-H2 mini-workpackages and the
-existing sprint plans; deliver the updated PR2 for human commit/push/publication.
-This is a static dated delivery snapshot, not a live authenticated dashboard.
-Local readiness, remote PR state, blocking dependency, outcome and H-gate closure
-are separate fields. No invented PR numbers or milestones.
+Direct human on November 3 asks verify all chats against their boards, restart
+unfinished work, prioritize PR2 viewer and dirty-base cleanup, preserve extras,
+and permits GRILL to bring main into base when safe. Prior D-20261102-01 is
+closed; current scope does not reset its clock or manufacture old acceptance.
+Full prior board disposition is preserved in Git `29e52a4...`.
 
-NEW explicit Git authority supersedes the earlier human-only board checkpoint
-rule: GRILL may control, commit and push coordination-board/history work on
-`feat/base-implementation-H0`, including future coordination-only updates.
-This grants NO product-code, unrelated human-index, feature-publication,
-main merge, tag, provider, robot or experiment authority. Canonical live boards
-stay here; implementation/tests/change docs stay in their targeted PR worktrees.
-Before publishing a board checkpoint, freeze exact paths/bytes, verify the same
-explicit branch/remote destination, review sensitive content, preserve unrelated
-index entries, and record commit/push outcome. No force push. Board history is
-coordination evidence, not code acceptance or runtime authority.
+Verified native statuses: DEV1 audit closed, DEV2 viewer stopped without reviews,
+RESEARCH custody complete/idle. Board and native handoffs agree. No orphaned
+subagents are active. RESEARCH needs no restart for this delivery task.
 
-Observed product main remains `d9eb84a...`. Human has committed/pushed PR2 as
-`d9f4ab94e0009fd241601b16486e2f4ebaf724bd`, tree `d07d509b...`, exactly the prior
-approved twelve-doc unit. No GitHub PR2 exists yet. Its assigned worktree has an
-unrelated human `uv.lock` edit changing Python minimum 3.12 to 3.14; preserve and
-exclude it from this viewer scope. The new viewer bytes require fresh review.
+New finite tasks, actual clocks from owner boards:
 
-Root froze 782 working files plus six retained ignored historical JSONL,
-tracked/staged binary patches, exact index and branch history before any
-checkpoint. Freeze root: `/home/juanbeck/uah-experiments/checkpoint-20261102/grill/`.
-The original non-board index records remain protected. The authorized board
-checkpoint changed 146 staged paths to 144 without changing other entries. No product cleanup/copy/reset.
-Most base source is older than merged PR1; exact reviewed residuals need path
-and dependency closure, not an inherited historical APPROVE label.
+- DEV2 PR2-VIEWER-FINISH-02: <=90 minutes inclusive checks/fresh independent
+  6.1 Sol/XHigh + 5.6 Sol/XHigh review pair and one focused in-scope fix review.
+  Reuse private candidate, refreeze against human PR2 head d97fadd4..., preserve
+  committed uv.lock. Add PR1/PR2 cards, ten sprint cards, micro-workpackage
+  crosswalk and exact status truth; no runtime work. Whole-unit APPROVE only
+  permits root collision-safe UNSTAGED transfer. No product Git publication.
+- DEV1 BASE-QUARANTINE-MAP-02: <=45 minutes, base read-only. Produce exact
+  current path/byte/mode/review dispositions and isolated cleanup preview.
+  Root alone adopts cleanup after recovery and no-loss checks. No source repair,
+  new sprint implementation, public artifacts or index/HEAD mutation by DEV1.
 
-## D-20261102-01 disposition: frozen, no active implementation
+GRILL now owns authorized base cleanup. Before changing staged/working files,
+freeze exact index, working files, ignored-required fixtures, patches and Git
+history privately. Preserve original staged versus working distinctions and
+recoverability. Desired coordination checkout is current-main product tree plus
+current owner-maintained boards; residual research/planning/source extras move
+to explicit private quarantine and targeted candidate/sprint provenance paths.
+Superseded source must not overwrite merged PR1. Do not publish unreviewed
+research/probe archives/raw histories or mutate parked native No-Mistakes.
+No product feature commit/push/PR/main merge/tag. Base-only main reconciliation
+and coordination Git are human authorized. Reject concurrent human collisions.
 
-- DEV1 audit completed 21:08:39 UTC within 20:59:46–21:34:46. Exact report:
-  `/home/juanbeck/uah-experiments/checkpoint-20261102/dev1/BASE-RESIDUAL-SPRINT-MAP-20261102.md`,
-  SHA-256 `cd0a9c12a019cc1a51d82d923f2b7306688e42f2e4dfd414b379ccba9e867dfc`.
-  Later receipt wording did not authorize a new audit or sprint.
-- DEV2 exceeded its 20:59:46–22:04:46 UTC bound. Owner observed stop at
-  22:13:50; root issued explicit stop at 22:15. No independent reviewer pair
-  was dispatched. Ten-path private viewer candidate is UNREVIEWED and was
-  never transferred or staged. Full hook/check success reported by owner is
-  validation evidence only, not acceptance. Receipt-only closeout permitted.
-- Root verified all ten frozen payload hashes/modes and patch. Manifest SHA-256
-  `7a41633e99e4a286fae5a929608028ebd2c75170133522d9c58279565797ce7e`,
-  patch `2fada155ed76ed2c6ea5bf3784bd02ae578138c22fc2dd690b1c2ddaeb4d8ed8`.
-  Source `/home/juanbeck/uah-experiments/pr-migration-20261102/pr2-masterplan-viewer/source`;
-  freeze in sibling `evidence/candidate-freeze.json`. Root custody/archive:
-  `/home/juanbeck/uah-experiments/checkpoint-20261102/grill/viewer-stopped-root-custody.json`.
-- Missing completion: PR1/PR2 cards in the viewer (currently only ten Draft
-  sprint cards), DEV1 H0-H2 micro-workpackage integration, reconcile SPR-08
-  scaffold observation, and exact fresh independent Spec/Standards approval.
-  PR1 remains in the separate status document but is not a delivery-viewer card.
-  File preview was rejected by browser URL policy; no alternate serving/browser
-  workaround, screenshot or visual/accessibility qualification was performed.
-- RESEARCH custody-only work closed 21:05:39. No external research or next
-  implementation wave is active. Existing ten plans suffice for granularity.
-- The old exact twelve-document PR2 commit d9f4ab9 retains its original reviews.
-  New private viewer bytes do not inherit them. Assigned PR2 still has only the
-  protected human uv.lock edit; no product publication or tag by GRILL.
+User's new clean PR2 head is d97fadd4b84f1dee1d5b2434eb88030ec6146e31,
+`build(uv): update python ver`, a human uv.lock commit over approved docs d9f4ab9.
+Main remains d9eb84a; only public PR1 exists and is merged. New viewer needs exact
+fresh qualification; old twelve-doc approval does not cover human lock/viewer.
 
-## Residual and next-sprint map
+Root pre-cleanup custody root:
+`/home/juanbeck/uah-experiments/checkpoint-20261103/grill/base-before-cleanup/`.
+DEV1 map root `/home/juanbeck/uah-experiments/checkpoint-20261103/dev1/`.
+DEV2 new review receipts under `/home/juanbeck/uah-experiments/pr-migration-20261103/`.
 
-The dirty base is an evidence inventory, not a newer integration base. Nine
-changed states already match main/approved PR1. Lifecycle, prompt compiler and
-its test include superseded CHANGES-era bytes; runtime-example and admission-test
-variants are unreviewed/stale. Synthetic additions remain deferred. Remaining
-research/planning/docs are not collectively approved by being staged. Keep all
-bytes and index entries protected; do not copy the dirty overlay into main.
+Human Git authority for coordination boards/history remains: same explicit
+feat/base-implementation-H0 branch and origin, normal fast-forward push, frozen
+scope/sensitivity checks and recorded readback. New cleanup changes prior human
+staging only after full recoverable quarantine under explicit November 3 cleanup
+permission. Do not restore historical index snapshots into the live checkout.
 
-DEV1's report records H0-C1..C5, H1-R1..R3, H2-P1..P3 and H2.1-N1 with current
-versus missing evidence. Next source unit after PR2 is a freshly main-based
-SPR-01 historical replay/strict-fresh-use scope. Remove owner-bound resume/notify
-already delivered on main. Authentic fixture provenance must be established;
-no invented historical records. SPR-02 exact-budget/static-contract coverage
-follows. Existing scaffold bases are stale and must be refrozen, not reused as
-current implementation starts. No milestone is closed by this planning map.
+Previous viewer freeze remains exact 10 paths, manifest7a41633e...,
+patch2fada155..., private UNREVIEWED, no target transfer. Browser policy rejected
+file preview and prohibited serving/browser workarounds; use allowed static
+checks and leave human visual preview explicitly unverified. No circumvention.
 
-Existing UAH skills: uah-guardrails, uah-stack-iteration-loop, deslop-refactor,
-no-mistakes. Native No-Mistakes remains parked. Reviewers remain fresh fork-none
-6.1 Sol /XHigh and 5.6 Sol /XHigh, no Astra/Max. RESEARCH stays 6.1 Sol /Medium.
-No automatic successor or deadline extension. Board checkpointing authority
-continues under the explicit human coordination-only permission above.
+Existing ten sprint briefs suffice. Next source scope after PR2 is refreshed
+SPR-01 historical replay/strict-fresh-use, dropping resume/notify already on main.
+No H0/H1/H2 closure, no arbitrary new features, no automatic successor wave.
+Root routes research; DEV1/DEV2 may exchange scoped technical dependencies.
 
 ## Current source and release facts
 
 - GitHub main: `d9eb84a04099431d774f459792bcd16524ab54ce`, PR1 merged.
-- PR2 human commit/pushed head: `d9f4ab94e0009fd241601b16486e2f4ebaf724bd`,
-  tree `d07d509b6d82b82de039543806580f46fe4e6618`, exact previous twelve-document unit.
-  New viewer revision requires its own qualification. No PR2 exists yet.
+- PR2 human head: `d97fadd4b84f1dee1d5b2434eb88030ec6146e31`, human lock update
+  over exact reviewed twelve-doc d9f4ab9. New viewer requires fresh qualification.
+  No public PR2 exists yet.
 - Product worktree: `/home/juanbeck/.codex/worktrees/uah-pr2-docs/universal-agentic-harness`.
-  Unrelated human uv.lock >=3.14 edit is protected and excluded.
+  Human uv.lock >=3.14 commit is protected; assigned PR2 worktree is clean.
 - v0.1 / package 0.1.0 identifies the reviewed baseline, not H0/H1 closure.
   H0 v0.2; H1/O1 v0.3-v0.4; full Python NAO H2 v0.5; native H2.1 v0.6;
   H3 v0.7-v1.0; H4 v1.5; H5+ unassigned; H6 research. No new tag created.

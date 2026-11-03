@@ -231,6 +231,19 @@ def test_in_memory_registry_rejects_a_tampered_schema_identity():
         )
 
 
+def test_registry_rejects_non_boolean_policy_even_if_verifier_is_shadowed():
+    schema = ObjectArgumentSchema.issue(
+        schema_ref="schema://find_object/input/v1",
+        fields=(ArgumentField(name="label", value_type="string"),),
+        required=("label",),
+    )
+    object.__setattr__(schema, "allow_additional_properties", "false")
+    object.__setattr__(schema, "verify_identity", lambda: None)
+
+    with pytest.raises(TypeError, match="additional properties.*boolean"):
+        InMemoryArgumentSchemaRegistry((schema,))
+
+
 def test_object_schema_identity_is_independent_of_field_order():
     first = ObjectArgumentSchema.issue(
         schema_ref="schema://ordered/input/v1",

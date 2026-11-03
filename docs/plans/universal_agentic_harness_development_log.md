@@ -1,7 +1,7 @@
 # Universal Agentic Harness: Development Log
 
 **Purpose:** Practical implementation ledger linked to the semantic masterplan  
-**Updated:** 2026-10-08
+**Updated:** 2026-10-21
 **Target:** UAH H2 NAO planner qualification after ordered evidence gates pass
 **Current release boundary:** H0 contract spine, one H1 synthetic vertical
 slice, profile-bound state-update and new-task ingress, explicit NAO adapter
@@ -11,14 +11,100 @@ edges, and terminal required-effect counterexamples persist in one strict
 common JSONL ledger and replay after restart. Initial H1 runtime controls,
 durable actor activation, fixed model allocation, and O1 environment/task/trace
 and actor rendering are present. Stale-effect-evidence policy, the live provider
-path, and H2 planner parity remain incomplete
+path, and H2 planner parity remain incomplete.
 
 ## Current state
+
+### 2026-10-21: PR1-WIRE-06 resumed repair, projection review pending
+
+The original frozen PR1-WIRE-06 candidate received fresh Standards and Spec
+`CHANGES` findings on native-result coercion, overridable receipt verification,
+runtime-callable truthiness, and replay's missing native/normalized receipt
+content. GRILL D-20261021-02 authorized one bounded repair/re-review cycle for
+the three direct bypasses. Human disposition D-20261021-03 approved retaining
+the exact versioned receipt projection in the existing ledger, superseding only
+the prior persistence hold. The original 2026-10-20 23:40:23 UTC start and
+2026-10-21 01:20:23 UTC hard stop remain unchanged.
+
+The private candidate now records `uah.execution_receipt/v1` on new execution
+starts, persists the exact receipt wire object with `execution_completed`, and
+requires the paired `evidence_issued` event to agree with it and with the
+content-addressed evidence references. A typed evidence-rejection path remains
+distinct. The genuine historical completed-ledger fixture stays readable
+without synthetic receipt fields; its replay provides only the historical
+checks and no fresh execution authority. The three direct bypass fixes and
+projection/rejection replay cases are implemented in the candidate. The focused
+ledger, receipt, and provenance selection passes 186 tests; the full suite
+passes 837 tests. Normal and hostile-environment pre-commit runs both pass, with
+required hooks still executing when inherited `UAH_PYTHON_BIN` and `SKIP`
+overrides are set. The recorded O1 canary was regenerated from the versioned
+events and its freshness test passes. Exact reconstruction, packaging checks,
+and the fresh review pair remain pending. This is candidate-local evidence,
+not H0/H1/O1 closure or H2 parity.
+
+### 2026-10-17: release milestones
+
+Human decision D-20261017-07 sets H0 v0.2, H1/O1 v0.3-v0.4, complete Python
+NAO planner parity H2 v0.5, native NAO H2.1 v0.6, H3 increments from v0.7
+through full Workbench integration v1.0, and H4 v1.5. H5+ release numbers
+remain unassigned. The v1.0 H3 target does not imply H4/H5 completion or
+cross-domain conformance. Full H3 retains allocation, concurrency, and
+handle-fidelity gates; entropy-search and crystallization are excluded from
+the H3 base. Companion package 0.1.0 and the intended internal Workbench V1
+scope remain separate versioning decisions. These milestones do not waive
+acceptance evidence or authorize tags/publication. H0, H1, O1, and H2 remain
+open.
+
+### 2026-10-17: PR1 candidate packaging audit
+
+The PR1 preparation pass reconciles its source and test closure with the
+approved REVIEW-DELIVER-03 handoff and the complete base dirty-path inventory.
+The two required legacy invocation fixtures are byte-identical to the
+approved evidence; only their narrow ignore exceptions were restored in the
+candidate. A helper repair now makes the manual pre-commit runner validate the
+eligible tracked and untracked path set that its cache certifies. Its focused
+tests pass (5 tests). Full-suite, clean-reconstruction, documentation, example,
+wheel/import and fresh whole-manifest review gates remain pending. This
+packaging audit does not close H0, H1, O1 or H2, and it does not authorize
+publication.
+
+### Historical candidate report (2026-10-09): Prompt-source integrity
+
+The retained SOURCE-PACK-01 reproducer showed that a caller could mutate
+`PromptPack` wording, shadow its verifier/exporter methods and keep the old pack
+ID while the changed wording reached compilation and provider dispatch. A
+private candidate now reconstructs exact prompt-source dataclasses from stored
+fields, rechecks content-addressed identities, and detaches the source closure
+before compilation or invocation accounting. `PromptCompiler` revalidates its
+inputs independently. A newly authored `CompiledPrompt` with matching actor and
+task metadata remains rejected unless its content equals the configured
+owner-issued compilation.
+
+Focused prompt-compiler and invocation checks pass (62 tests); the full suite
+passes (730 tests) in the isolated repository environment. Ruff, whitespace,
+both O1/runtime example freshness checks and `./scripts/run_precommit.sh` pass.
+The first system-interpreter wheel test could not import `setuptools`; after the
+repository's normal setup created its isolated `.venv`, the packaging test and
+full suite passed. This remains candidate-local evidence. The independent
+review pair and exact transfer gate are pending. No source or documentation
+bytes have transferred to the shared checkout, and H0/H1/O1/H2 qualification
+remains open. The native No-Mistakes pipeline stays parked and was not invoked.
+
+### 2026-10-11: Review delivery and next design queue
+
+REVIEW-DELIVER-03 later received independent Spec and Standards `APPROVE`
+verdicts; 731 tests passed and 24 path states were delivered unstaged. Its
+closeout (`2026-10-09_uah_reviewed_handoff_02_closeout.md`) and report index
+(`docs/artifacts/reviews/evidence/2026-10-09_review-deliver-03/README.md`)
+supersede the historical pending status above. H0/H1/O1/H2 remain open. The
+proposed next order is P03 → P02 → P04 → STD-02; its design dossier is
+`2026-10-11_uah_mechanical_seam_design.md`. No implementation successor is
+dispatched.
 
 ### Consolidation and NAO-first priority on 2026-10-08
 
 The human selected NAO as the first parity/test environment and deferred the
-synthetic environment. The [consolidated handoff](../artifacts/reviews/2026-10-08_uah_consolidated_handoff.md)
+synthetic environment. The consolidated handoff (`2026-10-08_uah_consolidated_handoff.md`)
 records four original scoped closures plus the extra approved raw O1 repair.
 At consolidation, original STD-02, SPEC-02 and ARCH-02 remained open. The R1 report-hash discrepancy,
 incomplete R4-FIX primary review, stopped dashboard blockers and three R5
@@ -44,7 +130,7 @@ read-only provenance consumer, and historical unmarked starts remain readable
 without authorizing fresh compilation. Ledger-file ownership remains part of
 the trusted runtime boundary.
 
-The [bounded ingress round](../artifacts/reviews/2026-10-08_uah_ingress_authority_repair.md)
+The bounded ingress round (`2026-10-08_uah_ingress_authority_repair.md`)
 began from committed docs HEAD `06f5a29`, with dirty runtime bytes frozen
 separately. The candidate now rejects raw task-start writes, records command
 provenance and checks it before fresh compilation. Historical unmarked starts
@@ -68,7 +154,7 @@ for a replacement commit. The ingress review remains scoped to its frozen bytes.
 
 The human selected rejecting unsupported `measured` and `reviewed` requests
 through the current projector and renderer, including both source branches and
-empty inputs. The [ARCH-02 round](../artifacts/reviews/2026-10-08_uah_arch02_label_repair.md)
+empty inputs. The ARCH-02 round (`2026-10-08_uah_arch02_label_repair.md`)
 starts from `864c6d3`; its source change and fresh gate remain separate from
 SPEC-02 approval and the broader committed modules awaiting human review.
 Supported recorded, synthetic and conceptual views retain their existing
@@ -92,25 +178,25 @@ or release closure follows from the passing tests.
 
 ### Independent review qualification
 
-The [October 5 review](../artifacts/reviews/2026-10-05_uah_h0_h1_independent_review.md)
-found seven distinct blocking mechanisms. The [October 8 R0 receipt](../artifacts/reviews/2026-10-08_uah_r0_baseline_and_skill_handoff.md)
+The October 5 review (`2026-10-05_uah_h0_h1_independent_review.md`)
+found seven distinct blocking mechanisms. The October 8 R0 receipt (`2026-10-08_uah_r0_baseline_and_skill_handoff.md`)
 reproduces all seven against the captured dirty tree. Passing narrow fixtures,
 including the rows marked Green below, does not establish H0/H1 exit or complete
 authority conformance. R0 performed no runtime repair.
 
-The [separate R1 receipt](../artifacts/reviews/2026-10-08_uah_r1_domain_pack_identity.md)
+The separate R1 receipt (`2026-10-08_uah_r1_domain_pack_identity.md`)
 tracks only STD-01/SPEC-01: domain-pack identity revalidation before compilation.
 R1 alone did not address the remaining six mechanisms or establish complete
 failure-suite evidence and release qualification. Provider transport and evidence/freshness contracts
 remain separately staged; no live endpoint result is implied by these checks.
 
-[R2](../artifacts/reviews/2026-10-08_uah_r2_catalog_semantic_fencing.md)
+R2 (`2026-10-08_uah_r2_catalog_semantic_fencing.md`)
 is independently approved only for the admission-time catalog comparison.
 SPEC-03 remains PARTIAL/OPEN because the post-admission owner gap reproduces
 through public execution and restart. Five other mechanisms remained open
 at that checkpoint. H0/H1 exit is not established by these repairs.
 
-[R3](../artifacts/reviews/2026-10-08_uah_r3_ledger_integrity.md) closes the
+R3 (`2026-10-08_uah_r3_ledger_integrity.md`) closes the
 reproduced ledger-export alias and stale-event consumer mechanisms under
 STD-03/SPEC-04 at its independently reviewed bytes. Raw-iterable O1 projection
 identity remains a separate reproduced residual, alongside the four untouched
@@ -119,7 +205,7 @@ admitted-object snapshots are the next separately frozen repair, not delivered
 by R3. The synthetic suite will use a reviewed owner-local exact-content
 predicate; its adapter and full integration evidence remain unimplemented.
 
-[R4](../artifacts/reviews/2026-10-08_uah_r4_admitted_object_snapshot.md)
+R4 (`2026-10-08_uah_r4_admitted_object_snapshot.md`)
 adds the v3 exact object snapshot and replay body, but returns CHANGES. The
 catalog controls pass while all-marker removal and genuine old-object active
 consumer probes reproduce authority gaps. The next separately frozen repair
@@ -127,19 +213,19 @@ must preserve historical readability without granting current execution or
 evidence authority. Passing 435 tests and hooks before review did not detect
 those alternative inputs; H0/H1 and SPEC-03 closure remain unqualified.
 
-The [R4-FIX receipt](../artifacts/reviews/2026-10-08_uah_r4_fix.md) preserves a
+The R4-FIX receipt (`2026-10-08_uah_r4_fix.md`) preserves a
 complete second-review approval and an interrupted primary review with a
 nested-field mismatch. Its aggregate gate remains CHANGES. The separately
-authorized [nested-owner round](../artifacts/reviews/2026-10-08_uah_r4_nested_owner.md)
+authorized nested-owner round (`2026-10-08_uah_r4_nested_owner.md`)
 froze sources at 18:04:47 and closes with two fresh approvals and passing
 integration, without retrying the interrupted review. Approval covers the
 reproduced concrete-artifact mechanisms, not a release-wide authority proof.
-The [O1 constructor correction](../artifacts/reviews/2026-10-08_uah_o1_conformance_fix.md)
+The O1 constructor correction (`2026-10-08_uah_o1_conformance_fix.md`)
 has two scoped approvals and passing current integration checks after the
-concurrent author freeze. The [follow-up index](../artifacts/reviews/2026-10-08_uah_review_followup_status.md)
+concurrent author freeze. The follow-up index (`2026-10-08_uah_review_followup_status.md`)
 tracks original findings without rewriting their historical verdicts.
 
-The separately authorized [ARCH-01 correction](../artifacts/reviews/2026-10-08_uah_arch01_static_eligibility.md)
+The separately authorized ARCH-01 correction (`2026-10-08_uah_arch01_static_eligibility.md`)
 shares static operation eligibility between PromptCompiler and semantic
 admission. The forbidden-observable public red fails before repair and passes
 after it; permitted effects remain usable. Sources freeze at 18:26:32, with 116
@@ -149,7 +235,7 @@ Original SPEC-03 probes now reject catalog widening at admission and dispatch;
 their early-stop limits and separately executed valid controls are recorded in
 that receipt. These are finding-specific results, not release-wide conformance.
 
-The separately frozen [R5 native foundation](../artifacts/reviews/2026-10-08_uah_r5_owner_local_foundation.md)
+The separately frozen R5 native foundation (`2026-10-08_uah_r5_owner_local_foundation.md`)
 adds the synthetic note owner outside the core. The 22 native controls pass,
 and the shared tree passes 532 tests. The source froze at 18:58:38, after the
 18:55:53 soft target; the 19:12:53 hard bound is unchanged. Both fresh independent
@@ -178,10 +264,10 @@ qualification remains blocked on task-ingress producer provenance.
 | Neural Workbench promotion/adaptation | Quarantined design only | No trusted runtime mutation or registry promotion implemented |
 | NeuralWorkbench repository | Boundary defined, gitlink missing | Intended companion revision is `e76ba7e`; `.gitmodules` exists but the UAH tree does not currently mount the gitlink |
 | Workbench adapter protocol | Green contract slice | Focused tests cover serialization, handshake, mismatch, and observation-only override |
-| Prompt compiler | Green bounded H1 slice | Versioned prompt pack and deterministic compiled task/role/domain projection, direct-operation schema, reviewed input-schema and binding fingerprints, task-scoped examples, and content-addressed prompt |
+| Prompt compiler | Green bounded H1 slice | Configured immutable source owner resolves exact task spec/projection, role, PromptPack, registry/binding and schema revisions; deterministic compilation is rechecked against caller prompt content before invocation authority is granted. Mutable YAML authoring remains separate from pinned runtime revisions. |
 | Two-stage admission and execution | Green narrow kernel seam | Proposal normalization or typed rejection, bounded input-schema validation, semantic admission, domain lease, exact lease-only execution, distinct result/evidence artifacts, typed evidence rejection, explicit operation edges, and terminal required-effect rejection are executable; output validation, concurrency, stale evidence, and false-completion policy remain open |
 | Runtime controls | Green initial H1 slice | Typed execution failure, model/tool accounting atomic with call/dispatch start, pre-dispatch cancellation, recorded-time timeout evaluation, and bounded retry decisions replay without granting proposal or lease authority; token/cost accounting and in-flight interruption remain open |
-| Provider invocation | Green fake-provider H1 slice | Exact ready actor, unexpired lease, recorded compiled task, atomic model-call grant/start, raw finite-JSON completion or typed failure, restart-safe completed-call lookup, and no automatic retry of an outstanding call; live ZeroTier transport remains open |
+| Provider invocation | Green fake-provider H1 slice | Exact ready actor, unexpired lease, ledger-recorded compiled task, invocation-time owner compilation, source-reference binding on atomic model-call grant/start, fail-closed unavailable or changed sources, raw finite-JSON completion or typed failure, completed-call replay before source resolution, and no retry of an outstanding call; live ZeroTier transport remains open |
 | Agent identity and standby | Green bounded H1 slice | Role/model registries and non-reserving declaration preflight, ledger-backed roster attachment/termination with frozen profile/manifest/attestation/handle lineage, exclusive fixed leases, bounded owner readiness, ready/invoking/standby replay, and release; rebinding, dynamic scheduling, durable context, and live provider calls remain open |
 | Observatory | Green bounded O1 slice | Static environment-run/task/trace index, explicit actor cards even before task start, terminal-status honesty, control/rejection failure stages, explicit operation nodes and recorded edges, provenance labels, search, inert graph JSON, and recorded-canary example; complete configuration/comparison views and O2 remain open |
 | Repository guardrails | Green | Python-native pre-commit and pre-push hooks enforce hygiene, Ruff, tests, generated-doc synchronization, and a fresh repository-signature cache |

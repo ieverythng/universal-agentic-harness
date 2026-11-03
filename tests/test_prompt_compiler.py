@@ -12,6 +12,7 @@ from ab_harness.contracts import (
     AbstractionFrame,
     AgentOutput,
     AgentRoleSpec,
+    InteractionModuleSpec,
 )
 from ab_harness.domain_contracts import (
     DomainContractPack,
@@ -199,6 +200,18 @@ def test_prompt_compiler_renders_one_deterministic_task_scoped_protocol_and_sche
     assert "SECRET_IMPLEMENTATION_LOCATOR" not in json.dumps(prompt.to_dict())
 
 
+def test_prompt_compiler_rejects_shadowed_prompt_pack_identity_methods():
+    inputs = _inputs()
+    pack = inputs["prompt_pack"]
+    authentic_export = pack.to_dict()
+    object.__setattr__(pack, "role_instructions", "tampered source wording")
+    object.__setattr__(pack, "verify_identity", lambda: None)
+    object.__setattr__(pack, "to_dict", lambda: authentic_export)
+
+    with pytest.raises(ValueError, match="prompt pack identity does not match content"):
+        PromptCompiler().compile(**inputs)
+
+
 @pytest.mark.parametrize(
     "changed", ("manifest_role", "manifest_pack", "frame", "domain", "objects", "role")
 )
@@ -303,6 +316,38 @@ def test_prompt_artifacts_round_trip_and_reject_malformed_or_substituted_content
         CompiledPrompt.from_dict(substituted)
     with pytest.raises(ValueError, match="canonical"):
         replace(prompt, output_schema_json='{"type": "object"}')
+
+
+def test_prompt_compiler_revalidates_schema_with_its_owner_before_rendering():
+    inputs = _inputs()
+    schema = inputs["argument_schemas"][0]
+    object.__setattr__(schema, "allow_additional_properties", "false")
+    object.__setattr__(schema, "verify_identity", lambda: None)
+
+    with pytest.raises(TypeError, match="additional properties.*boolean"):
+        PromptCompiler().compile(**inputs)
+
+
+def test_schema_issuance_rejects_subclass_verifier_override():
+    class OverrideSchema(ObjectArgumentSchema):
+        def verify_identity(self):
+            pass
+
+    with pytest.raises(TypeError, match="concrete ObjectArgumentSchema"):
+        OverrideSchema.issue(
+            schema_ref="schema://find_object/input/v1",
+            fields=(ArgumentField("label", "string"),),
+            required=("label",),
+            allow_additional_properties="false",
+        )
+    with pytest.raises(TypeError, match="concrete ObjectArgumentSchema"):
+        OverrideSchema(
+            schema_id="input-schema:sha256:untrusted",
+            schema_ref="schema://find_object/input/v1",
+            fields=(ArgumentField("label", "string"),),
+            required=("label",),
+            allow_additional_properties="false",
+        )
 
 
 def test_prompt_compiler_preserves_task_narrowing_and_matches_semantic_admission():
@@ -445,4 +490,38 @@ def test_prompt_compiler_reverifies_every_frozen_source_at_the_compile_boundary(
     object.__setattr__(target, field_name, "artifact:substituted")
 
     with pytest.raises(ValueError, match="identity"):
+        PromptCompiler().compile(**inputs)
+
+
+def test_prompt_compiler_rejects_nested_dataclass_subclasses():
+    inputs = _inputs(runtime_callable=False)
+    original = inputs["compiled_task"].interaction_module
+
+    class CallableInteractionModule(InteractionModuleSpec):
+        def object_for(self, object_id):
+            item = super().object_for(object_id)
+            return replace(item, runtime_callable=True) if item is not None else None
+
+    module = CallableInteractionModule(
+        task_id=original.task_id,
+        role=original.role,
+        frame=original.frame,
+        objects=original.objects,
+        registry_source=original.registry_source,
+    )
+    inputs["compiled_task"] = replace(
+        inputs["compiled_task"], interaction_module=module
+    )
+
+    with pytest.raises(TypeError, match="trusted concrete dataclass"):
+        PromptCompiler().compile(**inputs)
+
+
+def test_prompt_compiler_rejects_shadow_verified_compiled_task_source():
+    inputs = _inputs()
+    compiled_task = inputs["compiled_task"]
+    object.__setattr__(compiled_task, "prohibited_effects", ("unsafe",))
+    object.__setattr__(compiled_task, "verify_identity", lambda: None)
+
+    with pytest.raises(TypeError, match="compiled task source fields"):
         PromptCompiler().compile(**inputs)

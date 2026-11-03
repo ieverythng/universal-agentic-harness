@@ -38,10 +38,10 @@ class _TaskStartCommand:
             or self.capability is not authority._start_capability
         ):
             raise ValueError("invalid authority-bound task-start command")
-        self.ingress.verify_identity()
-        self.decision.verify_identity()
-        expected = authority._start_decision(self.environment_run, self.ingress)
-        if expected != self.decision:
+        ingress = EnvironmentIngress.verified_copy(self.ingress)
+        decision = TaskIngressDecision.verified_copy(self.decision)
+        expected = authority._start_decision(self.environment_run, ingress)
+        if expected != decision:
             raise ValueError("task-start command does not match admitted ingress")
         return TaskStartedFact(
             environment_run_id=expected.environment_run_id,
@@ -94,7 +94,7 @@ class TaskIngressAuthority:
         domain_contract_pack: DomainContractPack,
         lifecycle_ledger: LifecycleLedger | None = None,
     ) -> None:
-        domain_contract_pack.verify_identity()
+        domain_contract_pack = DomainContractPack.verified_copy(domain_contract_pack)
         self._environment_profile_id = environment_profile_id
         self._domain_contract_pack_revision = domain_contract_pack.revision
         self._ledger = lifecycle_ledger or LifecycleLedger()
@@ -139,7 +139,7 @@ class TaskIngressAuthority:
     ) -> TaskIngressDecision:
         """Decide ingress and record accepted task-bearing lineage in the ledger."""
 
-        ingress.verify_identity()
+        ingress = EnvironmentIngress.verified_copy(ingress)
         if (
             self._environment_profile_id
             != environment_run.attestation.environment_profile_id

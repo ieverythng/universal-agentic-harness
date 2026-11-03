@@ -1,108 +1,60 @@
 # Universal Agentic Harness Documentation
 
-Markdown is canonical. Generated HTML companions are committed for local review
-and must be regenerated after canonical edits.
+Markdown is canonical. The selected architecture and plan documents have
+generated HTML companions; regenerate them after canonical edits.
 
 ## Plans
 
-- `plans/universal_agentic_harness_masterplan.md`: canonical H0-H6 delivery
-  spine and current H2 qualification gates.
-- `plans/universal_agentic_harness_development_log.md`: implementation and
-  verification ledger.
-- `plans/domain_initialization_and_ab_coupling.md`: manual and LLM-assisted
-  domain onboarding, qualification, and activation gates.
+- [Implementation masterplan](plans/universal_agentic_harness_masterplan.md):
+  H0-H6 delivery spine and current qualification gates.
+- [Development log](plans/universal_agentic_harness_development_log.md):
+  implementation evidence and open release gates.
+- [Domain initialization](plans/domain_initialization_and_ab_coupling.md):
+  onboarding, qualification, and activation boundaries.
 
 ## Architecture
 
-- `architecture/universal_agentic_harness_foundation.md`: project thesis and
-  portable kernel architecture.
-- `architecture/neural_workbench_adaptive_ab_harness.md`: H3+ adaptive engine
-  integration and AB research synthesis.
-- `architecture/observatory_contract.md`: O1 read-only API and O2 interactive
-  Observatory boundary.
-- `architecture/watson_inference_seams.md`: local-model inference seams.
-- `architecture/decisions/`: architectural decision records.
+- [Foundation](architecture/universal_agentic_harness_foundation.md): portable
+  kernel and environment-owner boundaries.
+- [Neural Workbench integration](architecture/neural_workbench_adaptive_ab_harness.md):
+  H3+ adaptive search and quarantined promotion.
+- [Observatory contract](architecture/observatory_contract.md): O1 read-only
+  projection and O2 interaction boundary.
+- [Watson inference seams](architecture/watson_inference_seams.md): local
+  inference integration constraints.
+- [Semantic object and binding decision](architecture/decisions/0001-semantic-objects-and-shadow-first-bindings.md).
 
-## Artifacts
+## Decision records and examples
 
-- `artifacts/decisions/2026-08-04_uah_h2_neural_workbench_grill.md`: initial
-  H2 and Workbench ownership decisions.
-- `artifacts/decisions/2026-09-08_uah_identity_environment_and_memory_grill.md`:
-  identity, environment, ingress, multi-actor trace, task-closure, and memory
-  decisions from the extended architecture grill.
-- `artifacts/reviews/`: dated implementation and release-gate audits.
-- `artifacts/design-reports/uah_environment_ingress_task_closure_design_report.docx`:
-  retained-template review of the 2026-09-08 architecture checkpoint.
-- `artifacts/system-design/`: system-design document, retained template, and
-  architecture figure.
-- `artifacts/observatory/o1_recorded_nao_canary.html`: generated O1 static
-  projection of the deterministic recorded NAO canary. It is not a live H2
-  parity result.
-- `artifacts/observatory/o1_h1_agent_lifecycle.html`: generated H1 fixed-model
-  activation, fake-provider invocation, release, and termination review. It uses
-  explicit actor events and real task lineage; it is not live provider evidence.
-- `artifacts/provenance.md`: source and extraction provenance.
-- `artifacts/h0_source_readme.md`: retained H0 source note.
+- [H2 and Workbench ownership grill](artifacts/decisions/2026-08-04_uah_h2_neural_workbench_grill.md).
+- [Identity, environment, and memory grill](artifacts/decisions/2026-09-08_uah_identity_environment_and_memory_grill.md).
+- [Synthetic owner-test deferral](artifacts/decisions/2026-10-09_synthetic_owner_test_deferral.md).
+- [Source provenance](artifacts/provenance.md).
+- [Recorded NAO O1 example](artifacts/observatory/o1_recorded_nao_canary.html):
+  deterministic fixture only, not live H2 parity.
+- [Agent lifecycle O1 example](artifacts/observatory/o1_h1_agent_lifecycle.html):
+  synthetic fixed-model/fake-provider evidence only.
 
-## Research
+## Status and publication boundary
 
-- `research/`: primary-source reviews and experimental notes. Research claims
-  remain separate from implementation status.
-- `research/jev_system_one_uah_research.md`: Jev and RLCD source review,
-  local decision-model alternatives, UAH integration boundaries, hardware and
-  schema-scaling analysis, and the proposed H3 shadow experiment.
-- `research/uah_h0_h1_seam_deepening.md`: non-canonical H0/H1 authority audit,
-  deletion tests, failure grammar, and interface alternatives used to plan the
-  next TDD slices.
+H0, H1, and O1 remain partial; H2 NAO parity is unqualified. These documents
+describe implemented seams and roadmap separately. Detailed reviewer
+narratives, coordination boards, raw probe archives, GTM material, and binary
+design artifacts are not part of the core-plus-CI migration. The five exact
+historical fixture files under `artifacts/reviews/` exist only as inputs to
+`tests/test_admission_active_provenance.py`; they are not published review
+reports. Historical receipt filenames cited in the canonical Markdown remain
+plain-text references for traceability; their source reports are outside this
+product candidate.
 
-## Repository Relationship
+## Rendering and local checks
 
-`src/ab_harness` is the portable UAH core. It owns H0-H2 contracts, domain
-projection, bindings, gates, environment-owner evidence, configuration identity,
-and the mandatory execution ledger. `src/ab_harness_nao` is the explicit
-ROS-free NAO compatibility and recorded qualification adapter. The kernel has a
-test-enforced dependency boundary against importing that adapter.
-
-NeuralWorkbench remains an independently usable companion repository and begins
-its authoritative role at H3 through a versioned adapter. The intended revision
-is `e76ba7e`, but the current UAH tree does not contain the declared
-`src/Neural-Wokbench` gitlink. Documentation and qualification must treat that
-revision as an intended pin until the gitlink is restored and verified. The
-companion owns pulse search, adaptive trace products, scoring, entropy
-experiments, and quarantined crystallization, not UAH execution authority or
-environment registry content.
-
-NAO is the first reference domain. Existing chatbot, planner, orchestrator,
-dialogue, knowledge, perception, and skill ownership remains in the NAO
-repository while UAH provides compatibility adapters and comparable traces.
-
-## Rendering
-
-Regenerate every canonical HTML companion and the legacy browser redirects:
+Regenerate the selected HTML companions and legacy browser redirects with:
 
 ```bash
 python scripts/render_agentic_harness_docs.py
 ```
 
-The shared theme lives in `docs/assets/`. The old
-`docs/agentic_harness/*.html` paths are redirects only and are not canonical.
-
-## Local validation
-
-Initialize the repository-local Python environment and install the Git hooks
-once:
-
-```bash
-./scripts/setup_dev_tools.sh
-```
-
-Run the complete pre-commit suite before staging a change:
-
-```bash
-./scripts/run_precommit.sh
-```
-
-The wrapper records the repository signature only after every hook passes. The
-pre-push hook rejects missing or stale validation. Provider credentials belong
-in the ignored root `.env`; `.env.example` documents the supported local
-settings without containing secrets.
+Use `./scripts/setup_dev_tools.sh` to create the local environment and install
+hooks, then `./scripts/run_precommit.sh` for the repository checks. Provider
+credentials and machine-specific paths must remain outside tracked artifacts.

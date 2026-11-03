@@ -1,4 +1,6 @@
 from dataclasses import replace
+from concurrent.futures import ThreadPoolExecutor
+from threading import Barrier, BrokenBarrierError
 
 import pytest
 
@@ -196,6 +198,88 @@ def test_task_ingress_decision_detects_post_construction_content_changes():
 
     with pytest.raises(ValueError, match="identity does not match"):
         decision.to_dict()
+
+
+def test_task_ingress_decision_verified_copy_rejects_shadowed_identity_method():
+    decision = TaskIngressDecision(
+        environment_ingress_id="environment-ingress:verified-copy",
+        environment_ingress_artifact_id="environment-ingress:sha256:verified-copy",
+        environment_run_id="environment-run:verified-copy",
+        action="state_update",
+        reason_code="matched_rule",
+    )
+    snapshot = TaskIngressDecision.verified_copy(decision)
+
+    assert snapshot is not decision
+    assert snapshot.decision_id == decision.decision_id
+    object.__setattr__(decision, "reason_code", "forged")
+    object.__setattr__(decision, "verify_identity", lambda: None)
+
+    with pytest.raises(ValueError, match="identity does not match"):
+        TaskIngressDecision.verified_copy(decision)
+
+
+def test_environment_ingress_verified_copy_rejects_shadowed_identity_payload():
+    ingress = EnvironmentIngress(
+        environment_ingress_id="environment-ingress:verified-copy",
+        environment_run_id="environment-run:synthetic:001",
+        binding_id="binding:synthetic.observation:v1",
+        ingress_type="observation",
+        payload_artifact_id="artifact:verified-copy",
+        native_lineage=(("observation_id", "observation:verified-copy"),),
+        observed_at="2026-10-21T09:00:00Z",
+    )
+    snapshot = EnvironmentIngress.verified_copy(ingress)
+    original_payload = EnvironmentIngress._identity_payload(ingress)
+
+    assert snapshot is not ingress
+    assert snapshot.ingress_artifact_id == ingress.ingress_artifact_id
+    object.__setattr__(ingress, "binding_id", "binding:synthetic.request:v1")
+    object.__setattr__(ingress, "ingress_type", "user_request")
+    object.__setattr__(ingress, "native_lineage", (("goal_id", "task:forged"),))
+    object.__setattr__(ingress, "_identity_payload", lambda: original_payload)
+    object.__setattr__(ingress, "verify_identity", lambda: None)
+
+    with pytest.raises(ValueError, match="identity does not match"):
+        EnvironmentIngress.verified_copy(ingress)
+
+
+def test_environment_ingress_verified_copy_requires_the_concrete_owner_class():
+    class DerivedEnvironmentIngress(EnvironmentIngress):
+        pass
+
+    ingress = EnvironmentIngress(
+        environment_ingress_id="environment-ingress:derived",
+        environment_run_id="environment-run:synthetic:001",
+        binding_id="binding:synthetic.observation:v1",
+        ingress_type="observation",
+        payload_artifact_id="artifact:derived",
+        native_lineage=(("observation_id", "observation:derived"),),
+        observed_at="2026-10-21T09:00:00Z",
+    )
+
+    with pytest.raises(TypeError, match="concrete owner type"):
+        DerivedEnvironmentIngress.verified_copy(ingress)
+
+
+def test_environment_ingress_to_dict_uses_a_verified_snapshot():
+    ingress = EnvironmentIngress(
+        environment_ingress_id="environment-ingress:verified-export",
+        environment_run_id="environment-run:synthetic:001",
+        binding_id="binding:synthetic.observation:v1",
+        ingress_type="observation",
+        payload_artifact_id="artifact:verified-export",
+        native_lineage=(("observation_id", "observation:verified-export"),),
+        observed_at="2026-10-21T09:00:01Z",
+    )
+    original_id = ingress.ingress_artifact_id
+    object.__setattr__(ingress, "payload_artifact_id", "artifact:changed")
+    object.__setattr__(ingress, "verify_identity", lambda: None)
+
+    with pytest.raises(ValueError, match="identity does not match"):
+        ingress.to_dict()
+
+    assert ingress.ingress_artifact_id == original_id
 
 
 def test_ingress_policy_rejects_post_construction_content_changes():
@@ -429,10 +513,49 @@ def test_rejected_or_mutated_start_ingress_records_no_authoritative_start():
     assert ledger.events() == ()
 
 
+def test_shadowed_ingress_verifier_cannot_admit_or_replay_a_forged_task_start(
+    tmp_path,
+):
+    environment_run = _active_environment_run()
+    ledger_path = tmp_path / "forged-ingress-start.jsonl"
+    ledger = LifecycleLedger(ledger_path)
+    authority = TaskIngressAuthority(
+        environment_profile_id=environment_run.attestation.environment_profile_id,
+        domain_contract_pack=DOMAIN_PACK,
+        lifecycle_ledger=ledger,
+    )
+    ingress = EnvironmentIngress(
+        environment_ingress_id="environment-ingress:forged-start",
+        environment_run_id=environment_run.environment_run_id,
+        binding_id="binding:synthetic.observation:v1",
+        ingress_type="observation",
+        payload_artifact_id="artifact:forged-start",
+        native_lineage=(("observation_id", "observation:legitimate"),),
+        observed_at="2026-10-21T09:00:02Z",
+    )
+    original_ingress_artifact_id = ingress.ingress_artifact_id
+    original_identity_payload = EnvironmentIngress._identity_payload(ingress)
+    object.__setattr__(ingress, "binding_id", "binding:synthetic.request:v1")
+    object.__setattr__(ingress, "ingress_type", "user_request")
+    object.__setattr__(ingress, "native_lineage", (("goal_id", "task:forged"),))
+    object.__setattr__(ingress, "_identity_payload", lambda: original_identity_payload)
+    object.__setattr__(ingress, "verify_identity", lambda: None)
+
+    with pytest.raises(ValueError, match="identity does not match"):
+        authority.admit(environment_run, ingress)
+
+    assert ingress.ingress_artifact_id == original_ingress_artifact_id
+    assert ledger.events() == ()
+    assert LifecycleLedger(ledger_path).events() == ()
+
+
 def test_task_ingress_authority_rejects_stale_domain_policy_before_freezing():
     domain = _pack_with_rules(tuple(replace(rule) for rule in DOMAIN_PACK.ingress_rules))
     object.__setattr__(domain.ingress_rules[1], "binding_id", "binding:unreviewed")
-    with pytest.raises(ValueError, match="revision does not match content"):
+    with pytest.raises(
+        ValueError,
+        match="revision does not match content|domain ingress rules must use canonical order",
+    ):
         TaskIngressAuthority(
             environment_profile_id="environment-profile:synthetic:v1",
             domain_contract_pack=domain,
@@ -883,3 +1006,118 @@ def test_ingress_rule_rejects_an_unknown_action():
             ingress_type="observation",
             action="invoke_model",
         )
+
+
+def test_default_in_memory_ledger_serializes_concurrent_public_task_starts():
+    environment_run = _active_environment_run()
+    writers_reached_clock = Barrier(2)
+
+    def clock():
+        try:
+            writers_reached_clock.wait(timeout=0.25)
+        except BrokenBarrierError:
+            pass
+        return "2026-09-11T09:01:00Z"
+
+    ledger = LifecycleLedger(clock=clock)
+
+    def admit(index):
+        ingress = EnvironmentIngress(
+            environment_ingress_id=f"environment-ingress:concurrent:{index}",
+            environment_run_id=environment_run.environment_run_id,
+            binding_id="binding:synthetic.request:v1",
+            ingress_type="user_request",
+            payload_artifact_id=f"artifact:sha256:concurrent-{index}",
+            native_lineage=(("goal_id", f"goal:concurrent:{index}"),),
+            observed_at="2026-09-11T09:01:00Z",
+        )
+        authority = TaskIngressAuthority(
+            environment_profile_id="environment-profile:synthetic:v1",
+            domain_contract_pack=DOMAIN_PACK,
+            lifecycle_ledger=ledger,
+        )
+        return authority.admit(environment_run, ingress)
+
+    with ThreadPoolExecutor(max_workers=2) as executor:
+        decisions = tuple(executor.map(admit, (1, 2)))
+
+    assert tuple(decision.action for decision in decisions) == (
+        "start_task",
+        "start_task",
+    )
+    events = ledger.events()
+    assert tuple(event.sequence for event in events) == (1, 2)
+    for decision in decisions:
+        assert ledger.replay(decision.trace_id).events[0].event_type == "task_started"
+
+
+def test_shared_registry_keeps_concurrent_read_projections_isolated():
+    environment_run = _active_environment_run()
+    ledger = LifecycleLedger()
+    authority = TaskIngressAuthority(
+        environment_profile_id="environment-profile:synthetic:v1",
+        domain_contract_pack=DOMAIN_PACK,
+        lifecycle_ledger=ledger,
+    )
+    decision = authority.admit(
+        environment_run,
+        EnvironmentIngress(
+            environment_ingress_id="environment-ingress:projection:seed",
+            environment_run_id=environment_run.environment_run_id,
+            binding_id="binding:synthetic.request:v1",
+            ingress_type="user_request",
+            payload_artifact_id="artifact:sha256:projection-seed",
+            native_lineage=(("goal_id", "goal:projection:seed"),),
+            observed_at="2026-09-11T09:01:00Z",
+        ),
+    )
+    registry = EnvironmentTaskRegistry(ledger)
+    readers_ready = Barrier(2)
+
+    def read_lineage():
+        readers_ready.wait(timeout=2)
+        return registry.lineage_for_task(
+            environment_run_id=environment_run.environment_run_id,
+            task_id="goal:projection:seed",
+        )
+
+    with ThreadPoolExecutor(max_workers=2) as executor:
+        lineages = tuple(executor.map(lambda _index: read_lineage(), range(2)))
+
+    assert all(lineage is not None for lineage in lineages)
+    assert {lineage.trace_id for lineage in lineages} == {decision.trace_id}
+
+
+def test_shared_authority_admits_distinct_tasks_without_projection_races():
+    environment_run = _active_environment_run()
+    ledger = LifecycleLedger()
+    authority = TaskIngressAuthority(
+        environment_profile_id="environment-profile:synthetic:v1",
+        domain_contract_pack=DOMAIN_PACK,
+        lifecycle_ledger=ledger,
+    )
+    ingress_reads_ready = Barrier(2)
+
+    def admit(index):
+        ingress_reads_ready.wait(timeout=2)
+        ingress = EnvironmentIngress(
+            environment_ingress_id=f"environment-ingress:shared:{index}",
+            environment_run_id=environment_run.environment_run_id,
+            binding_id="binding:synthetic.request:v1",
+            ingress_type="user_request",
+            payload_artifact_id=f"artifact:sha256:shared-{index}",
+            native_lineage=(("goal_id", f"goal:shared:{index}"),),
+            observed_at="2026-09-11T09:01:00Z",
+        )
+        return authority.admit(environment_run, ingress)
+
+    with ThreadPoolExecutor(max_workers=2) as executor:
+        decisions = tuple(executor.map(admit, (1, 2)))
+
+    assert tuple(decision.action for decision in decisions) == (
+        "start_task",
+        "start_task",
+    )
+    starts = tuple(event for event in ledger.events() if event.event_type == "task_started")
+    assert len(starts) == 2
+    assert {event.task_id for event in starts} == {"goal:shared:1", "goal:shared:2"}

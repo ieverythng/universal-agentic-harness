@@ -22,11 +22,6 @@ DOCS = (
     Path("architecture/observatory_contract"),
     Path("artifacts/decisions/2026-08-04_uah_h2_neural_workbench_grill"),
     Path("artifacts/decisions/2026-09-08_uah_identity_environment_and_memory_grill"),
-    Path("artifacts/reviews/2026-08-17_uah_h2_commit_review"),
-    Path("gtm/investor_handoff/README"),
-    Path("gtm/investor_handoff/executive_brief"),
-    Path("gtm/investor_handoff/technical_diligence"),
-    Path("gtm/investor_handoff/gtm_and_investment_case"),
 )
 LEGACY_REDIRECTS = {
     "universal_agentic_harness_masterplan": "../plans/universal_agentic_harness_masterplan.html",
@@ -99,14 +94,6 @@ def main(argv: list[str] | None = None) -> int:
         if not render(name, check=args.check):
             drifted.append(ROOT / "docs" / name.with_suffix(".html"))
     drifted.extend(render_legacy_redirects(check=args.check))
-    research_command = [
-        sys.executable, str(ROOT / "scripts/render_research_dashboard.py"),
-        "--repo-root", str(ROOT),
-    ]
-    if args.check:
-        research_command.append("--check")
-    if subprocess.run(research_command, check=False).returncode:
-        drifted.append(ROOT / "docs/research/uah_research_dashboard.html")
     if drifted:
         print("Generated documentation is out of sync:", file=sys.stderr)
         for path in drifted:

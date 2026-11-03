@@ -8,6 +8,7 @@ from dataclasses import dataclass
 from dataclasses import replace
 import hashlib
 import json
+import math
 from typing import Any, TYPE_CHECKING
 
 from ab_harness.bindings import BindingCatalog
@@ -43,21 +44,116 @@ def _receipt_payload(
         "task_id": lease.admitted_operation.task_id,
         "trace_id": lease.admitted_operation.trace_id,
         "operation_id": lease.operation_id,
-        "owner_result": asdict(owner_result),
-        "evidence": asdict(evidence),
+        "owner_result": _owner_result_payload(owner_result),
+        "evidence": _effect_evidence_payload(evidence),
     }
 
 
-def _receipt_id(payload: dict[str, object]) -> str:
+def _owner_result_payload(owner_result: OwnerExecutionResult) -> dict[str, object]:
+    return {
+        "evidence_ref": owner_result.evidence_ref,
+        "succeeded": owner_result.succeeded,
+        "observed_effects": list(owner_result.observed_effects),
+        "payload": owner_result.payload,
+    }
+
+
+def _effect_evidence_payload(evidence: EffectEvidence) -> dict[str, object]:
+    return {
+        "evidence_ref": evidence.evidence_ref,
+        "object_id": evidence.object_id,
+        "binding_id": evidence.binding_id,
+        "environment_id": evidence.environment_id,
+        "owner": evidence.owner,
+        "succeeded": evidence.succeeded,
+        "observed_effects": list(evidence.observed_effects),
+        "payload": evidence.payload,
+    }
+
+
+def _validate_json_value(value: object, *, path: str) -> None:
+    if value is None or type(value) in (str, bool, int):
+        return
+    if type(value) is float:
+        if math.isfinite(value):
+            return
+        raise ValueError("execution result must contain finite JSON values")
+    if type(value) is list:
+        for index, item in enumerate(value):
+            _validate_json_value(item, path="%s[%s]" % (path, index))
+        return
+    if type(value) is dict:
+        for key, item in value.items():
+            if type(key) is not str:
+                raise ValueError("execution result mapping keys must be strings")
+            _validate_json_value(item, path="%s.%s" % (path, key))
+        return
+    raise ValueError("execution result must contain JSON values")
+
+
+def _validate_json_object(value: object, *, field_name: str) -> None:
+    if type(value) is not dict:
+        raise ValueError("execution receipt %s must be JSON objects" % field_name)
+    _validate_json_value(value, path=field_name)
+
+
+def _validate_owner_result(owner_result: OwnerExecutionResult) -> None:
+    if type(owner_result) is not OwnerExecutionResult:
+        raise ValueError("execution owner result has an invalid type")
+    if type(owner_result.evidence_ref) is not str:
+        raise ValueError("execution receipt evidence references must be strings")
+    if type(owner_result.succeeded) is not bool:
+        raise ValueError("execution receipt success values must be booleans")
+    if type(owner_result.observed_effects) is not tuple or any(
+        type(effect) is not str for effect in owner_result.observed_effects
+    ):
+        raise ValueError("execution receipt effects must be tuples of strings")
+    _validate_json_object(owner_result.payload, field_name="owner payloads")
+
+
+def _validate_effect_evidence(evidence: EffectEvidence) -> None:
+    if type(evidence) is not EffectEvidence:
+        raise ValueError("normalized effect evidence has an invalid type")
+    if any(
+        type(value) is not str
+        for value in (
+            evidence.evidence_ref,
+            evidence.object_id,
+            evidence.binding_id,
+            evidence.environment_id,
+            evidence.owner,
+        )
+    ):
+        raise ValueError("execution receipt evidence fields must be strings")
+    if type(evidence.succeeded) is not bool:
+        raise ValueError("execution receipt success values must be booleans")
+    if type(evidence.observed_effects) is not tuple or any(
+        type(effect) is not str for effect in evidence.observed_effects
+    ):
+        raise ValueError("execution receipt effects must be tuples of strings")
+    _validate_json_object(evidence.payload, field_name="evidence payloads")
+
+
+def _canonical_json_bytes(value: object) -> bytes:
+    _validate_json_value(value, path="execution result")
     try:
         encoded = json.dumps(
-            payload,
+            value,
             allow_nan=False,
             sort_keys=True,
             separators=(",", ":"),
         ).encode("utf-8")
     except (TypeError, ValueError) as exc:
         raise ValueError("execution result must contain finite JSON values") from exc
+    return encoded
+
+
+def _same_json_value(left: object, right: object) -> bool:
+    return _canonical_json_bytes(left) == _canonical_json_bytes(right)
+
+
+def _receipt_id(payload: dict[str, object]) -> str:
+    encoded = _canonical_json_bytes(payload)
     return "execution-receipt:sha256:%s" % hashlib.sha256(encoded).hexdigest()
 
 
@@ -105,13 +201,91 @@ class ExecutionReceipt:
             "task_id": self.task_id,
             "trace_id": self.trace_id,
             "operation_id": self.operation_id,
-            "owner_result": asdict(self.owner_result),
-            "evidence": asdict(self.evidence),
+            "owner_result": _owner_result_payload(self.owner_result),
+            "evidence": _effect_evidence_payload(self.evidence),
         }
 
     def verify_identity(self) -> None:
-        if self.execution_result_id != _receipt_id(self._identity_payload()):
+        if type(self) is not ExecutionReceipt:
+            raise ValueError("execution receipt must use the concrete receipt type")
+        if any(
+            type(getattr(self, name)) is not str
+            for name in (
+                "execution_result_id",
+                "execution_lease_id",
+                "admission_id",
+                "environment_run_id",
+                "task_id",
+                "trace_id",
+                "operation_id",
+            )
+        ):
+            raise ValueError("execution receipt fields must be strings")
+        _validate_owner_result(self.owner_result)
+        _validate_effect_evidence(self.evidence)
+        if self.execution_result_id != _receipt_id(
+            ExecutionReceipt._identity_payload(self)
+        ):
             raise ValueError("execution receipt identity does not match content")
+        mismatched_owner_result_fields = []
+        for name in ("evidence_ref", "succeeded", "observed_effects"):
+            if getattr(self.owner_result, name) != getattr(self.evidence, name):
+                mismatched_owner_result_fields.append(name)
+        if not _same_json_value(self.owner_result.payload, self.evidence.payload):
+            mismatched_owner_result_fields.append("payload")
+        if mismatched_owner_result_fields:
+            raise ValueError(
+                "execution evidence does not match owner result: %s"
+                % ", ".join(mismatched_owner_result_fields)
+            )
+
+    @classmethod
+    def verified_copy(cls, receipt: ExecutionReceipt) -> ExecutionReceipt:
+        """Validate and detach a receipt before a trusted ledger consumes it."""
+        if cls is not ExecutionReceipt or type(receipt) is not ExecutionReceipt:
+            raise ValueError("execution receipt must use the concrete receipt type")
+
+        owner_result = object.__getattribute__(receipt, "owner_result")
+        evidence = object.__getattribute__(receipt, "evidence")
+        _validate_owner_result(owner_result)
+        _validate_effect_evidence(evidence)
+
+        owner_result_copy = OwnerExecutionResult(
+            evidence_ref=object.__getattribute__(owner_result, "evidence_ref"),
+            succeeded=object.__getattribute__(owner_result, "succeeded"),
+            observed_effects=object.__getattribute__(owner_result, "observed_effects"),
+            payload=json.loads(
+                _canonical_json_bytes(object.__getattribute__(owner_result, "payload"))
+            ),
+        )
+        evidence_copy = EffectEvidence(
+            evidence_ref=object.__getattribute__(evidence, "evidence_ref"),
+            object_id=object.__getattribute__(evidence, "object_id"),
+            binding_id=object.__getattribute__(evidence, "binding_id"),
+            environment_id=object.__getattribute__(evidence, "environment_id"),
+            owner=object.__getattribute__(evidence, "owner"),
+            succeeded=object.__getattribute__(evidence, "succeeded"),
+            observed_effects=object.__getattribute__(evidence, "observed_effects"),
+            payload=json.loads(
+                _canonical_json_bytes(object.__getattribute__(evidence, "payload"))
+            ),
+        )
+        verified = cls(
+            execution_result_id=object.__getattribute__(
+                receipt, "execution_result_id"
+            ),
+            execution_lease_id=object.__getattribute__(receipt, "execution_lease_id"),
+            admission_id=object.__getattribute__(receipt, "admission_id"),
+            environment_run_id=object.__getattribute__(receipt, "environment_run_id"),
+            task_id=object.__getattribute__(receipt, "task_id"),
+            trace_id=object.__getattribute__(receipt, "trace_id"),
+            operation_id=object.__getattribute__(receipt, "operation_id"),
+            owner_result=owner_result_copy,
+            evidence=evidence_copy,
+            schema_version=object.__getattribute__(receipt, "schema_version"),
+        )
+        ExecutionReceipt.verify_identity(verified)
+        return verified
 
     @classmethod
     def issue(
@@ -121,6 +295,8 @@ class ExecutionReceipt:
         owner_result: OwnerExecutionResult,
         evidence: EffectEvidence,
     ) -> ExecutionReceipt:
+        _validate_owner_result(owner_result)
+        _validate_effect_evidence(evidence)
         lease = ExecutionLease.verified_copy(lease)
         admitted = lease.admitted_operation
         mismatched = []
@@ -138,7 +314,7 @@ class ExecutionReceipt:
             mismatched.append("succeeded")
         if evidence.observed_effects != owner_result.observed_effects:
             mismatched.append("observed_effects")
-        if evidence.payload != owner_result.payload:
+        if not _same_json_value(evidence.payload, owner_result.payload):
             mismatched.append("payload")
         if mismatched:
             raise ValueError(
@@ -164,14 +340,10 @@ class ExecutionReceipt:
 
     def to_dict(self) -> dict[str, object]:
         self.verify_identity()
-        payload = self._identity_payload()
-        owner_result = dict(payload["owner_result"])
-        owner_result["observed_effects"] = list(self.owner_result.observed_effects)
-        evidence = dict(payload["evidence"])
-        evidence["observed_effects"] = list(self.evidence.observed_effects)
-        payload["owner_result"] = owner_result
-        payload["evidence"] = evidence
-        return {"execution_result_id": self.execution_result_id, **payload}
+        return {
+            "execution_result_id": self.execution_result_id,
+            **self._identity_payload(),
+        }
 
     @classmethod
     def from_dict(cls, payload: dict[str, object]) -> ExecutionReceipt:
@@ -212,29 +384,31 @@ class ExecutionReceipt:
             "payload",
         }:
             raise ValueError("invalid normalized effect evidence")
-        if not isinstance(owner_result["succeeded"], bool) or not isinstance(
-            evidence["succeeded"], bool
-        ):
+        if type(owner_result["succeeded"]) is not bool or type(
+            evidence["succeeded"]
+        ) is not bool:
             raise ValueError("execution receipt success values must be booleans")
-        if not isinstance(owner_result["payload"], dict) or not isinstance(
-            evidence["payload"], dict
-        ):
+        if type(owner_result["payload"]) is not dict or type(
+            evidence["payload"]
+        ) is not dict:
             raise ValueError("execution receipt payloads must be JSON objects")
+        _validate_json_object(owner_result["payload"], field_name="owner payloads")
+        _validate_json_object(evidence["payload"], field_name="evidence payloads")
         for item in (owner_result, evidence):
             observed = item["observed_effects"]
-            if not isinstance(observed, list) or any(
-                not isinstance(value, str) for value in observed
+            if type(observed) is not list or any(
+                type(value) is not str for value in observed
             ):
                 raise ValueError("execution receipt effects must be strings")
-        evidence_strings = (
-            "evidence_ref",
-            "object_id",
-            "binding_id",
-            "environment_id",
-            "owner",
-        )
-        if not isinstance(owner_result["evidence_ref"], str) or any(
-            not isinstance(evidence[name], str) for name in evidence_strings
+        if type(owner_result["evidence_ref"]) is not str or any(
+            type(evidence[name]) is not str
+            for name in (
+                "evidence_ref",
+                "object_id",
+                "binding_id",
+                "environment_id",
+                "owner",
+            )
         ):
             raise ValueError("execution receipt evidence fields must be strings")
         return cls(
@@ -301,6 +475,11 @@ class EvidenceRejection:
         reason_codes: tuple[str, ...],
     ) -> EvidenceRejection:
         lease = ExecutionLease.verified_copy(lease)
+        _validate_owner_result(owner_result)
+        if not isinstance(reason_codes, tuple) or not reason_codes or any(
+            type(reason) is not str or not reason.strip() for reason in reason_codes
+        ):
+            raise ValueError("evidence rejection requires reason codes")
         fields = {
             "lease": lease,
             "owner_result": owner_result,
@@ -317,8 +496,10 @@ class EvidenceRejection:
         ExecutionLease.verify_identity(self.lease)
         if self.schema_version != EVIDENCE_REJECTION_SCHEMA:
             raise ValueError("unsupported evidence rejection schema")
-        if not self.reason_codes or any(
-            not reason.strip() for reason in self.reason_codes
+        _validate_owner_result(self.owner_result)
+        if not isinstance(self.reason_codes, tuple) or not self.reason_codes or any(
+            type(reason) is not str or not reason.strip()
+            for reason in self.reason_codes
         ):
             raise ValueError("evidence rejection requires reason codes")
         expected = _evidence_rejection_id(
@@ -392,7 +573,7 @@ def _resolve_handler(
     item = catalog.object_for(object_id)
     if item is None:
         raise ValueError("unknown AB object: %s" % object_id)
-    if not item.runtime_callable:
+    if item.runtime_callable is not True:
         raise ValueError("AB object is not runtime callable: %s" % object_id)
 
     binding = catalog.resolve(
@@ -425,8 +606,11 @@ def _execute_handler(
     arguments: dict[str, Any],
 ) -> tuple[OwnerExecutionResult, EffectEvidence, tuple[str, ...]]:
     result = handler(dict(arguments))
-    if not isinstance(result, OwnerExecutionResult):
+    if type(result) is not OwnerExecutionResult:
         raise TypeError("environment handler must return OwnerExecutionResult")
+    if type(result.succeeded) is not bool:
+        raise TypeError("environment handler succeeded must be a boolean")
+    _validate_owner_result(result)
     reasons: list[str] = []
     if not result.evidence_ref.strip():
         reasons.append("missing_evidence_reference")
@@ -440,12 +624,6 @@ def _execute_handler(
     if result.succeeded and item.observable_success and not result.observed_effects:
         reasons.append("successful_result_without_observable")
 
-    result = OwnerExecutionResult(
-        evidence_ref=result.evidence_ref,
-        succeeded=result.succeeded,
-        observed_effects=tuple(result.observed_effects),
-        payload=dict(result.payload),
-    )
     evidence = EffectEvidence(
         evidence_ref=result.evidence_ref,
         object_id=item.object_id,
@@ -454,7 +632,7 @@ def _execute_handler(
         owner=item.owner_package,
         succeeded=result.succeeded,
         observed_effects=result.observed_effects,
-        payload=dict(result.payload),
+        payload=result.payload,
     )
     return result, evidence, tuple(reasons)
 

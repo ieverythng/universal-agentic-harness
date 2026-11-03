@@ -2,7 +2,7 @@
 
 **Status:** O1 environment/task/trace index and explicit actor rendering implemented;
 complete configuration comparison and O2 deferred
-**Date:** 2026-10-08
+**Date:** 2026-10-11
 **Applies to:** UAH H0-H6 and NeuralWorkbench H3+
 
 ## 1. Decision
@@ -19,6 +19,14 @@ registry authority.
 Trace emission and trace inspection are separate authorities. The UAH kernel
 records every admitted lifecycle automatically. A model receives Observatory
 access only through an explicit, task-scoped, read-only frame projection.
+
+**Accepted context direction (2026-10-11; not implemented):** local source
+artifacts (requests, raw responses, and tool observations) remain distinct from
+derived model context; the sole lifecycle ledger owns their hashes and causal
+references. Summaries cannot change ledger outcomes or stand in for owner
+evidence. The first authorized retrieval is limited to current-task artifacts
+through a read-only projection. No raw transport fidelity or new storage is
+claimed.
 
 ## 2. Authority and Data Flow
 
@@ -246,7 +254,7 @@ allowlists, ingress rules, effect-to-object and evidence-owner rules, failure
 policy, and prohibited effects. `uah.environment_ingress/v1` and
 `uah.task_ingress_decision/v1` are also content-addressed, and the decision
 binds the ingress artifact identity. The independently approved
-[SPEC-02 correction](../artifacts/reviews/2026-10-08_uah_ingress_authority_repair.md)
+SPEC-02 correction (`2026-10-08_uah_ingress_authority_repair.md`)
 requires a ledger-bound command from `TaskIngressAuthority` for new starts.
 Raw `TaskStartedFact` writes are rejected. Fresh compilation checks durable
 command provenance as well as exact lineage; the registry remains read-only.
@@ -275,7 +283,7 @@ The current H0 authority slice also emits content-addressed
 frame-relative object snapshot. Its full current artifact is recorded for
 identity verification on replay. Historical metadata-only events remain
 readable. Original R4 probes exposed replay downgrade and active old-object
-consumer gaps. The separately reviewed [nested-owner gate](../artifacts/reviews/2026-10-08_uah_r4_nested_owner.md)
+consumer gaps. The separately reviewed nested-owner gate (`2026-10-08_uah_r4_nested_owner.md`)
 now approves the concrete-artifact correction and its historical read-only
 controls. This does not establish release-wide provenance or causal completeness.
 Accepted values are appended as distinct proposal,
@@ -285,6 +293,21 @@ environment owner accepts only the exact lease,
 records execution start before native dispatch, and emits a content-addressed
 receipt containing separate native result and normalized evidence artifacts.
 Replay verifies receipt admission, object, binding, and evidence-owner lineage.
+The new receipt projection is carried in the existing lifecycle ledger, not a
+second store:
+
+| Event | Receipt projection fields | Replay contract |
+| --- | --- | --- |
+| `execution_started` | `receipt_projection_version: uah.execution_receipt/v1` | Marks the event family that must use the versioned projection when accepted evidence is issued. |
+| `execution_completed` | `receipt_projection_version`, `execution_receipt` | Retains the exact versioned receipt, including native and normalized payloads, references, effects, and content identity. |
+| `evidence_issued` | `receipt_projection_version` plus existing normalized fields and artifact references | Must agree with the retained receipt and its recomputed evidence artifact identity. |
+
+Typed `EvidenceRejection` remains a separate path: it records execution
+completion and rejection without an accepted receipt projection. Historical
+events with no projection marker remain readable under their narrower existing
+checks. Replay does not synthesize missing receipt data or use historical
+metadata to grant fresh execution authority. A marked projection that is
+partial or inconsistent is rejected.
 Terminal acceptance must reference the complete recorded evidence set rather
 than a caller-selected subset.
 Accepted, best-effort-deficit, and required-effect-rejected traces replay into
@@ -304,7 +327,7 @@ Content identity alone proves neither causal prerequisites nor measured/reviewed
 provenance. ARCH-02 is tracked separately under the accepted label policy below.
 Both fresh independent
 reviews approve this bounded repair at its frozen source/dependency bytes,
-as recorded in the [O1 conformance receipt](../artifacts/reviews/2026-10-08_uah_o1_conformance_fix.md).
+as recorded in the O1 conformance receipt (`2026-10-08_uah_o1_conformance_fix.md`).
 Current integration also passes after inspection of the concurrent lifecycle
 diff, which leaves TraceEvent's constructor, schema, identity and export
 contracts unchanged. Approval does not establish the complete O1 exit.
@@ -418,7 +441,7 @@ not an evaluator result or independent review. The API must report an
 unsupported request rather than silently downgrade it. The enum values and
 definitions above remain reserved for future evidence-backed support.
 
-The [separate ARCH-02 round](../artifacts/reviews/2026-10-08_uah_arch02_label_repair.md)
+The separate ARCH-02 round (`2026-10-08_uah_arch02_label_repair.md`)
 tracks the candidate correction and fresh independent gate. Its defect status
 is separate from the deferred evidence interface and complete O1 exit.
 Recorded ledger views, explicitly synthetic or conceptual illustrations and

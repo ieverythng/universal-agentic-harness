@@ -57,6 +57,10 @@ class ABObjectView:
     decomposes_to: tuple[str, ...] = ()
     runtime_callable: bool = False
 
+    def __post_init__(self) -> None:
+        if type(self.runtime_callable) is not bool:
+            raise ValueError("runtime_callable must be a boolean")
+
 
 @dataclass(frozen=True)
 class ABImplementationBinding:

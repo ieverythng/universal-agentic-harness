@@ -27,6 +27,38 @@ def test_environment_profile_registry_preserves_the_frozen_profile():
     assert registry.get(profile.environment_profile_id) == profile
 
 
+def test_environment_profile_registry_rejects_mutable_rosters():
+    profile = _profile()
+    object.__setattr__(profile, "agent_handle_ids", ["handle:synthetic.worker.primary"])
+
+    with pytest.raises(TypeError, match="rosters must be tuples of strings"):
+        EnvironmentProfileRegistry((profile,))
+
+
+def test_environment_profile_registry_detaches_registered_and_returned_profiles():
+    profile = _profile()
+    registry = EnvironmentProfileRegistry((profile,))
+    object.__setattr__(profile, "agent_handle_ids", ("handle:unapproved",))
+
+    returned = registry.get(profile.environment_profile_id)
+    assert returned.agent_handle_ids == ("handle:synthetic.worker.primary",)
+    object.__setattr__(returned, "agent_handle_ids", ("handle:also-unapproved",))
+
+    assert registry.get(profile.environment_profile_id).agent_handle_ids == (
+        "handle:synthetic.worker.primary",
+    )
+
+
+def test_environment_profile_registry_rejects_subclasses():
+    class DerivedEnvironmentProfile(EnvironmentProfile):
+        pass
+
+    profile = DerivedEnvironmentProfile(**vars(_profile()))
+
+    with pytest.raises(TypeError, match="concrete owner type"):
+        EnvironmentProfileRegistry((profile,))
+
+
 def test_duplicate_environment_profile_id_is_rejected():
     profile = _profile()
 

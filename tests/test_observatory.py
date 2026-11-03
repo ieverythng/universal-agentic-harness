@@ -19,11 +19,10 @@ from tests.test_agent_identity import _run_registries
 
 
 def test_explicit_task_invocation_is_visible_in_actor_and_task_views(tmp_path):
-    from ab_harness.model_invocation import ModelInvocationAuthority
-    from tests.test_model_invocation import _invocation_fixture, _RecordedProvider
+    from tests.test_model_invocation import _authority, _invocation_fixture, _RecordedProvider
 
     ledger, _, lease, prompt = _invocation_fixture(tmp_path)
-    ModelInvocationAuthority(
+    _authority(
         ledger, _RecordedProvider(ledger), clock=lambda: "2026-10-04T10:00:02Z"
     ).invoke(lease, prompt, invocation_id="invocation:o1")
     projection = project_observatory(

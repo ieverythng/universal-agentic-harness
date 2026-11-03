@@ -480,7 +480,12 @@ class TaskTimeoutDecision:
     schema_version: str = TASK_TIMEOUT_DECISION_SCHEMA
 
     def __post_init__(self) -> None:
-        self.verify_identity()
+        object.__setattr__(
+            self,
+            "compiled_task",
+            CompiledTask.verified_copy(self.compiled_task),
+        )
+        TaskTimeoutDecision.verify_identity(self)
 
     @classmethod
     def issue(cls, **fields: object) -> TaskTimeoutDecision:
@@ -491,7 +496,7 @@ class TaskTimeoutDecision:
         )
 
     def verify_identity(self) -> None:
-        self.compiled_task.verify_identity()
+        compiled_task = CompiledTask.verified_copy(self.compiled_task)
         if self.schema_version != TASK_TIMEOUT_DECISION_SCHEMA:
             raise ValueError("unsupported timeout decision schema")
         if self.outcome not in {"within_budget", "timed_out"}:
@@ -502,7 +507,7 @@ class TaskTimeoutDecision:
         deadline = _parse_time(self.deadline_at)
         observed = _parse_time(self.observed_at)
         expected_deadline = started + timedelta(
-            seconds=self.compiled_task.budgets.wall_time_seconds
+            seconds=compiled_task.budgets.wall_time_seconds
         )
         if deadline != expected_deadline:
             raise ValueError(
@@ -514,7 +519,7 @@ class TaskTimeoutDecision:
         expected = _content_id(
             "timeout-decision",
             _timeout_payload(
-                compiled_task=self.compiled_task,
+                compiled_task=compiled_task,
                 task_started_at=self.task_started_at,
                 deadline_at=self.deadline_at,
                 observed_at=self.observed_at,
@@ -539,6 +544,7 @@ class TaskRuntimeControlAuthority:
         observed_at: str,
         policy_revision: str,
     ) -> TaskTimeoutDecision:
+        compiled_task = CompiledTask.verified_copy(compiled_task)
         events = self._ledger.events()
         started_event = next(
             (
@@ -699,6 +705,7 @@ class RetryAuthority:
         target_operation_id: str,
         policy_revision: str,
     ) -> RetryDecision:
+        compiled_task = CompiledTask.verified_copy(compiled_task)
         source_failure.verify_identity()
         if (
             source_failure.lease.admitted_operation.compiled_task_id

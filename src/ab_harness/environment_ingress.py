@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from dataclasses import field
+from dataclasses import fields
 import hashlib
 import json
 
@@ -28,11 +29,45 @@ class EnvironmentIngress:
     schema_version: str = ENVIRONMENT_INGRESS_SCHEMA
     ingress_artifact_id: str = field(init=False)
 
-    def __post_init__(self) -> None:
-        if not isinstance(self.native_lineage, tuple) or any(
-            not isinstance(item, tuple) for item in self.native_lineage
+    @classmethod
+    def verified_copy(cls, value: object) -> EnvironmentIngress:
+        """Return a detached owner-verified copy of one ingress artifact."""
+        if cls is not EnvironmentIngress:
+            raise TypeError("environment ingress requires its concrete owner type")
+        values = _stored_ingress_fields(value, EnvironmentIngress)
+        lineage = values["native_lineage"]
+        if type(lineage) is not tuple or any(
+            type(item) is not tuple
+            or len(item) != 2
+            or any(type(part) is not str for part in item)
+            for item in lineage
         ):
-            raise TypeError("native lineage must be an immutable tuple")
+            raise TypeError("environment ingress lineage must contain plain pairs")
+        string_fields = tuple(
+            name
+            for name in values
+            if name not in {"native_lineage", "ingress_artifact_id"}
+        )
+        if any(type(values[name]) is not str for name in string_fields):
+            raise TypeError("environment ingress fields must be plain strings")
+        if type(values["ingress_artifact_id"]) is not str:
+            raise TypeError("environment ingress identity must be a plain string")
+        snapshot = EnvironmentIngress(
+            **{name: values[name] for name in string_fields},
+            native_lineage=tuple(tuple(item) for item in lineage),
+        )
+        if snapshot.ingress_artifact_id != values["ingress_artifact_id"]:
+            raise ValueError("environment ingress identity does not match content")
+        return snapshot
+
+    def __post_init__(self) -> None:
+        if type(self.native_lineage) is not tuple or any(
+            type(item) is not tuple
+            or len(item) != 2
+            or any(type(part) is not str for part in item)
+            for item in self.native_lineage
+        ):
+            raise TypeError("native lineage must be an immutable tuple of string pairs")
         lineage_keys = tuple(key for key, _value in self.native_lineage)
         if len(lineage_keys) != len(set(lineage_keys)):
             raise ValueError("native lineage keys must be unique")
@@ -48,6 +83,8 @@ class EnvironmentIngress:
             "payload_artifact_id": self.payload_artifact_id,
             "observed_at": self.observed_at,
         }
+        if any(type(value) is not str for value in required.values()):
+            raise TypeError("environment ingress fields must be plain strings")
         missing = tuple(name for name, value in required.items() if not value.strip())
         if missing:
             raise ValueError(
@@ -60,10 +97,12 @@ class EnvironmentIngress:
         object.__setattr__(
             self,
             "ingress_artifact_id",
-            _ingress_artifact_id(self._identity_payload()),
+            _ingress_artifact_id(EnvironmentIngress._identity_payload(self)),
         )
 
     def _identity_payload(self) -> dict[str, object]:
+        if type(self) is not EnvironmentIngress:
+            raise TypeError("environment ingress requires its concrete owner type")
         return {
             "schema_version": self.schema_version,
             "environment_ingress_id": self.environment_ingress_id,
@@ -76,14 +115,18 @@ class EnvironmentIngress:
         }
 
     def verify_identity(self) -> None:
-        if self.ingress_artifact_id != _ingress_artifact_id(self._identity_payload()):
+        if type(self) is not EnvironmentIngress:
+            raise TypeError("environment ingress requires its concrete owner type")
+        if self.ingress_artifact_id != _ingress_artifact_id(
+            EnvironmentIngress._identity_payload(self)
+        ):
             raise ValueError("environment ingress identity does not match content")
 
     def to_dict(self) -> dict[str, object]:
-        self.verify_identity()
-        payload = self._identity_payload()
-        payload["native_lineage"] = [list(item) for item in self.native_lineage]
-        return {"ingress_artifact_id": self.ingress_artifact_id, **payload}
+        snapshot = EnvironmentIngress.verified_copy(self)
+        payload = EnvironmentIngress._identity_payload(snapshot)
+        payload["native_lineage"] = [list(item) for item in snapshot.native_lineage]
+        return {"ingress_artifact_id": snapshot.ingress_artifact_id, **payload}
 
 
 def _ingress_artifact_id(payload: dict[str, object]) -> str:
@@ -112,6 +155,32 @@ class TaskIngressDecision:
     schema_version: str = TASK_INGRESS_DECISION_SCHEMA
     decision_id: str = field(init=False)
 
+    @classmethod
+    def verified_copy(cls, value: object) -> TaskIngressDecision:
+        """Return a detached owner-verified copy of one ingress decision."""
+        if cls is not TaskIngressDecision:
+            raise TypeError("task ingress decision requires its concrete owner type")
+        values = _stored_ingress_fields(value, TaskIngressDecision)
+        for name, item in values.items():
+            if name in {"action", "decision_id"}:
+                continue
+            if item is not None and type(item) is not str:
+                raise TypeError("task ingress decision fields must be plain strings")
+        if type(values["action"]) is not str:
+            raise TypeError("task ingress decision action must be a plain string")
+        if type(values["decision_id"]) is not str:
+            raise TypeError("task ingress decision identity must be a plain string")
+        snapshot = TaskIngressDecision(
+            **{
+                name: item
+                for name, item in values.items()
+                if name not in {"decision_id"}
+            }
+        )
+        if snapshot.decision_id != values["decision_id"]:
+            raise ValueError("task ingress decision identity does not match content")
+        return snapshot
+
     def __post_init__(self) -> None:
         required = {
             "environment_ingress_id": self.environment_ingress_id,
@@ -119,6 +188,16 @@ class TaskIngressDecision:
             "environment_run_id": self.environment_run_id,
             "reason_code": self.reason_code,
         }
+        if any(type(value) is not str for value in required.values()):
+            raise TypeError("task ingress decision fields must be plain strings")
+        for value in (
+            self.domain_contract_pack_revision,
+            self.task_id,
+            self.trace_id,
+            self.task_status,
+        ):
+            if value is not None and type(value) is not str:
+                raise TypeError("task ingress decision fields must be plain strings")
         missing = tuple(name for name, value in required.items() if not value.strip())
         if missing:
             raise ValueError(
@@ -129,7 +208,7 @@ class TaskIngressDecision:
             raise ValueError(
                 "unsupported task ingress decision schema: %s" % self.schema_version
             )
-        if self.action not in {
+        if type(self.action) is not str or self.action not in {
             "state_update",
             "start_task",
             "resume_task",
@@ -152,10 +231,12 @@ class TaskIngressDecision:
                 raise ValueError(
                     "accepted task start requires contract revision and lineage"
                 )
-        payload = self._identity_payload()
+        payload = TaskIngressDecision._identity_payload(self)
         object.__setattr__(self, "decision_id", _decision_id(payload))
 
     def _identity_payload(self) -> dict[str, object]:
+        if type(self) is not TaskIngressDecision:
+            raise TypeError("task ingress decision requires its concrete owner type")
         return {
             "schema_version": self.schema_version,
             "environment_ingress_id": self.environment_ingress_id,
@@ -170,12 +251,29 @@ class TaskIngressDecision:
         }
 
     def verify_identity(self) -> None:
-        if self.decision_id != _decision_id(self._identity_payload()):
+        if type(self) is not TaskIngressDecision:
+            raise TypeError("task ingress decision requires its concrete owner type")
+        if self.decision_id != _decision_id(
+            TaskIngressDecision._identity_payload(self)
+        ):
             raise ValueError("task ingress decision identity does not match content")
 
     def to_dict(self) -> dict[str, object]:
-        self.verify_identity()
-        return {"decision_id": self.decision_id, **self._identity_payload()}
+        snapshot = TaskIngressDecision.verified_copy(self)
+        return {
+            "decision_id": snapshot.decision_id,
+            **TaskIngressDecision._identity_payload(snapshot),
+        }
+
+
+def _stored_ingress_fields(value: object, expected_type: type) -> dict[str, object]:
+    if type(value) is not expected_type:
+        raise TypeError("ingress artifacts require their concrete owner type")
+    stored = object.__getattribute__(value, "__dict__")
+    names = tuple(item.name for item in fields(expected_type))
+    if type(stored) is not dict or set(stored) != set(names):
+        raise ValueError("ingress artifact identity does not match content")
+    return {name: stored[name] for name in names}
 
 
 def _decision_id(payload: dict[str, object]) -> str:

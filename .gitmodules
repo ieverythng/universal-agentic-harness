@@ -1,4 +1,0 @@
-[submodule "src/Neural-Wokbench"]
-	path = src/Neural-Wokbench
-	url = https://github.com/juanbendek-aily/Neural-Wokbench.git
-	branch = feat/base-implementation

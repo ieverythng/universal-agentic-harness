@@ -30,6 +30,8 @@ class InteractionProjector:
             item = self._registry.get(object_id)
             if item is None:
                 raise ValueError('unknown AB object: %s' % object_id)
+            if type(item.runtime_callable) is not bool:
+                raise ValueError('runtime_callable must be a boolean')
             if not role.control_band.admits_inspection(item.ab_level):
                 raise ValueError('AB object outside inspectable control band: %s' % object_id)
             selected[object_id] = item
