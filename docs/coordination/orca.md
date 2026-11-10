@@ -1,5 +1,22 @@
 # Orca GRILL coordination
 
+## Current: selected hook probe completed (2026-11-10)
+
+The human-selected disposable investigation completed and stopped.
+[SM-001](sprints/SPR-11-hook-probe.md) records failure between moving the
+pre-push delegate and publishing its guard: no active hook remains, an
+unchecked local fake push succeeds, and setup rerun refuses the delegate.
+The intact control preserves legacy execution and rejects unchecked pushes.
+Shared-common setup remains caller-policy misuse; successful hook-local
+installation is unproven. No production script or active-user hook was changed.
+
+Next human decision: select the minimal future DEV scope for installation
+preservation/recovery, and decide separately whether to enforce metadata
+custody in the script. PR2/fresh-base/review gates still precede implementation.
+No repair or automatic next round is dispatched. The startup record below
+retains its original evidence; the selected probe supersedes its hypothesis
+status only for the exact failure schedule recorded in SM-001.
+
 **Updated:** 2026-11-10. **Owner:** this human-designated GRILL thread.
 **Branch:** `coordination/orca`. **Worktree:**
 `/home/juanbeck/.codex/worktrees/coordination/orca`. Independent Git common
