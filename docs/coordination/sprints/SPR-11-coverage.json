@@ -1,0 +1,323 @@
+{
+  "baseline": "d9eb84a04099431d774f459792bcd16524ab54ce",
+  "scope": "Tracked executable source, NAO wrappers, scripts, UI assets and package setup, excluding research artifacts, tests as machinery, generated HTML, dependencies and external repositories. Top-level coverage does not prove all implicit machines were found.",
+  "files": [
+    {
+      "path": "docs/assets/harness-theme.js",
+      "sha256": "b129b2b415957dd3e5302f9345cb4e6df4d68e3d3f3f1f049c430d1011f026dc",
+      "classification": "view_state",
+      "observation": "Enhancement-once Boolean, DOM section construction and scroll progress; browser presentation only."
+    },
+    {
+      "path": "scripts/pre_push_guard.sh",
+      "sha256": "23bc1af91fc074630e2590f43d4328ef11ef1464bcf9e6f608155c99fd3319d1",
+      "classification": "stateful_tooling",
+      "observation": "Requires delegate and private venv, records incoming ref-update list, delegates only after guarded cache check."
+    },
+    {
+      "path": "scripts/precommit_cache.py",
+      "sha256": "cc9d73df7c93d5147841b84b4f8f270c795cee04321259ef2e1e9d2fbd77b095",
+      "classification": "stateful_tooling",
+      "observation": "Validation receipt invalidation, candidate signature, run/check and outgoing-tree custody."
+    },
+    {
+      "path": "scripts/render_agent_runtime_example.py",
+      "sha256": "63c6d2f668a18a3df0c3ed9a4324748c71bc8b045a1e1e01a70adab128aff005",
+      "classification": "supporting",
+      "observation": "Synthetic actor lifecycle and generated example freshness."
+    },
+    {
+      "path": "scripts/render_agentic_harness_docs.py",
+      "sha256": "b4d0bbf88ede7b592f39d843a0e357d59b93d73e6125efbfa723ddbf63ee3b50",
+      "classification": "publication_state",
+      "observation": "Canonical render/check and legacy redirect generation; no runtime qualification."
+    },
+    {
+      "path": "scripts/render_markdown_html.py",
+      "sha256": "9c8c463f97743d338a01fcc9a7430711328045c225282d514e147b5688cccacc",
+      "classification": "publication_state",
+      "observation": "Markdown/tracker parsing and emitted document; presentation only."
+    },
+    {
+      "path": "scripts/render_observatory_example.py",
+      "sha256": "b7e0c26ed0a364cc838e664c1b2f4fba18d3ff4bb88ca512eb5cbac14b5f7ef4",
+      "classification": "supporting",
+      "observation": "Recorded synthetic qualification lifecycle and O1 example freshness."
+    },
+    {
+      "path": "scripts/render_research_dashboard.py",
+      "sha256": "e636579246575f68508612ca25d47bf82aba7deb82da1491baf03dfc2f79fea3",
+      "classification": "publication_state",
+      "observation": "Research metadata normalization, output and freshness; proposals remain advisory."
+    },
+    {
+      "path": "scripts/run_precommit.sh",
+      "sha256": "781bba5384ef7aa15420c92150e0aab36ea8ef14cfbaf63a92a7ab0bda8afb63",
+      "classification": "supporting",
+      "observation": "Invokes cache run owner; no independent durable authority."
+    },
+    {
+      "path": "scripts/run_repo_python.sh",
+      "sha256": "87a6c742538a29198f3c4b8532cf948d73a961815007d8e9ac35d332a22f8ce7",
+      "classification": "stateless",
+      "observation": "Interpreter selection and exec; process-local control flow, no persistent lifecycle."
+    },
+    {
+      "path": "scripts/setup_dev_tools.sh",
+      "sha256": "e1f293ec236d57766d3b625fb014907c1e1cfb0a76e1aac154196b214c1d6651",
+      "classification": "stateful_tooling",
+      "observation": "Venv/hook/guard/delegate installation state; tooling owner, not runtime admission."
+    },
+    {
+      "path": "setup.py",
+      "sha256": "fc40e790b049590e75b5416a1d8f79095ef117fe66db80c81770eb02f02f6fe7",
+      "classification": "build_publication_state",
+      "observation": "CleanBuildPy removes stale package output before build; filesystem-dependent build state, not a runtime owner."
+    },
+    {
+      "path": "src/ab_harness/__init__.py",
+      "sha256": "b474e909cc3f1ca5265c0478c5cd23702e58bc58b8af88b05f5892f9d0e7e044",
+      "classification": "supporting",
+      "observation": "Export surface; no state owner. Reexports existing module interfaces."
+    },
+    {
+      "path": "src/ab_harness/acceptance.py",
+      "sha256": "d720df5c294e9d340921f6ee77b3441c7fd1f78eb8ead906ca2e77ca220ee1ed",
+      "classification": "source_inspected",
+      "observation": "S08; pure evidence/obligation evaluator; persistent judgment belongs to ledger."
+    },
+    {
+      "path": "src/ab_harness/agent_configuration.py",
+      "sha256": "52e8954f458405ac11414a20003a04044e0756f279416e5b9c287aa1a7e3ab32",
+      "classification": "source_inspected",
+      "observation": "S13; role/model registration maps and pure declaration preflight."
+    },
+    {
+      "path": "src/ab_harness/agent_identity.py",
+      "sha256": "8b5f37bf37bc6207d3138645b469bc14c755bb137b0c86fd133404c03fc074b5",
+      "classification": "source_inspected",
+      "observation": "S13/S15; manifest/initial handle publication and refreshed ledger actor projection."
+    },
+    {
+      "path": "src/ab_harness/agent_lifecycle.py",
+      "sha256": "dba37f9b3d2b7ac89ac25234a22ae2ed6cd8a54fd485b52b5d81222991292e36",
+      "classification": "source_inspected",
+      "observation": "S15\u2013S17; internal actor/invocation reducer, not a second public writer."
+    },
+    {
+      "path": "src/ab_harness/bindings.py",
+      "sha256": "1492eb91866ed67b1691ecdbe95c5307efcaefdfd3bd8daa595c53af90fca33d",
+      "classification": "source_inspected",
+      "observation": "S18; constructed binding index and status-filtered resolution; no promotion transition."
+    },
+    {
+      "path": "src/ab_harness/configuration.py",
+      "sha256": "28ea7d1a6b204436d50f9886531d9da99ca6d932def246f142ea48c71c732942",
+      "classification": "supporting",
+      "observation": "Immutable configuration identity contract; no cross-call mutation or lifecycle reducer."
+    },
+    {
+      "path": "src/ab_harness/contracts.py",
+      "sha256": "06e99272df0ac1d22cf45e065c0ee240557df334c982819428ace498990d7c54",
+      "classification": "source_inspected",
+      "observation": "Value contracts and eligibility/status grammar; consumed by S05/S08/S18, no standalone FSM owner."
+    },
+    {
+      "path": "src/ab_harness/domain_contracts.py",
+      "sha256": "c261be48c5f8bb152075aa0f89b0be1ab322dbb3963c2164bc0f13c474e55a24",
+      "classification": "supporting",
+      "observation": "Immutable pack/rule identity and validation; frozen input to S02/S03/S08."
+    },
+    {
+      "path": "src/ab_harness/domain_lifecycle.py",
+      "sha256": "48de0478d577b58567483f5fa22334f641a32855f32a240944b91346906dff6f",
+      "classification": "source_inspected",
+      "observation": "S06; domain lease decision interface, state projected from ledger."
+    },
+    {
+      "path": "src/ab_harness/environment.py",
+      "sha256": "7d8a0a702ddc589102c790656dde19ce6cb5605f729e592b75330380637a6300",
+      "classification": "source_inspected",
+      "observation": "S07; exact lease-only dispatch/evidence owner; copied handler configuration, no independent execution store."
+    },
+    {
+      "path": "src/ab_harness/environment_ingress.py",
+      "sha256": "faeb661ebfc43eef62c2599d68881dc304247e2fb9b7aa18b2e4e8e35e0e7ee4",
+      "classification": "supporting",
+      "observation": "Immutable ingress/decision artifacts; S02 owns classification and persistence."
+    },
+    {
+      "path": "src/ab_harness/environment_profiles.py",
+      "sha256": "e4a3147e8bab6e68d755aadd57a61f5a0f606046b02479199739793c882a482f",
+      "classification": "source_inspected",
+      "observation": "S14; frozen profile index constructed once."
+    },
+    {
+      "path": "src/ab_harness/environment_runs.py",
+      "sha256": "261d0a75ad94e286be19722dacdc15c4fdc6f0340c529779b66ddeaa78ce556c",
+      "classification": "source_inspected",
+      "observation": "S14; in-memory activation registration map and attestation dedup set; active-only status."
+    },
+    {
+      "path": "src/ab_harness/gate.py",
+      "sha256": "bbd8d08bb57085d5f8cfcc7a9b53f2ff05390ed7f3355557c3322dd61316d229",
+      "classification": "supporting",
+      "observation": "Pure interaction/output gate; no persistent state or lifecycle transition owner."
+    },
+    {
+      "path": "src/ab_harness/lifecycle.py",
+      "sha256": "de80ba95d7b87b7d91912deaac10ebe6105251dc72275e85d6f6cd986ea29556",
+      "classification": "source_inspected",
+      "observation": "S01\u2013S12 plus joins with S15\u2013S17; sole public lifecycle write/replay owner."
+    },
+    {
+      "path": "src/ab_harness/model_allocator.py",
+      "sha256": "10587715ea2e1c65c8dd37e3f6bb4665090330a900966bc84fe656e45dd91afa",
+      "classification": "source_inspected",
+      "observation": "S16; ledger-backed fixed allocation/readiness/release decisions."
+    },
+    {
+      "path": "src/ab_harness/model_invocation.py",
+      "sha256": "b1d357b5a1126b80f3614e37f139e0ccdcc85b5d912fa2c5ef48034135490f02",
+      "classification": "source_inspected",
+      "observation": "S17; durable start before provider call, exact identity replay and in-flight fence."
+    },
+    {
+      "path": "src/ab_harness/observatory.py",
+      "sha256": "957700058dce24691cb7ab730ebd7620b40ba61a6952e920ed4a98fb36261ee8",
+      "classification": "source_inspected",
+      "observation": "S20; derived group/status/filter state only."
+    },
+    {
+      "path": "src/ab_harness/operation_edges.py",
+      "sha256": "6ae23907e8b4a8745b3a64817d80d0e6721516e5476b33a3f133a4b4d44d0045",
+      "classification": "source_inspected",
+      "observation": "S12; immutable typed relation artifact; topology/order reduced by ledger."
+    },
+    {
+      "path": "src/ab_harness/projection.py",
+      "sha256": "0ccfb6104563f1f38d31f16b18d0f892f492f1d92464f4b54169801c462ff454",
+      "classification": "source_inspected",
+      "observation": "S18; transient pending/selected graph closure plus configured registry reference."
+    },
+    {
+      "path": "src/ab_harness/prompt_compiler.py",
+      "sha256": "4c6a1140729829b74cba863565ff38c634c80f782460660ded2e40c570570845",
+      "classification": "source_inspected",
+      "observation": "S18; immutable prompt/source values and exact configured source map; pure deterministic assembly."
+    },
+    {
+      "path": "src/ab_harness/proposal_admission.py",
+      "sha256": "d4e52a281d8d9db1157e7ef2b5be5878ac2e08c5215ad4d031c548cd70a93013",
+      "classification": "source_inspected",
+      "observation": "S04/S05; pure proposal/semantic decisions and immutable artifacts; persistent ordering lives in ledger."
+    },
+    {
+      "path": "src/ab_harness/registry.py",
+      "sha256": "0e02eb8125a8242060b7597c3b2efc662e2f2195cdb0bca9a5b872f3449348c9",
+      "classification": "source_inspected",
+      "observation": "S18; constructed semantic object index/snapshot; no runtime promotion transition."
+    },
+    {
+      "path": "src/ab_harness/runtime_controls.py",
+      "sha256": "16b49bf2596fed889d30f45791c79b6b1cdb49173ef82d4d5aa511bff9933bc0",
+      "classification": "source_inspected",
+      "observation": "S09\u2013S11; budget, timeout and retry decisions derived from ledger."
+    },
+    {
+      "path": "src/ab_harness/schema_validation.py",
+      "sha256": "6512a14cf5b203b6b39b5b624ef9e76ebd87944af1c3ff354be7fa352d4bc292",
+      "classification": "source_inspected",
+      "observation": "S18; constructed schema index and pure argument validation; missing schema is explicit rejection."
+    },
+    {
+      "path": "src/ab_harness/task_compiler.py",
+      "sha256": "5d5627f53535a01686c3e433fdc6f2ea3dfd466e67ac1b6f33a7424e28a36a39",
+      "classification": "source_inspected",
+      "observation": "S03; pure verified compile-once artifact production; registry/ledger establish authority."
+    },
+    {
+      "path": "src/ab_harness/task_ingress_authority.py",
+      "sha256": "ad8b00452f00d9b364a7b2397d585d99bdbb570e69b338213be94421b8274f61",
+      "classification": "source_inspected",
+      "observation": "S02; frozen rules and issuer capability; public ingress classification writes through ledger."
+    },
+    {
+      "path": "src/ab_harness/task_registry.py",
+      "sha256": "e52596e72780f6e9e42af27ca04be5acafabca7b2c0154f40038f13e04de0aca",
+      "classification": "source_inspected",
+      "observation": "S02/S03; fresh read-only ledger projections, no independent task writes."
+    },
+    {
+      "path": "src/ab_harness/workbench.py",
+      "sha256": "b71d5377e6c0bad2a9659f5299f67173b57d1873d11df91631c8b791f3e441b3",
+      "classification": "source_inspected",
+      "observation": "S19; immutable experience collection and candidate-only retrieval."
+    },
+    {
+      "path": "src/ab_harness/workbench_protocol.py",
+      "sha256": "44606ca712e20b6555e8ecea17cb20b138469be70656188bf1c9a10990089c6e",
+      "classification": "source_inspected",
+      "observation": "S19; one-time handshake state and advisory forward interface."
+    },
+    {
+      "path": "src/ab_harness_nao/__init__.py",
+      "sha256": "3c3c3f4406a66b2daef9b3d4b9339199d847eccf1556ab62543f2a39c47fe73e",
+      "classification": "supporting",
+      "observation": "Recorded wrapper sequencing and diagnostic projection; existing SPR-04/07; qualification module coordinates deterministic owners, never replaces them."
+    },
+    {
+      "path": "src/ab_harness_nao/__main__.py",
+      "sha256": "e61befb3227e1b54de6c3bbdcd4a5d3030522d57f66bd21dfa0aa85cd7fa5b27",
+      "classification": "supporting",
+      "observation": "Recorded wrapper sequencing and diagnostic projection; existing SPR-04/07; qualification module coordinates deterministic owners, never replaces them."
+    },
+    {
+      "path": "src/ab_harness_nao/cli.py",
+      "sha256": "256caa09ec48a26ee2e31f64191394ad04e4331ba21255badd19c845e40fe715",
+      "classification": "supporting",
+      "observation": "Recorded wrapper sequencing and diagnostic projection; existing SPR-04/07; qualification module coordinates deterministic owners, never replaces them."
+    },
+    {
+      "path": "src/ab_harness_nao/contracts.py",
+      "sha256": "a0f8d0e2878b1d3309f24ae039a36c3899d1ef6459aa431ab5cefbba791e338b",
+      "classification": "supporting",
+      "observation": "Recorded wrapper sequencing and diagnostic projection; existing SPR-04/07; qualification module coordinates deterministic owners, never replaces them."
+    },
+    {
+      "path": "src/ab_harness_nao/qualification.py",
+      "sha256": "9d94f9192723bc4e2ed2b7fbab8c49fd1281b77775f63f9330d004ea634fbddb",
+      "classification": "stateful_adapter",
+      "observation": "Recorded wrapper sequencing and diagnostic projection; existing SPR-04/07; qualification module coordinates deterministic owners, never replaces them."
+    },
+    {
+      "path": "src/ab_harness_nao/smoke.py",
+      "sha256": "e38ac70b90793c02b2c2d2494908dbbef35ec5e1e66c3615a8e24d82e5fabaab",
+      "classification": "stateful_adapter",
+      "observation": "Recorded wrapper sequencing and diagnostic projection; existing SPR-04/07; qualification module coordinates deterministic owners, never replaces them."
+    }
+  ],
+  "additional_candidate_asset": {
+    "path": "docs/assets/masterplan-tracker.js",
+    "source": "prior PR2 delivered candidate, absent from main",
+    "classification": "view_state",
+    "observation": "Query/status/repository selection, card visibility and reset; browser-only state, no authority write."
+  },
+  "declarative_controls": [
+    {
+      "path": ".github/workflows/ci.yml",
+      "sha256": "cef6dbdc135b3539723a7f147d894d36f57ae6b847b18bf0b9979dc7ba5aa5f6",
+      "observation": "Push-to-main/pull-request matrix and ordered install/lint/tests/canary/docs/wheel steps; hosted job state is separate from local approval and release qualification."
+    },
+    {
+      "path": ".pre-commit-config.yaml",
+      "sha256": "d75b7fdfd80f46c4a3ae87e091e7225030747b568b7c4251079dea249330de5f",
+      "observation": "Pre-commit checks and pre-push receipt gate; configuration invokes tooling owners, confers no human Git authority."
+    },
+    {
+      "path": "pyproject.toml",
+      "sha256": "7b6a774a3733b859958b48d753c1578188bdecb08f2e1399540194877d3cba5d",
+      "observation": "Build/test configuration; test success is evidence for executed checks only."
+    }
+  ]
+}

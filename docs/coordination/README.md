@@ -32,8 +32,9 @@ branches/worktrees are removed only after the human confirms merge.
 ## Release-label map
 
 The human-selected planning map is migration/development `v0.1`, H0 `v0.2`,
-H1/O1 `v0.3`–`v0.4`, H2 `v0.5`, H3/H4 `v0.6+`, and H5 `v1.0` for the stable
-public contract. These labels are not release qualifications. A merge does not
+H1/O1 `v0.3`–`v0.4`, Python NAO H2 `v0.5`, native H2.1 `v0.6`,
+H3 `v0.7` through `v1.0`, and H4 `v1.5` (D-20261017-07). H5+ versions
+remain unassigned. These labels are not release qualifications. A merge does not
 close a milestone, and a tag may be created only on the exact human-selected
 committed release after its required gates pass. No tag is created by this
 workflow.
@@ -42,3 +43,15 @@ The repository's [REVIEW.md](../../REVIEW.md) remains the independent-review
 contract. Research proposals, exact reviewed bytes, validation results, staged
 files, and release qualification are separate states. Missing evidence cannot
 close a gate.
+
+## Orca coordination and SPR-11
+
+The human-designated Orca GRILL thread owns [its current board](orca.md) on
+`coordination/orca` in an independent checkout. The retained role boards are
+snapshots; their historical active headings do not dispatch work. Each new
+branch parent owns its board and reports to GRILL; peers do not edit it.
+[SPR-11](sprints/SPR-11-state-machines.md) audits implicit state machines and
+routes overlap to SPR-01..10. Discovery can proceed before PR2 merges; product
+implementation still requires verified merged PR2, a fresh main base and finite
+GRILL dispatch. Coordination commit/push authority is specific to this branch;
+sprint/product staging and commits remain human-owned.

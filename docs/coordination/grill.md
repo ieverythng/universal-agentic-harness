@@ -1,4 +1,32 @@
+# Orca successor coordination pointer (2026-11-10)
+
+The human designated the Orca thread as GRILL for the state-machine audit.
+Its current finite scope and isolated checkout are on [the Orca board](orca.md).
+The board below is retained verbatim as prior coordination evidence; expired
+scopes do not reactivate. PR2 delivery remains unstaged and human-owned.
+
 # GRILL coordination
+
+## DSH-PILOT-20261110 — PR2 delivered unstaged; human publication pending
+
+**Human-resumed after credit interruption:** 2026-11-10 10:22 Madrid. All six pilot threads were inactive after the outage and explicitly notified to resume their existing scopes, not spawn successors. No continuous activity or completion is inferred across the interruption. New closeout windows from actual owner resume: DEV and stars/FPV25min; fresh reviewers20min; session memo10min; completed architecture receipt5min. Original expired clocks below remain historical. PR2 target was still clean d97fadd and sprint drafts remained unstaged at resume. Goal was already active/armed on inspection; attempted resume reported that state, no goal was replaced.
+
+Human November 10 request authorizes bounded PR2 fixes/delivery, an unstaged SPR-01 preparation note, deduplicated stars/session research, architecture proposals and exposing existing local skills in DSH. This conversation is GRILL. Writer: gpt-6.1-sol/high per active profile; serving identity not independently attested. ALL staging, commits, pushes, PR publication, merges and tags remain human-owned; earlier coordination push exceptions are not exercised. Historical sections below retain their original facts and do not reactivate old scopes.
+
+- DEV parent `d6cdc1b7-f367-44fe-9530-789df53f0797`: PR2-CLOSEOUT product scope plus planning-only SPR-01-REFRESH. Start 03:46:33 Madrid, stop 04:31:33 inclusive review/handoff. Product target remains dedicated PR2 worktree; private source and receipts live under the [pilot evidence directory](/home/juanbeck/uah-experiments/dsh-pilot-20261110/dev/REVIEW-SCOPE.md). No sprint implementation.
+- RESEARCH parent `fcbc1c78-c6ef-4dd6-8466-85326bc51386`: <=100 recent stars metadata, <=8 new/deep reads, dedup prior reports, FPV/NAO contract/sprint mapping; 45-minute budget, proposals only. Owns research board.
+- Flat RESEARCH lanes: session audit `4bae001d-1270-4a63-971d-f5d0cc8cc93d` and architecture Explore `71aa9c95-b04b-4e22-a682-262c843c3a71`; 20-minute budgets, private handoffs only, GRILL routes synthesis. No peer DEV/RESEARCH messaging.
+- Runtime caps delegation at depth1. GRILL launches fresh reviewers mechanically and routes their reports to accountable DEV rather than pretending children spawned grandchildren. Frozen candidate manifest SHA-256 `554cba94f492c78486fa880f2ed1901c1a8faa16b3df177fbfaab0f5d0334de1`; Standards reviewer `843b5d2c-395c-4e28-8029-aa28d193181b`, Spec reviewer `6da8405c-2bbd-49ed-801e-3778a685dac1`, both fresh gpt-6.1-sol/max. Exact source approval required before collision-safe unstaged transfer. This is not distinct-model high-risk coverage.
+- Eight existing NAO/UAH skill bundles exposed through the user DSH skill root, without source edits or product-manifest additions. Live catalog refresh and two loader probes succeeded. Repository-relative contract links must still be interpreted against their owning repository.
+- Human explicitly requested one Qwen check about three minutes later; one-time task `schedule-fd3ea9c0-1616-413d-8cfd-2b8b78bb1b0c` targets 03:51:16 Madrid. Watson route registration is not this session’s delegation authorization: discovery currently rejects Watson. Connectivity may be checked separately; no raw inference workaround or silent allowlist change. No periodic heartbeat created.
+
+Qwen check completed 03:54:05 Madrid: direct health/models200 with qwen3.8 advertised; proxy health/models500; this session still exposes only Sol for delegation. No inference or model task ran, no policy bypass. One-time schedule ended normally. See [Qwen check and future trial](/home/juanbeck/uah-experiments/dsh-pilot-20261110/qwen-check.md).
+
+**Verified product outcome:** fresh Standards and Spec both explicitly APPROVE the exact18-path source manifest, BLOCKING0/NIT0 each, all five principlesOK. DEV transferred11 changed/new paths at10:28:13–10:28:14 Madrid,7 already-exact paths not rewritten. GRILL independently read back all18 hashes, unchanged d97fadd HEAD and empty staged delta; per-file collision checks and index SHA before/after match. No commit/push/PR/merge/tag. [Consolidated pilot handoff](</home/juanbeck/uah-experiments/dsh-pilot-20261110/pilot-handoff.md>) and [transfer receipts](</home/juanbeck/uah-experiments/dsh-pilot-20261110/dev/transfer-receipts.json>) hold exact evidence.
+
+**Planning/research outcome:** additive unstaged SPR-01 refresh retains old drafts and stale HEAD/index,89 seam controls plus authentic historical replay reds/current accepted control. Optional FPV planning paragraph was routed through GRILL, not into PR2. Stars memo classifies65 returned entries:6new-to-corpus primary inspections,2changed prior compares,18prior mentions,39metadata-only. No external code adopted. Session audit10suggestions:0new/8duplicate/1defer/1reject; model labels reversed in recollection, both sessions repo-assisted and no persisted Ralph goal loop proven. Visual architecture report offers2future choices only.
+
+Current next action: human inspects the unstaged PR2 delta and diagrammed description, then alone stages/commits/pushes/publishes. DEV closed10:33:19 and RESEARCH final custody10:34:10 Madrid, within resumed bounds; all six threads stopped, no successor implementation or new research dispatch. Existing H0/H1/O1/H2 gates remain open. Coordination snapshots are checked in independent metadata; exact final check receipts stay in the consolidated pilot handoff, without shared-hook installation or Git staging.
 
 Updated: 3 November 2026. Owner: GRILL. Canonical coordination checkout:
 `/home/juanbeck/universal-agentic-harness`, branch `feat/base-implementation-H0`.
