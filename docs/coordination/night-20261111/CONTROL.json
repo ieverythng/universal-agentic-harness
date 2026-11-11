@@ -1,0 +1,110 @@
+{
+  "version": 1,
+  "campaign": "night-20261111",
+  "orchestrator": "session-b4578032-f2ce-4f44-be24-9c2a0f1b0c35",
+  "updated_at": "2026-11-11T01:03:46.778Z",
+  "start": "2026-11-11T00:48:00Z",
+  "hard_stop": "2026-11-11T08:48:00Z",
+  "global_limit": 12,
+  "declared_active_quota": 2,
+  "merge_base": "5e6734173f2f755430f85e2fbe7d937bfbaa8b7d",
+  "authority": {
+    "coordination": "local path-scoped stage/commit completed checkpoints; no push",
+    "sprints": "reviewed cumulative local staging only; no commit/push",
+    "plugin": "local supported install/verification; phaseAthenB",
+    "h3": "research/planning only"
+  },
+  "workers": [
+    {
+      "id": "652eb713-52ae-4292-aee5-f390a02b3b84",
+      "role": "bootstrap-discovery",
+      "state": "completed",
+      "quota": 0,
+      "source_writes": false,
+      "artifact": "/home/juanbeck/uah-experiments/night-20261111/bootstrap/session-creation-discovery.md"
+    },
+    {
+      "id": "276310f2-0e54-4f51-ae9a-0bf3b5545c0d",
+      "role": "SPR01-evidence-preflight",
+      "state": "active",
+      "quota": 1,
+      "source_writes": false
+    },
+    {
+      "id": "7b3b4a1d-f0af-48cf-981a-6fa1e289c7d9",
+      "role": "H3-custody-preflight",
+      "state": "active",
+      "quota": 1,
+      "source_writes": false
+    }
+  ],
+  "failed_probes": [
+    {
+      "id": "session-a764f462-cb1d-4d5c-bbc6-5ac36a2b7829",
+      "job": "bash-589c0384f9894eec",
+      "state": "closed_failed_bootstrap",
+      "reason": "headless profile NO_ADAPTER for openai-codex; no inference or product changes"
+    }
+  ],
+  "sprints": [
+    {
+      "id": "SPR-01",
+      "state": "evidence_preflight",
+      "branch": "dsh/night-20261111-spr01",
+      "worktree": "/home/juanbeck/uah-experiments/night-20261111/sprints/SPR-01",
+      "base": "5e6734173f2f755430f85e2fbe7d937bfbaa8b7d",
+      "source_approved": false,
+      "staged": false
+    },
+    {
+      "id": "SPR-02",
+      "state": "dependency_wait",
+      "branch": "dsh/night-20261111-spr02",
+      "worktree": "/home/juanbeck/uah-experiments/night-20261111/sprints/SPR-02",
+      "base": "5e6734173f2f755430f85e2fbe7d937bfbaa8b7d",
+      "source_approved": false,
+      "staged": false
+    },
+    {
+      "id": "SPR-03",
+      "state": "dependency_wait",
+      "branch": "dsh/night-20261111-spr03",
+      "worktree": "/home/juanbeck/uah-experiments/night-20261111/sprints/SPR-03",
+      "base": "5e6734173f2f755430f85e2fbe7d937bfbaa8b7d",
+      "source_approved": false,
+      "staged": false
+    },
+    {
+      "id": "SPR-04",
+      "state": "dependency_wait",
+      "branch": "dsh/night-20261111-spr04",
+      "worktree": "/home/juanbeck/uah-experiments/night-20261111/sprints/SPR-04",
+      "base": "5e6734173f2f755430f85e2fbe7d937bfbaa8b7d",
+      "source_approved": false,
+      "staged": false
+    },
+    {
+      "id": "SPR-05",
+      "state": "dependency_wait",
+      "branch": "dsh/night-20261111-spr05",
+      "worktree": "/home/juanbeck/uah-experiments/night-20261111/sprints/SPR-05",
+      "base": "5e6734173f2f755430f85e2fbe7d937bfbaa8b7d",
+      "source_approved": false,
+      "staged": false
+    }
+  ],
+  "plugin": {
+    "state": "waiting_creator_session",
+    "phase": "A_readonly"
+  },
+  "h3": {
+    "state": "custody_preflight",
+    "implementation": false
+  },
+  "stale_after_minutes": 60,
+  "session_bootstrap": {
+    "state": "authenticated_web_context_required",
+    "mechanism": "documented existing-webHost session/create, agentPreset cordis; no inherited old-policy forks",
+    "headless_attempt": "closed NO_ADAPTER; separate profile not reused"
+  }
+}

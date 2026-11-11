@@ -1,6 +1,24 @@
 # RESEARCH coordination
 
-## Current: IDLE, custody cleanup complete
+## Current: DSH-PILOT-20261110 bounded research CLOSED
+
+Original start: 2026-11-10 02:46 UTC; original deadline 03:31 UTC expired during the credit outage. The pass was interrupted before synthesis; no continuous activity or completed review is inferred.
+Human-authorized resumed closeout: actual start 2026-11-10 09:22:45 UTC / 10:22:45 Europe/Madrid; new hard stop 09:47:45 UTC (25 minutes). Recover saved evidence only; no repeated fetch, expanded research, implementation or automatic successor.
+Writer: gpt-6.1-sol per runtime; effective reasoning effort unknown.
+Owner writes: this board and private `/home/juanbeck/uah-experiments/dsh-pilot-20261110/research/`; architecture HTML exception in OS TMPDIR as explicitly requested.
+Current exclusive scope after GRILL clarification: newest <=100 stars metadata / <=8 primary deep reads, FPV source/governing parity mapping, and consolidation. GRILL separately owns exact-session audit and architecture report assignments; do not duplicate. Two exact session cache headers were located/read before reassignment only; no transcript audit or architecture source review performed here. Evidence/proposals only, UNREVIEWED; no implementation, runtime, hooks, staging, commits, push or PR publication. No DEV contact. Delegation unavailable at current maximum depth.
+
+### Final bounded outcome
+
+Substantive closeout finished 2026-11-10T09:33:45.773Z. Consolidated [RESEARCH handoff](</home/juanbeck/uah-experiments/dsh-pilot-20261110/research/HANDOFF.md>), [stars memo](</home/juanbeck/uah-experiments/dsh-pilot-20261110/research/stars-memo.md>), [FPV/NAO mapping and optional sprint-note insertion](</home/juanbeck/uah-experiments/dsh-pilot-20261110/research/fpv-nao-memo.md>), [all-entry coverage](</home/juanbeck/uah-experiments/dsh-pilot-20261110/research/stars-coverage.md>), [source manifest](</home/juanbeck/uah-experiments/dsh-pilot-20261110/research/source-manifest.json>) and [static validation](</home/juanbeck/uah-experiments/dsh-pilot-20261110/research/validation.json>). Fresh findings remain UNREVIEWED proposals, not independent approval.
+
+- Authenticated max100 query returned65 visible stars:6 NEW-to-searched-corpus primary reviews,2 CHANGED prior FPV studies with README/compare refresh only,18 previous mentions not repeated,39 metadata-only unreviewed. No upstream repeat of Hermit/Agentloop/neuron-explorer/figures4papers. No post-outage fetch.
+- FPV actual main d773ec05737e3cf050dde47d31eeadf0bfebcfd5; inspected PR1 OPEN/non-draft at dc69e344e7a604c9efe687591310072e4bea0070. Nov8 proposal snapshot leaves G0-B/P1a/P1b/P2 without runtime receipts. Future fake-goal parity remains separately frozen, post-NAO, not a new H2 prerequisite or flight qualification. Optional SPR-01 reserved text routed to GRILL only; no DEV contact.
+- GRILL-routed [session audit](</home/juanbeck/uah-experiments/dsh-pilot-20261110/session-audit/session-audit-memo.md>): exact labels reversed (ed351206… Qwen3.8; ad6a64d8… Luna), no proven Q3/serving identity or autonomous persisted Ralph loop;10 ideas =0new/8duplicate/1defer/1reject.
+- [Architecture handoff](</home/juanbeck/uah-experiments/dsh-pilot-20261110/architecture/HANDOFF.md>) and [static HTML](</tmp/architecture-review-20261110T025442Z.html>):2 future-only choices, user selection before design; no concrete Interface or PR2 requirement. Separate lane records opener exit0 and offline visual check, not independent approval.
+- This lane ran no source behavior tests or downloaded code. Static checks:49 local citation targets exist,65 unique metadata/table rows reconcile, public/self repo-star timestamps match; source/tests working diff empty; final board whitespace check recorded in validation receipt. No hook setup/full suite, runtime/config/session edit, staging/commit/push/PR/merge/tag or automatic successor. Writer remains gpt-6.1-sol; effective effort unknown. GRILL owns next finite scope.
+
+## Prior: IDLE, custody cleanup complete
 
 Owner: RESEARCH parent. Scope: COORDINATION-CUSTODY-ONLY-20261102.
 Actual start: November 2, 2026, 21:04:47 UTC / 22:04:47 Europe/Madrid.
