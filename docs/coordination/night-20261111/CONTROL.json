@@ -2,11 +2,11 @@
   "version": 1,
   "campaign": "night-20261111",
   "orchestrator": "session-b4578032-f2ce-4f44-be24-9c2a0f1b0c35",
-  "updated_at": "2026-11-11T01:17:07.331Z",
+  "updated_at": "2026-11-11T02:06:50.822Z",
   "start": "2026-11-11T00:48:00Z",
   "hard_stop": "2026-11-11T08:48:00Z",
   "global_limit": 12,
-  "declared_active_quota": 2,
+  "declared_active_quota": 5,
   "merge_base": "5e6734173f2f755430f85e2fbe7d937bfbaa8b7d",
   "authority": {
     "coordination": "local path-scoped stage/commit completed checkpoints; no push",
@@ -42,16 +42,62 @@
     {
       "id": "9f9ab3a0-cb78-4426-93b4-066180925550",
       "role": "DEV2-SPR01-tests-only-private",
-      "state": "active",
-      "quota": 1,
+      "state": "completed",
+      "quota": 0,
       "source_writes": false,
-      "test_candidate_writes": true
+      "test_candidate_writes": true,
+      "artifact": "/home/juanbeck/uah-experiments/night-20261111/spr01-tests-handoff.md",
+      "result": "9RED/19PASS; one unreadability mechanism, no source changes or stage"
     },
     {
       "id": "8c0eabbb-0221-4ae2-ab11-af25b220f7b8",
       "role": "SPR01-pinned-producer-evidence",
+      "state": "completed",
+      "quota": 0,
+      "source_writes": false,
+      "artifact": "/home/juanbeck/uah-experiments/night-20261111/failed-history-producer-handoff.md",
+      "result": "newNov11 pinned-producer7eventfailure acceptedold/rejectedcurrent; no retainedhistoryclaim or sourceapproval"
+    },
+    {
+      "id": "fb812af7-ab7e-47a8-9222-69be15e73501",
+      "role": "SPR01-private-source-writer",
+      "state": "active_resumed_after_token_failure",
+      "quota": 1,
+      "deadline": "2026-11-11T03:39:41+01:00",
+      "path": "/home/juanbeck/uah-experiments/night-20261111/private/spr01-tests",
+      "source_writes": "private_only",
+      "acceptance_staging": false
+    },
+    {
+      "id": "7be9f289-1686-4319-baab-939da52a1c49",
+      "role": "H3-parent-integration",
+      "state": "active_resumed_after_token_failure",
+      "quota": 1,
+      "deadline": "2026-11-11T03:39:47+01:00",
+      "source_writes": false
+    },
+    {
+      "id": "8391d263-290c-4237-80c1-510e8f78cfcb",
+      "role": "H3-helperA-theory-audit",
+      "state": "active_resumed_after_token_failure",
+      "quota": 1,
+      "deadline": "2026-11-11T03:21:00+01:00",
+      "source_writes": false
+    },
+    {
+      "id": "a337c3ad-6cce-4a23-adc3-76bc2ec63bfb",
+      "role": "H3-helperB-SOTA-delta",
+      "state": "active_resumed_after_token_failure",
+      "quota": 1,
+      "deadline": "2026-11-11T03:21:00+01:00",
+      "source_writes": false
+    },
+    {
+      "id": "40783638-30c6-4780-bfee-3c48219e2c13",
+      "role": "successor-contract-preflight-readonly",
       "state": "active",
       "quota": 1,
+      "deadline": "2026-11-11T03:29:00+01:00",
       "source_writes": false
     }
   ],
@@ -66,7 +112,7 @@
   "sprints": [
     {
       "id": "SPR-01",
-      "state": "evidence_preflight",
+      "state": "private_writer_active_review_pending",
       "branch": "dsh/night-20261111-spr01",
       "worktree": "/home/juanbeck/uah-experiments/night-20261111/sprints/SPR-01",
       "base": "5e6734173f2f755430f85e2fbe7d937bfbaa8b7d",
@@ -111,21 +157,33 @@
     }
   ],
   "plugin": {
-    "state": "waiting_creator_session",
+    "state": "phaseA_authoring_active_review_pending",
     "phase": "A_readonly"
   },
   "h3": {
-    "state": "custody_preflight",
-    "implementation": false
+    "state": "active_recovering_from_token_failure",
+    "implementation": false,
+    "checkpoint": "2026-11-11T03:39:47+01:00"
   },
   "stale_after_minutes": 60,
   "session_bootstrap": {
-    "state": "authenticated_web_context_required",
-    "mechanism": "documented existing-webHost session/create, agentPreset cordis; no inherited old-policy forks",
-    "headless_attempt": "closed NO_ADAPTER; separate profile not reused"
+    "state": "verified_ready_attempt002",
+    "prior_session": "session-ecdbe551-d950-4750-880f-e16d3fdbb8b3",
+    "prior_created_at": "2026-11-11T01:24:08+01:00",
+    "prior_policy_event_present": false,
+    "latest_saved_web_settings": "2026-11-11T02:28:42+01:00",
+    "astra_saved_route": "openai-codex/gpt-6-astra",
+    "enabled": true,
+    "attempt002_reserved_quota": 0,
+    "ready_file": "/home/juanbeck/uah-experiments/night-20261111/bootstrap/CREATOR-READY-002.json",
+    "watcher_job": "bash-960f989fa6254a4d",
+    "source_writes_authorized": false,
+    "verified_policy_file": "/home/juanbeck/uah-experiments/night-20261111/bootstrap/creator-policy-events-002.json",
+    "session": "session-dcf4380b-700b-4920-8a3d-037db77ed964",
+    "astra_medium_smoke_passed": true
   },
-  "reserved_creator_bootstrap_quota": 2,
-  "capacity_committed": 4,
+  "reserved_creator_bootstrap_quota": 0,
+  "capacity_committed": 11,
   "planning_custody": {
     "state": "copied_verified",
     "files": 16,
@@ -133,5 +191,47 @@
     "original_heads_indexes_status_preserved": true,
     "receipt": "/home/juanbeck/uah-experiments/night-20261111/planning-migration-receipt.json",
     "staged": false
+  },
+  "test_preparation": {
+    "state": "private_red_controls_complete",
+    "reds": 9,
+    "passes": 19,
+    "mechanisms": 1,
+    "fixture_jsonl_ignored": true,
+    "source_accepted": false,
+    "staged": false
+  },
+  "hub_lease": {
+    "id": "HUB-INBOX-001",
+    "recipient": "session-dcf4380b-700b-4920-8a3d-037db77ed964",
+    "state": "acknowledged_active",
+    "quota_max_including_root": 6,
+    "checkpoint": "2026-11-11T04:05:00+01:00",
+    "paths": [
+      "/home/juanbeck/uah-experiments/night-20261111/plugin",
+      "docs/coordination/night-20261111/hub.md",
+      "docs/coordination/night-20261111/plugin.md"
+    ],
+    "scope": "phaseAreadonlyplugin and reviewbroker only",
+    "sourcefile": "/home/juanbeck/uah-experiments/night-20261111/dispatch/HUB-001-SCOPE.md",
+    "signal_sent": true,
+    "no_sprint_h3_writer": true,
+    "ack_file": "/home/juanbeck/uah-experiments/night-20261111/dispatch/HUB-ACK-001.json",
+    "actual_started_at": "2026-11-11T02:04:46Z",
+    "route_reverified": true,
+    "unattested_serving_identity": true
+  },
+  "hourly_supervision": {
+    "last_at": "2026-11-11T02:06:50.822Z",
+    "observed_token_failures": 4,
+    "continued_on_direct_human_request": true,
+    "deadlines_extended": false,
+    "no_shared_product_edits": true,
+    "staged_source_accepted": false,
+    "hub_ack_verified": true,
+    "pending_writers": 1,
+    "current_review_approvals": 0,
+    "staged_sprint_count": 0,
+    "campaign_hardstop_unchanged": true
   }
 }

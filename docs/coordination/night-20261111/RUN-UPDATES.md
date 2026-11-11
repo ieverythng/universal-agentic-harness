@@ -1,0 +1,16 @@
+# night-20261111 — supervised run updates
+
+Owner:originalGRILL. Hardstop09:48Madrid; updatesareevidence/state, notpermissionorqualification. Exactleasesarein [CONTROL](CONTROL.json); readtimestamp andscopeexpiry, neverassumeoldactiveflagsmeancontinuouswork.
+
+## 03:12Madrid checkpoint (sampled immediately around this update)
+
+- PR2merged5e673417…;3PRCIjobs andpostmergeCIpassed. Diagrammeddescription andJS/CSSnotes published, branchpreserved.
+- Coordinationcompletedcheckpoints committedlocally86bd390,b22a6e4; nopush. Original5sprintplanningworktrees andSPR11stagedfilespreserved.16planningfilescopiedexactly,5separatecurrententrynotes; nooldruntimeoverlay.
+- FreshCreatorsessiondcf4380b…capturedAstra+Solpolicy, loadedcordis, exactAstraMediumfixedfactsmokepassed. This isroutingonly, notrevieworcapabilityattestation. HUB001ackreceived03:04:46Madrid; phaseAreadonlyexplorer+reviewbrokerquota6TOTALincludingdescendants, noSPR/H3writer.
+- RootSPR01privatewriter resumedaftertokenfailurewithoriginal03:39:41checkpoint. Lastverifiedpreparedbaseline28tests:9red/19pass, allredssamehistoricalmissingbudgetconstructor. Noacceptedsource/stage. Newpinned-old-producerfailurefixtureprovenanceisNEWNov11, notretainedOct08.
+- H3parent+2readonlyhelpers recoveredwithoriginalcheckpoints, theory/protocolaudit andboundedfirstpartyJevdelta. NoH3implementation/modeltraining/promotion. Exactautoresearchskillnotlocated, notpretendedrun.
+- SuccessorSPR02–05contractprep readonlyquota1; implementationstillserialblockedonacceptedpredecessor.
+- Maximumreservedcapacity11/12 (root5 +hub6), actualrunningchildrenmaybelower. FreshreviewslotsmustnotdoublecountacrosspluginandSPRbroker. Productcommits/pushesstillforbidden; AstraMedium+SolHighsourceapprovalrequiredbeforetransfer/stage.
+- Tokenlimitsinterrupted4workers; receiptsnotautoapproved, originaldeadlineskept, resumedsource/indexchecksrequired. Source/sharedindexesremainedunchangedat03:02audit. Noforcedcompletionandno09:48extension.
+
+Nextmilestones: SPR01frozenreviewpacket; H3helpermemosto integrate; firstinstalled/verifiedexplorerslice; exactremaininggatesreported. Rootwillpublishconsolidatedmilestones/hourlysupervision, notstreamprobechatter.
