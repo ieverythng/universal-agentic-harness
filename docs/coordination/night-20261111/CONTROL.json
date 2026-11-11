@@ -2,7 +2,7 @@
   "version": 1,
   "campaign": "night-20261111",
   "orchestrator": "session-b4578032-f2ce-4f44-be24-9c2a0f1b0c35",
-  "updated_at": "2026-11-11T08:10:11.674Z",
+  "updated_at": "2026-11-11T08:50:48.249Z",
   "start": "2026-11-11T00:48:00Z",
   "hard_stop": "2026-11-11T08:48:00Z",
   "global_limit": 12,
@@ -545,7 +545,7 @@
     "astra_medium_smoke_passed": true
   },
   "reserved_creator_bootstrap_quota": 0,
-  "capacity_committed": 2,
+  "capacity_committed": 1,
   "planning_custody": {
     "state": "copied_verified",
     "files": 16,
@@ -566,8 +566,8 @@
   "hub_lease": {
     "id": "HUB-INBOX-001",
     "recipient": "session-dcf4380b-700b-4920-8a3d-037db77ed964",
-    "state": "HUB018STOP_closeout_receipt_all34childreninactive_no_knownjobs",
-    "quota_max_including_root": 1,
+    "state": "STOPPED_turn_end_confirmed_at_hardstop",
+    "quota_max_including_root": 0,
     "checkpoint": "2026-11-11T08:15:00+01:00",
     "paths": [
       "/home/juanbeck/uah-experiments/night-20261111/plugin",
@@ -650,7 +650,7 @@
     "closeout_receipt": "/home/juanbeck/uah-experiments/night-20261111/dispatch/HUB-CLOSEOUT-018.json",
     "closeout_published": "2026-11-11T09:06:38+01:00",
     "new_workers_or_watchers_authorized": false,
-    "lifecycle_limit": "lastobservedclosingcompaction; scopedno-knownjobsnotglobalOSquiescence"
+    "lifecycle_limit": "Hardstopreadonlymetadata tailconfirmsfinalturn/end,no lateractivity"
   },
   "hourly_supervision": {
     "scheduled_occurrence": "2026-11-11T08:48:00+01:00",
@@ -777,7 +777,7 @@
     "existing_jobs_scheduled_supervision_authorized": true,
     "hard_stop_unchanged": true
   },
-  "campaign_state": "parked_incomplete_closeout_published_no_product_successor",
+  "campaign_state": "STOPPED_HARD_DEADLINE_INCOMPLETE_NO_SUCCESSOR",
   "objective_achieved": false,
   "final_preservation_receipt": "/home/juanbeck/uah-experiments/night-20261111/FINAL-PRODUCT-PRESERVATION-001.json",
   "final_handoff": "docs/coordination/night-20261111/CLOSEOUT.md",
@@ -788,6 +788,27 @@
     "hub_known_running_jobs": 0,
     "no_source_or_install_successor": true,
     "hard_stop_unchanged": "2026-11-11T09:48:00+01:00",
-    "no_product_commit_push": true
+    "no_product_commit_push": true,
+    "hard_stop_observed_at": "2026-11-11T08:50:48.249Z",
+    "scheduled_stop": "2026-11-11T09:48:00+01:00",
+    "product_work_stopped_at": "2026-11-11T09:00:00+01:00",
+    "hub_turn_end_confirmed": true,
+    "campaign_schedules_ended": true,
+    "new_dispatch_authorized": false,
+    "new_source_writes_authorized": false,
+    "new_install_authorized": false,
+    "automatic_successor": false,
+    "staged_path_counts": [
+      14,
+      17,
+      0,
+      0,
+      0
+    ],
+    "allHEAD5e": true,
+    "source_and_index_hashes_reverified_after_hardstop": true,
+    "goal_phase": "active",
+    "goal_activation": "disarmed",
+    "goal_not_completed_because_objective_unachieved": true
   }
 }
