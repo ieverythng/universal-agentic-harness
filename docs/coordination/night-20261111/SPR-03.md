@@ -1,29 +1,24 @@
-# SPR-03 — R2 writer ready for fresh whole-source reviews
+# SPR-03 — FINAL R3 v5 ready for fresh reviews
 
-NEW R2 actualstart07:40:21Madrid, stricter absolute07:50, campaign09:48unchanged.
-Same independent clone/HEAD/index/all159sealedv3 revalidated before code; quota1/
-nochildren/one batch. Source frozen **07:44:35**, no further source edits.
-Runtime serving identity/effort unattested. No source/policy/H/native approval.
+Recovery actualstart08:19:07Madrid, no backdate/reset; strict08:25, campaign09:48.
+Earlier runtimefailure causeunknown; current all159sealedv4/HEAD/index verified,
+no partial source/livejobs found; no setup/spawn. One final batch, freeze08:22:55.
+Local context lease-object/exact11keys guard before UNCHANGEDlegacyloader; optional
+simplegroup_actionstringguard. No policy/schema/authority/store expansion or bypass
+claim. Only module/regressionfile changed, other157unchanged; seeds/reports preserved.
 
-Exact nestedpolicy wire coercion repaired: serialized refs exact JSON arrays of
-nonempty strings BEFOREtuple; rules exactarray/objectfields; optional malformed
-renderedtext→TaskContextError sameclass. This was constructor representation defect,
-NOTauthoritybypass (owner restore already rejects policy mismatch). No field/
-schema/authority/store expansion. ProductionONLYcontext module, plus small existing
-public regression additions; other157v3members unchanged. Seeds/reports preserved.
+[Final handoff](</home/juanbeck/uah-experiments/night-20261111/spr03-writer-handoff.md>) /
+[v5 unit](</home/juanbeck/uah-experiments/night-20261111/private/spr03-evidence/review-source-v5/source-unit.json>):
+698874eeb5d4eaaf72fda5f99738816d7fb2da315e42df4195ce636d6ac8193a;
+tree574afb3919ddacf85b55bcb4e68c2d0eaed9cc3fd346132c83b7364e4f13e83a;
+integrity1b062dc5f119b165e1121b15719e2cc6df9248fd619ad7abeb1b1e02be571330.
+159/143/154S2,26cum/10inc. PublicRED5fail→39publicPASS,1166fullPASS41.62s,
+ALL7hooks/noexemptionsPASS,O1x2/render/package/origins/Ruff/hygiene/index0; alljobs
+collected. No further code/no sourceapproval/target/stage/ref/commit/push/Source4.
 
-[Current handoff](</home/juanbeck/uah-experiments/night-20261111/spr03-writer-handoff.md>) /
-[clean v4 unit](</home/juanbeck/uah-experiments/night-20261111/private/spr03-evidence/review-source-v4/source-unit.json>):
-c75b345726faa183c7e3ee8dd3c20c77ed88664dbf74bac5dea652955e6eff53;
-tree852c5710e4914492f775b39afebbd1938b23527b05248b8ab685aec974b9cd25;
-integrity1581fd44955b76d04b89e5c3b4cb6a4078c634f20b7a596984787cc9faa5e681.
-159/143/154EXACTS2,26cum/10inc. API006
-c4c6638ad5176b400a18df11ff6efc55dd8630592ec147a6b94d48d3292d48b9.
-
-147focused/1161fullPASS48.36s; ALL7hooks/noexemptionsPASS;O1x2/render/package/
-origins/Ruff/hygiene/index0; alljobscollected. All15oldhelper/7R1controls remainGREEN.
-Root routes TWO NEW fresh contexts: inspect ALL changed-source/oldcomparison BEFORE
-large optional matrices; prior Standards incomplete is NOTapprovalwaiver. ONLYv4
-clean inputs/access, explicitALL26product+2docexceptions, opaqueoutsideONLY; no old
-verdicts/reports/writerresults/history. No target/stage/ref/transfer/commit/push/
-source4. Stop READY, green writer checks do not establish source approval.
+Fresh two contexts receive ONLYv5 cleaninputs. MUSTread ONEsmall joinedtextchunk
+max~5KB incllongJSONL, ALL26candidate+old/depcomparisons BEFOREoptional matrices;
+no silentpruning/priorpartialinheritance. ALL26changedproduct+2docexceptions,
+opaqueoutsideonly; no writerresults/priorverdict/history. FINALbudgetclosed:
+if fresh CHANGES/incomplete, park Source3/SRC04/05 dependencywork atRoot, not
+endless rescope or forced approval. Stop READY before08:25.
