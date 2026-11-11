@@ -45,6 +45,9 @@ publication state is recorded in the [PR delivery status](docs/plans/pr-delivery
   Git metadata.
 - Coordination boards are owner-maintained records. Keep them outside product
   manifests and indexes, and leave them unstaged in the persistent base.
+- GRILL may commit and push reviewed board and related history updates to the
+  designated base branch only when explicitly authorized by the human. This
+  narrow authority does not cover product changes, PR publication, merges, or tags.
 - Stop before a destination write if any selected path differs from its
   recorded bytes. Preserve the existing content and report the collision.
 

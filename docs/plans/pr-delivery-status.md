@@ -1,8 +1,6 @@
 # PR delivery status
 
-**Current snapshot:** 2026-10-28 12:13 UTC, before the fresh PR2 review. This records
-publication and readiness states; it is not a release qualification or
-milestone closure.
+**Current snapshot:** 2026-11-03 15:00 UTC, at the start of the private viewer run. This records publication and readiness states; it is not a release qualification or milestone closure.
 
 ## PR1: merged baseline
 
@@ -19,11 +17,13 @@ milestone closure.
 
 ## PR2: documentation candidate readiness
 
-No PR2 has been opened as of this snapshot. The twelve-path documentation
-candidate is based on the merged `main` commit above. The fresh independent
-review pair is pending at this snapshot. No PR2 hosted CI or merge outcome is
-claimed. Publication remains subject to the review, checks, and human staging
-authority recorded in the repository guidance.
+The pushed codex/uah-pr2-docs branch points to d97fadd4b84f1dee1d5b2434eb88030ec6146e31, based on the merged main commit above. Its uv.lock update retains requires-python >=3.14. GitHub lists PR1 as merged and no PR2 exists at this snapshot. The masterplan viewer candidate is private and unreviewed at the snapshot time. No hosted CI or merge outcome is claimed. Publication remains subject to the repository review contract and human staging authority.
+
+Current private correction (2026-11-10): the closeout candidate restores
+`uv.lock` to `requires-python >=3.10`, consistent with package metadata and
+still permitting Python 3.14. This does not rewrite the November 3 branch
+snapshot above or change its recorded publication state. Exact review and
+transfer receipts remain separate from this historical delivery snapshot.
 
 The Markdown pull request template is a static scaffold. GitHub makes it
 available to prefill new descriptions after it is present on the default
@@ -37,7 +37,11 @@ remains under human consideration. H0, H1, O1, and H2 remain open. H6 remains
 research only. Release targets are listed in the
 [release process](../RELEASING.md) and [masterplan](universal_agentic_harness_masterplan.md).
 
-## Historical snapshot: 2026-10-22 01:16:50 UTC
+## Historical snapshot: 2026-10-28 12:13 UTC
+
+The PR2 documentation candidate was then based on merged main, with the fresh independent review pair pending and no GitHub PR2, hosted CI, or merge outcome claimed.
+
+## Earlier historical snapshot: 2026-10-22 01:16:50 UTC
 
 At this snapshot, PR1 was open and unmerged. Its head was
 `61301d731e801c5c160f45c8d121520c81d155df`, tree

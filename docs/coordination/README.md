@@ -18,7 +18,10 @@ coordination policy only; parent boards, transient logs, raw probe output, and
 review workspaces are not copied into product PRs. A board records its scope,
 owner, frozen branch or snapshot, time bound, evidence, gate state, next action,
 and exact decision needed. Board writes do not wake another chat or grant
-runtime, review, Git, or release authority.
+runtime, review, or release authority. GRILL may commit and push reviewed board
+and related history updates to the designated base branch only when explicitly
+authorized by the human. This does not authorize product changes, PR publication,
+merges, or tags.
 
 ## Product PR workflow
 
