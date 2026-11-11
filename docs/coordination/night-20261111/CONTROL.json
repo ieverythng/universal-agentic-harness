@@ -2,7 +2,7 @@
   "version": 1,
   "campaign": "night-20261111",
   "orchestrator": "session-b4578032-f2ce-4f44-be24-9c2a0f1b0c35",
-  "updated_at": "2026-11-11T02:25:08.279Z",
+  "updated_at": "2026-11-11T03:02:29.162Z",
   "start": "2026-11-11T00:48:00Z",
   "hard_stop": "2026-11-11T08:48:00Z",
   "global_limit": 12,
@@ -120,6 +120,45 @@
       "private_probe_only": true,
       "artifact": "/home/juanbeck/uah-experiments/night-20261111/spr01-ingress-selection-handoff.md",
       "result": "both public raw-fact rejection reds +genuineadmitcontrols; no sourcechange or currentreplaymanifestchange"
+    },
+    {
+      "id": "a8f48650-161b-445c-9bb7-85fee5d5ae9d",
+      "role": "DEV1-SPR01-B-private-issuer-repair",
+      "state": "completed_frozen_candidate",
+      "quota": 0,
+      "budget_minutes": 60,
+      "checkpoint": "2026-11-11T04:30:00+01:00",
+      "source_root": "/home/juanbeck/uah-experiments/night-20261111/private/spr01-ingress-source",
+      "source_writes": "private_only",
+      "provisional_dependency": "SPR01-A frozen80b728… not yetaccepted",
+      "transfer_staging": false,
+      "artifact": "/home/juanbeck/uah-experiments/night-20261111/spr01-ingress-writer-handoff.md",
+      "result": "Combined188focused/1025full/allhooksPASS; cleanfrozen14paths/152sourcefiles; sourceapprovalpending"
+    },
+    {
+      "id": "9f9ab3a0-cb78-4426-93b4-066180925550:ingress-adversarial-tests",
+      "session_id": "9f9ab3a0-cb78-4426-93b4-066180925550",
+      "role": "DEV2-SPR01-B-private-adversarial-tests",
+      "state": "completed",
+      "quota": 0,
+      "budget_minutes": 25,
+      "source_writes": false,
+      "private_test_only": true,
+      "artifact": "/home/juanbeck/uah-experiments/night-20261111/spr01-ingress-tests-handoff.md",
+      "result": "42cases:8expected-rejection reds/34protectedpass on base; exactartifact rootrouted Bwriter"
+    },
+    {
+      "id": "1e97eb69-7c9a-4b70-8bd5-9e394848421e",
+      "role": "SPR01-R-mixed-failure-generation-repair",
+      "state": "completed_unreviewed_delta",
+      "quota": 0,
+      "budget_minutes": 25,
+      "deadline": "2026-11-11T03:58:56+01:00",
+      "source_root": "/home/juanbeck/uah-experiments/night-20261111/private/spr01-replay-repair",
+      "source_writes": "private_only",
+      "transfer_staging": false,
+      "artifact": "/home/juanbeck/uah-experiments/night-20261111/spr01-replay-repair-handoff.md",
+      "result": "Fourintendedpublicreds fixed by2lineowner guard;492focused/979full/allhooksPASS; exactRdelta guarded into B"
     }
   ],
   "failed_probes": [
@@ -133,15 +172,15 @@
   "sprints": [
     {
       "id": "SPR-01",
-      "state": "SPR01-A_replay_frozen_review_pending_B_selection_active",
+      "state": "whole_combined14path_frozen_new_pair_running",
       "branch": "dsh/night-20261111-spr01",
       "worktree": "/home/juanbeck/uah-experiments/night-20261111/sprints/SPR-01",
       "base": "5e6734173f2f755430f85e2fbe7d937bfbaa8b7d",
       "source_approved": false,
       "staged": false,
-      "cumulative_manifest_sha256": "80b7283065ba5c543f20fe1d48cba7e03911842eec23b771cb70d8f9aaefa662",
-      "manifest_paths": 10,
-      "review_broker_request": "HUB-INBOX-002",
+      "cumulative_manifest_sha256": "582863a09eea2eb246ca7cc2016dafcaa920aaa9f50dff790cc9f2f8d81c08eb",
+      "manifest_paths": 14,
+      "review_broker_request": "HUB-INBOX-004",
       "reviews_complete": false,
       "destination_baseline": "/home/juanbeck/uah-experiments/night-20261111/private/spr01-evidence/destination-baseline-root.json",
       "focused_writer_test_report": {
@@ -150,13 +189,40 @@
         "mandatory_hooks_reported_pass": true,
         "extra_standalone_suite": "running with corrected repository runner; no source changes after freeze"
       },
-      "full_suite_writer_report": 969,
+      "full_suite_writer_report": 1025,
       "remaining_sprint_scope": [
         "BOTH-action issuer containment requires independent public red/genuine control selection; new private evidence-only lane dispatched",
         "Mixed-history competing-writer and downstream current-use rows remain uncovered, not closed",
         "Exact source reviews and custody gates pending"
       ],
-      "full_sprint_closed": false
+      "full_sprint_closed": false,
+      "whole_sprint_gate": "No successor source integration until combined required scope accepted; A review does not approve B",
+      "reviews": {
+        "state": "CHANGES",
+        "receipt": "/home/juanbeck/uah-experiments/night-20261111/dispatch/SPR01-REVIEWS-001.json",
+        "astra": {
+          "blocking": 1,
+          "nits": 0,
+          "verdict": "CHANGES"
+        },
+        "sol": {
+          "blocking": 1,
+          "nits": 0,
+          "verdict": "CHANGES"
+        },
+        "unique_reproduced_mechanisms": 1,
+        "source_approved": false,
+        "finding": "Unbudgeted old-generation failure can enter modern failure-policy fallback; no fresh execution/retry exploit demonstrated"
+      },
+      "clean_review_manifest_sha256": "2b010454ef1acf00ff89affc048a7c1cad96dce8a9b4e78394fd5ff91ba21036",
+      "latest_review": {
+        "state": "running_at_ack",
+        "ack": "/home/juanbeck/uah-experiments/night-20261111/dispatch/HUB-ACK-004.json",
+        "fresh_contexts": true,
+        "prior_history_excluded": true,
+        "reports_pending": true,
+        "approval": false
+      }
     },
     {
       "id": "SPR-02",
@@ -271,20 +337,29 @@
     "known_active_including_hub_at_ack": 4,
     "reviewers": [
       {
-        "id": "310fc56c-e3eb-4ee3-b446-cbab9737f260",
+        "id": "9fb44612-03d2-4f7a-b6bc-e2eee9abedd3",
         "route": "openai-codex/gpt-6-astra",
         "effort": "medium",
         "status": "running_at_ack",
-        "deadline": "2026-11-11T03:38:30+01:00"
+        "deadline": "2026-11-11T04:19:30+01:00"
       },
       {
-        "id": "dd99f72b-d215-45ae-9a5e-9b488fa90d9d",
+        "id": "ed099146-a7c6-4ee0-8c15-b11798472aa1",
         "route": "openai-codex/gpt-6.1-sol",
         "effort": "high",
         "status": "running_at_ack",
-        "deadline": "2026-11-11T03:38:30+01:00"
+        "deadline": "2026-11-11T04:19:30+01:00"
       }
-    ]
+    ],
+    "install_prerequisite": {
+      "state": "bundled_corepack_pnpm_shims_enabled; managed_shell_pnpm11.24.0",
+      "profile_files_unchanged": true,
+      "manager_retry": "HUB-INBOX-003 one retry only; actual Host success pending",
+      "plugin_installed": false
+    },
+    "broker_checkpoint": "2026-11-11T04:22:00+01:00",
+    "plugin_checkpoint": "2026-11-11T04:05:00+01:00",
+    "latest_known_state": "hub+2newSPRreviewers+onepluginfinalcorrectionat03:55ack=4of6; source approvalpending"
   },
   "hourly_supervision": {
     "last_at": "2026-11-11T02:06:50.822Z",
@@ -305,5 +380,13 @@
     "state": "completed_unreviewed",
     "artifact": "/home/juanbeck/uah-experiments/night-20261111/successor-contracts-preflight.md",
     "implementation_authorized": false
+  },
+  "remote_observation": {
+    "at": "2026-11-11T03:48:55+01:00",
+    "head": "3f533252aea1c9e199ef8064eee538512e327707",
+    "origin_same": true,
+    "reflog": "update by push at03:26:16Madrid",
+    "actor": "unattributed external activity; original GRILL did not issue push",
+    "authority": "No new coordination or sprint push permission inferred"
   }
 }
