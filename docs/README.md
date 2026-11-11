@@ -5,6 +5,8 @@ generated HTML companions; regenerate them after canonical edits.
 
 ## Plans
 
+- [PR delivery status](plans/pr-delivery-status.md): source identities and the
+  separate local-review, hosted-CI, merge, and milestone states.
 - [Implementation masterplan](plans/universal_agentic_harness_masterplan.md):
   H0-H6 delivery spine and current qualification gates.
 - [Development log](plans/universal_agentic_harness_development_log.md):
@@ -35,6 +37,15 @@ generated HTML companions; regenerate them after canonical edits.
 - [Agent lifecycle O1 example](artifacts/observatory/o1_h1_agent_lifecycle.html):
   synthetic fixed-model/fake-provider evidence only.
 
+## Research proposal
+
+- [Harness2, UniiChat, and bounded harness improvement](artifacts/research/2026-10-20_uah_harness2_uniichat_and_bounded_rsi.md):
+  source observations and unexecuted design proposals; no runtime or milestone
+  qualification.
+- [Research-to-sprint roadmap](plans/harness_research_to_sprints.md): maps the
+  dossier's six existing comparisons to owner and gate dependencies. It does
+  not dispatch those studies or change the implementation masterplan.
+
 ## Status and publication boundary
 
 H0, H1, and O1 remain partial; H2 NAO parity is unqualified. These documents
@@ -45,7 +56,13 @@ historical fixture files under `artifacts/reviews/` exist only as inputs to
 `tests/test_admission_active_provenance.py`; they are not published review
 reports. Historical receipt filenames cited in the canonical Markdown remain
 plain-text references for traceability; their source reports are outside this
-product candidate.
+product candidate. The Harness2/UniiChat dossier is research documentation;
+its proposed adaptations do not establish completed experiments, release
+evidence, or adopted runtime architecture.
+
+The [contribution guide](../CONTRIBUTING.md), [release process](RELEASING.md),
+and [coordination policy](coordination/README.md) describe repository workflow.
+The status page is a dated snapshot and does not close an implementation gate.
 
 ## Rendering and local checks
 

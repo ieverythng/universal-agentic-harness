@@ -6,6 +6,488 @@
 **Extends:** `../architecture/universal_agentic_harness_foundation.md` and `../architecture/neural_workbench_adaptive_ab_harness.md`
 **Decision owner:** UAH H0-H2 core; NeuralWorkbench H3+ companion track; NAO remains the first reference environment
 
+## Delivery board snapshot
+
+The shared **Delivery status** describes work, not GitHub publication: **Draft** is proposed or unstarted work; **Open** is work underway; **Ready for review** is an exact candidate with its stated checks and independent review complete; **Closed** is an ended scope with an explicit outcome. The actual GitHub PR state is a separate card fact. An Open delivery may have no remote PR, and a Closed delivery may be merged or closed without merge. A draft plan, pushed branch, or merged PR does not establish an H-gate result.
+
+This static view includes PR1, the PR2 delivery branch and SPR-01..10. The filter applies the same workflow meaning to delivery and sprint records. Snapshot dates preserve when publication, local scaffold and readiness facts were observed.
+
+```uah-tracker
+{
+  "snapshot_date": "2026-11-03",
+  "snapshot_note": "Static snapshot observed before the final independent review on 2026-11-03 at 18:43 UTC. GitHub lists PR #1 as merged and no PR2 as of this check; the codex/uah-pr2-docs branch is pushed at d97fadd. All ten sprint plans remain planning-only, blocked on predecessors, and unauthorized for execution. The local UAH, NAO, and Workbench observations are not implementation or qualification evidence. No live polling occurs. H0, H1, O1, and H2 remain open.",
+  "items": [
+    {
+      "id": "PR #1",
+      "title": "PR1, portable UAH kernel and recorded NAO baseline",
+      "kind": "pull_request",
+      "repo": "UAH",
+      "state": "Closed",
+      "summary": "Merged into main on 2026-10-28. The partial H0/H1 baseline closes no release gate.",
+      "url": "https://github.com/ieverythng/universal-agentic-harness/pull/1",
+      "details": [
+        {
+          "label": "GitHub state",
+          "value": "Merged, PR #1"
+        },
+        {
+          "label": "Merge commit",
+          "value": "d9eb84a04099431d774f459792bcd16524ab54ce"
+        },
+        {
+          "label": "Release state",
+          "value": "v0.1 tag not created"
+        },
+        {
+          "label": "H-gate state",
+          "value": "H0, H1, O1, and H2 remain open"
+        }
+      ]
+    },
+    {
+      "id": "PR2 branch",
+      "title": "PR2 documentation candidate branch",
+      "kind": "pull_request",
+      "repo": "UAH",
+      "state": "Open",
+      "summary": "Documentation/viewer work is underway on the pushed branch; no GitHub PR2 exists at this snapshot.",
+      "details": [
+        {
+          "label": "Branch state",
+          "value": "Pushed"
+        },
+        {
+          "label": "GitHub PR state",
+          "value": "No PR opened"
+        },
+        {
+          "label": "Branch head",
+          "value": "d97fadd4b84f1dee1d5b2434eb88030ec6146e31"
+        },
+        {
+          "label": "Main base",
+          "value": "d9eb84a04099431d774f459792bcd16524ab54ce"
+        },
+        {
+          "label": "Local worktree",
+          "value": "Observed clean before viewer handoff; human uv.lock retains requires-python >=3.14"
+        },
+        {
+          "label": "Viewer candidate",
+          "value": "Under final exact-byte review at this snapshot; consult the delivery receipt for its verdict"
+        },
+        {
+          "label": "H-gate effect",
+          "value": "None"
+        }
+      ]
+    },
+    {
+      "id": "SPR-01",
+      "title": "Historical replay and authority-bound ingress",
+      "kind": "sprint",
+      "repo": "UAH",
+      "state": "Draft",
+      "summary": "Preserve lifecycle history and require authorized task ingress across restart and duplicate delivery.",
+      "details": [
+        {
+          "label": "Planning gate",
+          "value": "H0-H1"
+        },
+        {
+          "label": "Release target",
+          "value": "v0.2-v0.4"
+        },
+        {
+          "label": "Dependencies",
+          "value": "None"
+        },
+        {
+          "label": "Proposed branch",
+          "value": "codex/sprint-01-replay-ingress"
+        },
+        {
+          "label": "Local scaffold",
+          "value": "Worktree on stale base eddfa6d; three untracked planning files only"
+        },
+        {
+          "label": "Remote branch",
+          "value": "No proposed sprint ref observed"
+        },
+        {
+          "label": "Execution authority",
+          "value": "Not authorized"
+        }
+      ]
+    },
+    {
+      "id": "SPR-02",
+      "title": "Canonical contracts and exact-budget coverage",
+      "kind": "sprint",
+      "repo": "UAH",
+      "state": "Draft",
+      "summary": "Close typed contract and budget-control cases before runtime or environment dispatch.",
+      "details": [
+        {
+          "label": "Planning gate",
+          "value": "H0-H1"
+        },
+        {
+          "label": "Release target",
+          "value": "v0.2-v0.4"
+        },
+        {
+          "label": "Dependencies",
+          "value": "SPR-01"
+        },
+        {
+          "label": "Proposed branch",
+          "value": "codex/sprint-02-contract-budgets"
+        },
+        {
+          "label": "Local scaffold",
+          "value": "Worktree on stale base eddfa6d; three untracked planning files only"
+        },
+        {
+          "label": "Remote branch",
+          "value": "No proposed sprint ref observed"
+        },
+        {
+          "label": "Execution authority",
+          "value": "Not authorized"
+        }
+      ]
+    },
+    {
+      "id": "SPR-03",
+      "title": "Task-local history and compiler-owned context",
+      "kind": "sprint",
+      "repo": "UAH",
+      "state": "Draft",
+      "summary": "Keep task context attributable to verified originals and compiler policy.",
+      "details": [
+        {
+          "label": "Planning gate",
+          "value": "H1/O1"
+        },
+        {
+          "label": "Release target",
+          "value": "v0.3-v0.4"
+        },
+        {
+          "label": "Dependencies",
+          "value": "SPR-01, SPR-02"
+        },
+        {
+          "label": "Proposed branch",
+          "value": "codex/sprint-03-task-history"
+        },
+        {
+          "label": "Local scaffold",
+          "value": "Worktree on stale base eddfa6d; three untracked planning files only"
+        },
+        {
+          "label": "Remote branch",
+          "value": "No proposed sprint ref observed"
+        },
+        {
+          "label": "Execution authority",
+          "value": "Not authorized"
+        }
+      ]
+    },
+    {
+      "id": "SPR-04",
+      "title": "Owner-evidence closure and advisory Observatory",
+      "kind": "sprint",
+      "repo": "UAH",
+      "state": "Draft",
+      "summary": "Project owner-issued evidence and replay state without adding write authority.",
+      "details": [
+        {
+          "label": "Planning gate",
+          "value": "H1/O1"
+        },
+        {
+          "label": "Release target",
+          "value": "v0.3-v0.4"
+        },
+        {
+          "label": "Dependencies",
+          "value": "SPR-02, SPR-03"
+        },
+        {
+          "label": "Proposed branch",
+          "value": "codex/sprint-04-evidence-observatory"
+        },
+        {
+          "label": "Local scaffold",
+          "value": "Worktree on stale base eddfa6d; three untracked planning files only"
+        },
+        {
+          "label": "Remote branch",
+          "value": "No proposed sprint ref observed"
+        },
+        {
+          "label": "Execution authority",
+          "value": "Not authorized"
+        }
+      ]
+    },
+    {
+      "id": "SPR-05",
+      "title": "Bounded activation, recovery, and accounting",
+      "kind": "sprint",
+      "repo": "UAH",
+      "state": "Draft",
+      "summary": "Bound activation recovery and attributable usage accounting under explicit owner policy.",
+      "details": [
+        {
+          "label": "Planning gate",
+          "value": "H1; H3 foundation"
+        },
+        {
+          "label": "Release target",
+          "value": "v0.3-v0.4; later H3"
+        },
+        {
+          "label": "Dependencies",
+          "value": "SPR-02, SPR-03, SPR-04"
+        },
+        {
+          "label": "Proposed branch",
+          "value": "codex/sprint-05-runtime-accounting"
+        },
+        {
+          "label": "Local scaffold",
+          "value": "Worktree on stale base eddfa6d; three untracked planning files only"
+        },
+        {
+          "label": "Remote branch",
+          "value": "No proposed sprint ref observed"
+        },
+        {
+          "label": "Execution authority",
+          "value": "Not authorized"
+        }
+      ]
+    },
+    {
+      "id": "SPR-06",
+      "title": "Controlled conformance and separately gated ablation",
+      "kind": "sprint",
+      "repo": "UAH",
+      "state": "Draft",
+      "summary": "Prepare controlled conformance and ablation evidence without claiming H2 closure.",
+      "details": [
+        {
+          "label": "Planning gate",
+          "value": "H1/O1 toward H2"
+        },
+        {
+          "label": "Release target",
+          "value": "Before v0.5"
+        },
+        {
+          "label": "Dependencies",
+          "value": "SPR-02, SPR-04, SPR-05"
+        },
+        {
+          "label": "Proposed branch",
+          "value": "codex/sprint-06-conformance"
+        },
+        {
+          "label": "Local scaffold",
+          "value": "Worktree on stale base eddfa6d; three untracked planning files only"
+        },
+        {
+          "label": "Remote branch",
+          "value": "No proposed sprint ref observed"
+        },
+        {
+          "label": "Execution authority",
+          "value": "Not authorized"
+        }
+      ]
+    },
+    {
+      "id": "SPR-07",
+      "title": "Complete Python NAO planner ingress/egress parity",
+      "kind": "sprint",
+      "repo": "UAH",
+      "state": "Draft",
+      "summary": "Qualify the Python planner path through projection, gate, fake owner, and replay.",
+      "details": [
+        {
+          "label": "Planning gate",
+          "value": "H2"
+        },
+        {
+          "label": "Release target",
+          "value": "v0.5"
+        },
+        {
+          "label": "Dependencies",
+          "value": "SPR-01, SPR-02, SPR-03, SPR-04, SPR-05, SPR-06"
+        },
+        {
+          "label": "Proposed branch",
+          "value": "codex/sprint-07-python-nao"
+        },
+        {
+          "label": "Local scaffold",
+          "value": "Worktree on stale base eddfa6d; three untracked planning files only"
+        },
+        {
+          "label": "Remote branch",
+          "value": "No proposed sprint ref observed"
+        },
+        {
+          "label": "Execution authority",
+          "value": "Not authorized"
+        }
+      ]
+    },
+    {
+      "id": "SPR-08",
+      "title": "Native NAO ROS integration with fake effects",
+      "kind": "sprint",
+      "repo": "NAO",
+      "state": "Draft",
+      "summary": "Validate the native ROS path after Python parity, with effects controlled by a fake owner.",
+      "details": [
+        {
+          "label": "Planning gate",
+          "value": "H2.1"
+        },
+        {
+          "label": "Release target",
+          "value": "v0.6"
+        },
+        {
+          "label": "Dependencies",
+          "value": "SPR-07"
+        },
+        {
+          "label": "Proposed branch",
+          "value": "codex/sprint-08-native-nao"
+        },
+        {
+          "label": "Local scaffold",
+          "value": "NAO worktree at adfcb269; three untracked planning files; no tracked code changes"
+        },
+        {
+          "label": "Remote branch",
+          "value": "No proposed sprint ref observed"
+        },
+        {
+          "label": "Execution authority",
+          "value": "Not authorized"
+        }
+      ]
+    },
+    {
+      "id": "SPR-09",
+      "title": "UAH host attachment for Workbench BASE",
+      "kind": "sprint",
+      "repo": "UAH",
+      "state": "Draft",
+      "summary": "Attach the pinned Workbench protocol through the UAH host boundary.",
+      "details": [
+        {
+          "label": "Planning gate",
+          "value": "H3 BASE attachment"
+        },
+        {
+          "label": "Release target",
+          "value": "v0.7-v1.0"
+        },
+        {
+          "label": "Dependencies",
+          "value": "SPR-04, SPR-05, SPR-06, SPR-08, SPR-10"
+        },
+        {
+          "label": "Proposed branch",
+          "value": "codex/sprint-09-wb-host"
+        },
+        {
+          "label": "Local scaffold",
+          "value": "Worktree on stale base eddfa6d; three untracked planning files only"
+        },
+        {
+          "label": "Remote branch",
+          "value": "No proposed sprint ref observed"
+        },
+        {
+          "label": "Execution authority",
+          "value": "Not authorized"
+        }
+      ]
+    },
+    {
+      "id": "SPR-10",
+      "title": "Bounded symbolic Workbench Base engine",
+      "kind": "sprint",
+      "repo": "Workbench",
+      "state": "Draft",
+      "summary": "Develop the bounded companion engine after its contract and predecessor gates.",
+      "details": [
+        {
+          "label": "Planning gate",
+          "value": "H3 BASE companion"
+        },
+        {
+          "label": "Release target",
+          "value": "UAH v0.7-v1.0; companion version separate"
+        },
+        {
+          "label": "Dependencies",
+          "value": "SPR-04, SPR-05, SPR-06, SPR-08"
+        },
+        {
+          "label": "Proposed branch",
+          "value": "codex/sprint-10-wb-base"
+        },
+        {
+          "label": "Local scaffold",
+          "value": "Worktree found at ae4a0eef in its separate planning repository; three untracked planning files, implementation not started"
+        },
+        {
+          "label": "Remote branch",
+          "value": "No proposed sprint ref observed"
+        },
+        {
+          "label": "Execution authority",
+          "value": "Not authorized"
+        },
+        {
+          "label": "Planning source identity",
+          "value": "Neural-Wokbench repository; codex/sprint-10-wb-base branch; observed revision ae4a0eef (2026-11-03 planning snapshot)"
+        }
+      ]
+    }
+  ]
+}
+```
+
+### H0-H2 workpackage crosswalk
+
+The evidence column refers to reviewed main at d9eb84a. The PR2 branch is based on that main and adds a documentation candidate; it is not merged. These rows summarize remaining work and do not change any acceptance gate.
+
+| Work package | Existing sprint | Reviewed main evidence at d9eb84a | Remaining gate |
+| --- | --- | --- | --- |
+| H0-C1: portable contract coverage | SPR-02 after SPR-01 | Versioned contract owners and encoders exist for some types. | Complete round-trip, tamper, unsupported-version, and exact-identity coverage. |
+| H0-C2: historical replay and fresh-use policy | SPR-01 | Owner-bound task-start authority and resume/notify ingress are present. | Verify authentic historical fixture provenance and strict rejection of fresh use from legacy history. Do not manufacture records. |
+| H0-C3: projection, permissions, and output contracts | SPR-02, SPR-04 | Input schema validation and two-stage admission are present. | Complete output-schema, effect, freshness, and permission coverage. |
+| H0-C4: owner evidence and false-completion rejection | SPR-04, SPR-06 | Owner evidence paths are present. | Complete stale-evidence, false-completion, and failure qualification. |
+| H0-C5: synthetic lifecycle and replay qualification | SPR-01, SPR-06 | Partial source and fixture coverage exists. | Pass the full H0/H1 acceptance matrix with replay evidence. |
+| H1-R1: task context and invocation lifecycle | SPR-03, SPR-05 | Actor, invocation, prompt, and replay components exist. | Complete durable task context, lifecycle failure handling, and recovery cases. |
+| H1-R2: budget, timeout, cancellation, and recovery | SPR-02, SPR-05 | Predispatch cancellation and basic accounting are present. | Qualify in-flight supersession, late settlement, task-level cost accounting, and recovery. |
+| H1-R3: failure suite and O1 provenance | SPR-04, SPR-06 | A read-only O1 slice is present. | Complete the H1 failure suite and provenance views; O1 is not qualified. |
+| H2-P1: NAO pack, projection, and report_result ownership | SPR-07 | Qualification and fake artifacts exist. | Freeze the domain pack and projections, then complete owner review. |
+| H2-P2: Python planner ingress/egress | SPR-07 | A complete package-owned parity path is not qualified. | Pass projection, gate, fake-owner dispatch, evidence, and replay cases. |
+| H2-P3: parity and outcome matrix | SPR-06, SPR-07 | No H2 parity result is claimed. | Classify disagreements across success, failure, and best-effort deficit cases before H2. |
+
 ## 1. Executive Decision
 
 The project should build a Universal Agentic Harness, but not by replacing the
@@ -59,6 +541,44 @@ tag records the H3 milestone only; it does not imply H4 or H5 completion,
 cross-domain conformance, or release-gate completion. These targets do not
 authorize tags or publication. H0, H1, O1, and H2 remain open until their
 stated acceptance evidence passes.
+
+### Current release status (2026-10-28)
+
+The `v0.1` reviewed migration baseline is the PR1 publication and records
+partial H0/H1 evidence. It closes neither milestone. No `v0.1` tag has been
+created or authorized; the tag remains under human consideration. The
+implementation targets in D-20261017-07 remain as stated above. H6 remains
+research only and receives no release assignment here.
+
+### Current publication state (updated 2026-11-03; PR1 evidence dated 2026-10-28)
+
+PR1 [merged into `main`](https://github.com/ieverythng/universal-agentic-harness/pull/1)
+on October 28 at merge commit `d9eb84a04099431d774f459792bcd16524ab54ce`
+(tree `f611dfbb9f8b6dfc5cd8800bef8e2fe3879fa3aa`). Its 137-state local review
+baseline received Spec and Standards `APPROVE` verdicts; the published PR1
+commit also includes `uv.lock` and the coordination policy README, outside that
+review manifest. The head-associated hosted CI run reported all three required
+Python jobs passed. Its pull-request workflow checked synthetic merge commit
+`b7ef095c8599db7ee20b432d2ae5a57376a5d966`, whose tree matches the published
+PR1 head; see the [pull-request run](https://github.com/ieverythng/universal-agentic-harness/actions/runs/39704657812).
+The post-merge push run on `d9eb84a04099431d774f459792bcd16524ab54ce` also
+reported success with all three jobs complete
+([main run](https://github.com/ieverythng/universal-agentic-harness/actions/runs/40683070828)).
+The merged commit is the verified `main` base for the current documentation
+candidate. PR2 has not been opened, and this candidate's independent review and
+hosted CI outcomes are not asserted here. These publication states do not
+close H0, H1, O1, or H2. See the [delivery status](pr-delivery-status.md) for
+the review and source identities. At 2026-11-03 15:00 UTC, the pushed PR2 base branch codex/uah-pr2-docs was at d97fadd4b84f1dee1d5b2434eb88030ec6146e31. GitHub listed PR1 as merged and no PR2 existed. This viewer candidate was private and unreviewed at that snapshot. The new uv.lock Python requirement is >=3.14. No hosted-CI or milestone-closure claim follows.
+
+The [Harness2/UniiChat dossier](../artifacts/research/2026-10-20_uah_harness2_uniichat_and_bounded_rsi.md)
+records primary-source observations and unexecuted proposals. Its original
+three-file research unit received final Spec and Standards `APPROVE` verdicts;
+those private receipts do not approve this publication copy or the PR2
+candidate. The [research-to-sprint map](harness_research_to_sprints.md) keeps
+the broader trajectory-learning objective, including the AB/ML-object strand,
+and maps six existing unexecuted comparisons to their owners and gates. The
+Workbench feedback loop remains a Workbench-owned H3 research target; UAH does
+not add a second search engine or relax H3/H4 review and promotion boundaries.
 
 ## 2. Target Contract
 

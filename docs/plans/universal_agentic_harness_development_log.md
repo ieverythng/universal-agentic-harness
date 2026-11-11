@@ -1,7 +1,7 @@
 # Universal Agentic Harness: Development Log
 
 **Purpose:** Practical implementation ledger linked to the semantic masterplan  
-**Updated:** 2026-10-21
+**Updated:** 2026-10-28
 **Target:** UAH H2 NAO planner qualification after ordered evidence gates pass
 **Current release boundary:** H0 contract spine, one H1 synthetic vertical
 slice, profile-bound state-update and new-task ingress, explicit NAO adapter
@@ -14,6 +14,57 @@ and actor rendering are present. Stale-effect-evidence policy, the live provider
 path, and H2 planner parity remain incomplete.
 
 ## Current state
+
+### 2026-10-28 12:13 UTC: PR1 merged; PR2 candidate re-frozen on main
+
+PR1 is [merged into `main`](https://github.com/ieverythng/universal-agentic-harness/pull/1)
+at `d9eb84a04099431d774f459792bcd16524ab54ce`, with tree
+`f611dfbb9f8b6dfc5cd8800bef8e2fe3879fa3aa`. Its published head
+`61301d731e801c5c160f45c8d121520c81d155df` has the same tree. The head-associated
+CI run reported all three required Python jobs passing; the pull-request
+workflow checked synthetic merge `b7ef095c8599db7ee20b432d2ae5a57376a5d966`,
+whose tree is the published PR1 tree. The source and run identities are in the
+[delivery status](pr-delivery-status.md). The push run on the merge commit
+also reported success with all three jobs complete
+([main run](https://github.com/ieverythng/universal-agentic-harness/actions/runs/40683070828)).
+
+The `v0.1` reviewed migration baseline provides partial H0/H1 evidence and
+closes neither milestone. No `v0.1` tag has been created or authorized; the tag
+remains under human consideration. H0/H1/O1/H2 remain open. The implementation
+release targets remain H0 `v0.2`, H1/O1 `v0.3`-`v0.4`, complete Python NAO H2
+`v0.5`, native H2.1 `v0.6`, full H3 `v0.7`-`v1.0`, and H4 `v1.5`; H5+ remain
+unassigned and H6 remains research only.
+
+At this snapshot, PR2 has not been opened. The documentation candidate is
+refrozen against the merged main commit above and is awaiting the fresh
+independent review pair. Its review and hosted CI outcomes are not asserted in
+this entry. The selected unit remains limited to the twelve documentation
+paths; it does not close a release milestone.
+
+### 2026-10-22: PR1 published; PR2 remains prospective
+
+PR1 is [open and unmerged](https://github.com/ieverythng/universal-agentic-harness/pull/1)
+at commit `61301d731e801c5c160f45c8d121520c81d155df`, tree
+`f611dfbb9f8b6dfc5cd8800bef8e2fe3879fa3aa`. The fresh local Spec
+(`gpt-6.1-sol`, requested `xhigh`) and Standards (`gpt-5.6-sol`, requested
+`xhigh`) reviews approved the exact 137-state baseline: tree
+`fc198f4c297e54b00e6653dad0bbb856b6b8054d`, manifest SHA-256
+`1ae0517bc6a75b370aa63ac65235465e5be6506f403fefd5a67bf35d779d1e29`.
+The human-published commit adds `uv.lock` and `docs/coordination/README.md`
+beyond that baseline review. The head-associated pull-request run reported all
+three required hosted Python CI jobs passed as of 2026-10-22 01:16:50 UTC
+([run](https://github.com/ieverythng/universal-agentic-harness/actions/runs/39704657812)).
+Its workflow checked synthetic merge
+`b7ef095c8599db7ee20b432d2ae5a57376a5d966`, with the same tree as the PR1 head.
+Remote `main` remains `eddfa6d28ebcc6f2967c0568a6ed2d29eccf665e`; PR1 has not
+merged. H0, H1, O1, and H2 remain open.
+
+The PR2 documentation candidate is based prospectively on the exact PR1 commit.
+This does not make it main-ready. After PR1 merges, rebase it onto actual
+`main`, refreeze the selected paths, and repeat the applicable checks and
+independent review before staging. The current PR2 review result is recorded
+outside this publication snapshot. See the [delivery status](pr-delivery-status.md)
+for the source and CI identities.
 
 ### 2026-10-21: PR1-WIRE-06 resumed repair, projection review pending
 
@@ -41,6 +92,29 @@ overrides are set. The recorded O1 canary was regenerated from the versioned
 events and its freshness test passes. Exact reconstruction, packaging checks,
 and the fresh review pair remain pending. This is candidate-local evidence,
 not H0/H1/O1 closure or H2 parity.
+
+### 2026-10-20: Harness2/UniiChat research fold-in
+
+The [dossier](../artifacts/research/2026-10-20_uah_harness2_uniichat_and_bounded_rsi.md)
+records source observations and unexecuted proposals from pinned Harness2,
+UniiChat, and paper revisions. A later custody check binds its original
+source-review approval to the exact three-file final manifest
+`review-unit.json` (SHA-256
+`522a27e815a9f973567e81930c18e520fd45918f6b94b781e7b24aea6e522803`) and the
+original dossier bytes (SHA-256
+`5891b87986ae1455a06f09d72c2ecabf864d5e39f352c38ee5e65032e1a07fcb`). Final
+Spec and Standards receipts both record `APPROVE`, with SHA-256 values
+`00a5b13230b86a3727f3b4822aa8ec954cc9358e63fb16acf192a906cb259f68` and
+`be46aa4d61b67010861773149e5f426bfef94d5bd9c4f12f8e3544b18f199b04`,
+respectively. These private receipts approve only that original unit, not the
+publication edits, runtime adoption, PR2 candidate, or milestone qualification.
+The [roadmap](harness_research_to_sprints.md) maps the six existing A–F
+comparisons to current sprint gates and owner boundaries. No experiment, model,
+benchmark, simulator, robot, or training run is reported here. This PR2
+candidate was prepared for review against a prospective PR1 reconstruction
+while PR1 was unmerged, as recorded at the time. After PR1 merged on October
+28, the new candidate was refrozen against actual `main`; see the current entry
+above.
 
 ### 2026-10-17: release milestones
 

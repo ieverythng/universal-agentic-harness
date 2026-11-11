@@ -6,8 +6,10 @@ from __future__ import annotations
 import argparse
 from dataclasses import dataclass
 import html
+import json
 import re
 from pathlib import Path
+from urllib.parse import urlparse
 
 
 def _escape(text: str) -> str:
@@ -63,6 +65,113 @@ def _wrapped_list_text(lines: list[str], start: int, initial: str) -> tuple[str,
         parts.append(raw.strip())
         index += 1
     return " ".join(parts), index
+
+
+_TRACKER_STATES = ("Draft", "Open", "Ready for review", "Closed")
+_TRACKER_REPOSITORIES = ("UAH", "NAO", "Workbench")
+_TRACKER_KINDS = {"pull_request": "Delivery record", "sprint": "Sprint plan"}
+
+
+def _render_uah_tracker(code_text: str) -> str:
+    data = json.loads(code_text)
+    if not isinstance(data, dict) or not isinstance(data.get("items"), list):
+        raise ValueError("uah-tracker requires an object with an items array")
+    snapshot = data.get("snapshot_date")
+    note = data.get("snapshot_note")
+    if not isinstance(snapshot, str) or not isinstance(note, str):
+        raise ValueError("uah-tracker requires snapshot_date and snapshot_note strings")
+
+    cards = []
+    seen_ids = set()
+    required = ("id", "title", "kind", "repo", "state", "summary")
+    for item in data["items"]:
+        if not isinstance(item, dict) or any(
+            not isinstance(item.get(key), str) for key in required
+        ):
+            raise ValueError("each uah-tracker item requires its string fields")
+        if item["kind"] not in _TRACKER_KINDS:
+            raise ValueError("uah-tracker item has an unsupported record kind")
+        if item["repo"] not in _TRACKER_REPOSITORIES:
+            raise ValueError("uah-tracker item has an unsupported repository")
+        if item["state"] not in _TRACKER_STATES:
+            raise ValueError("uah-tracker item has an unsupported state")
+        if item["id"] in seen_ids:
+            raise ValueError(f"duplicate uah-tracker item id: {item['id']}")
+        seen_ids.add(item["id"])
+
+        details = item.get("details", [])
+        if not isinstance(details, list) or any(
+            not isinstance(row, dict)
+            or not isinstance(row.get("label"), str)
+            or not isinstance(row.get("value"), str)
+            for row in details
+        ):
+            raise ValueError("uah-tracker details require label and value strings")
+
+        url = item.get("url")
+        if url is not None:
+            if not isinstance(url, str):
+                raise ValueError("uah-tracker url must be a string")
+            parsed_url = urlparse(url)
+            if parsed_url.scheme != "https" or parsed_url.netloc != "github.com":
+                raise ValueError("uah-tracker links must use the trusted GitHub host")
+            title = (
+                f'<a class="tracker-title-link" href="{_escape(url)}">'
+                f'{_escape(item["title"])}</a>'
+            )
+        else:
+            title = _escape(item["title"])
+
+        facts = "".join(
+            f'<div><dt>{_escape(row["label"])}</dt>'
+            f'<dd>{_escape(row["value"])}</dd></div>'
+            for row in details
+        )
+        cards.append(
+            f'<article class="tracker-card" data-kind="{_escape(item["kind"])}" '
+            f'data-status="{_escape(item["state"].lower())}" '
+            f'data-repo="{_escape(item["repo"].lower())}">'
+            f'<div class="tracker-card__top"><span class="tracker-id">'
+            f'{_escape(item["id"])}</span>'
+            f'<span class="tracker-kind">{_TRACKER_KINDS[item["kind"]]}</span>'
+            f'<span class="tracker-state">{_escape(item["state"])}</span></div>'
+            f'<h3>{title}</h3>'
+            f'<p class="tracker-summary">{_escape(item["summary"])}</p>'
+            f'<dl class="tracker-facts">{facts}</dl></article>'
+        )
+
+    if not cards:
+        raise ValueError("uah-tracker requires at least one item")
+    repo_options = "".join(
+        f'<option value="{_escape(repo.lower())}">{_escape(repo)}</option>'
+        for repo in _TRACKER_REPOSITORIES
+    )
+    state_options = "".join(
+        f'<option value="{_escape(state.lower())}">{_escape(state)}</option>'
+        for state in _TRACKER_STATES
+    )
+    return (
+        f'<div class="uah-tracker" data-snapshot="{_escape(snapshot)}">'
+        f'<p class="tracker-intro">Static snapshot from {_escape(snapshot)}. '
+        'Delivery status describes workflow progress for all records. '
+        'Observed GitHub PR state and H-gate qualification are separate facts.</p>'
+        '<div class="tracker-controls" hidden>'
+        '<label>Search records<input type="search" name="query" autocomplete="off" '
+        'placeholder="PR, sprint, gate, branch"></label>'
+        '<label>Delivery status<select name="status"><option value="all">All statuses</option>'
+        f'{state_options}</select></label>'
+        '<label>Repository<select name="repo"><option value="all">All repositories</option>'
+        f'{repo_options}</select></label>'
+        '<button type="button" class="tracker-clear">Clear filters</button>'
+        '</div>'
+        f'<p class="tracker-count" role="status" aria-live="polite">'
+        f'{len(cards)} records</p>'
+        f'<div class="tracker-grid" aria-label="Delivery and sprint records">'
+        f'{"".join(cards)}</div>'
+        '<p class="tracker-empty" role="status" hidden>'
+        'No records match these filters.</p>'
+        f'<p class="tracker-note">{_escape(note)}</p></div>'
+    )
 
 
 def _render_mermaid(code_text: str) -> str:
@@ -392,6 +501,8 @@ def render_markdown(markdown_text: str) -> tuple[str, str]:
                 raw_code_text = "\n".join(code_lines)
                 if code_lang == "mermaid":
                     output.append(_render_mermaid(raw_code_text))
+                elif code_lang == "uah-tracker":
+                    output.append(_render_uah_tracker(raw_code_text))
                 else:
                     code_text = _escape(raw_code_text)
                     cls = f' class="language-{_escape(code_lang)}"' if code_lang else ""
@@ -547,6 +658,8 @@ def render_markdown(markdown_text: str) -> tuple[str, str]:
         raw_code_text = "\n".join(code_lines)
         if code_lang == "mermaid":
             output.append(_render_mermaid(raw_code_text))
+        elif code_lang == "uah-tracker":
+            output.append(_render_uah_tracker(raw_code_text))
         else:
             code_text = _escape(raw_code_text)
             cls = f' class="language-{_escape(code_lang)}"' if code_lang else ""
