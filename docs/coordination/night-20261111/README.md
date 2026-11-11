@@ -1,12 +1,18 @@
-# night-20261111 — active coordination index
+# night-20261111 — partial-delivery closeout index
 
 Owner:GRILL. Start2026-11-11 01:48Madrid; hard stop09:48Madrid. Writer requestedSol/High; actual serving effort not independently attested. User approved global12activeworkers, serial cumulative local SPR01–05 handoffs, phaseAexplorer→phaseBconfirmedcontrols and H3planning only. [Approved contract](</home/juanbeck/uah-experiments/night-20261111/CONTRACT.md>). Historical boards outside this directory are evidence, not active dispatch.
 
-## Current completed prerequisite
+## Final status — objective not achieved
+
+Read the [human handoff](<CLOSEOUT.md>) and [final control ledger](<CONTROL.json>). PR2 merged; SPR-01/02 are independently approved and locally staged. SPR-03 is tested private v5 but final independent reviews are incomplete (3/26 and17/26): not accepted/staged. SPR-04/05 are preparation-only and parked. Explorer source/install is parked, never installed; phase B never started. H3 initial proposals are complete but unreviewed/UNRUN.
+
+Product work stopped at09:00 under the final park condition. Hub closeout published09:06:38: all34descendants inactive, known jobs collected/watchers stopped, no successor. Root verified all staged/source hashes, index counts14/17/0/0/0 and untouched successor bases. The09:48Madrid hard stop remains unchanged; no sprint commits/pushes or Root coordination push. Automatic goal continuation is disarmed, objective not marked complete.
+
+## Completed prerequisite
 
 [PR2](https://github.com/ieverythng/universal-agentic-harness/pull/2) merged5e6734173f2f755430f85e2fbe7d937bfbaa8b7d; exact humanheade48ca754… matched all18approvedstates. Description includes Mermaid and JS/CSS explanation. All3PRCIjobs and [postmerge mainCI](https://github.com/ieverythng/universal-agentic-harness/actions/runs/42934917523) passed. No branch deletion, gate bypass or source-fix push. Legacy gh edit failed before mutation; supportedRESTpublish/merge succeeded with exact-head guard.
 
-## Live phase / next gate
+## Historical phase progress — superseded by final status above
 
 The initial session, fixture, test and theory-custody preflights are complete. The failed headless-profile probe is closed, not a web-host worker. Fresh Creator session `session-dcf4380b-700b-4920-8a3d-037db77ed964` captured the saved Astra/Sol routes and selected `cordis`; its Astra/Medium fixed-fact smoke passed. This proves routing only, not source approval or capability. HUB-001 was acknowledged at 03:04:46 Madrid: phase-A read-only plugin and fresh-review broker, quota six including all descendants. It does not own the sprint writer or H3 research.
 

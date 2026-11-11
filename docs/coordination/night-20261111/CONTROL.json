@@ -2,7 +2,7 @@
   "version": 1,
   "campaign": "night-20261111",
   "orchestrator": "session-b4578032-f2ce-4f44-be24-9c2a0f1b0c35",
-  "updated_at": "2026-11-11T07:50:52.716Z",
+  "updated_at": "2026-11-11T08:10:11.674Z",
   "start": "2026-11-11T00:48:00Z",
   "hard_stop": "2026-11-11T08:48:00Z",
   "global_limit": 12,
@@ -380,7 +380,7 @@
     },
     {
       "id": "SPR-03",
-      "state": "FINALv5_TWO_NEWreviewersactive_ACK017_noapproval",
+      "state": "FINALv5_CHANGES_INCOMPLETE_PARKED_no_new_product_finding",
       "branch": "dsh/night-20261111-spr03",
       "worktree": "/home/juanbeck/uah-experiments/night-20261111/sprints/SPR-03",
       "base": "5e6734173f2f755430f85e2fbe7d937bfbaa8b7d",
@@ -418,7 +418,7 @@
       "full_sprint_closed": false,
       "preliminary_finding": "sameopaque modelinvocation_id/tooloperation_id mergesheterogeneousgroups and hidespending; Standardsactualpublicprobe, finalsealedpairpending",
       "review_ack": "/home/juanbeck/uah-experiments/night-20261111/dispatch/HUB-ACK-017.json",
-      "sealed_review_receipt": "/home/juanbeck/uah-experiments/night-20261111/dispatch/SPR03-REVIEWS-003.json",
+      "sealed_review_receipt": "/home/juanbeck/uah-experiments/night-20261111/dispatch/SPR03-REVIEWS-004.json",
       "blockers": [
         "nestedModelLease JSONarraypairscoercedbeforecontextobjectshapecheck",
         "Standards9of26full17partial; wholeinspectionincomplete"
@@ -426,25 +426,30 @@
       "repair_scope": "FINALSPR03-R3 <=7minabsolute08:25 productioncontextboundaryonly; nolegacyallocatorrewrite",
       "review_reports": [
         {
-          "sha256": "9437953fcabd31d3fa8db405972dbdd5852565f8dbf516dfcfaca8c77c92e84f",
-          "verdict": "CHANGES",
-          "whole_inspection_complete": false
+          "sha256": "605717fde1801b58f2a21d1afe43585ee0198bf1a0cc9171429e26b60a8167c5",
+          "verdict": "CHANGES_INCOMPLETE",
+          "fully_read": 3,
+          "incomplete": 23
         },
         {
-          "sha256": "50cdeaa06cbfbc39075ab247b381b5ef918a50fffedf559a599cd8b84dd5340a",
-          "verdict": "CHANGES",
-          "whole_inspection_complete": true
+          "sha256": "821027c342864ce696659f30485698aa65413d3374e3177d14665f24de495871",
+          "verdict": "CHANGES_INCOMPLETE",
+          "fully_read": 17,
+          "incomplete": 9
         }
       ],
       "review_deadline": "2026-11-11T09:00:00+01:00",
       "destination_baseline": "/home/juanbeck/uah-experiments/night-20261111/private/spr03-evidence/destination-baseline-root-26.json",
       "containment": "genuineownerrestoreandinvokerefuse; noprovider/start/debit/effectbypass",
       "whole_inspection_required_before_optional_matrix": true,
-      "park_source3_and_dependencies_if_next_CHANGES": true
+      "park_source3_and_dependencies_if_next_CHANGES": true,
+      "validated_new_product_defects": 0,
+      "park_at": "2026-11-11T09:00:00+01:00",
+      "no_further_repair_or_review_loop": true
     },
     {
       "id": "SPR-04",
-      "state": "dependency_wait",
+      "state": "not_implemented_PARKED_unapproved_predecessor",
       "branch": "dsh/night-20261111-spr04",
       "worktree": "/home/juanbeck/uah-experiments/night-20261111/sprints/SPR-04",
       "base": "5e6734173f2f755430f85e2fbe7d937bfbaa8b7d",
@@ -464,7 +469,7 @@
     },
     {
       "id": "SPR-05",
-      "state": "dependency_wait",
+      "state": "not_implemented_PARKED_unapproved_predecessor",
       "branch": "dsh/night-20261111-spr05",
       "worktree": "/home/juanbeck/uah-experiments/night-20261111/sprints/SPR-05",
       "base": "5e6734173f2f755430f85e2fbe7d937bfbaa8b7d",
@@ -540,7 +545,7 @@
     "astra_medium_smoke_passed": true
   },
   "reserved_creator_bootstrap_quota": 0,
-  "capacity_committed": 7,
+  "capacity_committed": 2,
   "planning_custody": {
     "state": "copied_verified",
     "files": 16,
@@ -561,8 +566,8 @@
   "hub_lease": {
     "id": "HUB-INBOX-001",
     "recipient": "session-dcf4380b-700b-4920-8a3d-037db77ed964",
-    "state": "ALLpluginPARKED; FINALSource3v5broker017requested09:00",
-    "quota_max_including_root": 6,
+    "state": "HUB018STOP_closeout_receipt_all34childreninactive_no_knownjobs",
+    "quota_max_including_root": 1,
     "checkpoint": "2026-11-11T08:15:00+01:00",
     "paths": [
       "/home/juanbeck/uah-experiments/night-20261111/plugin",
@@ -591,14 +596,14 @@
         "route": "openai-codex/gpt-6-astra",
         "effort": "medium",
         "actual_start": "2026-11-11T08:28:05+01:00",
-        "state": "active_at_ACK017"
+        "state": "completed_CHANGES_INCOMPLETE"
       },
       {
         "id": "6cadd42a-b4f9-4f7b-8433-e1056462d8d0",
         "route": "openai-codex/gpt-6.1-sol",
         "effort": "high",
         "actual_start": "2026-11-11T08:28:12+01:00",
-        "state": "active_at_ACK017"
+        "state": "completed_CHANGES_INCOMPLETE"
       }
     ],
     "install_prerequisite": {
@@ -640,7 +645,12 @@
     "ack013": "/home/juanbeck/uah-experiments/night-20261111/dispatch/HUB-ACK-013.json",
     "SPR03_R2_broker_checkpoint": "2026-11-11T08:15:00+01:00",
     "ack015": "/home/juanbeck/uah-experiments/night-20261111/dispatch/HUB-ACK-015.json",
-    "SPR03_final_broker_checkpoint": "2026-11-11T09:00:00+01:00"
+    "SPR03_final_broker_checkpoint": "2026-11-11T09:00:00+01:00",
+    "closeout_checkpoint": "2026-11-11T09:10:00+01:00",
+    "closeout_receipt": "/home/juanbeck/uah-experiments/night-20261111/dispatch/HUB-CLOSEOUT-018.json",
+    "closeout_published": "2026-11-11T09:06:38+01:00",
+    "new_workers_or_watchers_authorized": false,
+    "lifecycle_limit": "lastobservedclosingcompaction; scopedno-knownjobsnotglobalOSquiescence"
   },
   "hourly_supervision": {
     "scheduled_occurrence": "2026-11-11T08:48:00+01:00",
@@ -730,7 +740,14 @@
       "id": "bash-48ee900dc9354781",
       "state": "killed_collected_aftertimelyfreeze"
     },
-    "final_SPR03_v5_watch": "bash-93fc62d34fa748f1"
+    "final_SPR03_v5_watch": {
+      "id": "bash-93fc62d34fa748f1",
+      "state": "completed_collected"
+    },
+    "hub_closeout_watch": {
+      "id": "bash-2d676ddc51c7453b",
+      "state": "completed_collected"
+    }
   },
   "last_coordination_commit": "906634f",
   "supervision_history": [
@@ -759,5 +776,18 @@
     "human_requested_action": "send continue here to rearm",
     "existing_jobs_scheduled_supervision_authorized": true,
     "hard_stop_unchanged": true
+  },
+  "campaign_state": "parked_incomplete_closeout_published_no_product_successor",
+  "objective_achieved": false,
+  "final_preservation_receipt": "/home/juanbeck/uah-experiments/night-20261111/FINAL-PRODUCT-PRESERVATION-001.json",
+  "final_handoff": "docs/coordination/night-20261111/CLOSEOUT.md",
+  "shutdown": {
+    "root_descendants_running": 0,
+    "root_managed_jobs_running": 0,
+    "hub_descendants_inactive": 34,
+    "hub_known_running_jobs": 0,
+    "no_source_or_install_successor": true,
+    "hard_stop_unchanged": "2026-11-11T09:48:00+01:00",
+    "no_product_commit_push": true
   }
 }

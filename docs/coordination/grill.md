@@ -193,3 +193,7 @@ RESEARCH remains GPT 6.1 Sol /Medium; requested settings are not backend attesta
 Product implementation, tests and change docs live in assigned worktrees.
 GRILL's Git authority covers coordination/history only, with explicit same-named
 push destinations and no force. No automatic successor implementation/research.
+
+### Final campaign park — 09:00 Madrid
+
+Overall objective NOT achieved. [Closeout](<night-20261111/CLOSEOUT.md>) is authoritative: PR2merged; onlySPR01/02approved+staged; SPR03privatev5testedbutbothfinalreviewsINCOMPLETE(3/26,17/26), no validatednewproductdefect/noapproval; SPR04/05notimplemented. PluginALLsource/build/installPARKED/notinstalled, phaseBnotstarted. H3initialplanningunreviewed/UNRUN. Hubcloseout09:06:38all34inactive/knownjobscollected/no successor; Rootproductpreservationreceiptverifiesindex14/17/0/0/0, allHEAD5e, untouchedbases. No furtherrepair/review/integrationorinstallloop. Deadline09:48unchanged, goalautoactivationdisarmed/objectiveincomplete. Onlycompletedcoordinationcheckpointscommittedlocally, no pushes.

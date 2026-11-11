@@ -22,3 +22,7 @@ no silentpruning/priorpartialinheritance. ALL26changedproduct+2docexceptions,
 opaqueoutsideonly; no writerresults/priorverdict/history. FINALbudgetclosed:
 if fresh CHANGES/incomplete, park Source3/SRC04/05 dependencywork atRoot, not
 endless rescope or forced approval. Stop READY before08:25.
+
+## Root final decision — PARKED, not accepted or staged
+
+The final paired receipt SPR03-REVIEWS-004 was published08:59:05Madrid before09:00. Both verdicts are CHANGES/INCOMPLETE: Standards3/26fullyread23incomplete; Spec17/26fullyread9incomplete. No new validated product findings/NIT were established in these final reports. This is a whole-review evidence hold, not a new bug or approval. Root applies the final budget: no further repair/review loop and no Source4/5 implementation release. The159-file v5 private candidate and all prior reports remain intact; targetSPR03 remains143base/emptyindex. Writer1166tests/fullhooks does not replace missing independent inspection.
