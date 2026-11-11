@@ -2,11 +2,11 @@
   "version": 1,
   "campaign": "night-20261111",
   "orchestrator": "session-b4578032-f2ce-4f44-be24-9c2a0f1b0c35",
-  "updated_at": "2026-11-11T03:02:29.162Z",
+  "updated_at": "2026-11-11T03:25:55.727Z",
   "start": "2026-11-11T00:48:00Z",
   "hard_stop": "2026-11-11T08:48:00Z",
   "global_limit": 12,
-  "declared_active_quota": 0,
+  "declared_active_quota": 2,
   "merge_base": "5e6734173f2f755430f85e2fbe7d937bfbaa8b7d",
   "authority": {
     "coordination": "local path-scoped stage/commit completed checkpoints; no push",
@@ -159,6 +159,24 @@
       "transfer_staging": false,
       "artifact": "/home/juanbeck/uah-experiments/night-20261111/spr01-replay-repair-handoff.md",
       "result": "Fourintendedpublicreds fixed by2lineowner guard;492focused/979full/allhooksPASS; exactRdelta guarded into B"
+    },
+    {
+      "id": "6f600cec-d91c-4c6e-a868-71ac28e128b6",
+      "role": "DEV1-SPR02-exactbudget",
+      "state": "active",
+      "quota": 1,
+      "actual_start": "2026-11-11T04:22:51+01:00",
+      "deadline": "2026-11-11T05:22:51+01:00",
+      "source_root": "/home/juanbeck/uah-experiments/night-20261111/private/spr02-source"
+    },
+    {
+      "id": "96aa2c05-bd7a-4752-85f8-d406f99278bc",
+      "role": "DEV2-SPR02-adversarial-tests",
+      "state": "active",
+      "quota": 1,
+      "actual_start": "2026-11-11T04:22:51+01:00",
+      "deadline": "2026-11-11T04:42:51+01:00",
+      "source_writes": false
     }
   ],
   "failed_probes": [
@@ -172,12 +190,12 @@
   "sprints": [
     {
       "id": "SPR-01",
-      "state": "whole_combined14path_frozen_new_pair_running",
+      "state": "locally_reviewed_tested_staged",
       "branch": "dsh/night-20261111-spr01",
       "worktree": "/home/juanbeck/uah-experiments/night-20261111/sprints/SPR-01",
       "base": "5e6734173f2f755430f85e2fbe7d937bfbaa8b7d",
-      "source_approved": false,
-      "staged": false,
+      "source_approved": true,
+      "staged": true,
       "cumulative_manifest_sha256": "582863a09eea2eb246ca7cc2016dafcaa920aaa9f50dff790cc9f2f8d81c08eb",
       "manifest_paths": 14,
       "review_broker_request": "HUB-INBOX-004",
@@ -216,22 +234,31 @@
       },
       "clean_review_manifest_sha256": "2b010454ef1acf00ff89affc048a7c1cad96dce8a9b4e78394fd5ff91ba21036",
       "latest_review": {
-        "state": "running_at_ack",
-        "ack": "/home/juanbeck/uah-experiments/night-20261111/dispatch/HUB-ACK-004.json",
-        "fresh_contexts": true,
-        "prior_history_excluded": true,
-        "reports_pending": true,
-        "approval": false
-      }
+        "state": "both_approve",
+        "astra_blocking": 0,
+        "sol_blocking": 0,
+        "optional_same_stale_comment_nit_deferred": true,
+        "receipt": "/home/juanbeck/uah-experiments/night-20261111/dispatch/SPR01-REVIEWS-002.json"
+      },
+      "local_implementation_unit_closed": true,
+      "source_acceptance": "/home/juanbeck/uah-experiments/night-20261111/SPR01-SOURCE-ACCEPTANCE-001.json",
+      "staged_receipt": "/home/juanbeck/uah-experiments/night-20261111/SPR01-ACCEPTED-STAGED-001.json",
+      "destination_validation": "/home/juanbeck/uah-experiments/night-20261111/SPR01-DESTINATION-VALIDATION-001.json",
+      "post_transfer_tests": 188,
+      "qualified_H_gates": false
     },
     {
       "id": "SPR-02",
-      "state": "dependency_wait",
+      "state": "private_implementation_active",
       "branch": "dsh/night-20261111-spr02",
       "worktree": "/home/juanbeck/uah-experiments/night-20261111/sprints/SPR-02",
       "base": "5e6734173f2f755430f85e2fbe7d937bfbaa8b7d",
       "source_approved": false,
-      "staged": false
+      "staged": false,
+      "accepted_dependency": "2b010454ef1acf00ff89affc048a7c1cad96dce8a9b4e78394fd5ff91ba21036",
+      "predecessor_delivery": "SPR01 locally staged, not merged",
+      "writer": "6f600cec-d91c-4c6e-a868-71ac28e128b6",
+      "test_helper": "96aa2c05-bd7a-4752-85f8-d406f99278bc"
     },
     {
       "id": "SPR-03",
@@ -262,8 +289,12 @@
     }
   ],
   "plugin": {
-    "state": "phaseA_authoring_active_review_pending",
-    "phase": "A_readonly"
+    "state": "phaseA1_closed_partial_CHANGES_notinstalled_A2_dispatched",
+    "phase": "A_readonly",
+    "phaseB_authorized": false,
+    "checkpoint": "2026-11-11T05:10:00+01:00",
+    "source_approved": false,
+    "installed": false
   },
   "h3": {
     "state": "initial_planning_checkpoint_complete_unreviewed",
@@ -290,7 +321,7 @@
     "astra_medium_smoke_passed": true
   },
   "reserved_creator_bootstrap_quota": 0,
-  "capacity_committed": 7,
+  "capacity_committed": 9,
   "planning_custody": {
     "state": "copied_verified",
     "files": 16,
@@ -311,9 +342,9 @@
   "hub_lease": {
     "id": "HUB-INBOX-001",
     "recipient": "session-dcf4380b-700b-4920-8a3d-037db77ed964",
-    "state": "acknowledged_active",
+    "state": "HUB005_dispatched_ack_pending",
     "quota_max_including_root": 6,
-    "checkpoint": "2026-11-11T04:05:00+01:00",
+    "checkpoint": "2026-11-11T05:10:00+01:00",
     "paths": [
       "/home/juanbeck/uah-experiments/night-20261111/plugin",
       "docs/coordination/night-20261111/hub.md",
@@ -340,14 +371,14 @@
         "id": "9fb44612-03d2-4f7a-b6bc-e2eee9abedd3",
         "route": "openai-codex/gpt-6-astra",
         "effort": "medium",
-        "status": "running_at_ack",
+        "status": "completed_APPROVE",
         "deadline": "2026-11-11T04:19:30+01:00"
       },
       {
         "id": "ed099146-a7c6-4ee0-8c15-b11798472aa1",
         "route": "openai-codex/gpt-6.1-sol",
         "effort": "high",
-        "status": "running_at_ack",
+        "status": "completed_APPROVE",
         "deadline": "2026-11-11T04:19:30+01:00"
       }
     ],
@@ -358,21 +389,19 @@
       "plugin_installed": false
     },
     "broker_checkpoint": "2026-11-11T04:22:00+01:00",
-    "plugin_checkpoint": "2026-11-11T04:05:00+01:00",
-    "latest_known_state": "hub+2newSPRreviewers+onepluginfinalcorrectionat03:55ack=4of6; source approvalpending"
+    "plugin_checkpoint": "2026-11-11T05:10:00+01:00",
+    "latest_known_state": "hub+2newSPRreviewers+onepluginfinalcorrectionat03:55ack=4of6; source approvalpending",
+    "broker004_state": "completed_both_source_approve"
   },
   "hourly_supervision": {
-    "last_at": "2026-11-11T02:06:50.822Z",
-    "observed_token_failures": 4,
-    "continued_on_direct_human_request": true,
-    "deadlines_extended": false,
-    "no_shared_product_edits": true,
-    "staged_source_accepted": false,
-    "hub_ack_verified": true,
-    "pending_writers": 1,
-    "current_review_approvals": 0,
-    "staged_sprint_count": 0,
-    "campaign_hardstop_unchanged": true
+    "scheduled_occurrence": "2026-11-11T03:48:00+01:00",
+    "actual_started": "2026-11-11T04:04:36+01:00",
+    "updated_at": "2026-11-11T03:25:55.727Z",
+    "delay_reason": "queued behind active work; no time authorization extended",
+    "global_reservations": 9,
+    "product_staged_sprints": 1,
+    "plugin_initial_scope": "closedPARTIAL/sourceCHANGES/NOTINSTALLED; new005scopeexplicit",
+    "hard_stop_unchanged": true
   },
   "orchestrator_quota": 1,
   "capacity_definition": "Includes original GRILL, active/reserved root lanes, and the hub maximum including descendants; metadata watchers do not consume model-worker slots.",
