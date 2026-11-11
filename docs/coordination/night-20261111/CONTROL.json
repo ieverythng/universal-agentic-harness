@@ -2,7 +2,7 @@
   "version": 1,
   "campaign": "night-20261111",
   "orchestrator": "session-b4578032-f2ce-4f44-be24-9c2a0f1b0c35",
-  "updated_at": "2026-11-11T01:03:46.778Z",
+  "updated_at": "2026-11-11T01:17:07.331Z",
   "start": "2026-11-11T00:48:00Z",
   "hard_stop": "2026-11-11T08:48:00Z",
   "global_limit": 12,
@@ -26,13 +26,30 @@
     {
       "id": "276310f2-0e54-4f51-ae9a-0bf3b5545c0d",
       "role": "SPR01-evidence-preflight",
-      "state": "active",
-      "quota": 1,
-      "source_writes": false
+      "state": "completed",
+      "quota": 0,
+      "source_writes": false,
+      "artifact": "/home/juanbeck/uah-experiments/night-20261111/sprint01-preflight.md"
     },
     {
       "id": "7b3b4a1d-f0af-48cf-981a-6fa1e289c7d9",
       "role": "H3-custody-preflight",
+      "state": "completed",
+      "quota": 0,
+      "source_writes": false,
+      "artifact": "/home/juanbeck/uah-experiments/night-20261111/h3-custody-preflight.md"
+    },
+    {
+      "id": "9f9ab3a0-cb78-4426-93b4-066180925550",
+      "role": "DEV2-SPR01-tests-only-private",
+      "state": "active",
+      "quota": 1,
+      "source_writes": false,
+      "test_candidate_writes": true
+    },
+    {
+      "id": "8c0eabbb-0221-4ae2-ab11-af25b220f7b8",
+      "role": "SPR01-pinned-producer-evidence",
       "state": "active",
       "quota": 1,
       "source_writes": false
@@ -106,5 +123,15 @@
     "state": "authenticated_web_context_required",
     "mechanism": "documented existing-webHost session/create, agentPreset cordis; no inherited old-policy forks",
     "headless_attempt": "closed NO_ADAPTER; separate profile not reused"
+  },
+  "reserved_creator_bootstrap_quota": 2,
+  "capacity_committed": 4,
+  "planning_custody": {
+    "state": "copied_verified",
+    "files": 16,
+    "entry_notes": 5,
+    "original_heads_indexes_status_preserved": true,
+    "receipt": "/home/juanbeck/uah-experiments/night-20261111/planning-migration-receipt.json",
+    "staged": false
   }
 }
