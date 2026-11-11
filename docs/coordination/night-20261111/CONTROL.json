@@ -2,11 +2,11 @@
   "version": 1,
   "campaign": "night-20261111",
   "orchestrator": "session-b4578032-f2ce-4f44-be24-9c2a0f1b0c35",
-  "updated_at": "2026-11-11T03:25:55.727Z",
+  "updated_at": "2026-11-11T05:04:49.999Z",
   "start": "2026-11-11T00:48:00Z",
   "hard_stop": "2026-11-11T08:48:00Z",
   "global_limit": 12,
-  "declared_active_quota": 2,
+  "declared_active_quota": 3,
   "merge_base": "5e6734173f2f755430f85e2fbe7d937bfbaa8b7d",
   "authority": {
     "coordination": "local path-scoped stage/commit completed checkpoints; no push",
@@ -163,19 +163,96 @@
     {
       "id": "6f600cec-d91c-4c6e-a868-71ac28e128b6",
       "role": "DEV1-SPR02-exactbudget",
-      "state": "active",
-      "quota": 1,
+      "state": "completed_frozen_unapproved",
+      "quota": 0,
       "actual_start": "2026-11-11T04:22:51+01:00",
       "deadline": "2026-11-11T05:22:51+01:00",
-      "source_root": "/home/juanbeck/uah-experiments/night-20261111/private/spr02-source"
+      "source_root": "/home/juanbeck/uah-experiments/night-20261111/private/spr02-source",
+      "artifact": "/home/juanbeck/uah-experiments/night-20261111/spr02-writer-handoff.md",
+      "result": "resumed04:46:08; frozen04:48:30;1127full/allhooksPASS;17cumulative4incremental154sourcefiles"
     },
     {
       "id": "96aa2c05-bd7a-4752-85f8-d406f99278bc",
       "role": "DEV2-SPR02-adversarial-tests",
-      "state": "active",
-      "quota": 1,
+      "state": "completed",
+      "quota": 0,
       "actual_start": "2026-11-11T04:22:51+01:00",
       "deadline": "2026-11-11T04:42:51+01:00",
+      "source_writes": false,
+      "artifact": "/home/juanbeck/uah-experiments/night-20261111/spr02-tests-handoff.md",
+      "result": "38cases16RED/22PASSacceptedbase; exactsourceRootroutedtoDEV1"
+    },
+    {
+      "id": "b6fa0578-1087-4da3-a16e-01a33998ccd8",
+      "role": "SPR03-readonly-contract-extraction",
+      "state": "completed_readonly_preparation",
+      "quota": 0,
+      "budget_minutes": 15,
+      "dispatch_clock": "approximately04:35Madrid; actualworkerclockpendingreceipt",
+      "conservative_outer_stop": "2026-11-11T04:50:00+01:00",
+      "source_writes": false,
+      "product_implementation_authorized": false,
+      "actual_start": "2026-11-11T04:35:05+01:00",
+      "actual_stop": "2026-11-11T04:48:04+01:00",
+      "artifact": "/home/juanbeck/uah-experiments/night-20261111/spr03-contract-freeze-preparation.md"
+    },
+    {
+      "id": "cef97c54-de71-47be-9f6c-d12a19fe9b4b",
+      "role": "SPR03-design-A-compiler-transaction",
+      "state": "completed_design_only_unreviewed",
+      "quota": 0,
+      "budget_minutes": 10,
+      "source_writes": false,
+      "implementation_authorized": false
+    },
+    {
+      "id": "f4cf82b7-71ef-4043-bb31-82799be0a54a",
+      "role": "SPR03-design-B-value-pipeline",
+      "state": "completed_design_only_unreviewed",
+      "quota": 0,
+      "budget_minutes": 10,
+      "source_writes": false,
+      "implementation_authorized": false
+    },
+    {
+      "id": "225a4098-92ee-461f-9f5c-2b9053e25b2c",
+      "role": "SPR03-design-C-configured-source",
+      "state": "completed_design_only_unreviewed",
+      "quota": 0,
+      "budget_minutes": 10,
+      "source_writes": false,
+      "implementation_authorized": false
+    },
+    {
+      "id": "d1c183f6-4e83-463d-bbf9-ea3fdf3d8742",
+      "role": "DEV1-SPR03-context-owner",
+      "state": "active",
+      "quota": 1,
+      "actual_start": "2026-11-11T05:39:25+01:00",
+      "deadline": "2026-11-11T06:39:25+01:00"
+    },
+    {
+      "id": "46115156-8474-466f-b26f-0ac44e1d9139",
+      "role": "DEV2-SPR03-public-integration-tests",
+      "state": "completed_TESTS_FEATURE_UNRUN",
+      "quota": 0,
+      "artifact": "/home/juanbeck/uah-experiments/night-20261111/spr03-tests-handoff.md",
+      "test_sha256": "a1fe4d1cbb7a6954336966035b29a53c417c2c3c9b7e867630dfee29997f1f3f"
+    },
+    {
+      "id": "860d8c4b-001a-44b2-a8af-b804a2402194",
+      "role": "SPR04-readonly-contract-preparation",
+      "state": "active",
+      "quota": 1,
+      "budget_minutes": 18,
+      "source_writes": false
+    },
+    {
+      "id": "a3ac4637-598d-4630-906b-d2e8c1e1c4f4",
+      "role": "SPR05-readonly-envelope-preparation",
+      "state": "active",
+      "quota": 1,
+      "budget_minutes": 18,
       "source_writes": false
     }
   ],
@@ -249,25 +326,56 @@
     },
     {
       "id": "SPR-02",
-      "state": "private_implementation_active",
+      "state": "locally_reviewed_tested_staged",
       "branch": "dsh/night-20261111-spr02",
       "worktree": "/home/juanbeck/uah-experiments/night-20261111/sprints/SPR-02",
       "base": "5e6734173f2f755430f85e2fbe7d937bfbaa8b7d",
-      "source_approved": false,
-      "staged": false,
+      "source_approved": true,
+      "staged": true,
       "accepted_dependency": "2b010454ef1acf00ff89affc048a7c1cad96dce8a9b4e78394fd5ff91ba21036",
       "predecessor_delivery": "SPR01 locally staged, not merged",
       "writer": "6f600cec-d91c-4c6e-a868-71ac28e128b6",
-      "test_helper": "96aa2c05-bd7a-4752-85f8-d406f99278bc"
+      "test_helper": "96aa2c05-bd7a-4752-85f8-d406f99278bc",
+      "clean_review_manifest_sha256": "1a6bd8748e5030aba3c963b327e70cb905c525e9327f90d8ef165e4d308f6cd7",
+      "source_files": 154,
+      "incremental_paths": 4,
+      "full_suite_writer_report": 1127,
+      "review_request": "HUB-INBOX-007",
+      "reviews_running": false,
+      "review_ack": "/home/juanbeck/uah-experiments/night-20261111/dispatch/HUB-ACK-007.json",
+      "local_implementation_unit_closed": true,
+      "source_acceptance": "/home/juanbeck/uah-experiments/night-20261111/SPR02-SOURCE-ACCEPTANCE-001.json",
+      "staged_receipt": "/home/juanbeck/uah-experiments/night-20261111/SPR02-ACCEPTED-STAGED-001.json",
+      "destination_validation": "/home/juanbeck/uah-experiments/night-20261111/SPR02-DESTINATION-VALIDATION-001.json",
+      "staged_paths": 17,
+      "post_transfer_tests": 290,
+      "full_sprint_closed": false,
+      "qualified_H_gates": false
     },
     {
       "id": "SPR-03",
-      "state": "dependency_wait",
+      "state": "private_implementation_and_tests_active",
       "branch": "dsh/night-20261111-spr03",
       "worktree": "/home/juanbeck/uah-experiments/night-20261111/sprints/SPR-03",
       "base": "5e6734173f2f755430f85e2fbe7d937bfbaa8b7d",
       "source_approved": false,
-      "staged": false
+      "staged": false,
+      "preparation": {
+        "state": "three_interface_designs_compared_engineering_direction_only",
+        "artifact": "/home/juanbeck/uah-experiments/night-20261111/spr03-interface-decision-proposal.md",
+        "policy_adopted": false,
+        "implementation_authorized": false,
+        "predecessor_dependency": "SPR02notyetaccepted"
+      },
+      "accepted_dependency": "SPR02 exact17/154 staged; unit1a6bd874…; notmerged",
+      "implementation_authorized": true,
+      "writer": "d1c183f6-4e83-463d-bbf9-ea3fdf3d8742",
+      "test_helper": "46115156-8474-466f-b26f-0ac44e1d9139",
+      "writer_start": "2026-11-11T05:39:25+01:00",
+      "writer_stop": "2026-11-11T06:39:25+01:00",
+      "public_api": "/home/juanbeck/uah-experiments/night-20261111/dispatch/SPR03-PUBLIC-API-003-10da28.md",
+      "public_api_sha256": "10da28b7ff0f03a90415a50d722e09cfd6d8b9142ad87916f61a393e85d73640",
+      "policy_adopted": false
     },
     {
       "id": "SPR-04",
@@ -289,12 +397,21 @@
     }
   ],
   "plugin": {
-    "state": "phaseA1_closed_partial_CHANGES_notinstalled_A2_dispatched",
+    "state": "A2_closed_CHANGES_notinstalled_A3_single_hardening_pass_dispatched",
     "phase": "A_readonly",
     "phaseB_authorized": false,
-    "checkpoint": "2026-11-11T05:10:00+01:00",
+    "checkpoint": "2026-11-11T06:45:00+01:00",
     "source_approved": false,
-    "installed": false
+    "installed": false,
+    "latest_result": "/home/juanbeck/uah-experiments/night-20261111/dispatch/HUB-RESULT-008.json",
+    "source_blockers": [
+      "explicit-emptydeadline treatedabsent",
+      "looselegalgrant gate",
+      "non-node_modules unownedinput skipped"
+    ],
+    "actual_positive": "Three/Mermaid/liveDTO/41tests+genuine68notices present, no currentartifactpoison claimed",
+    "next_scope": "HUB-INBOX-009",
+    "install_retry_remaining": 1
   },
   "h3": {
     "state": "initial_planning_checkpoint_complete_unreviewed",
@@ -321,7 +438,7 @@
     "astra_medium_smoke_passed": true
   },
   "reserved_creator_bootstrap_quota": 0,
-  "capacity_committed": 9,
+  "capacity_committed": 10,
   "planning_custody": {
     "state": "copied_verified",
     "files": 16,
@@ -342,9 +459,9 @@
   "hub_lease": {
     "id": "HUB-INBOX-001",
     "recipient": "session-dcf4380b-700b-4920-8a3d-037db77ed964",
-    "state": "HUB005_dispatched_ack_pending",
+    "state": "HUB009_newonebatch_hardening_dispatched_ack_pending",
     "quota_max_including_root": 6,
-    "checkpoint": "2026-11-11T05:10:00+01:00",
+    "checkpoint": "2026-11-11T06:45:00+01:00",
     "paths": [
       "/home/juanbeck/uah-experiments/night-20261111/plugin",
       "docs/coordination/night-20261111/hub.md",
@@ -365,21 +482,19 @@
       "openai-codex/gpt-6.1-sol/high"
     ],
     "review_ack": "/home/juanbeck/uah-experiments/night-20261111/dispatch/HUB-ACK-002.json",
-    "known_active_including_hub_at_ack": 4,
+    "known_active_including_hub_at_ack": 3,
     "reviewers": [
       {
-        "id": "9fb44612-03d2-4f7a-b6bc-e2eee9abedd3",
+        "id": "a9045462-99d8-4544-9929-cd67ee722610",
         "route": "openai-codex/gpt-6-astra",
         "effort": "medium",
-        "status": "completed_APPROVE",
-        "deadline": "2026-11-11T04:19:30+01:00"
+        "status": "completed_APPROVE"
       },
       {
-        "id": "ed099146-a7c6-4ee0-8c15-b11798472aa1",
+        "id": "79d26281-a6cd-49f5-9da9-a27f00e79cef",
         "route": "openai-codex/gpt-6.1-sol",
         "effort": "high",
-        "status": "completed_APPROVE",
-        "deadline": "2026-11-11T04:19:30+01:00"
+        "status": "completed_APPROVE"
       }
     ],
     "install_prerequisite": {
@@ -391,7 +506,29 @@
     "broker_checkpoint": "2026-11-11T04:22:00+01:00",
     "plugin_checkpoint": "2026-11-11T05:10:00+01:00",
     "latest_known_state": "hub+2newSPRreviewers+onepluginfinalcorrectionat03:55ack=4of6; source approvalpending",
-    "broker004_state": "completed_both_source_approve"
+    "broker004_state": "completed_both_source_approve",
+    "ack005": "/home/juanbeck/uah-experiments/night-20261111/dispatch/HUB-ACK-005.json",
+    "actual_phaseA2_started": "2026-11-11T04:21:45+01:00",
+    "plugin_workers": [
+      {
+        "id": "3b748539-5c96-473c-8ee2-5b3176848a11",
+        "role": "backend_resource_owner_live_sources",
+        "deadline": "2026-11-11T04:45:00+01:00"
+      },
+      {
+        "id": "dcdb481c-7e0f-4ee4-a41e-7d63b26d435e",
+        "role": "native_Three_Mermaid_accessible_frontend",
+        "deadline": "2026-11-11T04:45:00+01:00"
+      }
+    ],
+    "maximum_quota_including_hub": 6,
+    "code_recovery_stop": "2026-11-11T06:15:00+01:00",
+    "plugin_status_checkpoint": "2026-11-11T05:10:00+01:00",
+    "SPR02_broker_checkpoint": "2026-11-11T05:25:00+01:00",
+    "recovery_ack": "/home/juanbeck/uah-experiments/night-20261111/dispatch/HUB-ACK-006.json",
+    "remaining_batch_request": "HUB-INBOX-008",
+    "plugin_code_stop": "2026-11-11T05:25:00+01:00",
+    "review_install_stop": "2026-11-11T06:45:00+01:00"
   },
   "hourly_supervision": {
     "scheduled_occurrence": "2026-11-11T03:48:00+01:00",
@@ -417,5 +554,30 @@
     "reflog": "update by push at03:26:16Madrid",
     "actor": "unattributed external activity; original GRILL did not issue push",
     "authority": "No new coordination or sprint push permission inferred"
+  },
+  "recovery": {
+    "requested_by_human": true,
+    "at": "2026-11-11T03:58:57.684Z",
+    "campaign_deadline_reset": false,
+    "SPR01_stage_intact": true,
+    "Root_writer_resumed_only_unfinished": "6f600cec…",
+    "research_not_restarted_because_running": "b6fa0578… completednormally",
+    "external_hub": "ACK006/007/008actual; source2newpaircompleted; A2finalCHANGESpreserved; A3newlimitedscopependingACK",
+    "lost_root_job": {
+      "id": "bash-c8e9fedc8ec24dc7",
+      "result": "unknown job after stop/registry reset, not collected success",
+      "old_matching_watch_processes_found": false,
+      "replacement": "bash-af5a724339ba411e"
+    },
+    "fresh_review_watcher": {
+      "id": "bash-3d347a632fe94028",
+      "status": "completed_collected"
+    },
+    "SPR02_stage_intact": true,
+    "final_A2_watcher": {
+      "id": "bash-b84a6ce024a04347",
+      "status": "completed_collected"
+    },
+    "A3_watcher": "bash-840dab1c060944e9"
   }
 }
