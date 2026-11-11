@@ -1,32 +1,29 @@
-# SPR-03 — R1 corrected writer ready for NEW source reviews
+# SPR-03 — R2 writer ready for fresh whole-source reviews
 
-NEW R1 actual resume **06:51:42 Madrid**, strict absolute deadline **07:15** (not an
-extension of original06:39 scope); campaign09:48 unchanged. Same independent clone,
-HEAD/index/all158 sealed bytes revalidated before edits. Quota1/no children, one
-R1 batch. Code complete06:58:33; source frozen **07:02:14**; no further source edits.
-Serving model/effort unattested; no production/H/native/source approval claim.
+NEW R2 actualstart07:40:21Madrid, stricter absolute07:50, campaign09:48unchanged.
+Same independent clone/HEAD/index/all159sealedv3 revalidated before code; quota1/
+nochildren/one batch. Source frozen **07:44:35**, no further source edits.
+Runtime serving identity/effort unattested. No source/policy/H/native approval.
 
-Both v2 review axes CHANGES; v2 and sealed reports preserved. Exact two reproduced
-mechanisms repaired: semantic typed owner-instance causal group identity (same raw
-model/tool ID never merges pending/completed), and actual timeout outcome truth
-(within_budget never negative, timed_out remains mandatory negative). API005
-clarifies negative flag retentionACK, never source-truth override; no new policy.
-Only production R1 edit task_context; minimal ADR,7case public regression, three
-Root-authorized strict helper call-ref lookup refinements. Original helper sealed;
-posthash846c60d43b98e95dd36c520ac54e824986c579dde0de40db5ba1b4a63684beb8.
+Exact nestedpolicy wire coercion repaired: serialized refs exact JSON arrays of
+nonempty strings BEFOREtuple; rules exactarray/objectfields; optional malformed
+renderedtext→TaskContextError sameclass. This was constructor representation defect,
+NOTauthoritybypass (owner restore already rejects policy mismatch). No field/
+schema/authority/store expansion. ProductionONLYcontext module, plus small existing
+public regression additions; other157v3members unchanged. Seeds/reports preserved.
 
 [Current handoff](</home/juanbeck/uah-experiments/night-20261111/spr03-writer-handoff.md>) /
-[clean v3 unit](</home/juanbeck/uah-experiments/night-20261111/private/spr03-evidence/review-source-v3/source-unit.json>):
-4f3eecccd47e42c5a726ef3a6f6046ab4533c0dd06f514956f66f1f9b06361e1;
-tree20001e7cacdf7b8fd4fbe2ac38278764f89edd9cc6dcd90a065a1cb8c5c223ef;
-integritya38cdc43229cede0833e69c9081a448402566fd8f93ac83e7c83980d43bc8781.
-159candidate/143base/154exactSource2;26cumulative/10increment. API005
-39b8bad264d5e31ea1e40391c9b5ff8e7f6b39388c8152c0694810176f1a7abd.
+[clean v4 unit](</home/juanbeck/uah-experiments/night-20261111/private/spr03-evidence/review-source-v4/source-unit.json>):
+c75b345726faa183c7e3ee8dd3c20c77ed88664dbf74bac5dea652955e6eff53;
+tree852c5710e4914492f775b39afebbd1938b23527b05248b8ab685aec974b9cd25;
+integrity1581fd44955b76d04b89e5c3b4cb6a4078c634f20b7a596984787cc9faa5e681.
+159/143/154EXACTS2,26cum/10inc. API006
+c4c6638ad5176b400a18df11ff6efc55dd8630592ec147a6b94d48d3292d48b9.
 
-PublicRED4fail/3pass→all7GREEN, prior15behaviorsGREEN,136focused/1150fullPASS,
-ALL7mandatoryhooks/noexemptionsPASS, O1x2/render/package/origins/Ruff/hygiene/index0.
-Alljobscollected. Root dispatches TWO NEW fresh source-only reviews of v3. Access
-explicitly allows ALL26 base-relative changed product paths and two doc exceptions;
-opaque history exclusions apply outside that list ONLY. No writer results/prior
-reports/verdicts/history in reviewer input. No target/stage/transfer/refs/commit/
-push/source4 authorization. Stop READY; green writer checks are NOT source approval.
+147focused/1161fullPASS48.36s; ALL7hooks/noexemptionsPASS;O1x2/render/package/
+origins/Ruff/hygiene/index0; alljobscollected. All15oldhelper/7R1controls remainGREEN.
+Root routes TWO NEW fresh contexts: inspect ALL changed-source/oldcomparison BEFORE
+large optional matrices; prior Standards incomplete is NOTapprovalwaiver. ONLYv4
+clean inputs/access, explicitALL26product+2docexceptions, opaqueoutsideONLY; no old
+verdicts/reports/writerresults/history. No target/stage/ref/transfer/commit/push/
+source4. Stop READY, green writer checks do not establish source approval.
