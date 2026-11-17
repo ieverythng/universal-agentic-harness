@@ -60,6 +60,12 @@ product candidate. The Harness2/UniiChat dossier is research documentation;
 its proposed adaptations do not establish completed experiments, release
 evidence, or adopted runtime architecture.
 
+The separately reviewed [coordination reorganization](coordination/README.md)
+is a human-authorized documentation-only exception for the existing Codex
+boards and dated DSH records, with exact-byte custody and privacy checks. It
+does not admit new raw transcripts/probe archives, change runtime authority, or
+qualify a sprint or release.
+
 The [contribution guide](../CONTRIBUTING.md), [release process](RELEASING.md),
 and [coordination policy](coordination/README.md) describe repository workflow.
 The status page is a dated snapshot and does not close an implementation gate.
@@ -74,4 +80,6 @@ python scripts/render_agentic_harness_docs.py
 
 Use `./scripts/setup_dev_tools.sh` to create the local environment and install
 hooks, then `./scripts/run_precommit.sh` for the repository checks. Provider
-credentials and machine-specific paths must remain outside tracked artifacts.
+credentials must remain outside tracked artifacts. New machine-specific paths
+belong on private operational bases; the reviewed coordination migration
+preserves existing operational references only under its explicit exception.

@@ -1,0 +1,40 @@
+{
+  "name": "@local/dsh-session-coordination",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Host-only native DSH session coordination with owner-supplied bindings",
+  "author": "tonyzdev (upstream); portable owner-configured derivative",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ieverythng/universal-agentic-harness.git",
+    "directory": "tools/dsh-session-coordination"
+  },
+  "type": "module",
+  "main": "lib/index.js",
+  "exports": {
+    ".": "./lib/index.js",
+    "./package.json": "./package.json",
+    "./cordis.patch.yml": "./cordis.patch.yml"
+  },
+  "files": [
+    "lib/index.js",
+    "cordis.patch.yml",
+    "LICENSE",
+    "README.md",
+    "UPSTREAM.json",
+    "SOURCE-SHA256SUMS",
+    "test/*.test.mjs"
+  ],
+  "scripts": {
+    "test": "node --test test/*.test.mjs"
+  },
+  "engines": {
+    "dsh": ">=0.2.2-rc.1 <0.3.0-0"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  }
+}

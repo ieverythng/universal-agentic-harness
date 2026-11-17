@@ -1,0 +1,13 @@
+{
+  "repository": "https://github.com/tonyzdev/dsh-session-messaging",
+  "commit": "69a97309ab3462249bdd02802d700ed93d08c55f",
+  "version": "0.3.2",
+  "archive_sha256": "f1e59d27d3a81a1f1a1d47d4d2cbc1d922ce47ead4fb38bbc5b2cf496eb17c59",
+  "license": "MIT",
+  "reviewed_base": {
+    "package": "@local/dsh-session-pair-pilot@0.2.0",
+    "host_sha256": "bc6898790361887bd7e3c54b8a9d8cdbe46c6ec2f5c6b87c5f54e9a14c3eda31"
+  },
+  "derivative": "@local/dsh-session-coordination@0.1.0",
+  "changes": "Host-only portable owner-configured workspace and unique role-to-root bindings; preserves the four native Tools, hub/spoke visibility and edges, cold-root resolution without Initiator, partial metadata, native steer/queue semantics, passive exact-source literal wait, cancellation cleanup, and canonical ABORTED delivery-unknown warning."
+}

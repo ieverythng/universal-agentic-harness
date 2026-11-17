@@ -17,7 +17,8 @@ boundaries:
 Run `./scripts/setup_dev_tools.sh` once, then `./scripts/run_precommit.sh` for
 source or documentation changes. The hook suite runs Ruff, source-aware tests,
 repository hygiene, and `python scripts/render_agentic_harness_docs.py --check`.
-Generated HTML and Markdown documents must remain synchronized.
+Generated HTML and Markdown documents must remain synchronized. Maintain the
+current delivery record using the [DSH methodology](<docs/coordination/dsh/METHODOLOGY.md#current-delivery-record>).
 
 ## Chat coordination and delegation
 
