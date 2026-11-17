@@ -6,6 +6,10 @@ implementation. Use that procedure for public source retrieval/pinning, private
 Cordis bindings, supported Plugin Manager conflict/replacement/rollback and actual
 handshakes. Merely copying either document installs nothing.
 
+Use `/bendek-multi-session-workflow` for coordination policy and its
+`/bendek-dsh-workflow` adapter for native mechanics. This document adds the
+repository bindings and constraints, not another policy authority.
+
 The [agent guide](<../../../AGENTS.md>), [domain model](<../../../CONTEXT.md>) and
 [independent review contract](<../../../REVIEW.md>) govern repository work.
 Human instructions retain their authority. Organizational roles and a working
@@ -47,7 +51,7 @@ Human -> GRILL
            -> existing session named PTC
            -> CREATOR
            -> VISUALS
-Each parent may use its own optional local flat native Team.
+Each parent uses its own local flat native Team/task board by default.
 ```
 
 | Existing parent | Project responsibility / board | Boundary |
@@ -93,12 +97,12 @@ technical handoff stays inside its assigned scopes and grants no review authorit
 A manually operated research parent may opt in through its board/approved channel;
 opt-in does not let another branch rewrite its board or commandeer its Session.
 
-Native Agent Teams is optional. Verify actual parent Tools before delegation;
-role/preset selection alone does not enable the bundle. If missing, report the
-owner setup decision rather than enabling plugins, forcing Standard or using a
-same-named substitute. If present, a parent may use its own flat Team within its
-scope, collecting explicit task/member results. Local `lead` means that parent,
-not automatically GRILL. Registration/inactivity is not task completion.
+Use native Agent Teams/task boards first; verify actual parent Tools and capacity.
+Missing capability requires an owner decision. Ordinary subagents require an
+explicit justified fallback, never a substitute represented as a configured parent
+or native Team. Do not enable plugins or force settings. Each local `lead` owns
+its flat Team, not automatically GRILL; use current-revision task transitions and
+collect explicit member/task results. Registration/inactivity is not completion.
 
 Task revisions/dependencies and disjoint write scopes coordinate work but are
 advisory, not locks, sandbox isolation or independent review. Protect dirty/staged
@@ -147,6 +151,22 @@ staging, source review, product publication and H qualification remain distinct;
 SPR03's later evening acceptance does not backdate its overnight review hold.
 Current human sprint review and Git hold remain: no sprint implementation,
 commit, push, PR, merge or tag follows from this document.
+
+### Current delivery record
+
+GRILL maintains the single [current delivery record](<../../plans/current_delivery_state.json>)
+during documentation sync and actual sprint or PR acceptance, staging, commit, push,
+merge, qualification or rollback closeout. Fact issuers retain authority: check the
+exact owner evidence and separately record each implementation, review, acceptance,
+staging, publication and qualification claim with its owner, approved relative citation
+and observation time. Use unknown or conflict when evidence is missing or inconsistent;
+never infer one axis from another or treat a dated staging receipt as a live index query.
+Keep cumulative path counts distinct and overlapping. Update the record as-of time,
+verify the Explorer resource and rendered view by opening or manually refreshing it,
+and record the outcome and any unavailable or stale-source gap. A read time is not
+an evidence as-of time. Preserve dated plans and campaign receipts as history; do not
+rewrite them or use this projection as authority for execution, publication or gates.
+No polling or background updater is implied.
 
 Repository architecture, execution and evidence rules remain with the governing
 instructions linked above. This operational method does not redefine them or

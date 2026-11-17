@@ -1,0 +1,173 @@
+{
+  "version": 1,
+  "asOf": "2026-11-17T16:01:15Z",
+  "owner": "GRILL",
+  "items": [
+    {
+      "id": "SPR01",
+      "unitHash": "2b010454ef1acf00ff89affc048a7c1cad96dce8a9b4e78394fd5ff91ba21036",
+      "dependencies": [],
+      "implementation": {
+        "state": "yes",
+        "citation": "docs/coordination/dsh/planning/sprints.md",
+        "owner": "delivery owner",
+        "asOf": "2026-11-17T16:01:15Z"
+      },
+      "review": {
+        "state": "yes",
+        "citation": "docs/coordination/dsh/planning/sprints.md",
+        "owner": "independent review owners",
+        "asOf": "2026-11-17T16:01:15Z"
+      },
+      "acceptance": {
+        "state": "yes",
+        "citation": "docs/coordination/dsh/planning/sprints.md",
+        "owner": "Root acceptance owner",
+        "asOf": "2026-11-17T16:01:15Z"
+      },
+      "staging": {
+        "state": "yes",
+        "citation": "docs/coordination/dsh/planning/sprints.md",
+        "owner": "Git observer",
+        "asOf": "2026-11-17T16:01:15Z",
+        "stagedPaths": 14
+      },
+      "committed": {
+        "state": "no",
+        "citation": "docs/coordination/dsh/planning/sprints.md",
+        "owner": "Git observer",
+        "asOf": "2026-11-17T16:01:15Z"
+      },
+      "pushed": {
+        "state": "unknown",
+        "citation": "docs/coordination/dsh/planning/sprints.md",
+        "owner": "publication owner",
+        "asOf": "2026-11-17T16:01:15Z"
+      },
+      "merged": {
+        "state": "unknown",
+        "citation": "docs/coordination/dsh/planning/sprints.md",
+        "owner": "publication owner",
+        "asOf": "2026-11-17T16:01:15Z"
+      },
+      "gateQualification": {
+        "state": "no",
+        "citation": "docs/coordination/dsh/planning/sprints.md",
+        "owner": "qualification owners",
+        "asOf": "2026-11-17T16:01:15Z"
+      }
+    },
+    {
+      "id": "SPR02",
+      "unitHash": "1a6bd8748e5030aba3c963b327e70cb905c525e9327f90d8ef165e4d308f6cd7",
+      "dependencies": [
+        "SPR01"
+      ],
+      "implementation": {
+        "state": "yes",
+        "citation": "docs/coordination/dsh/planning/sprints.md",
+        "owner": "delivery owner",
+        "asOf": "2026-11-17T16:01:15Z"
+      },
+      "review": {
+        "state": "yes",
+        "citation": "docs/coordination/dsh/planning/sprints.md",
+        "owner": "independent review owners",
+        "asOf": "2026-11-17T16:01:15Z"
+      },
+      "acceptance": {
+        "state": "yes",
+        "citation": "docs/coordination/dsh/planning/sprints.md",
+        "owner": "Root acceptance owner",
+        "asOf": "2026-11-17T16:01:15Z"
+      },
+      "staging": {
+        "state": "yes",
+        "citation": "docs/coordination/dsh/planning/sprints.md",
+        "owner": "Git observer",
+        "asOf": "2026-11-17T16:01:15Z",
+        "stagedPaths": 17
+      },
+      "committed": {
+        "state": "no",
+        "citation": "docs/coordination/dsh/planning/sprints.md",
+        "owner": "Git observer",
+        "asOf": "2026-11-17T16:01:15Z"
+      },
+      "pushed": {
+        "state": "unknown",
+        "citation": "docs/coordination/dsh/planning/sprints.md",
+        "owner": "publication owner",
+        "asOf": "2026-11-17T16:01:15Z"
+      },
+      "merged": {
+        "state": "unknown",
+        "citation": "docs/coordination/dsh/planning/sprints.md",
+        "owner": "publication owner",
+        "asOf": "2026-11-17T16:01:15Z"
+      },
+      "gateQualification": {
+        "state": "no",
+        "citation": "docs/coordination/dsh/planning/sprints.md",
+        "owner": "qualification owners",
+        "asOf": "2026-11-17T16:01:15Z"
+      }
+    },
+    {
+      "id": "SPR03",
+      "unitHash": "698874eeb5d4eaaf72fda5f99738816d7fb2da315e42df4195ce636d6ac8193a",
+      "dependencies": [
+        "SPR02"
+      ],
+      "implementation": {
+        "state": "yes",
+        "citation": "docs/coordination/dsh/archive/continuation-20261111-evening/README.md",
+        "owner": "delivery owner",
+        "asOf": "2026-11-17T16:01:15Z"
+      },
+      "review": {
+        "state": "yes",
+        "citation": "docs/coordination/dsh/archive/continuation-20261111-evening/README.md",
+        "owner": "independent review owners",
+        "asOf": "2026-11-17T16:01:15Z"
+      },
+      "acceptance": {
+        "state": "yes",
+        "citation": "docs/coordination/dsh/archive/continuation-20261111-evening/README.md",
+        "owner": "Root acceptance owner",
+        "asOf": "2026-11-17T16:01:15Z"
+      },
+      "staging": {
+        "state": "yes",
+        "citation": "docs/coordination/dsh/archive/continuation-20261111-evening/README.md",
+        "owner": "Git observer",
+        "asOf": "2026-11-17T16:01:15Z",
+        "stagedPaths": 26
+      },
+      "committed": {
+        "state": "no",
+        "citation": "docs/coordination/dsh/archive/continuation-20261111-evening/README.md",
+        "owner": "Git observer",
+        "asOf": "2026-11-17T16:01:15Z"
+      },
+      "pushed": {
+        "state": "unknown",
+        "citation": "docs/coordination/dsh/archive/continuation-20261111-evening/README.md",
+        "owner": "publication owner",
+        "asOf": "2026-11-17T16:01:15Z"
+      },
+      "merged": {
+        "state": "unknown",
+        "citation": "docs/coordination/dsh/archive/continuation-20261111-evening/README.md",
+        "owner": "publication owner",
+        "asOf": "2026-11-17T16:01:15Z"
+      },
+      "gateQualification": {
+        "state": "no",
+        "citation": "docs/coordination/dsh/archive/continuation-20261111-evening/README.md",
+        "owner": "qualification owners",
+        "asOf": "2026-11-17T16:01:15Z"
+      }
+    }
+  ]
+}

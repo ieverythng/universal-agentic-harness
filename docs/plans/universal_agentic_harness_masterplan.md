@@ -8,6 +8,9 @@
 
 ## Delivery board snapshot
 
+For the owner-maintained, dated current projection, see
+[current delivery state](current_delivery_state.json). The snapshot below remains historical.
+
 The shared **Delivery status** describes work, not GitHub publication: **Draft** is proposed or unstarted work; **Open** is work underway; **Ready for review** is an exact candidate with its stated checks and independent review complete; **Closed** is an ended scope with an explicit outcome. The actual GitHub PR state is a separate card fact. An Open delivery may have no remote PR, and a Closed delivery may be merged or closed without merge. A draft plan, pushed branch, or merged PR does not establish an H-gate result.
 
 This static view includes PR1, the PR2 delivery branch and SPR-01..10. The filter applies the same workflow meaning to delivery and sprint records. Snapshot dates preserve when publication, local scaffold and readiness facts were observed.

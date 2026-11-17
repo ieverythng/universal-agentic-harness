@@ -1,0 +1,19 @@
+---
+name: bendek-multi-session-workflow
+description: Coordinate bounded work through owner-configured parents, with explicit authority, evidence, and human publication boundaries.
+---
+
+# GRILL coordination workflow
+
+Use this policy when GRILL coordinates a nontrivial multi-part request. The human retains authority; delegation does not enlarge it. For concrete mechanics, discover and load an available owner-approved adapter matching the environment; it maps capabilities but does not replace this policy. If none is available or approved, stop and ask the owner.
+
+Optional adapter reference: `/bendek-dsh-workflow`.
+
+1. **Establish authority and capabilities.** Record the human's intent, acceptance evidence, authorized existing parent roles, budget, deadline, exclusions and publication permissions. Verify coordinator authority, bindings, requested identities and required capabilities through owner-approved means. Unknown or missing authority, binding, role or capability means stop and ask the owner for a decision or bootstrap; do not invent a replacement or change configuration. Avoid fanout for trivial work.
+2. **Allocate finite work.** Route through the owner's existing configured parents; each parent organizes its own work using its locally supported worker and task mechanism within its authority and capacity. Ordinary subagents are only an explicitly justified fallback, not substitutes represented as configured parents. Assign exactly one writer per disjoint scope, check expected base and collisions, and order dependent work before dispatch; advisory ownership is not a lock. Preserve existing work and do not duplicate running work.
+3. **Dispatch a bounded mission.** Give each owner a correlation marker, objective, exact allowed actions and write scope, base expectations, dependencies, evidence and review criteria, exclusions, budget, deadline, stop condition and result recipient. Scope or budget expansion requires fresh authorization. Parent owners remain accountable for their workers and integration.
+4. **Distinguish delivery from results.** Require a correlated explicit ACK stating accepted scope or refusal and limits, and a terminal result stating outcome, actual writes and hashes, validation, worker and task outcomes, owned jobs, blockers and remaining uncertainty. A receipt, availability, inactivity or passive observation is neither ACK nor completion. If delivery or outcome is ambiguous, preserve evidence, reconcile through an authorized channel or stop and report unknown; never blindly retry, duplicate work, spin, or infer failure from missing receipt.
+5. **Integrate and stop.** Validate explicit results and required task completion, collect owned jobs, and report partials, conflicts and cleanup limits; do not assume cancellation is safe or disturb unrelated work. Preserve independent review and distinguish evidence from assumptions. Stop at the finite boundary without courtesy loops, automatic successors, unsolicited scheduled work, owner impersonation or unauthorized persistent goals.
+6. **Respect human publication.** Human authority governs staging, commits, pushes, publication, merge and tags; perform them only with explicit authorization. Report the outcome, evidence, limitations and decisions needed rather than claiming unproven success.
+
+**Bounded skill iteration:** Run a bounded SkillOpt-style iteration (baseline -> mutate -> holdout gate -> accept/reject log) before finalizing major wording changes. Initial creation is the baseline; for later changes use at most three focused edits and about twelve changed lines per file per iteration unless the human authorizes more. Record the change and acceptance decision; run the agreed training checks and independently owned holdout non-regression checks without reading or tuning to holdouts. Missing evidence means hold, not a performance claim.
