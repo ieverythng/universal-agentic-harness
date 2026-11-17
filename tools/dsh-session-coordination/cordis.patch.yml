@@ -1,0 +1,5 @@
+# Unconfigured source template. Copy locally and fill only this row's owner config before supported installation.
+- insert:
+    - id: local-session-coordination
+      name: '@local/dsh-session-coordination'
+      config: {}
