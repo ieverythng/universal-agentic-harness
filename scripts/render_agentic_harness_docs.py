@@ -41,10 +41,16 @@ REDIRECT_TEMPLATE = """<!DOCTYPE html>
 def theme_links(html_path: Path) -> str:
     assets = os.path.relpath(ROOT / "docs" / "assets", html_path.parent)
     assets = assets.replace("\\", "/")
-    return (
+    links = (
         f'  <link rel="stylesheet" href="{assets}/harness-theme.css" />\n'
         f'  <script defer src="{assets}/harness-theme.js"></script>\n'
     )
+    if html_path.stem == "universal_agentic_harness_masterplan":
+        links += (
+            f'  <link rel="stylesheet" href="{assets}/masterplan-tracker.css" />\n'
+            f'  <script defer src="{assets}/masterplan-tracker.js"></script>\n'
+        )
+    return links
 
 
 def rendered_html(relative_path: Path) -> str:

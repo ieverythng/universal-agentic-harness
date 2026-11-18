@@ -55,9 +55,84 @@ def test_repository_signature_is_independent_of_git_listing_order(
     assert after_staging == before_staging
 
 
-def _git(repo: Path, *args: str, check: bool = True) -> subprocess.CompletedProcess[str]:
+_FIXTURE_INHERITED_ENV = (
+    "PATH",
+    "LANG",
+    "LC_ALL",
+    "SYSTEMROOT",
+    "WINDIR",
+    "PATHEXT",
+)
+
+
+def _fixture_git_environment(tmp_path: Path) -> dict[str, str]:
+    private_root = tmp_path / "fixture-environment"
+    home = private_root / "home"
+    xdg_config = private_root / "xdg-config"
+    xdg_data = private_root / "xdg-data"
+    xdg_cache = private_root / "xdg-cache"
+    precommit_home = private_root / "pre-commit-home"
+    temporary = private_root / "tmp"
+    git_config = private_root / "git-config"
+    git_templates = private_root / "git-templates"
+    for directory in (
+        home,
+        xdg_config,
+        xdg_data,
+        xdg_cache,
+        precommit_home,
+        temporary,
+        git_config,
+        git_templates,
+    ):
+        directory.mkdir(parents=True, exist_ok=True)
+
+    system_config = git_config / "system"
+    global_config = git_config / "global"
+    system_config.write_text("", encoding="utf-8")
+    global_config.write_text("", encoding="utf-8")
+    template_hooks = git_templates / "hooks"
+    template_hooks.mkdir()
+    (template_hooks / "pre-push.sample").write_text(
+        "#!/bin/sh\n# Inert private template sample.\n", encoding="utf-8"
+    )
+
+    env = {
+        name: os.environ[name]
+        for name in _FIXTURE_INHERITED_ENV
+        if name in os.environ
+    }
+    env.update(
+        {
+            "HOME": str(home),
+            "XDG_CONFIG_HOME": str(xdg_config),
+            "XDG_DATA_HOME": str(xdg_data),
+            "XDG_CACHE_HOME": str(xdg_cache),
+            "PRE_COMMIT_HOME": str(precommit_home),
+            "TMPDIR": str(temporary),
+            "TMP": str(temporary),
+            "TEMP": str(temporary),
+            "GIT_CONFIG_SYSTEM": str(system_config),
+            "GIT_CONFIG_GLOBAL": str(global_config),
+            "GIT_CONFIG_NOSYSTEM": "1",
+            "GIT_TEMPLATE_DIR": str(git_templates),
+            "GIT_ALLOW_PROTOCOL": "file",
+            "GIT_TERMINAL_PROMPT": "0",
+            "GIT_OPTIONAL_LOCKS": "0",
+        }
+    )
+    return env
+
+
+def _git(
+    env: dict[str, str],
+    repo: Path,
+    *args: str,
+    check: bool = True,
+) -> subprocess.CompletedProcess[str]:
     result = subprocess.run(
         ("git", "-C", str(repo), *args),
+        env=env,
         text=True,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
@@ -102,6 +177,7 @@ def _prepare_disposable_repo(
 ) -> tuple[Path, Path, dict[str, str]]:
     repo = tmp_path / "repo"
     repo.mkdir()
+    env = _fixture_git_environment(tmp_path)
     source_root = precommit_cache.REPO_ROOT
     for relative in (
         "scripts/precommit_cache.py",
@@ -180,15 +256,20 @@ def _prepare_disposable_repo(
     (repo / "src").mkdir()
     (repo / "src" / "checked.py").write_text("value = 1\n", encoding="utf-8")
 
-    _git(repo, "init", "--initial-branch=main")
-    _git(repo, "config", "user.name", "Hook Test")
-    _git(repo, "config", "user.email", "hook-test@example.invalid")
-    _git(repo, "add", "-A")
-    _git(repo, "commit", "-m", "baseline")
+    _git(env, repo, "init", "--initial-branch=main")
+    _git(env, repo, "config", "user.name", "Hook Test")
+    _git(env, repo, "config", "user.email", "hook-test@example.invalid")
+    _git(env, repo, "add", "-A")
+    _git(env, repo, "commit", "-m", "baseline")
 
     remote = tmp_path / "remote.git"
-    subprocess.run(("git", "init", "--bare", str(remote)), check=True, capture_output=True)
-    _git(repo, "remote", "add", "origin", str(remote))
+    subprocess.run(
+        ("git", "init", "--bare", str(remote)),
+        env=env,
+        check=True,
+        capture_output=True,
+    )
+    _git(env, repo, "remote", "add", "origin", str(remote))
     legacy_hook = repo / ".git" / "hooks" / "pre-push"
     legacy_hook.write_text(
         "#!/usr/bin/env bash\nprintf 'called\\n' >> .git/pre-push-legacy-called\n",
@@ -216,7 +297,6 @@ def _prepare_disposable_repo(
         encoding="utf-8",
     )
     fake_python.chmod(0o755)
-    env = os.environ.copy()
     setup = _run(repo, ("./scripts/setup_dev_tools.sh",), env)
     assert setup.returncode == 0, setup.stdout + setup.stderr
     guard = repo / ".git" / "hooks" / "pre-push"
@@ -237,14 +317,15 @@ def _run_precommit(repo: Path, env: dict[str, str]) -> None:
     assert result.returncode == 0, result.stdout + result.stderr
 
 
-def _commit(repo: Path, message: str) -> None:
-    _git(repo, "add", "-A")
-    _git(repo, "commit", "-m", message)
+def _commit(env: dict[str, str], repo: Path, message: str) -> None:
+    _git(env, repo, "add", "-A")
+    _git(env, repo, "commit", "-m", message)
 
 
-def _remote_ref(remote: Path, ref: str) -> str | None:
+def _remote_ref(env: dict[str, str], remote: Path, ref: str) -> str | None:
     result = subprocess.run(
         ("git", "--git-dir", str(remote), "rev-parse", "--verify", ref),
+        env=env,
         text=True,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
@@ -267,7 +348,7 @@ def test_pre_push_guard_cannot_skip_cache_with_python_override(tmp_path):
 
     assert attempted.returncode != 0, attempted.stdout + attempted.stderr
     assert "No pre-commit success record" in attempted.stdout + attempted.stderr
-    assert _remote_ref(remote, "refs/heads/main") is None
+    assert _remote_ref(env, remote, "refs/heads/main") is None
 
 
 def test_pre_push_guard_binds_checked_tree_and_rejects_unsupported_updates(tmp_path):
@@ -276,75 +357,80 @@ def test_pre_push_guard_binds_checked_tree_and_rejects_unsupported_updates(tmp_p
     # A complete checked tree can be committed and pushed.
     (repo / "tracked.txt").write_text("checked\n", encoding="utf-8")
     _run_precommit(repo, env)
-    assert _git(repo, "diff", "--cached", "--quiet").returncode == 0
-    _git(repo, "add", "tracked.txt")
-    _git(repo, "commit", "-m", "checked content")
+    assert _git(env, repo, "diff", "--cached", "--quiet").returncode == 0
+    _git(env, repo, "add", "tracked.txt")
+    _git(env, repo, "commit", "-m", "checked content")
     green = _run(repo, ("git", "push", "-u", "origin", "main"), env)
     assert green.returncode == 0, green.stdout + green.stderr
-    remote_main = _remote_ref(remote, "refs/heads/main")
-    assert remote_main == _git(repo, "rev-parse", "HEAD").stdout.strip()
+    remote_main = _remote_ref(env, remote, "refs/heads/main")
+    assert remote_main == _git(env, repo, "rev-parse", "HEAD").stdout.strip()
     assert (repo / ".git" / "pre-push-legacy-called").read_text() == "called\n"
 
     # Restore checked worktree bytes after committing different outgoing content.
     (repo / "tracked.txt").write_text("checked\n", encoding="utf-8")
     _run_precommit(repo, env)
     (repo / "tracked.txt").write_text("unchecked\n", encoding="utf-8")
-    _commit(repo, "unchecked outgoing content")
+    _commit(env, repo, "unchecked outgoing content")
     (repo / "tracked.txt").write_text("checked\n", encoding="utf-8")
     red = _run(repo, ("git", "push", "origin", "main"), env)
     assert red.returncode != 0
     assert "outgoing commit tree differs" in red.stderr
-    assert _remote_ref(remote, "refs/heads/main") == remote_main
+    assert _remote_ref(env, remote, "refs/heads/main") == remote_main
 
     # A deleted baseline path is rejected even if checked worktree bytes return.
-    _git(repo, "rm", "-f", "tracked.txt")
-    _git(repo, "commit", "-m", "unchecked deletion")
+    _git(env, repo, "rm", "-f", "tracked.txt")
+    _git(env, repo, "commit", "-m", "unchecked deletion")
     (repo / "tracked.txt").write_text("checked\n", encoding="utf-8")
     deleted = _run(repo, ("git", "push", "origin", "main"), env)
     assert deleted.returncode != 0
     assert "outgoing commit tree differs" in deleted.stderr
-    assert _remote_ref(remote, "refs/heads/main") == remote_main
+    assert _remote_ref(env, remote, "refs/heads/main") == remote_main
 
     # Reset only this disposable repo, then reject a multi-ref push atomically.
-    _git(repo, "reset", "--hard", remote_main)
+    _git(env, repo, "reset", "--hard", remote_main)
     _run_precommit(repo, env)
-    _git(repo, "branch", "other")
-    _git(repo, "commit", "--allow-empty", "-m", "checked same-tree advance")
+    _git(env, repo, "branch", "other")
+    _git(env, repo, "commit", "--allow-empty", "-m", "checked same-tree advance")
     multi = _run(repo, ("git", "push", "origin", "main", "other"), env)
     assert multi.returncode != 0
     assert "multi-ref pushes are unsupported" in multi.stderr
-    assert _remote_ref(remote, "refs/heads/main") == remote_main
-    assert _remote_ref(remote, "refs/heads/other") is None
+    assert _remote_ref(env, remote, "refs/heads/main") == remote_main
+    assert _remote_ref(env, remote, "refs/heads/other") is None
 
     # Tags, deletions, and a non-current branch are explicitly unsupported.
-    _git(repo, "tag", "v1")
+    _git(env, repo, "tag", "v1")
     tag = _run(repo, ("git", "push", "origin", "refs/tags/v1"), env)
     assert tag.returncode != 0
     assert "tags are rejected" in tag.stderr
-    assert _remote_ref(remote, "refs/tags/v1") is None
+    assert _remote_ref(env, remote, "refs/tags/v1") is None
     deletion = _run(repo, ("git", "push", "origin", ":refs/heads/main"), env)
     assert deletion.returncode != 0
     assert "ref deletions are unsupported" in deletion.stderr
-    assert _remote_ref(remote, "refs/heads/main") == remote_main
+    assert _remote_ref(env, remote, "refs/heads/main") == remote_main
     non_head = _run(repo, ("git", "push", "origin", "other"), env)
     assert non_head.returncode != 0
     assert "current checked-out branch tip" in non_head.stderr
-    assert _remote_ref(remote, "refs/heads/other") is None
+    assert _remote_ref(env, remote, "refs/heads/other") is None
 
     # A fetched remote tip that is not an ancestor is rejected even with --force.
     writer = tmp_path / "remote-writer"
-    subprocess.run(("git", "clone", "--branch", "main", str(remote), str(writer)), check=True, capture_output=True)
-    _git(writer, "config", "user.name", "Remote Writer")
-    _git(writer, "config", "user.email", "remote-writer@example.invalid")
+    subprocess.run(
+        ("git", "clone", "--branch", "main", str(remote), str(writer)),
+        env=env,
+        check=True,
+        capture_output=True,
+    )
+    _git(env, writer, "config", "user.name", "Remote Writer")
+    _git(env, writer, "config", "user.email", "remote-writer@example.invalid")
     (writer / "tracked.txt").write_text("remote only\n", encoding="utf-8")
-    _git(writer, "add", "tracked.txt")
-    _git(writer, "commit", "-m", "remote advance")
-    _git(writer, "push", "origin", "main")
-    _git(repo, "fetch", "origin", "main")
+    _git(env, writer, "add", "tracked.txt")
+    _git(env, writer, "commit", "-m", "remote advance")
+    _git(env, writer, "push", "origin", "main")
+    _git(env, repo, "fetch", "origin", "main")
     forced = _run(repo, ("git", "push", "--force", "origin", "main"), env)
     assert forced.returncode != 0
     assert "non-fast-forward updates are unsupported" in forced.stderr
-    assert _remote_ref(remote, "refs/heads/main") != remote_main
+    assert _remote_ref(env, remote, "refs/heads/main") != remote_main
 
 
 def test_pre_push_rejects_checked_new_dependency_omitted_from_tip(tmp_path):
@@ -359,9 +445,10 @@ def test_pre_push_rejects_checked_new_dependency_omitted_from_tip(tmp_path):
     required.write_text("value = 2\n", encoding="utf-8")
 
     _run_precommit(repo, env)
-    _git(repo, "add", "src/checked.py")
+    _git(env, repo, "add", "src/checked.py")
     # Build the adversarial partial tip after the successful manual gate.
     _git(
+        env,
         repo,
         "-c",
         "core.hooksPath=/dev/null",
@@ -373,16 +460,16 @@ def test_pre_push_rejects_checked_new_dependency_omitted_from_tip(tmp_path):
     omitted = _run(repo, ("git", "push", "-u", "origin", "main"), env)
     assert omitted.returncode != 0
     assert "outgoing commit tree differs" in omitted.stderr
-    assert _remote_ref(remote, "refs/heads/main") is None
+    assert _remote_ref(env, remote, "refs/heads/main") is None
 
     # Once the checked dependency is included in the outgoing tree, the same
     # recorded tree is an acceptable push candidate.
     _run_precommit(repo, env)
-    _git(repo, "add", "src/required_new.py")
-    _git(repo, "commit", "-m", "include the checked dependency")
+    _git(env, repo, "add", "src/required_new.py")
+    _git(env, repo, "commit", "-m", "include the checked dependency")
     complete = _run(repo, ("git", "push", "-u", "origin", "main"), env)
     assert complete.returncode == 0, complete.stdout + complete.stderr
-    assert _remote_ref(remote, "refs/heads/main") == _git(repo, "rev-parse", "HEAD").stdout.strip()
+    assert _remote_ref(env, remote, "refs/heads/main") == _git(env, repo, "rev-parse", "HEAD").stdout.strip()
 
 
 
@@ -500,7 +587,7 @@ def test_manual_gate_and_pre_push_ignore_hostile_sitecustomize(tmp_path):
 
     assert pushed.returncode == 0, pushed.stdout + pushed.stderr
     assert not marker.exists()
-    assert _remote_ref(remote, "refs/heads/main") == _git(repo, "rev-parse", "HEAD").stdout.strip()
+    assert _remote_ref(env, remote, "refs/heads/main") == _git(env, repo, "rev-parse", "HEAD").stdout.strip()
     assert (repo / ".git" / "pre-push-legacy-called").read_text() == "called\n"
 
 

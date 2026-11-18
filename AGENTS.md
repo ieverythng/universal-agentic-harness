@@ -17,7 +17,19 @@ boundaries:
 Run `./scripts/setup_dev_tools.sh` once, then `./scripts/run_precommit.sh` for
 source or documentation changes. The hook suite runs Ruff, source-aware tests,
 repository hygiene, and `python scripts/render_agentic_harness_docs.py --check`.
-Generated HTML and Markdown documents must remain synchronized.
+Generated HTML and Markdown documents must remain synchronized. Maintain the
+current delivery record using the [DSH methodology](<docs/coordination/dsh/METHODOLOGY.md#current-delivery-record>).
+
+## Storage and artifact custody
+
+- Prefer `/data` for large experimental workspaces, dependency caches, build outputs,
+  and regenerable frontend/plugin artifacts when applicable. Verify the mounted
+  filesystem, writability and free space; if unavailable, ask GRILL before making
+  large copies on the root filesystem.
+- Keep stable control/source paths where their contracts require them. Inventory
+  owners/references before consolidation; never blindly delete or relocate live
+  dependencies, unique work or pinned review evidence. Verify exact resolved paths,
+  hashes, reference/replay checks and recovery before removing migration originals.
 
 ## Chat coordination and delegation
 
