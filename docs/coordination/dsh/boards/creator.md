@@ -2,6 +2,8 @@
 
 ## Current pointer · 2026-11-26
 
+**Settled:** NOV26-CATALOG5 updated the modular working record: PR #5 merged, SPR‑02 now first for human review, SPR‑04 still held. Installed record validation and official local gate passed. No plugin restart, index change or provider call.
+
 Canonical ownerboard: this path on `feat/base-implementation-H0`; see [board location rule](<README.md#canonical-location--2026-11-26>). The current round is the dated 26 November record below; older readiness/scope headings are retained history, not a new dispatch. Future owner updates go only to H0, not the main/review copy.
 
 Current coordination closeout: SPR-01 merged as PR5; SPR-02 is the Explorer focus; the official seven-hook check passed. This records coordination, not H2 qualification.

@@ -2,6 +2,8 @@
 
 ## Current pointer · 2026-11-26
 
+**Settled:** NOV26-TRANSPORT observed one real ROS 2 action round trip in the isolated Jazzy fake server. `/skill/fake/find_object` used `nao_skills/action/ScanScene`, real KB disabled, fake result succeeded. Local elapsed 0.803 s included 0.8 s configured simulation delay. No robot, model, UAH dispatch or H2 qualification. Container removed.
+
 Canonical ownerboard: this path on `feat/base-implementation-H0`; see [board location rule](<README.md#canonical-location--2026-11-26>). The current round is the dated 26 November record below; older readiness/scope headings are retained history, not a new dispatch. Future owner updates go only to H0, not the main/review copy.
 
 Any active parent probe remains live until its actual terminal; migration does not imply completion.

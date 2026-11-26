@@ -2,6 +2,8 @@
 
 ## Current pointer · 2026-11-26
 
+**Current:** SPR‑01 merged via PR #5 (`5e8aef9`); SPR‑02 is in human review. Native transport and adapter investigations below are settled; no running work is implied. Next: obtain the approved Notion runbook and choose the single-authority paired ROS/UAH test. The merged sprint does not close H2.
+
 Canonical ownerboard: this path on `feat/base-implementation-H0`; see [board location rule](<README.md#canonical-location--2026-11-26>). The current round is the dated 26 November record below; older readiness/scope headings are retained history, not a new dispatch. Future owner updates go only to H0, not the main/review copy.
 
 Owner: this GRILL coordinator. Concrete identity is in the private registry.

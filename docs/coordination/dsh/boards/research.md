@@ -2,6 +2,8 @@
 
 ## Current pointer · 2026-11-26
 
+**Settled:** manual frame onboarding checklist delivered. `uah-domain-onboarding` is documented as H3+ and was not found as an installed/runnable skill in the checked branches. No discovery-to-execution promotion, hardware test or new assignment.
+
 Canonical ownerboard: this path on `feat/base-implementation-H0`; see [board location rule](<README.md#canonical-location--2026-11-26>). The current round is the dated 26 November record below; older readiness/scope headings are retained history, not a new dispatch. Future owner updates go only to H0, not the main/review copy.
 
 Parent owner: the existing human-selected RESEARCH session, recorded privately.

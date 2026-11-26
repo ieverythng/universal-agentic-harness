@@ -2,6 +2,8 @@
 
 ## Current pointer · 2026-11-26
 
+**Settled:** O1 comparison proposal delivered: distinguish ledger-open normalization refusal, evidence rejection and explicit terminal acceptance. Next candidate is a static side-by-side read-only view keyed by case and ledger digest. No product implementation or new assignment.
+
 Canonical ownerboard: this path on `feat/base-implementation-H0`; see [board location rule](<README.md#canonical-location--2026-11-26>). The current round is the dated 26 November record below; older readiness/scope headings are retained history, not a new dispatch. Future owner updates go only to H0, not the main/review copy.
 
 Parent owner: the existing VISUALS root, bound to the private owner registry.
