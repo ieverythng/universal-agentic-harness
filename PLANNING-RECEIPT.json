@@ -1,0 +1,39 @@
+{
+  "sprint": "SPR-01",
+  "repository": "uah",
+  "repository_url": "https://github.com/ieverythng/universal-agentic-harness.git",
+  "branch": "codex/sprint-01-replay-ingress",
+  "path": "/home/juanbeck/.codex/worktrees/sprint-01-replay-ingress/universal-agentic-harness",
+  "base_revision": "eddfa6d28ebcc6f2967c0568a6ed2d29eccf665e",
+  "destination_branch": "main",
+  "created_utc": "2026-10-17T03:55:24.205711+00:00",
+  "status": "planning_only_blocked_predecessors",
+  "implementation_authorized": false,
+  "staged": false,
+  "dependencies": [],
+  "global_prerequisites": [
+    "Independently approved and human-merged PR1 and PR2 on actual UAH main",
+    "Reviewed predecessor source closure on each target repository destination",
+    "Reverified remote destination pin and absent/clean worktree path",
+    "Finite GRILL DEV dispatch; predecessor completion is not dispatch"
+  ],
+  "reviewed_source": "/home/juanbeck/universal-agentic-harness/docs/plans/pr-sprints/SPR-01-historical-replay-and-ingress.md",
+  "reviewed_source_sha256": "d56c11619929801cd7698a783af3f577ac37203c43c27d0a870c682016d412c7",
+  "implementation_sha256": "7a07368429a4988b8caaa2fa588e270c4f72aea8705a4a5ab0d4237d34994931",
+  "relocated_citations": [
+    {
+      "from": "../../artifacts/research/2026-10-09_uah_historical_replay_and_resume_notify_seam_briefs.md",
+      "to": "/home/juanbeck/universal-agentic-harness/docs/artifacts/research/2026-10-09_uah_historical_replay_and_resume_notify_seam_briefs.md"
+    },
+    {
+      "from": "../../artifacts/decisions/2026-10-11_uah_mechanical_seam_design.md",
+      "to": "/home/juanbeck/universal-agentic-harness/docs/artifacts/decisions/2026-10-11_uah_mechanical_seam_design.md"
+    },
+    {
+      "from": "../../artifacts/research/2026-10-17_uah_history_recovery_workbench_evaluation_and_nao_seams.md",
+      "to": "/home/juanbeck/universal-agentic-harness/docs/artifacts/research/2026-10-17_uah_history_recovery_workbench_evaluation_and_nao_seams.md"
+    }
+  ],
+  "cold_review_receipt": "/home/juanbeck/universal-agentic-harness/docs/artifacts/reviews/evidence/2026-10-17_seam-sprints-02/cold-review.md",
+  "cold_review_sha256": "2dab932ecd0e30930470c7b9e28d873fd088f01c4827130e231a0d3495715d34"
+}

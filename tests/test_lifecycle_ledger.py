@@ -24,7 +24,7 @@ def _ledger(path):
 
     ledger = LifecycleLedger(path, clock=lambda: "2026-09-28T13:00:00Z")
     run = _active_environment_run("environment-run:ledger:001")
-    decision = TaskIngressAuthority(
+    TaskIngressAuthority(
         environment_profile_id=run.attestation.environment_profile_id,
         domain_contract_pack=DOMAIN_PACK,
         lifecycle_ledger=ledger,
@@ -40,19 +40,32 @@ def _ledger(path):
             observed_at="2026-09-28T13:00:00Z",
         )
     )
-    ledger.record(
-        TaskIngressFact(
-            environment_run_id="environment-run:ledger:001",
-            task_id="task:ledger:001",
-            trace_id=decision.trace_id,
-            environment_ingress_id="ingress:ledger:resume",
-            ingress_artifact_id="environment-ingress:sha256:ledger-resume",
-            decision_id="task-ingress-decision:sha256:ledger-resume",
-            domain_contract_pack_revision=decision.domain_contract_pack_revision,
-            action="resume_task",
-        )
-    )
+    decision = _admit_existing(ledger, "ingress:ledger:resume", "resume_request")
+    assert decision.action == "resume_task"
     return ledger
+
+
+def _admit_existing(ledger, ingress_id, ingress_type):
+    from ab_harness import EnvironmentIngress, TaskIngressAuthority
+    from test_environment_ingress import DOMAIN_PACK, _active_environment_run
+
+    run = _active_environment_run("environment-run:ledger:001")
+    return TaskIngressAuthority(
+        environment_profile_id=run.attestation.environment_profile_id,
+        domain_contract_pack=DOMAIN_PACK,
+        lifecycle_ledger=ledger,
+    ).admit(
+        run,
+        EnvironmentIngress(
+            environment_run_id=run.environment_run_id,
+            environment_ingress_id=ingress_id,
+            binding_id="binding:synthetic.feedback:v1",
+            ingress_type=ingress_type,
+            payload_artifact_id="artifact:ledger:" + ingress_id,
+            native_lineage=(("goal_id", "task:ledger:001"),),
+            observed_at="2026-09-28T13:00:00Z",
+        ),
+    )
 
 
 def test_common_ledger_round_trips_strict_events_and_registry_projection(tmp_path):
@@ -165,25 +178,26 @@ def test_strict_ledger_reload_rejects_duplicate_event_member_names(tmp_path):
 
 
 @pytest.mark.parametrize("source", ["events", "replay", "commit"])
-def test_public_event_exports_do_not_alias_ledger_authority(source):
+def test_public_event_exports_do_not_alias_ledger_authority(source, monkeypatch):
     ledger = _ledger(None)
     if source == "events":
         exported = ledger.events()[-1]
     elif source == "replay":
         exported = ledger.replay(TRACE_ID).events[-1]
     else:
-        exported = ledger.record(
-            TaskIngressFact(
-                environment_run_id="environment-run:ledger:001",
-                task_id="task:ledger:001",
-                trace_id=TRACE_ID,
-                environment_ingress_id="ingress:ledger:notify",
-                ingress_artifact_id="environment-ingress:sha256:ledger-notify",
-                decision_id="task-ingress-decision:sha256:ledger-notify",
-                domain_contract_pack_revision=DOMAIN_REVISION,
-                action="notify_task",
-            )
-        ).events[-1]
+        commits = []
+        record = ledger.record
+
+        def capture_commit(fact, **kwargs):
+            commit = record(fact, **kwargs)
+            commits.append(commit)
+            return commit
+
+        monkeypatch.setattr(ledger, "record", capture_commit)
+        decision = _admit_existing(ledger, "ingress:ledger:notify", "task_notification")
+        assert decision.action == "notify_task"
+        assert len(commits) == 1
+        exported = commits[0].events[-1]
     original = tuple(event.to_dict() for event in ledger.events())
     object.__setattr__(exported, "event_type", "terminal_task_accepted")
 
@@ -355,23 +369,15 @@ def test_common_ledger_fences_existing_task_ingress_across_stale_writers(tmp_pat
     _ledger(path)
     first = LifecycleLedger(path, clock=lambda: "2026-09-28T13:00:01Z")
     stale = LifecycleLedger(path, clock=lambda: "2026-09-28T13:00:02Z")
-    fact = TaskIngressFact(
-        environment_run_id="environment-run:ledger:001",
-        task_id="task:ledger:001",
-        trace_id=TRACE_ID,
-        environment_ingress_id="ingress:ledger:contended",
-        ingress_artifact_id="environment-ingress:sha256:ledger-contended",
-        decision_id="task-ingress-decision:sha256:ledger-contended",
-        domain_contract_pack_revision=DOMAIN_REVISION,
-        action="resume_task",
-    )
-
-    first.record(fact)
-    with pytest.raises(ValueError, match="duplicate task ingress"):
-        stale.record(fact)
+    ingress_id = "ingress:ledger:contended"
+    accepted = _admit_existing(first, ingress_id, "resume_request")
+    duplicate = _admit_existing(stale, ingress_id, "resume_request")
+    assert accepted.action == "resume_task"
+    assert duplicate.action == "reject"
+    assert duplicate.reason_code == "duplicate_environment_ingress"
 
     assert tuple(
         event.data.get("environment_ingress_id")
         for event in LifecycleLedger(path).events()
         if event.event_type in {"task_started", "task_resumed", "task_notified"}
-    ).count(fact.environment_ingress_id) == 1
+    ).count(ingress_id) == 1
