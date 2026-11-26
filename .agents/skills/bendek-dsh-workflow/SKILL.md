@@ -12,4 +12,13 @@ Apply `/bendek-multi-session-workflow` as the single policy authority. This adap
 3. **Dispatch and reconcile.** Send each parent the policy's finite correlated mission with exact scope, ownership, dependencies, evidence, budget and stop condition using `session_send_message` to its verified identity. Preserve the default steer and safe-step semantics; queue only when explicitly requested. An accepted receipt is inbox acceptance, not an ACK, result or effect. A canonical post-dispatch `ABORTED` can lose the receipt even if delivery occurred: delivery is unknown; reconcile through an authorized channel or stop, never blindly retry.
 4. **Observe and finish.** `session_wait_for_message` passively observes the caller's current inbox with a peer and literal marker; it does not send, resume, search history, consume messages or establish completion. Inspect attributed content for the explicit correlated ACK and terminal result; timeout or absent receipt remains unknown, not failure or success. Use bounded event-driven waiting, not polling. Each parent collects owned jobs and explicit teammate/task outcomes; preserve in-flight work, avoid unsafe cancellation and report partials, evidence and limits. Do not create Goals, impersonate the owner, schedule work or change settings without human authority.
 
+**Map freshness to native events.** After an explicit parent ACK, native task/status
+change, milestone/blocker, terminal result or settlement, reconcile task revisions
+and the owner's concise live-board view; the parent integrates child/task outcomes,
+owned jobs and settled evidence. Resolve canonical board/source/branch through the
+policy's actual owner-approved map, not roster labels or guessed runtime metadata.
+Inactive members, inbox receipts and waits remain observations, not completion.
+Board-only durable checkpoints follow the portable policy's scoped authority;
+do not create a recurring updater or infer permission from native capabilities.
+
 **Bounded skill iteration:** Run a bounded SkillOpt-style iteration (baseline -> mutate -> holdout gate -> accept/reject log) before finalizing major wording changes. Follow the iteration limits and acceptance rules owned by `/bendek-multi-session-workflow`; this adapter does not redefine them.
