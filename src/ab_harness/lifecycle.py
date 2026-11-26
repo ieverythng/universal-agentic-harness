@@ -38,7 +38,7 @@ if TYPE_CHECKING:
     from ab_harness.runtime_controls import RetryDecision
     from ab_harness.runtime_controls import TaskTimeoutDecision
     from ab_harness.task_compiler import CompiledTask
-    from ab_harness.task_ingress_authority import _TaskStartCommand
+    from ab_harness.task_ingress_authority import _TaskIngressCommand
     from ab_harness.agent_lifecycle import (
         AgentRunAttached,
         AgentRunTermination,
@@ -353,9 +353,8 @@ class AcceptanceFact:
 
 if TYPE_CHECKING:
     LifecycleFact = (
-        _TaskStartCommand
+        _TaskIngressCommand
         | _ModelInvocationStartCommand
-        | TaskIngressFact
         | CompiledTask
         | TypedProposal
         | ProposalNormalizationRejection
@@ -553,6 +552,7 @@ class _TraceState:
     task_ingress_decision_id: str = ""
     task_started_at: str = ""
     authoritative_task_start: bool = False
+    historical_task_start: bool = False
     compiled_task_id: str | None = None
     effect_obligations: tuple[EffectObligation, ...] | None = None
     evidence_by_artifact_id: dict[str, EffectEvidence] = field(default_factory=dict)
@@ -591,7 +591,7 @@ class _TraceState:
     )
     receipt_by_operation: dict[str, object] = field(default_factory=dict)
     operation_edges: set[tuple[str, str, str]] = field(default_factory=set)
-    budget_limits: dict[str, int] = field(default_factory=dict)
+    budget_limits: dict[str, int] | None = None
     budget_consumed: dict[str, int] = field(default_factory=dict)
     budget_subjects: set[tuple[str, str]] = field(default_factory=set)
     tool_budget_granted_operation_ids: set[str] = field(default_factory=set)
@@ -637,7 +637,7 @@ class LifecycleLedger:
                 and expected_sequence != self.next_sequence
             ):
                 raise LifecycleSequenceConflict("lifecycle ledger sequence conflict")
-            from ab_harness.task_ingress_authority import _TaskStartCommand
+            from ab_harness.task_ingress_authority import _TaskIngressCommand
             from ab_harness.model_invocation import (
                 ModelInvocationStarted,
                 _ModelInvocationStartCommand,
@@ -645,9 +645,13 @@ class LifecycleLedger:
 
             if isinstance(fact, TaskStartedFact):
                 raise ValueError("new starts require an authority-bound task-start command")
-            if type(fact) is _TaskStartCommand:
-                specs = _event_specs(fact.require_fact(self))
-                specs[0]["data"]["task_start_authority"] = TASK_START_AUTHORITY
+            if isinstance(fact, TaskIngressFact):
+                raise ValueError("new task ingress requires an authority-bound command")
+            if type(fact) is _TaskIngressCommand:
+                admitted_fact = fact.require_fact(self, tuple(self._events))
+                specs = _event_specs(admitted_fact)
+                if isinstance(admitted_fact, TaskStartedFact):
+                    specs[0]["data"]["task_start_authority"] = TASK_START_AUTHORITY
             elif type(fact) is _ModelInvocationStartCommand:
                 specs = _event_specs(fact.require_fact(self))
             elif isinstance(fact, ModelInvocationStarted):
@@ -1728,6 +1732,10 @@ def _reduce_events(
                 environment_ingress_artifact_id=str(event.data["ingress_artifact_id"]),
                 task_ingress_decision_id=str(event.data["decision_id"]),
                 task_started_at=event.recorded_at,
+                historical_task_start=(
+                    event.schema_version == TRACE_EVENT_SCHEMA
+                    and "task_start_authority" not in event.data
+                ),
                 authoritative_task_start=(
                     event.data.get("task_start_authority")
                     == TASK_START_AUTHORITY
@@ -1794,13 +1802,26 @@ def _reduce_events(
             apply_invocation_event(agent_states, event)
         if active_from_sequence is not None and event.sequence >= active_from_sequence:
             _require_current_event_authority(state, event)
-        _apply_event(state, event)
+        _apply_event(
+            state,
+            event,
+            allow_historical=(
+                event.schema_version == TRACE_EVENT_SCHEMA
+                and (active_from_sequence is None or event.sequence < active_from_sequence)
+            ),
+        )
         state.last_event_id = event.event_id
         known_event_ids.add(event.event_id)
     return states
 
 
 def _require_current_event_authority(state: _TraceState, event: TraceEvent) -> None:
+    if (
+        state.compiled_task_id is not None
+        and state.budget_limits is None
+        and event.event_type not in {"task_resumed", "task_notified"}
+    ):
+        raise ValueError("historical task policy is unavailable for current authority")
     if event.event_type == "task_compiled" and not state.authoritative_task_start:
         raise ValueError("fresh compilation requires authoritative task-start provenance")
     operation_id = event.operation_id
@@ -1880,7 +1901,9 @@ _EVENT_RULES = MappingProxyType(
 )
 
 
-def _apply_event(state: _TraceState, event: TraceEvent) -> None:
+def _apply_event(
+    state: _TraceState, event: TraceEvent, *, allow_historical: bool = False
+) -> None:
     rule = _EVENT_RULES.get(event.event_type)
     if rule is None:
         raise ValueError("unsupported lifecycle event type: %s" % event.event_type)
@@ -1888,7 +1911,10 @@ def _apply_event(state: _TraceState, event: TraceEvent) -> None:
     _validate_event_prerequisite(state, event.event_type, data, rule)
     operation_id = _event_operation_id(event, rule)
     if event.event_type == "task_compiled":
-        _apply_compiled_task(state, data, artifact_refs=event.artifact_refs)
+        _apply_compiled_task(
+            state, data, artifact_refs=event.artifact_refs,
+            allow_historical=allow_historical,
+        )
     elif event.event_type == "proposal_normalized":
         _apply_proposal(state, operation_id, data)
     elif event.event_type == "proposal_rejected":
@@ -1902,7 +1928,9 @@ def _apply_event(state: _TraceState, event: TraceEvent) -> None:
     elif event.event_type == "domain_admission_rejected":
         _apply_domain_rejection(state, operation_id, data)
     elif event.event_type == "execution_started":
-        _apply_execution_start(state, operation_id, data)
+        _apply_execution_start(
+            state, operation_id, data, allow_historical=allow_historical
+        )
     elif event.event_type in {"execution_completed", "execution_failed"}:
         _apply_execution_terminal(
             state,
@@ -1910,6 +1938,7 @@ def _apply_event(state: _TraceState, event: TraceEvent) -> None:
             operation_id,
             data,
             artifact_refs=event.artifact_refs,
+            allow_historical=allow_historical,
         )
     elif event.event_type == "execution_cancelled":
         _apply_execution_cancellation(state, operation_id, data)
@@ -2039,6 +2068,7 @@ def _apply_compiled_task(
     data: dict[str, object],
     *,
     artifact_refs: tuple[str, ...],
+    allow_historical: bool = False,
 ) -> None:
     if state.compiled_task_id is not None:
         raise ValueError("trace already has a compiled task")
@@ -2049,6 +2079,17 @@ def _apply_compiled_task(
     state.frame_id = str(data["frame_id"])
     state.registry_version = str(data["registry_version"])
     budgets = data.get("budgets")
+    if (
+        allow_historical
+        and state.historical_task_start
+        and set(data) == {
+            "compiled_task_id", "domain_contract_pack_revision",
+            "role_id", "frame_id", "registry_version",
+        }
+        and artifact_refs == (state.compiled_task_id,)
+    ):
+        # Absence is unavailable policy, not a zero or unlimited budget.
+        return
     if not isinstance(budgets, dict):
         raise ValueError("compiled task requires budget limits")
     expected_budget_keys = {
@@ -2153,6 +2194,8 @@ def _apply_semantic_admission(
     ):
         if data.get("schema_version") != ADMITTED_OPERATION_SCHEMA:
             raise ValueError("unsupported recorded admitted operation schema")
+        if state.budget_limits is None:
+            raise ValueError("current admission cannot use historical unavailable budgets")
         admitted = AdmittedOperation.from_dict(data.get("admitted_operation"))
         aliases = {
             "admission_id": admitted.admission_id,
@@ -2240,6 +2283,8 @@ def _apply_execution_start(
     state: _TraceState,
     operation_id: str,
     data: dict[str, object],
+    *,
+    allow_historical: bool = False,
 ) -> None:
     from ab_harness.environment import EXECUTION_RECEIPT_SCHEMA
 
@@ -2249,7 +2294,14 @@ def _apply_execution_start(
         raise ValueError("execution start does not match operation lease")
     if state.task_timed_out:
         raise ValueError("execution cannot start after task timeout")
-    if operation_id not in state.tool_budget_granted_operation_ids:
+    historical_start = (
+        allow_historical
+        and state.budget_limits is None
+        and state.historical_task_start
+        and operation_id not in state.current_admission_operation_ids
+        and set(data) == {"execution_lease_id"}
+    )
+    if not historical_start and operation_id not in state.tool_budget_granted_operation_ids:
         raise ValueError("execution start requires a granted tool-call budget")
     if operation_id in state.started_operation_ids:
         raise ValueError("execution lease already consumed")
@@ -2270,6 +2322,7 @@ def _apply_execution_terminal(
     data: dict[str, object],
     *,
     artifact_refs: tuple[str, ...] | None = None,
+    allow_historical: bool = False,
 ) -> None:
     if operation_id not in state.started_operation_ids:
         raise ValueError("execution terminated before it started")
@@ -2343,7 +2396,25 @@ def _apply_execution_terminal(
             state.receipt_by_operation[operation_id] = receipt
         state.result_by_operation[operation_id] = data["execution_result_id"]
         state.succeeded_by_operation[operation_id] = data["succeeded"]
+    elif (
+        allow_historical
+        and state.budget_limits is None
+        and state.historical_task_start
+        and operation_id not in state.current_admission_operation_ids
+        and set(data) == {"execution_lease_id", "failure_ref", "failure_type"}
+    ):
+        if any(
+            not isinstance(data[name], str) or not data[name].strip()
+            for name in ("failure_ref", "failure_type")
+        ):
+            raise ValueError("historical execution failure details are invalid")
+        if artifact_refs != (data["execution_lease_id"], data["failure_ref"]):
+            raise ValueError("historical execution failure references disagree")
+        # The old producer recorded operation failure, not retry/task policy.
+        state.failure_stage = "execution"
     else:
+        if state.budget_limits is None:
+            raise ValueError("historical execution failure policy is unavailable")
         failure_id = data.get("failure_id")
         retry_disposition = data.get("retry_disposition")
         if not isinstance(failure_id, str) or not isinstance(
@@ -2498,6 +2569,8 @@ def _apply_budget_decision(
     event_type: str,
     data: dict[str, object],
 ) -> None:
+    if state.budget_limits is None:
+        raise ValueError("historical budget policy is unavailable")
     if data["compiled_task_id"] != state.compiled_task_id:
         raise ValueError("budget decision does not match compiled task")
     resource = data["resource"]

@@ -13,3 +13,13 @@ source = ["ab_harness"]
 [tool.coverage.report]
 show_missing = true
 skip_covered = true
+
+# Only the kernel is forbidden from importing its NAO adapter. Keep other Ruff defaults.
+[tool.ruff.lint]
+extend-select = ["TID251"]
+
+[tool.ruff.lint.flake8-tidy-imports.banned-api]
+"ab_harness_nao".msg = "Depend on a portable kernel interface; keep NAO imports in the adapter."
+
+[tool.ruff.lint.per-file-ignores]
+"!src/ab_harness/**/*.py" = ["TID251"]

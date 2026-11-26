@@ -256,7 +256,7 @@ class TaskBudgetAuthority:
                 already_recorded=True,
                 expected_sequence=len(events) + 1,
             )
-        budgets = compiled.data["budgets"]
+        budgets = compiled.data.get("budgets")
         if not isinstance(budgets, dict):
             raise ValueError("compiled task budget projection is invalid")
         limit = budgets[self._LIMIT_KEYS[resource]]

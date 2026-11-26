@@ -34,7 +34,7 @@ jobs:
       - name: Run full deterministic tests (includes NAO public seams)
         run: python -m pytest
       - name: Run recorded NAO adapter canary
-        run: python -m ab_harness_nao
+        run: python -m ab_harness_nao > "$RUNNER_TEMP/source-canary.json"
       - name: Check generated documentation
         run: python scripts/render_agentic_harness_docs.py --check
       - name: Build wheel and verify isolated imports
@@ -48,3 +48,19 @@ jobs:
           "$smoke_venv/bin/python" -m pip install "$wheel_path"
           cd "$RUNNER_TEMP"
           "$smoke_venv/bin/python" -I -c 'from pathlib import Path; import sys; import ab_harness; import ab_harness_nao; prefix = Path(sys.prefix).resolve(); assert Path(ab_harness.__file__).resolve().is_relative_to(prefix); assert Path(ab_harness_nao.__file__).resolve().is_relative_to(prefix)'
+          "$smoke_venv/bin/python" -I -m ab_harness_nao > "$RUNNER_TEMP/installed-canary.json"
+          "$smoke_venv/bin/python" -I - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          root = Path(os.environ["RUNNER_TEMP"])
+          source = json.loads((root / "source-canary.json").read_text())
+          installed = json.loads((root / "installed-canary.json").read_text())
+          assert source == installed, "installed wheel and source disagree on recorded behavior"
+          assert installed["status"] == "passed"
+          assert installed["accepted_case"]["passed"] is True
+          assert installed["rejected_case"]["failure_stage"] == "semantic_admission"
+          assert installed["counterexample_case"]["acceptance_status"] == "rejected"
+          assert installed["verified_trace_digest"].startswith("verified-trace-digest:sha256:")
+          PY

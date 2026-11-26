@@ -14,6 +14,11 @@ htmlcov/
 *.jsonl
 !tests/fixtures/model_invocation_legacy_v1/completed.jsonl
 !tests/fixtures/model_invocation_legacy_v1/unfinished.jsonl
+!tests/fixtures/historical_replay/baseline-public-ledger.jsonl
+!tests/fixtures/historical_replay/base-accepted.jsonl
+!tests/fixtures/historical_replay/base-nao-ledger.jsonl
+!tests/fixtures/historical_replay/current-nao-ledger.jsonl
+!tests/fixtures/historical_replay/new-nov11-pinned-old-execution-failed.jsonl
 .artifacts/
 .test-tmp/
 ~$*.docx
