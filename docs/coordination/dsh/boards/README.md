@@ -20,3 +20,7 @@ This PR's boards freeze at reviewed handoff for the human's commit; do not write
 through that freeze or create another canonical copy in the dirty checkout.
 After the human confirms cutover, parents use the agreed persistent coordination
 base. No old mission is resumed by board creation or directory relocation.
+
+## Canonical location — 2026-11-26
+
+The human designated `feat/base-implementation-H0` in `/home/juanbeck/universal-agentic-harness` as the persistent canonical ownerboard base. Future parent writes use `docs/coordination/dsh/boards/<role>.md` there; GRILL owns this index and its own board. Main/PR-worktree copies are historical publication snapshots, not a second writable board. Retain prior entries and append dated updates; an ongoing probe completes only on its actual terminal. This cutover changes no runtime, role, model, preset, permission, sprint or release authority.
