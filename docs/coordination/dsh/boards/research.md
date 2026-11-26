@@ -37,3 +37,8 @@ was performed. Await a new finite GRILL scope; channel availability grants none.
 
 - ACK 2026-11-26T02:21:05.879Z: bounded source and local skill audit requested by GRILL; stop 2026-11-26T02:26:05.879Z. No domain execution or product/staging/publication changes. Only this dated board append and private report authorized.
 - TERMINAL 2026-11-26T02:24:06.737Z: no implemented uah-domain-onboarding skill found in scoped branch/catalog audit; it is an H3+ candidate-authoring proposal, not the existing registry or recorded NAO substrate. Manual portable checklist and synthetic non-flight FPV example delivered privately (SHA-256 b01548d144df08e12f66e147ffc36ef7fa9d2554748dfb81028d16d922a1f2f0). Task 23 completed; no jobs, tests, runtime effects, code or staging changes. No successor.
+
+## 2026-11-27 · NOV27-CANCEL
+
+- ACK 2026-11-26T23:22:30.687Z: scoped read-only FPV P1B cancellation and handoff audit; stop 2026-11-26T23:26:30.687Z. Non-flight contract and test proposal only; no hardware, network, models, repo changes or readiness claim.
+- TERMINAL 2026-11-26T23:24:49.870Z: FPV P1b handoff and exact source pin located. Current pinned UAH owner/reducer reject post-start cancellation; NAO timeout cancellation is a separate transport observation, not settlement. Windows staged state unverified from Linux. Hold until synthetic start/interrupt/acknowledgement/terminal evidence and replay are verified through a reviewed public interface. Private report SHA-256 1fa468e70314dacd088c4efd9442eac68230e0c0a142ff2def0d5382db560458; task 24 completed, no workers or jobs started, no execution or stage. No successor.

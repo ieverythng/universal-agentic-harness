@@ -1,6 +1,12 @@
 # GRILL — DSH ownerboard
 
-## Current pointer · 2026-11-26
+## Current pointer · 2026-11-27
+
+**Current:** [SPR‑02 PR #6](https://github.com/ieverythng/universal-agentic-harness/pull/6) is open for human review; its exact pushed head `74f00fe` passed the local gate and the three hosted CI jobs. Flagged the additional lockfile change (`>=3.12` vs package `>=3.10`); do not merge until the owner reviews. SPR‑03 stays untouched until the actual merge.
+
+**Settled this round:** DEV1 made a private SPR‑04 read-only Observatory correction. Independent coordinator rerun: both prior reproducers now withhold invalid evidence, the positive control survives and 28 focused tests pass; durable new tests, fresh approval and safe SPR‑03 reconciliation still precede product staging. RESEARCH identified the FPV P1b active-cancel handoff; an inert public control reproduced post-start refusal while pre-dispatch cancellation made zero handler calls. This is not fixed by SPR‑04. The fake-only NAO container reached UAH execution start but did not preserve the ROS UUID/result before a later failure; do not infer success or retry a possibly dispatched operation. No inference or hardware actions. The documented Qwen demo host had a local ZeroTier route but its model-list request returned no route to host; Inkling identity remains unverified pending the owner’s Barcelona endpoint. Jobs and disposable containers settled; no automatic successor.
+
+## Prior checkpoint · 2026-11-26
 
 **Current:** SPR‑01 merged in PR #5 (`5e8aef9`); SPR‑02 is next for human review. SPR‑02/03 now both include that main revision: eight and eighteen paths respectively remain staged against it, including all requested planning documents. Both actual worktree gates and checked-tree receipts passed. No sprint commit or push was made by this synchronization. Refresh receipts after further changes.
 
