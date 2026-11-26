@@ -2,7 +2,9 @@
 
 ## Current pointer · 2026-11-26
 
-**Current:** SPR‑01 merged via PR #5 (`5e8aef9`); SPR‑02 is in human review. Native transport and adapter investigations below are settled; no running work is implied. Next: obtain the approved Notion runbook and choose the single-authority paired ROS/UAH test. The merged sprint does not close H2.
+**Current:** SPR‑01 merged in PR #5 (`5e8aef9`); SPR‑02 is next for human review. SPR‑02/03 now both include that main revision: eight and eighteen paths respectively remain staged against it, including all requested planning documents. Both actual worktree gates and checked-tree receipts passed. No sprint commit or push was made by this synchronization. Refresh receipts after further changes.
+
+**Settled:** the authenticated Notion runbook, H2 plan and TFM hub were checked against pinned code and the installed fake-action server. One isolated ROS fake action succeeded; it was not a UAH-governed action, a robot effect or H2 closure. Next engineering decision: trial the UAH-to-fake ROS owner with native lineage and positive/no-effect controls, retaining one dispatch authority. Board freshness/checkpoint wording was accepted by independent holdout and committed locally on H0 (`70560ab`). Older dated entries below are historical.
 
 Canonical ownerboard: this path on `feat/base-implementation-H0`; see [board location rule](<README.md#canonical-location--2026-11-26>). The current round is the dated 26 November record below; older readiness/scope headings are retained history, not a new dispatch. Future owner updates go only to H0, not the main/review copy.
 
