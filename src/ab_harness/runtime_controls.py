@@ -226,6 +226,8 @@ class TaskBudgetAuthority:
         subject_id: str,
         units: int = 1,
     ) -> BudgetAssessment:
+        if type(units) is not int or units <= 0:
+            raise ValueError("budget units must be positive integers")
         events = self._ledger.events()
         compiled = next(
             (
